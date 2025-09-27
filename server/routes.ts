@@ -21,8 +21,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check routes - respond immediately for deployment health checks
-  // This endpoint provides a quick 200 response for deployment health checks
+  // ROOT HEALTH CHECK - Required for deployment health checks
+  app.get("/", (req, res) => {
+    // Respond immediately with 200 status for all requests to root
+    res.status(200).json({ 
+      status: "ok", 
+      service: "pillar-drug-club",
+      timestamp: new Date().toISOString(),
+      medications: storage.medicationCount
+    });
+  });
+
+  // Additional health check endpoints
   app.get("/api/ping", (req, res) => {
     res.status(200).json({ 
       status: "ok", 
