@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import Stripe from "stripe";
 import { storage } from "./storage";
+import { insertUserSchema } from "@shared/schema";
 import { 
   insertCustomerSchema, 
   insertMedicationSchema,
@@ -10,6 +12,13 @@ import {
   medicationSearchSchema,
   orderSearchSchema
 } from "@shared/pharmacy-schema";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check routes - respond immediately for deployment health checks
@@ -38,6 +47,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
       database: "connected",
       medications: storage.medicationCount
     });
+  });
+
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ error: "User already exists with this email" });
+      }
+      
+      // Create user
+      const user = await storage.createUser(userData);
+      
+      // Don't return password in response
+      const { password, ...userResponse } = user;
+      res.status(201).json({ user: userResponse });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      res.status(400).json({ error: "Registration failed", message: error.message });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) { // In production, use proper password hashing
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      // Don't return password in response
+      const { password: _, ...userResponse } = user;
+      res.json({ user: userResponse });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Login failed", message: error.message });
+    }
+  });
+
+  // Stripe subscription route for $10/month membership
+  app.post("/api/create-subscription", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Create Stripe customer if doesn't exist
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+        });
+        customerId = customer.id;
+      }
+      
+      // Create subscription
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Pillar Drug Club Membership',
+            },
+            unit_amount: 1000, // $10.00 in cents
+            recurring: {
+              interval: 'month',
+            },
+          },
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
+      
+      // Update user with Stripe info
+      await storage.updateUserStripeInfo(userId, customerId, subscription.id);
+      
+      res.json({ 
+        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        subscriptionId: subscription.id
+      });
+    } catch (error: any) {
+      console.error("Stripe subscription error:", error);
+      res.status(500).json({ 
+        error: "Error creating subscription", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Check subscription status
+  app.get("/api/subscription-status/:userId", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json({ 
+        subscriptionStatus: user.subscriptionStatus,
+        hasAccess: user.subscriptionStatus === "active"
+      });
+    } catch (error: any) {
+      console.error("Subscription status error:", error);
+      res.status(500).json({ error: "Error checking subscription status" });
+    }
   });
 
   // Medication routes

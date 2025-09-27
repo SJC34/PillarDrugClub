@@ -16,7 +16,10 @@ export interface IStorage {
   // Users
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined>;
+  updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
 
   // Customers
   getCustomer(id: string): Promise<Customer | undefined>;
@@ -207,11 +210,59 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const now = new Date().toISOString();
+    const user: User = { 
+      id,
+      username: insertUser.email, // Use email as username for simplicity
+      email: insertUser.email,
+      password: insertUser.password, // In production, this should be hashed
+      firstName: insertUser.firstName,
+      lastName: insertUser.lastName,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      subscriptionStatus: "incomplete",
+      isActive: "true",
+      createdAt: now,
+      updatedAt: now
+    };
     this.users.set(id, user);
     return user;
+  }
+
+  async updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = {
+      ...user,
+      stripeCustomerId,
+      stripeSubscriptionId,
+      subscriptionStatus: "active" as const,
+      updatedAt: new Date().toISOString()
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = {
+      ...user,
+      subscriptionStatus: status,
+      updatedAt: new Date().toISOString()
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   // Customer methods
