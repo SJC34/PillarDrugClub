@@ -63,7 +63,7 @@ export default function PricingComparison() {
                       </p>
                     </div>
                     
-                    <Badge variant="secondary" className="bg-chart-2/10 text-chart-2 border-0 px-3 py-1">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-3 py-1 font-semibold">
                       {calculateSavings(med.retailPrice, med.ourPrice)}% less
                     </Badge>
                   </div>

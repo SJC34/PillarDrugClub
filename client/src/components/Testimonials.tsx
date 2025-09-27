@@ -45,22 +45,22 @@ export default function Testimonials() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="border-0 shadow-sm" data-testid={`card-testimonial-${index}`}>
+            <Card key={index} className="border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-white to-primary/5 dark:from-card dark:to-primary/5" data-testid={`card-testimonial-${index}`}>
               <CardContent className="p-8 space-y-6">
                 <blockquote className="text-lg leading-relaxed" data-testid={`text-testimonial-quote-${index}`}>
                   "{testimonial.quote}"
                 </blockquote>
                 <div className="flex items-center gap-4">
-                  <Avatar className="w-12 h-12">
-                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                  <Avatar className="w-14 h-14 border-2 border-primary/20">
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-bold text-lg">
                       {testimonial.initials}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium" data-testid={`text-testimonial-author-${index}`}>
+                    <p className="font-semibold text-foreground" data-testid={`text-testimonial-author-${index}`}>
                       {testimonial.author}
                     </p>
-                    <p className="text-sm text-muted-foreground" data-testid={`text-testimonial-condition-${index}`}>
+                    <p className="text-sm text-primary font-medium" data-testid={`text-testimonial-condition-${index}`}>
                       {testimonial.condition}
                     </p>
                   </div>

@@ -3,14 +3,14 @@ import logoImage from "@assets/Add a heading_1758988919681.png";
 
 export default function Hero() {
   return (
-    <section className="relative py-32 lg:py-40 bg-gradient-to-br from-background via-background to-accent/30">
+    <section className="relative py-32 lg:py-40 bg-gradient-to-br from-background via-primary/5 to-primary/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
         <div className="text-center">
-          <div className="mb-8">
+          <div className="mb-12">
             <img 
               src={logoImage} 
               alt="Pillar Drug Club" 
-              className="h-32 w-auto mx-auto"
+              className="h-48 md:h-56 lg:h-64 w-auto mx-auto"
               data-testid="img-hero-logo"
             />
           </div>
@@ -42,26 +42,26 @@ export default function Hero() {
           </div>
 
           <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="space-y-3">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                <div className="w-8 h-8 bg-primary rounded-full"></div>
+            <div className="space-y-4 p-6 rounded-2xl bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-primary/20">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <div className="w-10 h-10 bg-white rounded-full shadow-inner"></div>
               </div>
-              <h3 className="font-medium text-foreground">Wholesale pricing</h3>
-              <p className="text-sm text-muted-foreground">Pay the same prices pharmacies pay their wholesalers</p>
+              <h3 className="font-semibold text-foreground text-lg">Wholesale pricing</h3>
+              <p className="text-muted-foreground">Pay the same prices pharmacies pay their wholesalers</p>
             </div>
-            <div className="space-y-3">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                <div className="w-8 h-8 bg-primary rounded-full"></div>
+            <div className="space-y-4 p-6 rounded-2xl bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-primary/20">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <div className="w-10 h-10 bg-white rounded-full shadow-inner"></div>
               </div>
-              <h3 className="font-medium text-foreground">No insurance needed</h3>
-              <p className="text-sm text-muted-foreground">Skip the complexity and save more than your copay</p>
+              <h3 className="font-semibold text-foreground text-lg">No insurance needed</h3>
+              <p className="text-muted-foreground">Skip the complexity and save more than your copay</p>
             </div>
-            <div className="space-y-3">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                <div className="w-8 h-8 bg-primary rounded-full"></div>
+            <div className="space-y-4 p-6 rounded-2xl bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-primary/20">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <div className="w-10 h-10 bg-white rounded-full shadow-inner"></div>
               </div>
-              <h3 className="font-medium text-foreground">Home delivery</h3>
-              <p className="text-sm text-muted-foreground">Medications shipped directly to your door</p>
+              <h3 className="font-semibold text-foreground text-lg">Home delivery</h3>
+              <p className="text-muted-foreground">Medications shipped directly to your door</p>
             </div>
           </div>
         </div>

@@ -31,7 +31,7 @@ export default function Benefits() {
   ];
 
   return (
-    <section className="py-20 lg:py-32 bg-accent/20" id="how-it-works">
+    <section className="py-20 lg:py-32 bg-gradient-to-b from-primary/5 to-background" id="how-it-works">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-20">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6">
@@ -45,12 +45,12 @@ export default function Benefits() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {benefits.map((benefit, index) => (
-            <div key={index} className="text-center space-y-6" data-testid={`card-benefit-${index}`}>
-              <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto">
-                <benefit.icon className="w-10 h-10 text-primary" />
+            <div key={index} className="text-center space-y-6 p-8 rounded-3xl bg-white/80 dark:bg-card/80 backdrop-blur-sm border border-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" data-testid={`card-benefit-${index}`}>
+              <div className="w-24 h-24 bg-gradient-to-br from-primary via-primary to-primary/90 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
+                <benefit.icon className="w-12 h-12 text-white" />
               </div>
-              <div className="space-y-3">
-                <h3 className="text-xl font-semibold" data-testid={`text-benefit-title-${index}`}>
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-foreground" data-testid={`text-benefit-title-${index}`}>
                   {benefit.title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed" data-testid={`text-benefit-description-${index}`}>

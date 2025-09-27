@@ -5,7 +5,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-accent/20 border-t">
+    <footer className="bg-gradient-to-b from-primary/5 to-primary/10 border-t border-primary/20">
       {/* CTA Section */}
       <div className="border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-20">
