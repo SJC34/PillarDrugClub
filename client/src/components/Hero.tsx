@@ -10,7 +10,7 @@ export default function Hero() {
             <img 
               src={logoImage} 
               alt="Pillar Drug Club" 
-              className="h-20 w-auto mx-auto"
+              className="h-32 w-auto mx-auto"
               data-testid="img-hero-logo"
             />
           </div>
