@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -65,7 +66,22 @@ app.use((req, res, next) => {
     port,
     host: "0.0.0.0",
     reusePort: true,
-  }, () => {
+  }, async () => {
     log(`serving on port ${port}`);
+    
+    // Load medications after server is ready - non-blocking for health checks
+    // Only load in development or when IMPORT_MEDICATIONS env var is set
+    const shouldImport = process.env.NODE_ENV === "development" || process.env.IMPORT_MEDICATIONS === "true";
+    
+    if (shouldImport) {
+      // Run import in background so it doesn't block health checks
+      setImmediate(async () => {
+        log(`🔄 Loading medications in background...`);
+        await storage.loadImportedMedications();
+        log(`✅ Medication loading complete`);
+      });
+    } else {
+      log(`ℹ️  Skipping medication import (set IMPORT_MEDICATIONS=true to enable)`);
+    }
   });
 })();

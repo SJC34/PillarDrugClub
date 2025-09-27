@@ -77,8 +77,6 @@ export class MemStorage implements IStorage {
     this.prescribers = new Map();
     this.orderCounter = 1000;
     this.seedMockData();
-    // Load imported medications when server starts
-    this.loadImportedMedications();
   }
 
   private seedMockData() {
@@ -181,16 +179,21 @@ export class MemStorage implements IStorage {
     sampleMedications.forEach(med => this.medications.set(med.id, med));
   }
 
-  private async loadImportedMedications() {
+  async loadImportedMedications() {
     try {
-      // Import medications from Excel file when server starts
+      // Import medications from Excel file after server startup
       const { importMedicationsFromExcel } = await import('../scripts/import-medications');
       await importMedicationsFromExcel();
-      console.log(`Loaded medications: ${this.medications.size} total`);
+      console.log(`✅ Loaded medications: ${this.medications.size} total`);
     } catch (error) {
-      console.log('Could not load imported medications:', error);
+      console.log('⚠️  Could not load imported medications:', error);
       console.log('Using sample medications only');
     }
+  }
+
+  // Getter for medication count (for health checks)
+  get medicationCount(): number {
+    return this.medications.size;
   }
 
   // User methods

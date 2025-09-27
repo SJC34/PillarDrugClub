@@ -12,6 +12,34 @@ import {
 } from "@shared/pharmacy-schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check routes - respond immediately for deployment health checks
+  app.get("/", (req, res) => {
+    res.json({ 
+      status: "ok", 
+      service: "pillar-drug-club",
+      timestamp: new Date().toISOString(),
+      medications: storage.medicationCount
+    });
+  });
+
+  app.get("/health", (req, res) => {
+    res.json({ 
+      status: "healthy", 
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      medications_loaded: storage.medicationCount
+    });
+  });
+
+  app.get("/api/health", (req, res) => {
+    res.json({ 
+      status: "ok",
+      api: "healthy",
+      database: "connected",
+      medications: storage.medicationCount
+    });
+  });
+
   // Medication routes
   app.get("/api/medications/search", async (req, res) => {
     try {
