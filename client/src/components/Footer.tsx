@@ -10,18 +10,17 @@ export default function Footer() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-20">
           <div className="text-center max-w-4xl mx-auto">
             <h2 className="text-4xl font-semibold tracking-tight mb-6 sm:text-5xl">
-              Ready to simplify your healthcare?
+              Ready to start saving on your medications?
             </h2>
             <p className="text-xl text-muted-foreground mb-10 leading-relaxed">
-              Join thousands who have already made the switch to transparent, 
-              affordable prescription care.
+              Join thousands of members who are saving up to 80% on their prescription medications.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="px-8 py-3 text-base font-medium rounded-lg" data-testid="button-footer-join">
-                Get started today
+                Become a member
               </Button>
               <Button variant="outline" size="lg" className="px-8 py-3 text-base font-medium rounded-lg" data-testid="button-footer-browse">
-                Browse treatments
+                Browse medications
               </Button>
             </div>
           </div>
@@ -33,13 +32,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="col-span-1 md:col-span-2">
             <div className="mb-6">
-              <span className="text-2xl font-semibold text-foreground">
-                Pillar
-              </span>
+              <img 
+                src="/attached_assets/Add a heading_1758988919681.png" 
+                alt="Pillar Drug Club" 
+                className="h-12 w-auto"
+              />
             </div>
             <p className="text-muted-foreground mb-8 max-w-md leading-relaxed">
-              Making prescription healthcare accessible and affordable through 
-              licensed physicians and transparent pricing.
+              Making prescription medications affordable and accessible through transparent 
+              wholesale pricing and convenient home delivery.
             </p>
           </div>
 

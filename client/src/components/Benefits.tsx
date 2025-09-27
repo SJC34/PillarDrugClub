@@ -1,4 +1,4 @@
-import { Shield, Truck, UserCheck, Clock } from "lucide-react";
+import { Shield, Truck, DollarSign, Clock } from "lucide-react";
 
 interface Benefit {
   icon: React.ComponentType<{ className?: string }>;
@@ -9,24 +9,24 @@ interface Benefit {
 export default function Benefits() {
   const benefits: Benefit[] = [
     {
-      icon: UserCheck,
-      title: "Licensed physicians",
-      description: "Get prescriptions from licensed doctors who review your medical history and symptoms."
+      icon: DollarSign,
+      title: "Wholesale pricing",
+      description: "Access medications at the same prices pharmacies pay their wholesalers - no markups or hidden fees."
     },
     {
       icon: Shield,
-      title: "FDA-approved medications",
-      description: "All medications are FDA-approved and sourced from licensed U.S. wholesalers for quality assurance."
+      title: "Quality guaranteed",
+      description: "All medications are FDA-approved and sourced from licensed U.S. wholesalers for safety and quality."
     },
     {
       icon: Truck,
-      title: "Discreet delivery",
-      description: "Medications shipped directly to your door in secure, unmarked packaging within 2-3 days."
+      title: "Free delivery",
+      description: "Medications shipped directly to your door in secure, discreet packaging within 2-3 business days."
     },
     {
       icon: Clock,
-      title: "Simple refills",
-      description: "Set up automatic refills or reorder anytime through your secure online account."
+      title: "Easy management",
+      description: "Transfer prescriptions easily and get automatic refill reminders through your member portal."
     }
   ];
 
@@ -35,11 +35,11 @@ export default function Benefits() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-20">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6">
-            Healthcare made simple
+            How Pillar Drug Club works
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            From consultation to delivery, we've streamlined every step to make 
-            getting your medications as easy as possible.
+            We've eliminated the middlemen and markups to bring you prescription 
+            medications at true wholesale prices.
           </p>
         </div>
 

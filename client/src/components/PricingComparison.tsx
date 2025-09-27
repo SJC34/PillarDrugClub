@@ -27,10 +27,10 @@ export default function PricingComparison() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6">
-            Transparent pricing, proven savings
+            Real medications, real savings
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            See exactly what your employees pay. No hidden markups, no insurance complexity.
+            Compare our wholesale prices with what you're paying now. No insurance required.
           </p>
         </div>
 

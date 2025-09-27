@@ -3,15 +3,15 @@ import { Button } from "@/components/ui/button";
 export default function Hero() {
   return (
     <section className="relative py-32 lg:py-40 bg-gradient-to-br from-background via-background to-accent/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
         <div className="text-center">
           <h1 className="text-5xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl leading-tight">
-            Take control of your{" "}
-            <span className="text-primary">pharmacy costs</span>
+            Prescription medications at{" "}
+            <span className="text-primary">wholesale prices</span>
           </h1>
-          <p className="mt-8 text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            Employers overpay for prescriptions due to hidden fees and markups. 
-            Our transparent, no-markup pricing model eliminates unpredictable expenses.
+          <p className="mt-8 text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Skip the insurance hassles and hidden markups. Get your medications delivered 
+            directly to your door at transparent, wholesale pricing.
           </p>
           
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
@@ -20,7 +20,7 @@ export default function Hero() {
               className="text-base px-12 py-4 h-auto rounded-lg font-medium"
               data-testid="button-hero-join"
             >
-              Get free assessment
+              Join Pillar Drug Club
             </Button>
             <Button 
               variant="outline" 
@@ -28,31 +28,31 @@ export default function Hero() {
               className="text-base px-12 py-4 h-auto rounded-lg font-medium"
               data-testid="button-hero-pricing"
             >
-              View plans
+              See how it works
             </Button>
           </div>
 
-          {/* Cost Comparison Visual */}
-          <div className="mt-20 bg-card border rounded-2xl p-8 max-w-4xl mx-auto">
-            <h3 className="text-lg font-semibold mb-6">Annual out-of-pocket cost for 4+ prescriptions per employee</h3>
-            <div className="grid grid-cols-2 gap-8 items-end">
-              <div className="text-center">
-                <div className="h-32 bg-destructive/20 rounded-lg flex items-end justify-center pb-4 mb-4">
-                  <span className="text-2xl font-bold text-destructive">$576</span>
-                </div>
-                <p className="text-sm text-muted-foreground">Traditional Pharmacies</p>
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="space-y-3">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-8 h-8 bg-primary rounded-full"></div>
               </div>
-              <div className="text-center">
-                <div className="h-20 bg-chart-2 rounded-lg flex items-end justify-center pb-4 mb-4">
-                  <span className="text-2xl font-bold text-white">$116</span>
-                </div>
-                <p className="text-sm text-muted-foreground">Pillar Drug Club</p>
-              </div>
+              <h3 className="font-medium text-foreground">Wholesale pricing</h3>
+              <p className="text-sm text-muted-foreground">Pay the same prices pharmacies pay their wholesalers</p>
             </div>
-            <div className="mt-6 text-center">
-              <span className="inline-flex items-center px-4 py-2 rounded-full bg-chart-2/10 text-chart-2 text-sm font-medium">
-                80% cost reduction
-              </span>
+            <div className="space-y-3">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-8 h-8 bg-primary rounded-full"></div>
+              </div>
+              <h3 className="font-medium text-foreground">No insurance needed</h3>
+              <p className="text-sm text-muted-foreground">Skip the complexity and save more than your copay</p>
+            </div>
+            <div className="space-y-3">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-8 h-8 bg-primary rounded-full"></div>
+              </div>
+              <h3 className="font-medium text-foreground">Home delivery</h3>
+              <p className="text-sm text-muted-foreground">Medications shipped directly to your door</p>
             </div>
           </div>
         </div>

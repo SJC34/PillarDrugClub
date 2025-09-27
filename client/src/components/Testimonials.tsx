@@ -12,21 +12,21 @@ export default function Testimonials() {
   //todo: remove mock functionality
   const testimonials: Testimonial[] = [
     {
-      quote: "The process was incredibly straightforward. My doctor was professional, and I received my medication within two days. The pricing is transparent and fair.",
-      author: "Sarah M.",
-      condition: "Hypertension treatment",
-      initials: "SM"
+      quote: "I'm saving over $200 a month on my blood pressure and cholesterol medications with Pillar Drug Club. The membership fee pays for itself in the first month!",
+      author: "Sarah J.",
+      condition: "Hypertension & cholesterol",
+      initials: "SJ"
     },
     {
-      quote: "I was paying $150/month for my diabetes medication. With Pillar, it's $45 and the quality is exactly the same. The consultation was thorough and professional.",
+      quote: "As someone living with diabetes, my medication costs were breaking the bank. With Pillar Drug Club, I'm paying less than half of what I used to pay with insurance.",
       author: "Robert C.",
-      condition: "Diabetes management",
+      condition: "Type 2 diabetes",
       initials: "RC"
     },
     {
-      quote: "What impressed me most was the doctor taking time to understand my medical history. No rush, clear explanations, and genuine care for my wellbeing.",
+      quote: "The transparency is what I love most. No surprises, no hidden fees - just straightforward pricing that's actually affordable. Plus, the home delivery is so convenient.",
       author: "Maria G.",
-      condition: "Anxiety treatment",
+      condition: "Multiple prescriptions",
       initials: "MG"
     }
   ];
@@ -36,10 +36,10 @@ export default function Testimonials() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-20">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6">
-            Trusted by thousands
+            What our members say
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Real experiences from people who've simplified their healthcare with Pillar.
+            Thousands of members are saving on their medications every day.
           </p>
         </div>
 
