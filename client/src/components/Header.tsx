@@ -20,13 +20,10 @@ export default function Header() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center gap-2">
-              <img 
-                src={logoImage} 
-                alt="Pillar Drug Club" 
-                className="h-10 w-auto"
-                data-testid="img-logo"
-              />
+            <div className="flex-shrink-0">
+              <span className="text-xl font-semibold text-foreground" data-testid="text-logo">
+                Pillar Drug Club
+              </span>
             </div>
           </div>
 

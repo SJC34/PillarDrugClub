@@ -1,10 +1,19 @@
 import { Button } from "@/components/ui/button";
+import logoImage from "@assets/Add a heading_1758988919681.png";
 
 export default function Hero() {
   return (
     <section className="relative py-32 lg:py-40 bg-gradient-to-br from-background via-background to-accent/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
         <div className="text-center">
+          <div className="mb-8">
+            <img 
+              src={logoImage} 
+              alt="Pillar Drug Club" 
+              className="h-20 w-auto mx-auto"
+              data-testid="img-hero-logo"
+            />
+          </div>
           <h1 className="text-5xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl leading-tight">
             Prescription medications at{" "}
             <span className="text-primary">wholesale prices</span>
