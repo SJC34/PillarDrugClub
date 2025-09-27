@@ -6,7 +6,7 @@ interface ExcelMedication {
   [key: string]: any;
 }
 
-async function importMedicationsFromExcel() {
+export async function importMedicationsFromExcel() {
   try {
     // Read the Excel file
     const filePath = 'attached_assets/Top Generics 5.22.25_1758991198647.xlsx';
@@ -193,16 +193,15 @@ function generateInteractions(drugName: string): string[] {
   return shuffled.slice(0, count);
 }
 
-// Export for use in other scripts
-export { importMedicationsFromExcel };
-
-// Run the import immediately when this file is executed
-importMedicationsFromExcel()
-  .then(() => {
-    console.log('Import completed successfully');
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error('Import failed:', error);
-    process.exit(1);
-  });
+// Run the import immediately when this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  importMedicationsFromExcel()
+    .then(() => {
+      console.log('Import completed successfully');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('Import failed:', error);
+      process.exit(1);
+    });
+}

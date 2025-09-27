@@ -77,10 +77,12 @@ export class MemStorage implements IStorage {
     this.prescribers = new Map();
     this.orderCounter = 1000;
     this.seedMockData();
+    // Load imported medications when server starts
+    this.loadImportedMedications();
   }
 
   private seedMockData() {
-    // Add some sample medications
+    // Add some sample medications (will be supplemented with imported data)
     const sampleMedications: Medication[] = [
       {
         id: "med-1",
@@ -177,6 +179,18 @@ export class MemStorage implements IStorage {
     ];
 
     sampleMedications.forEach(med => this.medications.set(med.id, med));
+  }
+
+  private async loadImportedMedications() {
+    try {
+      // Import medications from Excel file when server starts
+      const { importMedicationsFromExcel } = await import('../scripts/import-medications');
+      await importMedicationsFromExcel();
+      console.log(`Loaded medications: ${this.medications.size} total`);
+    } catch (error) {
+      console.log('Could not load imported medications:', error);
+      console.log('Using sample medications only');
+    }
   }
 
   // User methods

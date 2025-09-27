@@ -19,7 +19,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.searchMedications(params);
       res.json(result);
     } catch (error) {
-      res.status(400).json({ error: "Invalid search parameters" });
+      console.log('Search error:', error);
+      console.log('Query params:', req.query);
+      res.status(400).json({ error: "Invalid search parameters", details: error });
     }
   });
 
