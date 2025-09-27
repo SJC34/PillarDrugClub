@@ -31,32 +31,45 @@ async function importMedicationsFromExcel() {
     
     for (const row of rawData) {
       try {
-        // Try to map common field names - we'll need to adjust these based on actual Excel structure
-        const medicationData = {
-          ndc: row['NDC'] || row['ndc'] || `generated-${Date.now()}-${Math.random()}`,
-          name: row['Drug Name'] || row['name'] || row['Drug'] || row['Generic Name'] || 'Unknown',
-          genericName: row['Generic Name'] || row['generic'] || row['Drug Name'] || row['name'] || 'Unknown',
-          brandName: row['Brand Name'] || row['brand'] || undefined,
-          strength: row['Strength'] || row['strength'] || 'Unknown',
-          dosageForm: row['Dosage Form'] || row['form'] || row['Form'] || 'Tablet',
-          manufacturer: row['Manufacturer'] || row['manufacturer'] || row['Mfr'] || 'Generic Manufacturer',
-          category: determineMedicationCategory(row['Drug Name'] || row['name'] || row['Generic Name'] || ''),
-          description: `Generic medication: ${row['Generic Name'] || row['Drug Name'] || row['name'] || 'Unknown medication'}`,
-          price: parseFloat(row['Retail Price'] || row['price'] || row['Price'] || '0') || generateRandomPrice(15, 200),
-          wholesalePrice: parseFloat(row['Wholesale Price'] || row['wholesale'] || '0') || generateRandomPrice(5, 50),
-          inStock: true,
-          quantity: parseInt(row['Quantity'] || row['quantity'] || '100') || 100,
-          requiresPrescription: true, // Most generics require prescription
-          controlledSubstance: false,
-          sideEffects: generateSideEffects(row['Drug Name'] || row['name'] || row['Generic Name'] || ''),
-          warnings: generateWarnings(row['Drug Name'] || row['name'] || row['Generic Name'] || ''),
-          interactions: generateInteractions(row['Drug Name'] || row['name'] || row['Generic Name'] || '')
-        };
-
-        // Ensure wholesale price is less than retail price
-        if (medicationData.wholesalePrice >= medicationData.price) {
-          medicationData.wholesalePrice = medicationData.price * 0.3; // 30% of retail
+        // Calculate actual per-tablet cost from Excel data
+        const totalQuantity = parseFloat(row['Claims Total Quantity Dispensed'] || '0');
+        const totalCost = parseFloat(row['Claims Total Post-Savings Plan Pay'] || '0');
+        
+        // Skip if we don't have valid quantity or cost data
+        if (totalQuantity <= 0 || totalCost <= 0) {
+          skipped++;
+          continue;
         }
+        
+        // Calculate real per-tablet wholesale price
+        const realWholesalePrice = totalCost / totalQuantity;
+        
+        // Generate a reasonable retail price (typically 2-5x wholesale)
+        const retailMultiplier = Math.random() * 3 + 2; // 2x to 5x
+        const retailPrice = realWholesalePrice * retailMultiplier;
+
+        const drugName = row['Drugs Drug Label Name (MDDB)'] || 'Unknown Medication';
+        
+        const medicationData = {
+          ndc: `ndc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: drugName,
+          genericName: extractGenericName(drugName),
+          brandName: extractBrandName(drugName),
+          strength: extractStrength(drugName),
+          dosageForm: extractDosageForm(drugName),
+          manufacturer: 'Generic Manufacturer',
+          category: determineMedicationCategory(drugName),
+          description: `Generic medication: ${drugName}`,
+          price: Math.round(retailPrice * 100) / 100, // Round to 2 decimal places
+          wholesalePrice: Math.round(realWholesalePrice * 100) / 100, // Real per-tablet cost
+          inStock: true,
+          quantity: Math.floor(totalQuantity / 1000), // Estimate available stock
+          requiresPrescription: true,
+          controlledSubstance: false,
+          sideEffects: generateSideEffects(drugName),
+          warnings: generateWarnings(drugName),
+          interactions: generateInteractions(drugName)
+        };
 
         await storage.createMedication(medicationData);
         imported++;
@@ -102,8 +115,45 @@ function determineMedicationCategory(drugName: string): string {
   }
 }
 
-function generateRandomPrice(min: number, max: number): number {
-  return Math.round((Math.random() * (max - min) + min) * 100) / 100;
+function extractGenericName(drugName: string): string {
+  // Extract generic name from full drug label
+  // Most drugs follow pattern: "Brand Generic Strength Form"
+  const parts = drugName.split(' ');
+  if (parts.length >= 2) {
+    // Try to identify generic name (often second part)
+    return parts.slice(0, 2).join(' ');
+  }
+  return drugName;
+}
+
+function extractBrandName(drugName: string): string | undefined {
+  // Look for common brand name patterns
+  if (drugName.includes('Brand') || drugName.includes('®')) {
+    return drugName.split(' ')[0];
+  }
+  return undefined;
+}
+
+function extractStrength(drugName: string): string {
+  // Look for strength patterns (numbers followed by units)
+  const strengthMatch = drugName.match(/(\d+(?:\.\d+)?)\s*(mg|mcg|g|ml|GM|MG)/i);
+  if (strengthMatch) {
+    return strengthMatch[0];
+  }
+  return 'Various';
+}
+
+function extractDosageForm(drugName: string): string {
+  const name = drugName.toLowerCase();
+  if (name.includes('tablet')) return 'Tablet';
+  if (name.includes('capsule')) return 'Capsule';
+  if (name.includes('solution')) return 'Solution';
+  if (name.includes('cream') || name.includes('ointment')) return 'Topical';
+  if (name.includes('injection')) return 'Injection';
+  if (name.includes('drops')) return 'Drops';
+  if (name.includes('powder')) return 'Powder';
+  if (name.includes('gel')) return 'Gel';
+  return 'Tablet'; // Default
 }
 
 function generateSideEffects(drugName: string): string[] {
