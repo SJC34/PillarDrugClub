@@ -1,0 +1,39 @@
+Milestone 1: Discovery & Requirements Gathering (Weeks 1-3)
+• Conduct stakeholder interviews and review existing documents to finalize requirements. 
+• Define user personas and business use cases for all four portals (Clients, Brokers, Companies, Admin). 
+• Develop a high-level architecture diagram and select the technology stack. 
+• Draft initial risk assessments and compliance requirements (e.g., HIPAA). 
+───────────────────────────── 
+Milestone 2: Design & Architecture Finalization (Weeks 4-5)
+• Create detailed UI/UX prototypes in Figma for all portals 
+• Finalize technical architecture including frontend, backend, and third-party integrations (HealthWarehouse API, Stripe, geolocation services, etc..). 
+
+• Prepare integration documentation and system design specifications. 
+───────────────────────────── 
+Milestone 3: MVP Development (Weeks 5-12)
+• Frontend Development:
+
+9 / 10
+ – Build responsive interfaces for the Client, Broker, Company, and Admin portals. 
+ – Implement key features  
+• Backend Development:
+ – Develop RESTful APIs to handle business logic, user data, and secure prescription management. 
+ – Integrate with HealthWarehouse API for drug ordering and Stripe for payment processing. 
+• Integration & Configuration:
+ – Configure AWS Serverless components (Lambda, API Gateway, database) and enforce security compliance. 
+
+───────────────────────────── 
+Milestone 4: Testing & Quality Assurance (Weeks 12-15)
+• Perform unit testing, integration testing, and system testing across all modules. 
+• Conduct security audits and ensure HIPAA compliance. 
+• Address bug fixes and performance optimization based on test outcomes. 
+───────────────────────────── 
+Milestone 5: Beta Launch & User Feedback (Weeks 15-18)
+• Roll out a beta version to a controlled group of users. 
+• Gather feedback on user experience, doctor finder functionality, and prescription upload process. 
+• Monitor system performance and document any issues for resolution. 
+───────────────────────────── 
+Milestone 7: Post-Launch Support & Enhancements (Ongoing)
+• Provide ongoing technical support and system monitoring. 
+• Plan iterative enhancements based on user feedback, including advanced analytics and expanded functionalities (e.g., insurance-based payments, enhanced doctor-patient communication). 
+• Regularly update documentation and conduct periodic security reviews.
