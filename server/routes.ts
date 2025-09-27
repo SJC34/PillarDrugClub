@@ -22,15 +22,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check routes - respond immediately for deployment health checks
-  app.get("/", (req, res) => {
-    res.json({ 
-      status: "ok", 
-      service: "pillar-drug-club",
-      timestamp: new Date().toISOString(),
-      medications: storage.medicationCount
-    });
-  });
-
   app.get("/health", (req, res) => {
     res.json({ 
       status: "healthy", 
