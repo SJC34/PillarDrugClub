@@ -69,25 +69,10 @@ app.use((req, res, next) => {
   }, async () => {
     log(`serving on port ${port}`);
     
-    // Load medications after server is ready - non-blocking for health checks
-    // Import medications unless explicitly disabled with IMPORT_MEDICATIONS=false
-    const shouldImport = process.env.IMPORT_MEDICATIONS !== "false";
-    
-    if (shouldImport) {
-      // Run import in background so it doesn't block health checks
-      setImmediate(async () => {
-        log(`🔄 Loading medications in background...`);
-        try {
-          await storage.loadImportedMedications();
-          log(`✅ Medication loading complete: ${storage.medicationCount} medications`);
-        } catch (error) {
-          log(`⚠️  Medication import failed: ${error}`);
-          log(`ℹ️  Server will continue without imported medications`);
-        }
-      });
-    } else {
-      log(`ℹ️  Skipping medication import (IMPORT_MEDICATIONS=false)`);
-      log(`ℹ️  Use POST /api/admin/import-medications to import after deployment`);
-    }
+    // DISABLE medication import during startup to prevent health check timeouts
+    // Medications can be imported manually after deployment using the admin endpoint
+    log(`ℹ️  Medication import disabled during startup for deployment health checks`);
+    log(`ℹ️  Use POST /api/admin/import-medications to import after successful deployment`);
+    log(`✅ Server ready for health checks`);
   });
 })();

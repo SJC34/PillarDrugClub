@@ -22,23 +22,23 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // ROOT HEALTH CHECK - Required for deployment health checks
+  // CRITICAL: Respond immediately without accessing any storage operations
   app.get("/", (req, res) => {
-    // Respond immediately with 200 status for all requests to root
     res.status(200).json({ 
       status: "ok", 
       service: "pillar-drug-club",
       timestamp: new Date().toISOString(),
-      medications: storage.medicationCount
+      ready: true
     });
   });
 
-  // Additional health check endpoints
+  // Additional health check endpoints - also respond immediately
   app.get("/api/ping", (req, res) => {
     res.status(200).json({ 
       status: "ok", 
       service: "pillar-drug-club",
       timestamp: new Date().toISOString(),
-      medications: storage.medicationCount
+      ready: true
     });
   });
 
@@ -47,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: "healthy", 
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      medications_loaded: storage.medicationCount
+      timestamp: new Date().toISOString()
     });
   });
 
@@ -56,7 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: "ok",
       api: "healthy",
       database: "connected",
-      medications: storage.medicationCount
+      timestamp: new Date().toISOString()
     });
   });
 
