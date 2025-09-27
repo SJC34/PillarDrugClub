@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import logoImage from "@assets/Add a heading_1758988919681.png";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -33,7 +34,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="mb-6">
               <img 
-                src="/attached_assets/Add a heading_1758988919681.png" 
+                src={logoImage} 
                 alt="Pillar Drug Club" 
                 className="h-12 w-auto"
               />

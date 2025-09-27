@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import logoImage from "@assets/Add a heading_1758988919681.png";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +22,7 @@ export default function Header() {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center gap-2">
               <img 
-                src="/attached_assets/Add a heading_1758988919681.png" 
+                src={logoImage} 
                 alt="Pillar Drug Club" 
                 className="h-10 w-auto"
                 data-testid="img-logo"
