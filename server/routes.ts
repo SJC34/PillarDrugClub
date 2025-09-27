@@ -21,16 +21,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // ROOT HEALTH CHECK - Required for deployment health checks
-  // CRITICAL: Respond immediately without accessing any storage operations
-  app.get("/", (req, res) => {
-    res.status(200).json({ 
-      status: "ok", 
-      service: "pillar-drug-club",
-      timestamp: new Date().toISOString(),
-      ready: true
+  // ROOT HEALTH CHECK - Only for production deployment health checks
+  // In development, let Vite handle the frontend serving
+  if (process.env.NODE_ENV !== "development") {
+    app.get("/", (req, res) => {
+      res.status(200).json({ 
+        status: "ok", 
+        service: "pillar-drug-club",
+        timestamp: new Date().toISOString(),
+        ready: true
+      });
     });
-  });
+  }
 
   // Additional health check endpoints - also respond immediately
   app.get("/api/ping", (req, res) => {
