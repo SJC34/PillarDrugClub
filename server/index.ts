@@ -70,8 +70,8 @@ app.use((req, res, next) => {
     log(`serving on port ${port}`);
     
     // Load medications after server is ready - non-blocking for health checks
-    // Only load in development or when IMPORT_MEDICATIONS env var is set
-    const shouldImport = process.env.NODE_ENV === "development" || process.env.IMPORT_MEDICATIONS === "true";
+    // Import medications unless explicitly disabled with IMPORT_MEDICATIONS=false
+    const shouldImport = process.env.IMPORT_MEDICATIONS !== "false";
     
     if (shouldImport) {
       // Run import in background so it doesn't block health checks
@@ -81,7 +81,7 @@ app.use((req, res, next) => {
         log(`✅ Medication loading complete`);
       });
     } else {
-      log(`ℹ️  Skipping medication import (set IMPORT_MEDICATIONS=true to enable)`);
+      log(`ℹ️  Skipping medication import (IMPORT_MEDICATIONS=false)`);
     }
   });
 })();
