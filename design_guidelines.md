@@ -1,85 +1,85 @@
 # Pillar Drug Club - Design Guidelines
 
-## Design Approach: Reference-Based (Healthcare/Fintech)
-Taking inspiration from modern healthcare platforms like Roman, Capsule, and fintech services like Stripe, focusing on trust, transparency, and professional credibility.
+## Design Approach: Reference-Based (Modern Healthcare)
+Inspired by Ro, For Hims, and Roman - emphasizing medical credibility through minimal design, generous whitespace, and professional typography that builds user confidence.
 
 ## Core Design Elements
 
 ### A. Color Palette
 **Primary Brand Colors:**
-- Primary Blue: 210 85% 45% (medical trust, reliability)
-- Success Green: 142 70% 45% (savings, positive outcomes)
-- Dark Navy: 220 25% 15% (professional depth)
+- Primary Blue: 210 90% 40% (medical trust, credibility)
+- Deep Navy: 215 30% 12% (professional authority)
+- Success Green: 145 65% 42% (positive outcomes, savings)
 
 **Supporting Colors:**
-- Light Gray: 210 15% 96% (clean backgrounds)
-- Medium Gray: 210 8% 65% (secondary text)
-- Warning Orange: 25 90% 55% (CTAs, urgency - use sparingly)
+- Pure White: 0 0% 100% (clean, medical-grade)
+- Light Gray: 210 10% 96% (subtle backgrounds)
+- Medium Gray: 210 12% 60% (secondary text)
+- Accent Orange: 20 85% 50% (CTAs - minimal use)
 
 ### B. Typography
-- **Primary:** Inter (Google Fonts) - clean, medical-grade readability
-- **Accent:** Inter Medium for headings and emphasis
-- **Body:** Inter Regular 16px, line-height 1.6
-- **Headings:** Inter Medium, scale: 48px/36px/24px/20px
+- **Primary:** Inter (Google Fonts) - medical-grade clarity
+- **Headings:** Inter Semibold for trust and authority
+- **Body:** Inter Regular 16px, line-height 1.7 for readability
+- **Scale:** 56px/40px/28px/20px with generous spacing
 
 ### C. Layout System
-Tailwind spacing units: 4, 6, 8, 12, 16, 24 for consistent rhythm
-- Container max-width: 1200px
-- Section padding: py-16 or py-24
-- Component spacing: gap-8 or gap-12
+Tailwind spacing: 6, 8, 12, 16, 24, 32 for medical-grade precision
+- Container: max-width 1100px for optimal reading
+- Section padding: py-20 or py-32 for breathing room
+- Component spacing: gap-12 or gap-16
 
 ### D. Component Library
 
 **Navigation:**
-- Clean header with logo left, navigation center, CTA button right
-- Sticky behavior with subtle shadow on scroll
-- Mobile: hamburger menu with slide-out panel
+- Minimal header: logo left, sparse navigation, single CTA right
+- Invisible until scroll, then subtle white background
+- Mobile: clean slide-out with large touch targets
 
 **Hero Section:**
-- Large, impactful headline with savings-focused messaging
-- Two-button CTA pattern: primary "Join Now" + secondary "See Pricing"
-- Clean illustration or photo of medications/pharmacy (not stock people)
-- Subtle gradient background: 210 20% 98% to 210 15% 95%
+- **Large hero image required:** Professional medical/pharmacy environment
+- Headline focused on accessibility and trust
+- Single primary CTA with outline secondary on hero image
+- Subtle gradient overlay: 215 20% 8% to 215 15% 25% (40% opacity)
 
-**Pricing Comparison Cards:**
-- Side-by-side retail vs. club price
-- Large percentage savings badges (green)
-- Clean card design with subtle borders
-- Hover states with gentle lift effect
+**Trust Indicators:**
+- FDA/certification badges in dedicated section
+- Licensed pharmacy messaging prominently displayed
+- Security and privacy assurances with icons
 
-**Feature Sections:**
-- 3-column grid for key benefits
-- Icons using Heroicons (medical/shield/truck themes)
-- Generous whitespace between sections
+**Product Cards:**
+- Clean white cards with subtle shadows
+- Medication names with clear pricing
+- Prescription requirements clearly stated
+- Hover: gentle elevation, no color changes
+
+**Consultation Flow:**
+- Multi-step forms with clear progress indication
+- One question per screen for medical accuracy
+- Primary button progression, ghost back buttons
 
 **Testimonials:**
-- Quote-style cards with member photos (or initials)
-- Location and savings amount highlighted
-- Rotating carousel on mobile
+- Quote-focused with minimal styling
+- Professional typography, no photos
+- Location and condition treated (appropriately private)
 
-**Forms:**
-- Clean, medical-grade input styling
-- Clear labels above inputs
-- Primary button styling for submissions
-- Progress indicators for multi-step flows
-
-### E. Trust & Credibility Elements
-- FDA approval badges and certifications
-- Security icons and encryption messaging
-- Professional photography of actual medications
-- Clear pricing tables with no hidden fees messaging
+### E. Medical Credibility Elements
+- Licensed physician review process highlighted
+- Pharmacy credentials and partnerships
+- Clear medication sourcing and safety information
+- Transparent pricing without insurance complexity
 
 ## Images
-- **Hero Image:** Clean, professional photo of prescription bottles or pharmacy setting (not people-focused)
-- **Feature Icons:** Medical/pharmaceutical themed icons from Heroicons
-- **Testimonial Images:** Professional headshots or letter avatars
-- **Product Images:** Clean photos of actual medication packaging
+- **Hero Image:** Clean, professional medical consultation or pharmacy setting - avoid stock photography
+- **Trust Section:** Subtle icons for certifications and security
+- **Product Images:** Clean pharmaceutical packaging on white backgrounds
+- **Process Illustrations:** Minimal line drawings showing consultation-to-delivery flow
 
 ## Content Strategy
-- Lead with savings amounts and transparency
-- Emphasize "no insurance needed" prominently
-- Use specific dollar amounts and percentages
-- Include trust signals (FDA approved, licensed, secure)
-- Keep copy clear and jargon-free
+- Lead with medical legitimacy and licensed care
+- Emphasize convenience without compromising quality
+- Use clear, jargon-free medical language
+- Highlight prescription requirement compliance
+- Focus on personalized care and professional oversight
 
-This design approach balances medical professionalism with accessibility, ensuring users feel confident about their healthcare decisions while emphasizing the significant cost savings.
+This approach prioritizes medical authority through restrained design, building confidence through professional presentation rather than flashy marketing elements.

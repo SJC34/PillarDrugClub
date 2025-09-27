@@ -1,5 +1,4 @@
-import { Shield, Truck, DollarSign, Clock } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Shield, Truck, UserCheck, Clock } from "lucide-react";
 
 interface Benefit {
   icon: React.ComponentType<{ className?: string }>;
@@ -10,55 +9,55 @@ interface Benefit {
 export default function Benefits() {
   const benefits: Benefit[] = [
     {
-      icon: DollarSign,
-      title: "Wholesale Pricing",
-      description: "Access medications at the same prices pharmacies pay, with no markups or hidden fees."
+      icon: UserCheck,
+      title: "Licensed physicians",
+      description: "Get prescriptions from licensed doctors who review your medical history and symptoms."
     },
     {
       icon: Shield,
-      title: "Quality Guaranteed",
-      description: "All medications are FDA-approved and sourced from licensed U.S. wholesalers."
+      title: "FDA-approved medications",
+      description: "All medications are FDA-approved and sourced from licensed U.S. wholesalers for quality assurance."
     },
     {
       icon: Truck,
-      title: "Direct Delivery",
-      description: "Medications shipped directly to your door in secure, discreet packaging."
+      title: "Discreet delivery",
+      description: "Medications shipped directly to your door in secure, unmarked packaging within 2-3 days."
     },
     {
       icon: Clock,
-      title: "Easy Prescription Management",
-      description: "Transfer prescriptions easily and get automatic refill reminders."
+      title: "Simple refills",
+      description: "Set up automatic refills or reorder anytime through your secure online account."
     }
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-muted/30" id="how-it-works">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-            Why Choose Pillar Drug Club
+    <section className="py-20 lg:py-32 bg-accent/20" id="how-it-works">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6">
+            Healthcare made simple
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            We're revolutionizing how people access and afford their medications through 
-            a transparent membership model.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            From consultation to delivery, we've streamlined every step to make 
+            getting your medications as easy as possible.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {benefits.map((benefit, index) => (
-            <Card key={index} className="hover-elevate h-full" data-testid={`card-benefit-${index}`}>
-              <CardContent className="p-8 text-center h-full flex flex-col">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <benefit.icon className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4" data-testid={`text-benefit-title-${index}`}>
+            <div key={index} className="text-center space-y-6" data-testid={`card-benefit-${index}`}>
+              <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto">
+                <benefit.icon className="w-10 h-10 text-primary" />
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-xl font-semibold" data-testid={`text-benefit-title-${index}`}>
                   {benefit.title}
                 </h3>
-                <p className="text-muted-foreground flex-1" data-testid={`text-benefit-description-${index}`}>
+                <p className="text-muted-foreground leading-relaxed" data-testid={`text-benefit-description-${index}`}>
                   {benefit.description}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>

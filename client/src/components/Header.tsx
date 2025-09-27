@@ -8,28 +8,27 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
 
   const navigation = [
-    { name: "How It Works", href: "#how-it-works" },
+    { name: "How it works", href: "#how-it-works" },
     { name: "Pricing", href: "#pricing" },
-    { name: "Medications", href: "#medications" },
-    { name: "About", href: "#about" },
+    { name: "FAQ", href: "#faq" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-border/40">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <span className="text-xl font-semibold text-primary" data-testid="text-logo">
-                Pillar Drug Club
+              <span className="text-2xl font-semibold text-foreground" data-testid="text-logo">
+                Pillar
               </span>
             </div>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:block">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-10">
               {navigation.map((item) => (
                 <a
                   key={item.name}
@@ -44,7 +43,7 @@ export default function Header() {
           </nav>
 
           {/* Right side actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <Button
               variant="ghost"
               size="icon"
@@ -58,12 +57,12 @@ export default function Header() {
               )}
             </Button>
             
-            <div className="hidden md:flex items-center space-x-3">
-              <Button variant="ghost" data-testid="button-login">
-                Sign In
+            <div className="hidden md:flex items-center space-x-4">
+              <Button variant="ghost" className="font-medium" data-testid="button-login">
+                Sign in
               </Button>
-              <Button data-testid="button-signup">
-                Join Now
+              <Button className="font-medium px-6" data-testid="button-signup">
+                Get started
               </Button>
             </div>
 
@@ -87,25 +86,25 @@ export default function Header() {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t pt-4 pb-6">
-            <div className="space-y-3">
+          <div className="md:hidden border-t pt-6 pb-8">
+            <div className="space-y-4">
               {navigation.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="block text-sm font-medium text-muted-foreground"
+                  className="block text-base font-medium text-muted-foreground"
                   onClick={() => setIsMenuOpen(false)}
                   data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   {item.name}
                 </a>
               ))}
-              <div className="pt-3 space-y-2">
-                <Button variant="ghost" className="w-full justify-start" data-testid="mobile-button-login">
-                  Sign In
+              <div className="pt-4 space-y-3">
+                <Button variant="ghost" className="w-full justify-start text-base" data-testid="mobile-button-login">
+                  Sign in
                 </Button>
-                <Button className="w-full justify-start" data-testid="mobile-button-signup">
-                  Join Now
+                <Button className="w-full justify-start text-base" data-testid="mobile-button-signup">
+                  Get started
                 </Button>
               </div>
             </div>
