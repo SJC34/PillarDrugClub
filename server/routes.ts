@@ -22,6 +22,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check routes - respond immediately for deployment health checks
+  // This endpoint provides a quick 200 response for deployment health checks
+  app.get("/api/ping", (req, res) => {
+    res.status(200).json({ 
+      status: "ok", 
+      service: "pillar-drug-club",
+      timestamp: new Date().toISOString(),
+      medications: storage.medicationCount
+    });
+  });
+
   app.get("/health", (req, res) => {
     res.json({ 
       status: "healthy", 
@@ -110,31 +120,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerId = customer.id;
       }
       
-      // Create subscription
-      const subscription = await stripe.subscriptions.create({
+      // Create a payment intent for the subscription (simplified approach)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 1000, // $10.00 in cents
+        currency: "usd",
         customer: customerId,
-        items: [{
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Pillar Drug Club Membership',
-            },
-            unit_amount: 1000, // $10.00 in cents
-            recurring: {
-              interval: 'month',
-            },
-          },
-        }],
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent'],
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          type: "subscription",
+          amount: "10.00",
+          interval: "month",
+          userId: userId
+        }
       });
       
-      // Update user with Stripe info
-      await storage.updateUserStripeInfo(userId, customerId, subscription.id);
+      // Update user with Stripe info (using payment intent ID as subscription ID for now)
+      await storage.updateUserStripeInfo(userId, customerId, paymentIntent.id);
       
       res.json({ 
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
-        subscriptionId: subscription.id
+        clientSecret: paymentIntent.client_secret,
+        subscriptionId: paymentIntent.id
       });
     } catch (error: any) {
       console.error("Stripe subscription error:", error);
@@ -160,6 +167,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Subscription status error:", error);
       res.status(500).json({ error: "Error checking subscription status" });
+    }
+  });
+
+  // Manual medication import endpoint - can be called after deployment
+  app.post("/api/admin/import-medications", async (req, res) => {
+    try {
+      console.log("🔄 Manual medication import triggered...");
+      await storage.loadImportedMedications();
+      res.json({ 
+        status: "success", 
+        message: "Medications imported successfully",
+        count: storage.medicationCount
+      });
+    } catch (error: any) {
+      console.error("Manual import error:", error);
+      res.status(500).json({ 
+        error: "Failed to import medications", 
+        message: error.message 
+      });
     }
   });
 

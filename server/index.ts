@@ -77,11 +77,17 @@ app.use((req, res, next) => {
       // Run import in background so it doesn't block health checks
       setImmediate(async () => {
         log(`🔄 Loading medications in background...`);
-        await storage.loadImportedMedications();
-        log(`✅ Medication loading complete`);
+        try {
+          await storage.loadImportedMedications();
+          log(`✅ Medication loading complete: ${storage.medicationCount} medications`);
+        } catch (error) {
+          log(`⚠️  Medication import failed: ${error}`);
+          log(`ℹ️  Server will continue without imported medications`);
+        }
       });
     } else {
       log(`ℹ️  Skipping medication import (IMPORT_MEDICATIONS=false)`);
+      log(`ℹ️  Use POST /api/admin/import-medications to import after deployment`);
     }
   });
 })();
