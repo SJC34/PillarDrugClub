@@ -12,10 +12,10 @@ interface MedicationPrice {
 export default function PricingComparison() {
   //todo: remove mock functionality
   const medications: MedicationPrice[] = [
-    { name: "Lisinopril", dosage: "10mg", retailPrice: 25.99, ourPrice: 9.99 },
-    { name: "Metformin", dosage: "500mg", retailPrice: 15.50, ourPrice: 5.99 },
-    { name: "Atorvastatin", dosage: "10mg", retailPrice: 32.99, ourPrice: 12.99 },
-    { name: "Sertraline", dosage: "50mg", retailPrice: 24.50, ourPrice: 9.99 },
+    { name: "Lisinopril", dosage: "10mg", retailPrice: 25.99, ourPrice: 8.99 },
+    { name: "Metformin", dosage: "500mg", retailPrice: 15.50, ourPrice: 4.99 },
+    { name: "Atorvastatin", dosage: "10mg", retailPrice: 32.99, ourPrice: 11.99 },
+    { name: "Sertraline", dosage: "50mg", retailPrice: 24.50, ourPrice: 8.99 },
   ];
 
   const calculateSavings = (retail: number, our: number) => {
@@ -27,10 +27,10 @@ export default function PricingComparison() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6">
-            Real savings on real medications
+            Transparent pricing, proven savings
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Compare our transparent pricing with typical retail costs. No insurance required.
+            See exactly what your employees pay. No hidden markups, no insurance complexity.
           </p>
         </div>
 
