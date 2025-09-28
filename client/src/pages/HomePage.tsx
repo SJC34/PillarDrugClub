@@ -10,7 +10,7 @@ import {
   Check,
   ArrowRight
 } from "lucide-react";
-import logoImage from "@assets/4CA4D0E9-253D-4C5B-B652-4B8C427EACB6_1759046972491.png";
+import logoImage from "@assets/2FBC0E9A-6E01-4DD9-8536-F59338A6F29B_1759047450555.png";
 
 export default function HomePage() {
   const benefits = [
