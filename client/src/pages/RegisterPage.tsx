@@ -297,12 +297,6 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-6 md:mb-8">
-          <Link href="/">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Pill className="h-8 w-8 text-primary" />
-              <span className="text-xl md:text-2xl font-bold text-foreground">PILLAR DRUG CLUB</span>
-            </div>
-          </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join the Club</h1>
           <p className="text-sm md:text-base text-muted-foreground">Create your account and start saving on prescriptions</p>
         </div>
