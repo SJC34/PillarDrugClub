@@ -63,9 +63,9 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
-                  <div className="flex flex-col overflow-hidden" style={{ width: '120px' }}>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none text-center" style={{ transform: 'scaleX(1.0)', transformOrigin: 'center', display: 'block', width: '100%' }}>AVOID</span>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none text-center" style={{ transform: 'scaleX(2.4)', transformOrigin: 'center', display: 'block', width: '100%' }}>THIS</span>
+                  <div className="flex flex-col" style={{ width: '130px' }}>
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none" style={{ letterSpacing: '0.05em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none" style={{ letterSpacing: '0.35em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
                   </div>
                 </div>
               </div>
@@ -80,9 +80,9 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
-                  <div className="flex flex-col overflow-hidden" style={{ width: '150px' }}>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none text-center" style={{ transform: 'scaleX(1.9)', transformOrigin: 'center', display: 'block', width: '100%' }}>JOIN</span>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none text-center" style={{ transform: 'scaleX(1.0)', transformOrigin: 'center', display: 'block', width: '100%' }}>PILLAR!</span>
+                  <div className="flex flex-col" style={{ width: '160px' }}>
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none" style={{ letterSpacing: '0.25em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none" style={{ letterSpacing: '0.05em', display: 'block', width: '100%', textAlign: 'center' }}>PILLAR!</span>
                   </div>
                 </div>
               </div>
