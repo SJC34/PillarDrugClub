@@ -10,6 +10,7 @@ import {
   Check,
   ArrowRight
 } from "lucide-react";
+import avoidImage from "@assets/IMG_6107_1759082772316.jpeg";
 
 export default function HomePage() {
   const benefits = [
@@ -50,6 +51,23 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="py-12 md:py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
+          {/* Image with "AVOID THIS" overlay */}
+          <div className="relative mb-8 max-w-md mx-auto">
+            <img 
+              src={avoidImage} 
+              alt="Medication costs comparison" 
+              className="w-full h-auto rounded-lg shadow-lg"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-black/50 rounded-lg px-6 py-3 backdrop-blur-sm">
+                <span className="text-2xl md:text-3xl font-black">
+                  <span className="text-primary">AVOID</span>
+                  <span className="text-white ml-2">THIS</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
             Wholesale Prescription Prices
             <span className="text-primary block">No Insurance Required</span>
