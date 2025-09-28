@@ -10,6 +10,7 @@ import {
   Check,
   ArrowRight
 } from "lucide-react";
+import logoImage from "@assets/Add a heading_1759045832640.png";
 
 export default function HomePage() {
   const benefits = [
@@ -50,6 +51,13 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="py-12 md:py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
+          <div className="mb-8">
+            <img 
+              src={logoImage} 
+              alt="Pillar Drug Club" 
+              className="h-32 md:h-40 w-auto mx-auto"
+            />
+          </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
             Wholesale Prescription Prices
             <span className="text-primary block">No Insurance Required</span>
