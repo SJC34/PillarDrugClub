@@ -56,7 +56,7 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
             {/* Image with "AVOID THIS" overlay */}
             <div className="flex-1 max-w-md mx-auto md:mx-0">
-              <p className="text-lg font-bold text-secondary mb-2 text-center tracking-tight">WHO WANTS TO WAIT IN LINES AT THE PHARMACY?</p>
+              <p className="text-lg font-bold text-secondary mb-2 text-center tracking-tight">STUCK IN LINES AT THE PHARMACY?</p>
               <div className="relative overflow-hidden">
               <img 
                 src={avoidImage} 
