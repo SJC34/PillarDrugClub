@@ -107,14 +107,14 @@ export default function MedicationsPage() {
                   Category
                 </label>
                 <Select 
-                  value={searchParams.category || ""}
-                  onValueChange={(value) => updateSearch({ category: value || undefined })}
+                  value={searchParams.category || "all"}
+                  onValueChange={(value) => updateSearch({ category: value === "all" ? undefined : value })}
                 >
                   <SelectTrigger data-testid="select-category">
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All categories</SelectItem>
+                    <SelectItem value="all">All categories</SelectItem>
                     {categories.map(category => (
                       <SelectItem key={category} value={category}>
                         {category}
@@ -129,16 +129,16 @@ export default function MedicationsPage() {
                   Prescription Required
                 </label>
                 <Select 
-                  value={searchParams.requiresPrescription?.toString() || ""}
+                  value={searchParams.requiresPrescription?.toString() || "all"}
                   onValueChange={(value) => updateSearch({ 
-                    requiresPrescription: value === "" ? undefined : value === "true" 
+                    requiresPrescription: value === "all" ? undefined : value === "true" 
                   })}
                 >
                   <SelectTrigger data-testid="select-prescription-required">
                     <SelectValue placeholder="All medications" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All medications</SelectItem>
+                    <SelectItem value="all">All medications</SelectItem>
                     <SelectItem value="true">Prescription required</SelectItem>
                     <SelectItem value="false">Over-the-counter</SelectItem>
                   </SelectContent>
