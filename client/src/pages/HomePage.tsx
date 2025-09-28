@@ -52,11 +52,13 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
+          {/* Question above both images */}
+          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">STUCK IN LINES AT THE PHARMACY?</p>
+          
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
             {/* Image with "AVOID THIS" overlay */}
             <div className="flex-1 max-w-md mx-auto md:mx-0">
-              <p className="text-lg font-bold text-secondary mb-2 text-center tracking-tight">STUCK IN LINES AT THE PHARMACY?</p>
               <div className="relative overflow-hidden">
               <img 
                 src={avoidImage} 
