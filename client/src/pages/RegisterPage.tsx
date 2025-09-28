@@ -93,11 +93,11 @@ export default function RegisterPage() {
   // Check for Stripe configuration
   if (!STRIPE_PUBLIC_KEY) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
-        <div className="max-w-md mx-auto p-6">
+      <div className="min-h-screen flex items-center justify-center px-4 py-8">
+        <div className="max-w-md mx-auto w-full">
           <Card>
             <CardHeader className="text-center">
-              <Pill className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <Pill className="h-12 w-12 text-primary mx-auto mb-4" />
               <CardTitle>Configuration Required</CardTitle>
               <CardDescription>
                 Payment processing is not properly configured. Please contact support.
@@ -213,38 +213,38 @@ export default function RegisterPage() {
 
   if (step === 'payment' && clientSecret) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-        <div className="max-w-4xl mx-auto p-6">
+      <div className="min-h-screen px-4 py-8">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 md:mb-8">
             <Link href="/">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Pill className="h-8 w-8 text-blue-600" />
-                <span className="text-2xl font-bold text-gray-900">Pillar Drug Club</span>
+                <Pill className="h-8 w-8 text-primary" />
+                <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
               </div>
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Registration</h1>
-            <p className="text-gray-600">Subscribe for $10/month to access wholesale pricing</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Complete Your Registration</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Subscribe for $10/month to access wholesale pricing</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Benefits */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                   <Check className="h-5 w-5 text-green-600" />
                   Your Membership Benefits
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm md:text-base">
                   Everything included in your $10/month subscription
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
                   {benefits.map((benefit, idx) => (
-                    <li key={idx} className="flex items-center gap-3">
-                      <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-                      <span className="text-gray-700">{benefit}</span>
+                    <li key={idx} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm md:text-base text-foreground">{benefit}</span>
                     </li>
                   ))}
                 </ul>
@@ -254,20 +254,20 @@ export default function RegisterPage() {
             {/* Payment Form */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                  <CreditCard className="h-5 w-5 text-primary" />
                   Payment Information
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm md:text-base">
                   Secure payment powered by Stripe
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <div className="text-3xl font-bold text-blue-600">$10</div>
-                    <div className="text-gray-600">per month</div>
-                    <div className="text-sm text-gray-500 mt-1">Cancel anytime</div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <div className="text-2xl md:text-3xl font-bold text-primary">$10</div>
+                    <div className="text-sm md:text-base text-muted-foreground">per month</div>
+                    <div className="text-xs md:text-sm text-muted-foreground mt-1">Cancel anytime</div>
                   </div>
                 </div>
 
@@ -275,15 +275,15 @@ export default function RegisterPage() {
                   <PaymentForm clientSecret={clientSecret} onSuccess={onPaymentSuccess} />
                 </Elements>
 
-                <div className="mt-4 text-center text-xs text-gray-500">
+                <div className="mt-4 text-center text-xs md:text-sm text-muted-foreground">
                   Your payment information is secure and encrypted.
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <div className="text-center mt-8">
-            <Button variant="outline" onClick={() => setStep('register')} data-testid="button-back-to-register">
+          <div className="text-center mt-6 md:mt-8">
+            <Button variant="outline" onClick={() => setStep('register')} data-testid="button-back-to-register" className="w-full sm:w-auto">
               Back to Registration
             </Button>
           </div>
@@ -293,74 +293,77 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 md:mb-8">
           <Link href="/">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Pill className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">Pillar Drug Club</span>
+              <Pill className="h-8 w-8 text-primary" />
+              <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
             </div>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Join the Club</h1>
-          <p className="text-gray-600">Create your account and start saving on prescriptions</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join the Club</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Create your account and start saving on prescriptions</p>
         </div>
 
         {/* Registration Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Create Account</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg md:text-xl">Create Account</CardTitle>
+            <CardDescription className="text-sm md:text-base">
               Sign up for $10/month access to wholesale prescription pricing
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName" className="text-sm md:text-base">First Name</Label>
                   <Input
                     id="firstName"
                     placeholder="John"
                     {...register("firstName")}
                     data-testid="input-first-name"
+                    className="h-10 md:h-11"
                   />
                   {errors.firstName && (
-                    <p className="text-sm text-red-600">{errors.firstName.message}</p>
+                    <p className="text-xs md:text-sm text-destructive">{errors.firstName.message}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName" className="text-sm md:text-base">Last Name</Label>
                   <Input
                     id="lastName"
                     placeholder="Smith"
                     {...register("lastName")}
                     data-testid="input-last-name"
+                    className="h-10 md:h-11"
                   />
                   {errors.lastName && (
-                    <p className="text-sm text-red-600">{errors.lastName.message}</p>
+                    <p className="text-xs md:text-sm text-destructive">{errors.lastName.message}</p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-sm md:text-base">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="john@example.com"
                   {...register("email")}
                   data-testid="input-email"
+                  className="h-10 md:h-11"
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-600">{errors.email.message}</p>
+                  <p className="text-xs md:text-sm text-destructive">{errors.email.message}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-sm md:text-base">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -368,6 +371,7 @@ export default function RegisterPage() {
                     placeholder="Create a secure password"
                     {...register("password")}
                     data-testid="input-password"
+                    className="h-10 md:h-11 pr-10"
                   />
                   <Button
                     type="button"
@@ -378,19 +382,19 @@ export default function RegisterPage() {
                     data-testid="button-toggle-password"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
                   </Button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-red-600">{errors.password.message}</p>
+                  <p className="text-xs md:text-sm text-destructive">{errors.password.message}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-sm md:text-base">Confirm Password</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
@@ -398,6 +402,7 @@ export default function RegisterPage() {
                     placeholder="Confirm your password"
                     {...register("confirmPassword")}
                     data-testid="input-confirm-password"
+                    className="h-10 md:h-11 pr-10"
                   />
                   <Button
                     type="button"
@@ -408,42 +413,43 @@ export default function RegisterPage() {
                     data-testid="button-toggle-confirm-password"
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
                   </Button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+                  <p className="text-xs md:text-sm text-destructive">{errors.confirmPassword.message}</p>
                 )}
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-start space-x-3">
                 <Checkbox
                   id="acceptTerms"
                   checked={acceptTerms}
                   onCheckedChange={(checked) => setValue("acceptTerms", checked as boolean)}
                   data-testid="checkbox-accept-terms"
+                  className="mt-1"
                 />
-                <Label htmlFor="acceptTerms" className="text-sm">
+                <Label htmlFor="acceptTerms" className="text-xs md:text-sm leading-relaxed">
                   I agree to the{" "}
-                  <a href="#" className="text-blue-600 hover:underline">
+                  <a href="#" className="text-primary hover:underline">
                     Terms of Service
                   </a>{" "}
                   and{" "}
-                  <a href="#" className="text-blue-600 hover:underline">
+                  <a href="#" className="text-primary hover:underline">
                     Privacy Policy
                   </a>
                 </Label>
               </div>
               {errors.acceptTerms && (
-                <p className="text-sm text-red-600">{errors.acceptTerms.message}</p>
+                <p className="text-xs md:text-sm text-destructive">{errors.acceptTerms.message}</p>
               )}
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full h-11 md:h-12 text-sm md:text-base" 
                 disabled={isSubmitting}
                 data-testid="button-register-submit"
               >
@@ -452,10 +458,10 @@ export default function RegisterPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <div className="text-sm text-gray-600">
+              <div className="text-xs md:text-sm text-muted-foreground">
                 Already have an account?{" "}
                 <Link href="/login">
-                  <Button variant="link" className="p-0 h-auto font-semibold text-blue-600">
+                  <Button variant="link" className="p-0 h-auto font-semibold text-primary">
                     Sign in
                   </Button>
                 </Link>
@@ -467,7 +473,7 @@ export default function RegisterPage() {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/">
-            <Button variant="outline" data-testid="button-back-home">
+            <Button variant="outline" data-testid="button-back-home" className="w-full sm:w-auto">
               Back to Home
             </Button>
           </Link>
