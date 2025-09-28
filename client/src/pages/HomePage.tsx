@@ -53,11 +53,11 @@ export default function HomePage() {
       <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
           {/* Question above both images */}
-          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">STUCK IN LINES AT THE PHARMACY?</p>
+          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Stuck in Lines at the Pharmacy?</p>
           
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
-            {/* Image with "AVOID THIS" overlay */}
+            {/* Image with "Avoid This" overlay */}
             <div className="flex-1 max-w-md mx-auto md:mx-0">
               <div className="relative overflow-hidden">
               <img 
@@ -69,15 +69,15 @@ export default function HomePage() {
               <div className="absolute inset-0 flex items-center justify-end pr-4">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3">
                   <div className="flex flex-col text-center min-w-[100px]">
-                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">AVOID</span>
-                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-tight tracking-wider">THIS</span>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">Avoid</span>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-tight tracking-wider">This</span>
                   </div>
                 </div>
               </div>
               </div>
             </div>
 
-            {/* Image with "Join Pillar!" overlay */}
+            {/* Image with "Join pillar!" overlay */}
             <div className="relative flex-1 max-w-md mx-auto md:mx-0 overflow-hidden">
               <img 
                 src={joinImage} 
@@ -89,7 +89,7 @@ export default function HomePage() {
                 <Link href="/register">
                   <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-4 py-3">
                     <div className="flex flex-col text-center min-w-[120px]">
-                      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">JOIN</span>
+                      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">Join</span>
                       <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-tight tracking-wide">pillar!</span>
                     </div>
                   </div>
