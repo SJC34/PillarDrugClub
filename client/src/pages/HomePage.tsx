@@ -78,7 +78,7 @@ export default function HomePage() {
                 src={joinImage} 
                 alt="Join Pillar Drug Club" 
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '265px', objectFit: 'cover', objectPosition: '30% 70%' }}
+                style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 60%' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
