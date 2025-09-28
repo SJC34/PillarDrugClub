@@ -56,6 +56,7 @@ export default function HomePage() {
               src={logoImage} 
               alt="Pillar Drug Club" 
               className="h-48 md:h-56 lg:h-64 w-auto mx-auto rounded-2xl"
+              style={{ transform: 'scaleX(-1)' }}
             />
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
