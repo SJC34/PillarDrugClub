@@ -5,7 +5,8 @@ import {
   type Prescription, type InsertPrescription,
   type Order, type InsertOrder, type OrderSearch,
   type Shipment, type InsertShipment,
-  type Prescriber, type InsertPrescriber
+  type Prescriber, type InsertPrescriber,
+  type Pharmacy, type InsertPharmacy
 } from "@shared/pharmacy-schema";
 import { randomUUID } from "crypto";
 
@@ -58,6 +59,12 @@ export interface IStorage {
   getPrescriber(id: string): Promise<Prescriber | undefined>;
   getPrescriberByNpi(npi: string): Promise<Prescriber | undefined>;
   createPrescriber(prescriber: InsertPrescriber): Promise<Prescriber>;
+
+  // Pharmacies
+  getPharmacy(id: string): Promise<Pharmacy | undefined>;
+  getPharmacyByName(name: string): Promise<Pharmacy | undefined>;
+  searchPharmacies(query: string): Promise<Pharmacy[]>;
+  createPharmacy(pharmacy: InsertPharmacy): Promise<Pharmacy>;
 }
 
 export class MemStorage implements IStorage {
@@ -68,6 +75,7 @@ export class MemStorage implements IStorage {
   private orders: Map<string, Order>;
   private shipments: Map<string, Shipment>;
   private prescribers: Map<string, Prescriber>;
+  private pharmacies: Map<string, Pharmacy>;
   private orderCounter: number;
 
   constructor() {
@@ -78,8 +86,10 @@ export class MemStorage implements IStorage {
     this.orders = new Map();
     this.shipments = new Map();
     this.prescribers = new Map();
+    this.pharmacies = new Map();
     this.orderCounter = 1000;
     this.seedMockData();
+    this.importDataOnStartup();
   }
 
   private seedMockData() {
@@ -551,6 +561,599 @@ export class MemStorage implements IStorage {
     };
     this.prescribers.set(id, prescriber);
     return prescriber;
+  }
+
+  async importInitialPrescribers(): Promise<void> {
+    const prescribersData = [
+      {
+        npi: "1234567890",
+        firstName: "Sarah",
+        lastName: "Johnson",
+        specialty: "Internal Medicine",
+        phone: "(555) 123-4567",
+        fax: "(555) 123-4568",
+        address: {
+          street: "123 Medical Center Dr",
+          city: "Boston",
+          state: "MA",
+          zipCode: "02115",
+          country: "US"
+        },
+        licenseNumber: "MA123456",
+        deaNumber: "BJ1234567"
+      },
+      {
+        npi: "2345678901",
+        firstName: "Michael",
+        lastName: "Chen",
+        specialty: "Cardiology",
+        phone: "(555) 234-5678",
+        fax: "(555) 234-5679",
+        address: {
+          street: "456 Heart Center Ave",
+          city: "San Francisco",
+          state: "CA",
+          zipCode: "94102",
+          country: "US"
+        },
+        licenseNumber: "CA234567",
+        deaNumber: "BC2345678"
+      },
+      {
+        npi: "3456789012",
+        firstName: "Emily",
+        lastName: "Rodriguez",
+        specialty: "Endocrinology",
+        phone: "(555) 345-6789",
+        fax: "(555) 345-6780",
+        address: {
+          street: "789 Diabetes Way",
+          city: "Miami",
+          state: "FL",
+          zipCode: "33101",
+          country: "US"
+        },
+        licenseNumber: "FL345678",
+        deaNumber: "BR3456789"
+      },
+      {
+        npi: "4567890123",
+        firstName: "David",
+        lastName: "Thompson",
+        specialty: "Family Medicine",
+        phone: "(555) 456-7890",
+        fax: "(555) 456-7891",
+        address: {
+          street: "321 Family Health Blvd",
+          city: "Chicago",
+          state: "IL",
+          zipCode: "60601",
+          country: "US"
+        },
+        licenseNumber: "IL456789",
+        deaNumber: "BT4567890"
+      },
+      {
+        npi: "5678901234",
+        firstName: "Jessica",
+        lastName: "Williams",
+        specialty: "Psychiatry",
+        phone: "(555) 567-8901",
+        fax: "(555) 567-8902",
+        address: {
+          street: "654 Mental Health St",
+          city: "Seattle",
+          state: "WA",
+          zipCode: "98101",
+          country: "US"
+        },
+        licenseNumber: "WA567890",
+        deaNumber: "BW5678901"
+      },
+      {
+        npi: "6789012345",
+        firstName: "Robert",
+        lastName: "Davis",
+        specialty: "Orthopedic Surgery",
+        phone: "(555) 678-9012",
+        fax: "(555) 678-9013",
+        address: {
+          street: "987 Bone & Joint Rd",
+          city: "Dallas",
+          state: "TX",
+          zipCode: "75201",
+          country: "US"
+        },
+        licenseNumber: "TX678901",
+        deaNumber: "BD6789012"
+      },
+      {
+        npi: "7890123456",
+        firstName: "Lisa",
+        lastName: "Anderson",
+        specialty: "Dermatology",
+        phone: "(555) 789-0123",
+        fax: "(555) 789-0124",
+        address: {
+          street: "147 Skin Care Lane",
+          city: "Phoenix",
+          state: "AZ",
+          zipCode: "85001",
+          country: "US"
+        },
+        licenseNumber: "AZ789012",
+        deaNumber: "BA7890123"
+      },
+      {
+        npi: "8901234567",
+        firstName: "James",
+        lastName: "Wilson",
+        specialty: "Neurology",
+        phone: "(555) 890-1234",
+        fax: "(555) 890-1235",
+        address: {
+          street: "258 Brain Center Pkwy",
+          city: "Atlanta",
+          state: "GA",
+          zipCode: "30301",
+          country: "US"
+        },
+        licenseNumber: "GA890123",
+        deaNumber: "BW8901234"
+      },
+      {
+        npi: "9012345678",
+        firstName: "Rachel",
+        lastName: "Brown",
+        specialty: "Pediatrics",
+        phone: "(555) 901-2345",
+        fax: "(555) 901-2346",
+        address: {
+          street: "369 Children's Hospital Way",
+          city: "Denver",
+          state: "CO",
+          zipCode: "80201",
+          country: "US"
+        },
+        licenseNumber: "CO901234",
+        deaNumber: "BB9012345"
+      },
+      {
+        npi: "0123456789",
+        firstName: "Kevin",
+        lastName: "Martinez",
+        specialty: "Ophthalmology",
+        phone: "(555) 012-3456",
+        fax: "(555) 012-3457",
+        address: {
+          street: "741 Eye Care Center Dr",
+          city: "Las Vegas",
+          state: "NV",
+          zipCode: "89101",
+          country: "US"
+        },
+        licenseNumber: "NV012345",
+        deaNumber: "BM0123456"
+      },
+      {
+        npi: "1357924680",
+        firstName: "Amanda",
+        lastName: "Garcia",
+        specialty: "Oncology",
+        phone: "(555) 135-7924",
+        fax: "(555) 135-7925",
+        address: {
+          street: "852 Cancer Treatment Ave",
+          city: "Portland",
+          state: "OR",
+          zipCode: "97201",
+          country: "US"
+        },
+        licenseNumber: "OR135792",
+        deaNumber: "BG1357924"
+      },
+      {
+        npi: "2468013579",
+        firstName: "Christopher",
+        lastName: "Lee",
+        specialty: "Gastroenterology",
+        phone: "(555) 246-8013",
+        fax: "(555) 246-8014",
+        address: {
+          street: "963 Digestive Health Blvd",
+          city: "Nashville",
+          state: "TN",
+          zipCode: "37201",
+          country: "US"
+        },
+        licenseNumber: "TN246801",
+        deaNumber: "BL2468013"
+      },
+      {
+        npi: "3691470258",
+        firstName: "Nicole",
+        lastName: "Taylor",
+        specialty: "Rheumatology",
+        phone: "(555) 369-1470",
+        fax: "(555) 369-1471",
+        address: {
+          street: "159 Joint Care Center St",
+          city: "Salt Lake City",
+          state: "UT",
+          zipCode: "84101",
+          country: "US"
+        },
+        licenseNumber: "UT369147",
+        deaNumber: "BT3691470"
+      },
+      {
+        npi: "4815162342",
+        firstName: "Mark",
+        lastName: "White",
+        specialty: "Pulmonology",
+        phone: "(555) 481-5162",
+        fax: "(555) 481-5163",
+        address: {
+          street: "753 Lung Health Dr",
+          city: "Minneapolis",
+          state: "MN",
+          zipCode: "55401",
+          country: "US"
+        },
+        licenseNumber: "MN481516",
+        deaNumber: "BW4815162"
+      },
+      {
+        npi: "5926284037",
+        firstName: "Jennifer",
+        lastName: "Clark",
+        specialty: "Emergency Medicine",
+        phone: "(555) 592-6284",
+        fax: "(555) 592-6285",
+        address: {
+          street: "486 Emergency Care Way",
+          city: "Kansas City",
+          state: "MO",
+          zipCode: "64101",
+          country: "US"
+        },
+        licenseNumber: "MO592628",
+        deaNumber: "BC5926284"
+      }
+    ];
+
+    console.log('🔄 Importing prescribers...');
+    let importedCount = 0;
+
+    for (const prescriberData of prescribersData) {
+      try {
+        await this.createPrescriber(prescriberData);
+        importedCount++;
+      } catch (error) {
+        console.error(`Error importing prescriber ${prescriberData.firstName} ${prescriberData.lastName}:`, error);
+      }
+    }
+
+    console.log(`✅ Successfully imported ${importedCount} prescribers`);
+  }
+
+  // Pharmacy methods
+  async getPharmacy(id: string): Promise<Pharmacy | undefined> {
+    return this.pharmacies.get(id);
+  }
+
+  async getPharmacyByName(name: string): Promise<Pharmacy | undefined> {
+    return Array.from(this.pharmacies.values()).find(
+      (pharmacy) => pharmacy.name.toLowerCase().includes(name.toLowerCase()),
+    );
+  }
+
+  async searchPharmacies(query: string): Promise<Pharmacy[]> {
+    if (!query) {
+      return Array.from(this.pharmacies.values());
+    }
+    
+    return Array.from(this.pharmacies.values()).filter(pharmacy =>
+      pharmacy.name.toLowerCase().includes(query.toLowerCase()) ||
+      pharmacy.chain?.toLowerCase().includes(query.toLowerCase()) ||
+      pharmacy.address.city.toLowerCase().includes(query.toLowerCase()) ||
+      pharmacy.address.state.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+
+  async createPharmacy(insertPharmacy: InsertPharmacy): Promise<Pharmacy> {
+    const id = randomUUID();
+    const now = new Date().toISOString();
+    const pharmacy: Pharmacy = { 
+      ...insertPharmacy, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
+    };
+    this.pharmacies.set(id, pharmacy);
+    return pharmacy;
+  }
+
+  async importInitialPharmacies(): Promise<void> {
+    const pharmaciesData = [
+      {
+        name: "CVS Pharmacy #1234",
+        chain: "CVS",
+        phone: "(555) 100-1000",
+        fax: "(555) 100-1001",
+        email: "cvs1234@cvs.com",
+        address: {
+          street: "123 Main St",
+          city: "Boston",
+          state: "MA",
+          zipCode: "02101",
+          country: "US"
+        },
+        hours: {
+          monday: "8:00 AM - 10:00 PM",
+          tuesday: "8:00 AM - 10:00 PM",
+          wednesday: "8:00 AM - 10:00 PM",
+          thursday: "8:00 AM - 10:00 PM",
+          friday: "8:00 AM - 10:00 PM",
+          saturday: "9:00 AM - 9:00 PM",
+          sunday: "10:00 AM - 8:00 PM"
+        },
+        services: ["prescription_transfer", "vaccinations", "flu_shots", "covid_testing"],
+        ncpdpId: "0000001"
+      },
+      {
+        name: "Walgreens #2468",
+        chain: "Walgreens",
+        phone: "(555) 200-2000",
+        fax: "(555) 200-2001",
+        email: "wal2468@walgreens.com",
+        address: {
+          street: "456 Oak Ave",
+          city: "San Francisco",
+          state: "CA",
+          zipCode: "94102",
+          country: "US"
+        },
+        hours: {
+          monday: "7:00 AM - 11:00 PM",
+          tuesday: "7:00 AM - 11:00 PM",
+          wednesday: "7:00 AM - 11:00 PM",
+          thursday: "7:00 AM - 11:00 PM",
+          friday: "7:00 AM - 11:00 PM",
+          saturday: "8:00 AM - 10:00 PM",
+          sunday: "9:00 AM - 9:00 PM"
+        },
+        services: ["prescription_transfer", "vaccinations", "diabetes_care", "blood_pressure_monitoring"],
+        ncpdpId: "0000002"
+      },
+      {
+        name: "Rite Aid #3691",
+        chain: "Rite Aid",
+        phone: "(555) 300-3000",
+        fax: "(555) 300-3001",
+        email: "riteaid3691@riteaid.com",
+        address: {
+          street: "789 Pine St",
+          city: "Chicago",
+          state: "IL",
+          zipCode: "60601",
+          country: "US"
+        },
+        hours: {
+          monday: "9:00 AM - 9:00 PM",
+          tuesday: "9:00 AM - 9:00 PM",
+          wednesday: "9:00 AM - 9:00 PM",
+          thursday: "9:00 AM - 9:00 PM",
+          friday: "9:00 AM - 9:00 PM",
+          saturday: "9:00 AM - 8:00 PM",
+          sunday: "10:00 AM - 6:00 PM"
+        },
+        services: ["prescription_transfer", "wellness_screenings", "immunizations"],
+        ncpdpId: "0000003"
+      },
+      {
+        name: "Kroger Pharmacy #4815",
+        chain: "Kroger",
+        phone: "(555) 400-4000",
+        fax: "(555) 400-4001",
+        email: "pharmacy4815@kroger.com",
+        address: {
+          street: "321 Elm Dr",
+          city: "Atlanta",
+          state: "GA",
+          zipCode: "30301",
+          country: "US"
+        },
+        hours: {
+          monday: "9:00 AM - 8:00 PM",
+          tuesday: "9:00 AM - 8:00 PM",
+          wednesday: "9:00 AM - 8:00 PM",
+          thursday: "9:00 AM - 8:00 PM",
+          friday: "9:00 AM - 8:00 PM",
+          saturday: "10:00 AM - 6:00 PM",
+          sunday: "11:00 AM - 5:00 PM"
+        },
+        services: ["prescription_transfer", "medication_therapy_management", "health_screenings"],
+        ncpdpId: "0000004"
+      },
+      {
+        name: "Publix Pharmacy #5926",
+        chain: "Publix",
+        phone: "(555) 500-5000",
+        fax: "(555) 500-5001",
+        email: "publix5926@publix.com",
+        address: {
+          street: "654 Sunset Blvd",
+          city: "Miami",
+          state: "FL",
+          zipCode: "33101",
+          country: "US"
+        },
+        hours: {
+          monday: "9:00 AM - 9:00 PM",
+          tuesday: "9:00 AM - 9:00 PM",
+          wednesday: "9:00 AM - 9:00 PM",
+          thursday: "9:00 AM - 9:00 PM",
+          friday: "9:00 AM - 9:00 PM",
+          saturday: "9:00 AM - 7:00 PM",
+          sunday: "11:00 AM - 6:00 PM"
+        },
+        services: ["prescription_transfer", "vaccinations", "medication_synchronization"],
+        ncpdpId: "0000005"
+      },
+      {
+        name: "Walmart Pharmacy #6284",
+        chain: "Walmart",
+        phone: "(555) 600-6000",
+        fax: "(555) 600-6001",
+        email: "pharmacy6284@walmart.com",
+        address: {
+          street: "987 Commerce Way",
+          city: "Dallas",
+          state: "TX",
+          zipCode: "75201",
+          country: "US"
+        },
+        hours: {
+          monday: "9:00 AM - 8:00 PM",
+          tuesday: "9:00 AM - 8:00 PM",
+          wednesday: "9:00 AM - 8:00 PM",
+          thursday: "9:00 AM - 8:00 PM",
+          friday: "9:00 AM - 8:00 PM",
+          saturday: "9:00 AM - 7:00 PM",
+          sunday: "10:00 AM - 6:00 PM"
+        },
+        services: ["prescription_transfer", "$4_generics", "specialty_pharmacy"],
+        ncpdpId: "0000006"
+      },
+      {
+        name: "Costco Pharmacy #7158",
+        chain: "Costco",
+        phone: "(555) 700-7000",
+        fax: "(555) 700-7001",
+        email: "pharmacy7158@costco.com",
+        address: {
+          street: "159 Wholesale Dr",
+          city: "Seattle",
+          state: "WA",
+          zipCode: "98101",
+          country: "US"
+        },
+        hours: {
+          monday: "10:00 AM - 8:30 PM",
+          tuesday: "10:00 AM - 8:30 PM",
+          wednesday: "10:00 AM - 8:30 PM",
+          thursday: "10:00 AM - 8:30 PM",
+          friday: "10:00 AM - 8:30 PM",
+          saturday: "9:30 AM - 6:00 PM",
+          sunday: "10:00 AM - 6:00 PM"
+        },
+        services: ["prescription_transfer", "immunizations", "specialty_medications"],
+        ncpdpId: "0000007"
+      },
+      {
+        name: "Target Pharmacy #8369",
+        chain: "Target",
+        phone: "(555) 800-8000",
+        fax: "(555) 800-8001",
+        email: "pharmacy8369@target.com",
+        address: {
+          street: "753 Shopping Center Blvd",
+          city: "Phoenix",
+          state: "AZ",
+          zipCode: "85001",
+          country: "US"
+        },
+        hours: {
+          monday: "9:00 AM - 9:00 PM",
+          tuesday: "9:00 AM - 9:00 PM",
+          wednesday: "9:00 AM - 9:00 PM",
+          thursday: "9:00 AM - 9:00 PM",
+          friday: "9:00 AM - 9:00 PM",
+          saturday: "9:00 AM - 7:00 PM",
+          sunday: "11:00 AM - 6:00 PM"
+        },
+        services: ["prescription_transfer", "vaccinations", "health_consultations"],
+        ncpdpId: "0000008"
+      },
+      {
+        name: "Safeway Pharmacy #9147",
+        chain: "Safeway",
+        phone: "(555) 900-9000",
+        fax: "(555) 900-9001",
+        email: "pharmacy9147@safeway.com",
+        address: {
+          street: "486 Grocery Lane",
+          city: "Denver",
+          state: "CO",
+          zipCode: "80201",
+          country: "US"
+        },
+        hours: {
+          monday: "9:00 AM - 8:00 PM",
+          tuesday: "9:00 AM - 8:00 PM",
+          wednesday: "9:00 AM - 8:00 PM",
+          thursday: "9:00 AM - 8:00 PM",
+          friday: "9:00 AM - 8:00 PM",
+          saturday: "9:00 AM - 6:00 PM",
+          sunday: "10:00 AM - 5:00 PM"
+        },
+        services: ["prescription_transfer", "medication_review", "diabetes_education"],
+        ncpdpId: "0000009"
+      },
+      {
+        name: "H-E-B Pharmacy #0258",
+        chain: "H-E-B",
+        phone: "(555) 025-8000",
+        fax: "(555) 025-8001",
+        email: "pharmacy0258@heb.com",
+        address: {
+          street: "147 Texas Ave",
+          city: "Austin",
+          state: "TX",
+          zipCode: "73301",
+          country: "US"
+        },
+        hours: {
+          monday: "8:00 AM - 8:00 PM",
+          tuesday: "8:00 AM - 8:00 PM",
+          wednesday: "8:00 AM - 8:00 PM",
+          thursday: "8:00 AM - 8:00 PM",
+          friday: "8:00 AM - 8:00 PM",
+          saturday: "9:00 AM - 6:00 PM",
+          sunday: "10:00 AM - 5:00 PM"
+        },
+        services: ["prescription_transfer", "immunizations", "medication_adherence"],
+        ncpdpId: "0000010"
+      }
+    ];
+
+    console.log('🔄 Importing pharmacies...');
+    let importedCount = 0;
+
+    for (const pharmacyData of pharmaciesData) {
+      try {
+        await this.createPharmacy(pharmacyData);
+        importedCount++;
+      } catch (error) {
+        console.error(`Error importing pharmacy ${pharmacyData.name}:`, error);
+      }
+    }
+
+    console.log(`✅ Successfully imported ${importedCount} pharmacies`);
+  }
+
+  private async importDataOnStartup(): Promise<void> {
+    // Import prescribers and pharmacies on startup
+    console.log('🔄 Starting initial data import...');
+    
+    try {
+      await this.importInitialPrescribers();
+      await this.importInitialPharmacies();
+      console.log('✅ Initial data import completed successfully');
+    } catch (error) {
+      console.error('❌ Error during initial data import:', error);
+    }
   }
 }
 

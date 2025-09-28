@@ -12,7 +12,9 @@ import {
   Settings,
   TrendingDown,
   Clock,
-  CheckCircle
+  CheckCircle,
+  FileText,
+  ArrowRight
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -105,8 +107,15 @@ export default function DashboardPage() {
       title: "Cost Calculator",
       description: "Compare medication costs",
       icon: Calculator,
-      href: "/calculator",
+      href: "/cost-calculator",
       color: "bg-blue-50 text-blue-600"
+    },
+    {
+      title: "Prescription Transfer",
+      description: "Transfer prescriptions or request new ones",
+      icon: FileText,
+      href: "/prescription-transfer",
+      color: "bg-orange-50 text-orange-600"
     },
     {
       title: "Browse Medications",
@@ -121,13 +130,6 @@ export default function DashboardPage() {
       icon: Package,
       href: "/orders",
       color: "bg-purple-50 text-purple-600"
-    },
-    {
-      title: "Account Settings",
-      description: "Manage your profile",
-      icon: Settings,
-      href: "/settings",
-      color: "bg-gray-50 text-gray-600"
     }
   ];
 

@@ -11,6 +11,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import DashboardPage from "@/pages/DashboardPage";
+import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,7 +24,8 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
-      <Route path="/calculator" component={CostCalculatorPage} />
+      <Route path="/cost-calculator" component={CostCalculatorPage} />
+      <Route path="/prescription-transfer" component={PrescriptionTransferPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

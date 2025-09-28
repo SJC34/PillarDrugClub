@@ -177,6 +177,36 @@ export const prescriberSchema = z.object({
   updatedAt: z.string()
 });
 
+// Pharmacy Schema
+export const pharmacySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  chain: z.string().optional(), // CVS, Walgreens, etc.
+  phone: z.string(),
+  fax: z.string().optional(),
+  email: z.string().email().optional(),
+  address: z.object({
+    street: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zipCode: z.string(),
+    country: z.string().default("US")
+  }),
+  hours: z.object({
+    monday: z.string().optional(),
+    tuesday: z.string().optional(),
+    wednesday: z.string().optional(),
+    thursday: z.string().optional(),
+    friday: z.string().optional(),
+    saturday: z.string().optional(),
+    sunday: z.string().optional()
+  }).optional(),
+  services: z.array(z.string()).default([]), // ["prescription_transfer", "vaccinations", "diabetes_care"]
+  ncpdpId: z.string().optional(), // National Council for Prescription Drug Programs ID
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
 // Insert schemas for forms
 export const insertCustomerSchema = customerSchema.omit({ 
   id: true, 
@@ -190,10 +220,30 @@ export const insertMedicationSchema = medicationSchema.omit({
   updatedAt: true 
 });
 
-export const insertPrescriptionSchema = prescriptionSchema.omit({ 
-  id: true, 
-  createdAt: true, 
-  updatedAt: true 
+// Flexible prescription insert schema for form submissions
+export const insertPrescriptionSchema = z.object({
+  customerId: z.string(),
+  medicationName: z.string(),
+  dosage: z.string(),
+  quantity: z.number().int().positive(),
+  prescriber: z.string().optional(), // Doctor name for fax requests
+  prescriberPhone: z.string().optional(),
+  prescriberFax: z.string().optional(), 
+  prescriberAddress: z.string().optional(),
+  patientName: z.string(),
+  patientDateOfBirth: z.string(),
+  urgency: z.enum(["routine", "urgent", "emergency"]).optional(),
+  specialInstructions: z.string().optional(),
+  // Transfer-specific fields
+  isTransfer: z.boolean().default(false),
+  prescriptionNumber: z.string().optional(),
+  transferFromPharmacy: z.string().optional(),
+  transferFromPharmacyPhone: z.string().optional(),
+  transferFromPharmacyAddress: z.string().optional(),
+  lastFillDate: z.string().optional(),
+  refillsRemaining: z.number().int().min(0).optional(),
+  transferReason: z.string().optional(),
+  status: z.enum(["pending", "processing", "completed", "cancelled"]).default("pending")
 });
 
 export const insertOrderSchema = orderSchema.omit({ 
@@ -215,6 +265,12 @@ export const insertPrescriberSchema = prescriberSchema.omit({
   updatedAt: true 
 });
 
+export const insertPharmacySchema = pharmacySchema.omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
+
 // Types
 export type Customer = z.infer<typeof customerSchema>;
 export type Medication = z.infer<typeof medicationSchema>;
@@ -222,6 +278,7 @@ export type Prescription = z.infer<typeof prescriptionSchema>;
 export type Order = z.infer<typeof orderSchema>;
 export type Shipment = z.infer<typeof shipmentSchema>;
 export type Prescriber = z.infer<typeof prescriberSchema>;
+export type Pharmacy = z.infer<typeof pharmacySchema>;
 
 export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
 export type InsertMedication = z.infer<typeof insertMedicationSchema>;
@@ -229,6 +286,7 @@ export type InsertPrescription = z.infer<typeof insertPrescriptionSchema>;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type InsertShipment = z.infer<typeof insertShipmentSchema>;
 export type InsertPrescriber = z.infer<typeof insertPrescriberSchema>;
+export type InsertPharmacy = z.infer<typeof insertPharmacySchema>;
 
 // Search and filter schemas
 export const medicationSearchSchema = z.object({
