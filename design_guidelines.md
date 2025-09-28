@@ -7,15 +7,15 @@ Inspired by Ro, For Hims, and Roman - emphasizing medical credibility through mi
 
 ### A. Color Palette
 **Primary Brand Colors:**
-- Primary Blue: 210 90% 40% (medical trust, credibility)
-- Deep Navy: 215 30% 12% (professional authority)
-- Success Green: 145 65% 42% (positive outcomes, savings)
+- Primary Forest Green: 145 65% 42% (medical trust, credibility, natural healing)
+- Secondary Emerald Green: 160 60% 35% (professional authority, nature)
+- Accent Sage Green: 155 70% 38% (positive outcomes, savings, wellness)
 
 **Supporting Colors:**
 - Pure White: 0 0% 100% (clean, medical-grade)
 - Light Gray: 210 10% 96% (subtle backgrounds)
 - Medium Gray: 210 12% 60% (secondary text)
-- Accent Orange: 20 85% 50% (CTAs - minimal use)
+- Accent Green: 160 70% 45% (CTAs - natural trust)
 
 ### B. Typography
 - **Primary:** Inter (Google Fonts) - medical-grade clarity
