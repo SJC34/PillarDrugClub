@@ -16,13 +16,13 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-primary/20">
+    <header className="sticky top-0 z-50 w-full bg-primary backdrop-blur-lg border-b border-primary-foreground/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <span className="text-xl font-semibold text-foreground" data-testid="text-logo">
+              <span className="text-xl font-semibold text-primary-foreground" data-testid="text-logo">
                 Pillar Drug Club
               </span>
             </div>
@@ -35,7 +35,7 @@ export default function Header() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-sm font-medium text-primary-foreground/70 transition-colors hover:text-primary-foreground"
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   {item.name}
@@ -51,6 +51,7 @@ export default function Header() {
               size="icon"
               onClick={toggleTheme}
               data-testid="button-theme-toggle"
+              className="text-primary-foreground hover:bg-primary-foreground/10"
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
@@ -61,12 +62,12 @@ export default function Header() {
             
             <div className="hidden md:flex items-center space-x-4">
               <a href="/login">
-                <Button variant="ghost" className="font-medium" data-testid="button-login">
+                <Button variant="ghost" className="font-medium text-primary-foreground hover:bg-primary-foreground/10" data-testid="button-login">
                   Sign in
                 </Button>
               </a>
               <a href="/register">
-                <Button className="font-medium px-6" data-testid="button-signup">
+                <Button variant="secondary" className="font-medium px-6" data-testid="button-signup">
                   Get started
                 </Button>
               </a>
@@ -79,7 +80,7 @@ export default function Header() {
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 data-testid="button-mobile-menu"
-                className="relative z-50"
+                className="relative z-50 text-primary-foreground hover:bg-primary-foreground/10"
               >
                 {isMenuOpen ? (
                   <X className="h-5 w-5" />
