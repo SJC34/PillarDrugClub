@@ -98,7 +98,7 @@ export default function RegisterPage() {
           <Card>
             <CardHeader className="text-center">
               <Pill className="h-12 w-12 text-primary mx-auto mb-4" />
-              <CardTitle>Configuration Required</CardTitle>
+              <CardTitle className="font-display">Configuration Required</CardTitle>
               <CardDescription>
                 Payment processing is not properly configured. Please contact support.
               </CardDescription>
@@ -231,7 +231,7 @@ export default function RegisterPage() {
             {/* Benefits */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-display">
                   <Check className="h-5 w-5 text-green-600" />
                   Your Membership Benefits
                 </CardTitle>
@@ -254,7 +254,7 @@ export default function RegisterPage() {
             {/* Payment Form */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-display">
                   <CreditCard className="h-5 w-5 text-primary" />
                   Payment Information
                 </CardTitle>
@@ -310,7 +310,7 @@ export default function RegisterPage() {
         {/* Registration Form */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg md:text-xl">Create Account</CardTitle>
+            <CardTitle className="text-lg md:text-xl font-display">Create Account</CardTitle>
             <CardDescription className="text-sm md:text-base">
               Sign up for $10/month access to wholesale prescription pricing
             </CardDescription>
@@ -461,7 +461,7 @@ export default function RegisterPage() {
               <div className="text-xs md:text-sm text-muted-foreground">
                 Already have an account?{" "}
                 <Link href="/login">
-                  <Button variant="link" className="p-0 h-auto font-semibold text-primary">
+                  <Button variant="ghost" className="p-0 h-auto font-semibold text-primary">
                     Sign in
                   </Button>
                 </Link>

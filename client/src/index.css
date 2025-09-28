@@ -77,7 +77,8 @@
   --chart-5: 177 55% 40%;
 
   --font-sans: 'Inter', sans-serif;
-  --font-serif: Georgia, serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-display: 'Playfair Display', serif;
   --font-mono: Menlo, monospace;
   --radius: .5rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(210 20% 20% / 0.02);
@@ -212,6 +213,31 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+  }
+
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* Apply display font to card titles and other key headings */
+  [data-radix-collection-item] h3,
+  .shadcn-card h3,
+  .shadcn-card [class*="CardTitle"],
+  [class*="CardTitle"],
+  [class*="text-2xl"],
+  .text-2xl,
+  .text-2xl.font-semibold,
+  div.text-2xl,
+  div[class*="text-2xl"],
+  .text-2xl.font-semibold.leading-none.tracking-tight,
+  div.text-2xl.font-semibold.leading-none.tracking-tight {
+    font-family: 'Playfair Display', serif !important;
+    font-weight: 600 !important;
   }
 }
 
