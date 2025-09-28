@@ -60,9 +60,9 @@ export default function HomePage() {
             />
             <div className="absolute inset-0 flex items-center justify-end pr-4">
               <div className="bg-black/50 rounded-lg px-8 py-6 backdrop-blur-sm text-right">
-                <div className="flex flex-col">
-                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none">AVOID</span>
-                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-none">THIS</span>
+                <div className="flex flex-col items-end">
+                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none transform scale-x-75 origin-right">AVOID</span>
+                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-none transform scale-x-75 origin-right">THIS</span>
                 </div>
               </div>
             </div>
