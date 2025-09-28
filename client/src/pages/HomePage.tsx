@@ -49,13 +49,87 @@ export default function HomePage() {
     <div className="min-h-screen">
 
       {/* Hero Section */}
-      <section className="py-12 md:py-20 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="py-12 md:py-20 px-4 sm:px-6 relative overflow-hidden">
+        {/* Background Collage */}
+        <div className="absolute inset-0 pointer-events-none opacity-5">
+          {/* Variation 1 - Faded */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute top-10 left-10 h-20 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'opacity(0.1) grayscale(100%) blur(1px)' }}
+          />
+          {/* Variation 2 - Blurred */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute top-20 right-20 h-16 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'blur(3px) opacity(0.15) grayscale(80%)' }}
+          />
+          {/* Variation 3 - Grayscale */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute bottom-10 left-20 h-24 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'grayscale(100%) opacity(0.08) blur(2px)' }}
+          />
+          {/* Variation 4 - Sepia */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute bottom-20 right-10 h-18 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'sepia(100%) opacity(0.12) blur(1px)' }}
+          />
+          {/* Variation 5 - Inverted */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute top-1/3 left-1/4 h-14 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'invert(1) opacity(0.06) blur(2px) grayscale(50%)' }}
+          />
+          {/* Variation 6 - High Contrast */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute top-1/2 right-1/4 h-22 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'contrast(200%) opacity(0.07) grayscale(70%) blur(1px)' }}
+          />
+          {/* Variation 7 - Saturated */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute bottom-1/3 left-1/3 h-16 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'saturate(300%) opacity(0.09) blur(2px) grayscale(60%)' }}
+          />
+          {/* Variation 8 - Rotated */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute top-1/4 right-1/3 h-20 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1) rotate(15deg)', filter: 'opacity(0.05) blur(3px) grayscale(90%)' }}
+          />
+          {/* Variation 9 - Small Rotated */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute bottom-1/4 right-1/2 h-12 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1) rotate(-10deg)', filter: 'opacity(0.08) blur(2px) grayscale(100%)' }}
+          />
+          {/* Variation 10 - Hue Shifted */}
+          <img 
+            src={logoImage} 
+            alt="" 
+            className="absolute top-3/4 left-1/2 h-18 w-auto rounded-lg"
+            style={{ transform: 'scaleX(-1)', filter: 'hue-rotate(90deg) opacity(0.06) blur(1px) grayscale(40%)' }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="mb-8">
             <img 
               src={logoImage} 
               alt="Pillar Drug Club" 
-              className="h-48 md:h-56 lg:h-64 w-auto mx-auto rounded-2xl"
+              className="h-48 md:h-56 lg:h-64 w-auto mx-auto rounded-2xl relative z-20"
               style={{ transform: 'scaleX(-1)' }}
             />
           </div>
