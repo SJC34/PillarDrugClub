@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Pill } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import logoImage from "@assets/Add a heading_1758988919681.png";
 
@@ -22,8 +22,9 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <span className="text-xl font-semibold text-foreground" data-testid="text-logo">
+              <span className="text-xl font-bold text-foreground flex items-center gap-2" data-testid="text-logo">
                 Pillar Drug Club
+                <Pill className="h-5 w-5 text-secondary" />
               </span>
             </div>
           </div>
@@ -100,7 +101,10 @@ export default function Header() {
               <div className="flex flex-col h-full">
                 <div className="px-6 py-4 border-b">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl font-semibold">Pillar Drug Club</span>
+                    <span className="text-xl font-bold flex items-center gap-2">
+                      Pillar Drug Club
+                      <Pill className="h-5 w-5 text-secondary" />
+                    </span>
                   </div>
                 </div>
                 <div className="flex-1 px-6 py-6 space-y-6">
