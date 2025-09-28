@@ -10,10 +10,9 @@ export default function Header() {
 
   const navigation = [
     { name: "Medications", href: "/medications" },
-    { name: "Cost Calculator", href: "/calculator" },
-    { name: "How it works", href: "#how-it-works" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "FAQ", href: "#faq" },
+    { name: "Cost Calculator", href: "/cost-calculator" },
+    { name: "Transfer", href: "/prescription-transfer" },
+    { name: "Dashboard", href: "/dashboard" },
   ];
 
   return (
@@ -61,12 +60,16 @@ export default function Header() {
             </Button>
             
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" className="font-medium" data-testid="button-login">
-                Sign in
-              </Button>
-              <Button className="font-medium px-6" data-testid="button-signup">
-                Get started
-              </Button>
+              <a href="/login">
+                <Button variant="ghost" className="font-medium" data-testid="button-login">
+                  Sign in
+                </Button>
+              </a>
+              <a href="/register">
+                <Button className="font-medium px-6" data-testid="button-signup">
+                  Get started
+                </Button>
+              </a>
             </div>
 
             {/* Mobile menu button */}
@@ -76,11 +79,12 @@ export default function Header() {
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 data-testid="button-mobile-menu"
+                className="relative z-50"
               >
                 {isMenuOpen ? (
-                  <X className="h-4 w-4" />
+                  <X className="h-5 w-5" />
                 ) : (
-                  <Menu className="h-4 w-4" />
+                  <Menu className="h-5 w-5" />
                 )}
               </Button>
             </div>
@@ -89,26 +93,40 @@ export default function Header() {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t pt-6 pb-8">
-            <div className="space-y-4">
-              {navigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="block text-base font-medium text-muted-foreground"
-                  onClick={() => setIsMenuOpen(false)}
-                  data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                >
-                  {item.name}
-                </a>
-              ))}
-              <div className="pt-4 space-y-3">
-                <Button variant="ghost" className="w-full justify-start text-base" data-testid="mobile-button-login">
-                  Sign in
-                </Button>
-                <Button className="w-full justify-start text-base" data-testid="mobile-button-signup">
-                  Get started
-                </Button>
+          <div className="fixed inset-0 z-40 md:hidden">
+            <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} />
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-background shadow-xl">
+              <div className="flex flex-col h-full">
+                <div className="px-6 py-4 border-b">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-semibold">Pillar Drug Club</span>
+                  </div>
+                </div>
+                <div className="flex-1 px-6 py-6 space-y-6">
+                  {navigation.map((item) => (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className="block text-lg font-medium text-foreground hover:text-primary transition-colors py-2"
+                      onClick={() => setIsMenuOpen(false)}
+                      data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      {item.name}
+                    </a>
+                  ))}
+                </div>
+                <div className="px-6 py-6 border-t space-y-3">
+                  <a href="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full font-medium" data-testid="mobile-button-login">
+                      Sign in
+                    </Button>
+                  </a>
+                  <a href="/register" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full font-medium" data-testid="mobile-button-signup">
+                      Get started
+                    </Button>
+                  </a>
+                </div>
               </div>
             </div>
           </div>

@@ -13,6 +13,7 @@ import SubscriptionPage from "@/pages/SubscriptionPage";
 import DashboardPage from "@/pages/DashboardPage";
 import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
 import NotFound from "@/pages/not-found";
+import Header from "@/components/Header";
 
 function Router() {
   return (
@@ -36,8 +37,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <div className="min-h-screen bg-background text-foreground">
+          <Header />
+          <main className="flex-1">
+            <Router />
+          </main>
+        </div>
         <Toaster />
-        <Router />
       </TooltipProvider>
     </QueryClientProvider>
   );
