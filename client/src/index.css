@@ -76,9 +76,9 @@
   --chart-4: 177 30% 35%;
   --chart-5: 177 55% 40%;
 
-  --font-sans: 'Playfair Display', serif;
-  --font-serif: 'Playfair Display', serif;
-  --font-display: 'Playfair Display', serif;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-serif: 'Montserrat', sans-serif;
+  --font-display: 'Montserrat', sans-serif;
   --font-mono: Menlo, monospace;
   --radius: .5rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(177 20% 20% / 0.02);

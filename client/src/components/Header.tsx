@@ -16,13 +16,13 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-primary backdrop-blur-lg border-b border-primary-foreground/20">
+    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-primary/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <span className="text-xl font-semibold text-white" data-testid="text-logo">
+              <span className="text-xl font-semibold text-foreground" data-testid="text-logo">
                 Pillar Drug Club
               </span>
             </div>
@@ -35,7 +35,7 @@ export default function Header() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-sm font-medium text-white/80 transition-colors hover:text-white"
+                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   {item.name}
@@ -51,7 +51,7 @@ export default function Header() {
               size="icon"
               onClick={toggleTheme}
               data-testid="button-theme-toggle"
-              className="text-white hover:bg-white/10"
+              className=""
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
@@ -62,12 +62,12 @@ export default function Header() {
             
             <div className="hidden md:flex items-center space-x-4">
               <a href="/login">
-                <Button variant="ghost" className="font-medium text-white hover:bg-white/10" data-testid="button-login">
+                <Button variant="ghost" className="font-medium" data-testid="button-login">
                   Sign in
                 </Button>
               </a>
               <a href="/register">
-                <Button variant="secondary" className="font-medium px-6" data-testid="button-signup">
+                <Button className="font-medium px-6" data-testid="button-signup">
                   Get started
                 </Button>
               </a>
@@ -80,7 +80,7 @@ export default function Header() {
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 data-testid="button-mobile-menu"
-                className="relative z-50 text-white hover:bg-white/10"
+                className="relative z-50"
               >
                 {isMenuOpen ? (
                   <X className="h-5 w-5" />
@@ -96,11 +96,11 @@ export default function Header() {
         {isMenuOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} />
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-primary shadow-xl">
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-background shadow-xl">
               <div className="flex flex-col h-full">
                 <div className="px-6 py-4 border-b">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl font-semibold text-white">Pillar Drug Club</span>
+                    <span className="text-xl font-semibold">Pillar Drug Club</span>
                   </div>
                 </div>
                 <div className="flex-1 px-6 py-6 space-y-6">
@@ -108,7 +108,7 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-medium text-white hover:text-white/80 transition-colors py-2"
+                      className="block text-lg font-medium text-foreground hover:text-primary transition-colors py-2"
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
@@ -118,12 +118,12 @@ export default function Header() {
                 </div>
                 <div className="px-6 py-6 border-t space-y-3">
                   <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full font-medium border-white/30 text-white hover:bg-white/10" data-testid="mobile-button-login">
+                    <Button variant="outline" className="w-full font-medium" data-testid="mobile-button-login">
                       Sign in
                     </Button>
                   </a>
                   <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="secondary" className="w-full font-medium" data-testid="mobile-button-signup">
+                    <Button className="w-full font-medium" data-testid="mobile-button-signup">
                       Get started
                     </Button>
                   </a>
