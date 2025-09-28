@@ -37,7 +37,7 @@ export default function Header() {
 
           {/* Center - Brand name with pill symbol */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
-            <span className="text-xl font-bold text-foreground flex items-center gap-2" data-testid="text-logo">
+            <span className="text-xl font-black text-foreground flex items-center gap-2" data-testid="text-logo">
               Pillar Drug Club
               <Pill className="h-5 w-5 text-secondary" />
             </span>
@@ -50,7 +50,7 @@ export default function Header() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
+                  className="text-sm font-bold text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   {item.name}
@@ -76,12 +76,12 @@ export default function Header() {
             
             <div className="hidden md:flex items-center space-x-3">
               <a href="/login">
-                <Button variant="ghost" size="sm" className="font-medium" data-testid="button-login">
+                <Button variant="ghost" size="sm" className="font-bold" data-testid="button-login">
                   Sign in
                 </Button>
               </a>
               <a href="/register">
-                <Button size="sm" className="font-medium px-4" data-testid="button-signup">
+                <Button size="sm" className="font-bold px-4" data-testid="button-signup">
                   Get started
                 </Button>
               </a>
@@ -97,7 +97,7 @@ export default function Header() {
               <div className="flex flex-col h-full">
                 <div className="px-6 py-4 border-b">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl font-bold flex items-center gap-2">
+                    <span className="text-xl font-black flex items-center gap-2">
                       Pillar Drug Club
                       <Pill className="h-5 w-5 text-secondary" />
                     </span>
@@ -108,7 +108,7 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-medium text-foreground hover:text-primary transition-colors py-2"
+                      className="block text-lg font-bold text-foreground hover:text-primary transition-colors py-2"
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
@@ -118,12 +118,12 @@ export default function Header() {
                 </div>
                 <div className="px-6 py-6 border-t space-y-3">
                   <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full font-medium" data-testid="mobile-button-login">
+                    <Button variant="outline" className="w-full font-bold" data-testid="mobile-button-login">
                       Sign in
                     </Button>
                   </a>
                   <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full font-medium" data-testid="mobile-button-signup">
+                    <Button className="w-full font-bold" data-testid="mobile-button-signup">
                       Get started
                     </Button>
                   </a>

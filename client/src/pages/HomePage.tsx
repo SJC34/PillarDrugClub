@@ -54,19 +54,19 @@ export default function HomePage() {
             Wholesale Prescription Prices
             <span className="text-primary block">No Insurance Required</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
             Join thousands of patients saving money on prescription medications with transparent wholesale pricing. 
             Get access to real costs and home delivery for just $10/month.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
-              <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-4" data-testid="button-join-hero">
+              <Button size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-join-hero">
                 Start Saving Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="/cost-calculator">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 py-4" data-testid="button-try-calculator">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-try-calculator">
                 Try Cost Calculator
               </Button>
             </Link>
@@ -80,24 +80,24 @@ export default function HomePage() {
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Simple, Transparent Pricing</h2>
           <Card className="max-w-md mx-auto border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
             <CardHeader className="text-center">
-              <CardTitle className="text-xl md:text-2xl">Membership</CardTitle>
+              <CardTitle className="text-xl md:text-2xl font-bold">Membership</CardTitle>
               <div className="text-3xl md:text-4xl font-bold text-primary">
                 $10
-                <span className="text-base md:text-lg text-muted-foreground font-normal">/month</span>
+                <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
               </div>
-              <CardDescription>Cancel anytime</CardDescription>
+              <CardDescription className="font-bold">Cancel anytime</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3 mb-6">
                 {benefits.map((benefit, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-left">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base text-foreground">{benefit}</span>
+                    <span className="text-sm md:text-base font-bold text-foreground">{benefit}</span>
                   </li>
                 ))}
               </ul>
               <Link href="/register">
-                <Button className="w-full" size="lg" data-testid="button-subscribe-pricing">
+                <Button className="w-full font-bold" size="lg" data-testid="button-subscribe-pricing">
                   Start Membership
                 </Button>
               </Link>
@@ -121,10 +121,10 @@ export default function HomePage() {
                     <div className="mx-auto w-12 h-12 bg-gradient-to-br from-primary/10 to-secondary/15 rounded-lg flex items-center justify-center mb-4 border border-secondary/20">
                       <Icon className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle className="text-lg md:text-xl">{feature.title}</CardTitle>
+                    <CardTitle className="text-lg md:text-xl font-bold">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <CardDescription className="text-sm md:text-base">{feature.description}</CardDescription>
+                    <CardDescription className="text-sm md:text-base font-bold">{feature.description}</CardDescription>
                   </CardContent>
                 </Card>
               );
@@ -137,11 +137,11 @@ export default function HomePage() {
       <section className="py-12 md:py-16 px-4 sm:px-6 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Saving?</h2>
-          <p className="text-lg md:text-xl mb-8 opacity-90">
+          <p className="text-lg md:text-xl font-bold mb-8 opacity-90">
             Join thousands of patients who have already saved money on their prescriptions.
           </p>
           <Link href="/register">
-            <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg px-8 py-4" data-testid="button-join-cta">
+            <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-join-cta">
               Join Pillar Drug Club
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -154,12 +154,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <Pill className="h-6 w-6 text-primary" />
-            <span className="text-lg md:text-xl font-semibold text-foreground">Pillar Drug Club</span>
+            <span className="text-lg md:text-xl font-bold text-foreground">Pillar Drug Club</span>
           </div>
-          <p className="text-muted-foreground mb-4 text-sm md:text-base">
+          <p className="text-muted-foreground font-bold mb-4 text-sm md:text-base">
             Transparent wholesale prescription pricing for everyone.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm font-bold text-muted-foreground">
             <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-foreground transition-colors">Contact</a>
