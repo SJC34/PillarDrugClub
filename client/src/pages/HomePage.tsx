@@ -59,11 +59,11 @@ export default function HomePage() {
               className="w-full h-auto rounded-lg shadow-lg"
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-black/50 rounded-lg px-6 py-3 backdrop-blur-sm">
-                <span className="text-2xl md:text-3xl font-black">
-                  <span className="text-primary">AVOID</span>
-                  <span className="text-white ml-2">THIS</span>
-                </span>
+              <div className="bg-black/50 rounded-lg px-8 py-6 backdrop-blur-sm text-center">
+                <div className="flex flex-col">
+                  <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none">AVOID</span>
+                  <span className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none">THIS</span>
+                </div>
               </div>
             </div>
           </div>
