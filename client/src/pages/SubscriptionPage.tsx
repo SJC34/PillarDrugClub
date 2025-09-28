@@ -48,7 +48,7 @@ const SubscribeForm = () => {
     } else {
       toast({
         title: "Subscription Successful",
-        description: "Welcome to Pillar Drug Club! You now have access to wholesale pricing.",
+        description: "Welcome to PILLAR DRUG CLUB! You now have access to wholesale pricing.",
       });
       setLocation("/dashboard");
     }
@@ -159,7 +159,7 @@ export default function SubscriptionPage() {
           <Link href="/">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">Pillar Drug Club</span>
+              <span className="text-2xl font-bold text-gray-900">PILLAR DRUG CLUB</span>
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Membership</h1>

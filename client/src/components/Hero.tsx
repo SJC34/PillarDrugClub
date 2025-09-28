@@ -9,7 +9,7 @@ export default function Hero() {
           <div className="mb-12">
             <img 
               src={logoImage} 
-              alt="Pillar Drug Club" 
+              alt="PILLAR DRUG CLUB" 
               className="h-48 md:h-56 lg:h-64 w-auto mx-auto"
               data-testid="img-hero-logo"
             />
@@ -29,7 +29,7 @@ export default function Hero() {
               className="text-base px-12 py-4 h-auto rounded-lg font-medium"
               data-testid="button-hero-join"
             >
-              Join Pillar Drug Club
+              Join PILLAR DRUG CLUB
             </Button>
             <Button 
               variant="outline" 

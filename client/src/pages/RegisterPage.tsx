@@ -66,7 +66,7 @@ const PaymentForm = ({ clientSecret, onSuccess }: { clientSecret: string; onSucc
     } else {
       toast({
         title: "Registration Complete!",
-        description: "Welcome to Pillar Drug Club! You now have access to wholesale pricing.",
+        description: "Welcome to PILLAR DRUG CLUB! You now have access to wholesale pricing.",
       });
       onSuccess();
     }
@@ -220,7 +220,7 @@ export default function RegisterPage() {
             <Link href="/">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Pill className="h-8 w-8 text-primary" />
-                <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
+                <span className="text-xl md:text-2xl font-bold text-foreground">PILLAR DRUG CLUB</span>
               </div>
             </Link>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Complete Your Registration</h1>
@@ -300,7 +300,7 @@ export default function RegisterPage() {
           <Link href="/">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-primary" />
-              <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
+              <span className="text-xl md:text-2xl font-bold text-foreground">PILLAR DRUG CLUB</span>
             </div>
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join the Club</h1>

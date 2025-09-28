@@ -397,7 +397,7 @@ export default function CostCalculatorPage() {
                 Ready to start saving?
               </h3>
               <p className="text-sm md:text-base text-muted-foreground mb-4">
-                Get these wholesale prices by becoming a Pillar Drug Club member
+                Get these wholesale prices by becoming a PILLAR DRUG CLUB member
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <Link href="/medications">
