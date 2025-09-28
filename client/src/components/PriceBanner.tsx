@@ -14,7 +14,7 @@ export default function PriceBanner() {
   const duplicatedMedications = [...medications, ...medications];
 
   return (
-    <div className="w-full bg-primary text-primary-foreground py-2 overflow-hidden relative" data-testid="price-banner">
+    <div className="w-full bg-primary text-primary-foreground py-1 overflow-hidden relative" data-testid="price-banner">
       <div className="flex whitespace-nowrap animate-marquee">
         <span className="text-sm font-semibold mr-8">💊 Wholesale Prices:</span>
         {duplicatedMedications.map((med, index) => (
