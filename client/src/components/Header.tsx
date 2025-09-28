@@ -35,17 +35,15 @@ export default function Header() {
             </Button>
           </div>
 
-          {/* Center - Brand name with pill symbol */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
+          {/* Center - Brand name with pill symbol and navigation */}
+          <div className="flex items-center gap-8">
             <span className="text-xl font-black text-foreground flex items-center gap-2" data-testid="text-logo">
               PILLAR DRUG CLUB
               <Pill className="h-5 w-5 text-secondary" />
             </span>
-          </div>
-
-          {/* Desktop Navigation - hidden on mobile, shown after medium breakpoint */}
-          <nav className="hidden lg:block absolute left-1/2 transform -translate-x-1/2 top-full mt-2">
-            <div className="flex items-center space-x-8 bg-background/90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-sm border">
+            
+            {/* Desktop Navigation - inline with header */}
+            <nav className="hidden lg:flex items-center space-x-6">
               {navigation.map((item) => (
                 <a
                   key={item.name}
@@ -56,8 +54,8 @@ export default function Header() {
                   {item.name}
                 </a>
               ))}
-            </div>
-          </nav>
+            </nav>
+          </div>
 
           {/* Right side - Dark mode toggle and auth buttons */}
           <div className="flex items-center space-x-4">
