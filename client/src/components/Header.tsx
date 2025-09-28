@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sun, Moon, Pill } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
-import logoImage from "@assets/Add a heading_1758988919681.png";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,24 +18,39 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-primary/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="flex h-20 items-center justify-between">
-          {/* Logo */}
+          {/* Left side - Menu button */}
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <span className="text-xl font-bold text-foreground flex items-center gap-2" data-testid="text-logo">
-                Pillar Drug Club
-                <Pill className="h-5 w-5 text-secondary" />
-              </span>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              data-testid="button-mobile-menu"
+              className="relative z-50"
+            >
+              {isMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:block">
-            <div className="flex items-center space-x-10">
+          {/* Center - Brand name with pill symbol */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <span className="text-xl font-bold text-foreground flex items-center gap-2" data-testid="text-logo">
+              Pillar Drug Club
+              <Pill className="h-5 w-5 text-secondary" />
+            </span>
+          </div>
+
+          {/* Desktop Navigation - hidden on mobile, shown after medium breakpoint */}
+          <nav className="hidden lg:block absolute left-1/2 transform -translate-x-1/2 top-full mt-2">
+            <div className="flex items-center space-x-8 bg-background/90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-sm border">
               {navigation.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   {item.name}
@@ -45,14 +59,13 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* Right side actions */}
-          <div className="flex items-center space-x-6">
+          {/* Right side - Dark mode toggle and auth buttons */}
+          <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
               data-testid="button-theme-toggle"
-              className=""
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
@@ -61,34 +74,17 @@ export default function Header() {
               )}
             </Button>
             
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-3">
               <a href="/login">
-                <Button variant="ghost" className="font-medium" data-testid="button-login">
+                <Button variant="ghost" size="sm" className="font-medium" data-testid="button-login">
                   Sign in
                 </Button>
               </a>
               <a href="/register">
-                <Button className="font-medium px-6" data-testid="button-signup">
+                <Button size="sm" className="font-medium px-4" data-testid="button-signup">
                   Get started
                 </Button>
               </a>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                data-testid="button-mobile-menu"
-                className="relative z-50"
-              >
-                {isMenuOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" />
-                )}
-              </Button>
             </div>
           </div>
         </div>
