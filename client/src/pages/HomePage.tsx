@@ -78,7 +78,7 @@ export default function HomePage() {
       <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Simple, Transparent Pricing</h2>
-          <Card className="max-w-md mx-auto border-primary/20 bg-primary/5">
+          <Card className="max-w-md mx-auto border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
             <CardHeader className="text-center">
               <CardTitle className="text-xl md:text-2xl">Membership</CardTitle>
               <div className="text-3xl md:text-4xl font-bold text-primary">
@@ -91,7 +91,7 @@ export default function HomePage() {
               <ul className="space-y-3 mb-6">
                 {benefits.map((benefit, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-left">
-                    <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
                     <span className="text-sm md:text-base text-foreground">{benefit}</span>
                   </li>
                 ))}
@@ -116,9 +116,9 @@ export default function HomePage() {
             {features.map((feature, idx) => {
               const Icon = feature.icon;
               return (
-                <Card key={idx} className="text-center p-4 md:p-6">
+                <Card key={idx} className="text-center p-4 md:p-6 border-secondary/20 hover:border-secondary/40 transition-colors">
                   <CardHeader className="pb-4">
-                    <div className="mx-auto w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <div className="mx-auto w-12 h-12 bg-gradient-to-br from-primary/10 to-secondary/15 rounded-lg flex items-center justify-center mb-4 border border-secondary/20">
                       <Icon className="h-6 w-6 text-primary" />
                     </div>
                     <CardTitle className="text-lg md:text-xl">{feature.title}</CardTitle>

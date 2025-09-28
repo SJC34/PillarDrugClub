@@ -29,7 +29,7 @@ export default function CompetitiveAnalysis() {
           </p>
         </div>
 
-        <Card className="border-0 shadow-lg">
+        <Card className="border-secondary/20 shadow-lg">
           <CardContent className="p-8">
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-center mb-8">
@@ -59,7 +59,7 @@ export default function CompetitiveAnalysis() {
               </div>
 
               <div className="mt-8 text-center">
-                <div className="inline-flex items-center px-6 py-3 rounded-full bg-primary/10 text-primary">
+                <div className="inline-flex items-center px-6 py-3 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
                   <span className="font-semibold">
                     25% less than closest competitor
                   </span>

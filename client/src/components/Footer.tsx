@@ -5,7 +5,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-b from-primary/5 to-primary/10 border-t border-primary/20">
+    <footer className="bg-gradient-to-b from-primary/5 via-secondary/5 to-secondary/10 border-t border-secondary/20">
       {/* CTA Section */}
       <div className="border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-20">
@@ -48,20 +48,20 @@ export default function Footer() {
           <div>
             <h3 className="font-medium mb-6 text-foreground">Company</h3>
             <ul className="space-y-3 text-muted-foreground">
-              <li><a href="#about" className="hover:text-foreground transition-colors">About us</a></li>
-              <li><a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a></li>
-              <li><a href="#careers" className="hover:text-foreground transition-colors">Careers</a></li>
-              <li><a href="#contact" className="hover:text-foreground transition-colors">Contact</a></li>
+              <li><a href="#about" className="hover:text-secondary transition-colors">About us</a></li>
+              <li><a href="#how-it-works" className="hover:text-secondary transition-colors">How it works</a></li>
+              <li><a href="#careers" className="hover:text-secondary transition-colors">Careers</a></li>
+              <li><a href="#contact" className="hover:text-secondary transition-colors">Contact</a></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-medium mb-6 text-foreground">Support</h3>
             <ul className="space-y-3 text-muted-foreground">
-              <li><a href="#help" className="hover:text-foreground transition-colors">Help center</a></li>
-              <li><a href="#privacy" className="hover:text-foreground transition-colors">Privacy policy</a></li>
-              <li><a href="#terms" className="hover:text-foreground transition-colors">Terms of service</a></li>
-              <li><a href="#pharmacy" className="hover:text-foreground transition-colors">Pharmacy information</a></li>
+              <li><a href="#help" className="hover:text-secondary transition-colors">Help center</a></li>
+              <li><a href="#privacy" className="hover:text-secondary transition-colors">Privacy policy</a></li>
+              <li><a href="#terms" className="hover:text-secondary transition-colors">Terms of service</a></li>
+              <li><a href="#pharmacy" className="hover:text-secondary transition-colors">Pharmacy information</a></li>
             </ul>
           </div>
         </div>

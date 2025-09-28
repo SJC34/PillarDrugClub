@@ -45,8 +45,8 @@ export default function Benefits() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {benefits.map((benefit, index) => (
-            <div key={index} className="text-center space-y-6 p-8 rounded-3xl bg-white/80 dark:bg-card/80 backdrop-blur-sm border border-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" data-testid={`card-benefit-${index}`}>
-              <div className="w-24 h-24 bg-gradient-to-br from-primary via-primary to-primary/90 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
+            <div key={index} className="text-center space-y-6 p-8 rounded-3xl bg-white/80 dark:bg-card/80 backdrop-blur-sm border border-secondary/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" data-testid={`card-benefit-${index}`}>
+              <div className="w-24 h-24 bg-gradient-to-br from-primary via-primary to-secondary rounded-3xl flex items-center justify-center mx-auto shadow-lg border border-secondary/30">
                 <benefit.icon className="w-12 h-12 text-white" />
               </div>
               <div className="space-y-4">

@@ -229,10 +229,10 @@ export default function RegisterPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Benefits */}
-            <Card>
+            <Card className="border-secondary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-display">
-                  <Check className="h-5 w-5 text-green-600" />
+                  <Check className="h-5 w-5 text-secondary" />
                   Your Membership Benefits
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
@@ -243,7 +243,7 @@ export default function RegisterPage() {
                 <ul className="space-y-3">
                   {benefits.map((benefit, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
                       <span className="text-sm md:text-base text-foreground">{benefit}</span>
                     </li>
                   ))}
@@ -252,7 +252,7 @@ export default function RegisterPage() {
             </Card>
 
             {/* Payment Form */}
-            <Card>
+            <Card className="border-secondary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-display">
                   <CreditCard className="h-5 w-5 text-primary" />
@@ -308,7 +308,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Registration Form */}
-        <Card>
+        <Card className="border-secondary/20">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl font-display">Create Account</CardTitle>
             <CardDescription className="text-sm md:text-base">
