@@ -64,9 +64,9 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '12px 6px', width: 'fit-content' }}>
-                  <div className="flex flex-col overflow-hidden" style={{ width: '110px' }}>
+                  <div className="flex flex-col overflow-hidden" style={{ width: '95px' }}>
                     <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none" style={{ letterSpacing: '0.01em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
-                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.06em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.04em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
                   </div>
                 </div>
               </div>
@@ -82,8 +82,8 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '12px 6px', width: 'fit-content' }}>
-                  <div className="flex flex-col overflow-hidden" style={{ width: '135px' }}>
-                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none" style={{ letterSpacing: '0.04em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
+                  <div className="flex flex-col overflow-hidden" style={{ width: '120px' }}>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
                     <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.01em', display: 'block', width: '100%', textAlign: 'center' }}>PILLAR!</span>
                   </div>
                 </div>
