@@ -50,7 +50,7 @@ export default function HomePage() {
     <div className="min-h-screen">
 
       {/* Hero Section */}
-      <section className="py-12 md:py-20 px-4 sm:px-6">
+      <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
