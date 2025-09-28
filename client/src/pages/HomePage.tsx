@@ -52,35 +52,38 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="py-12 md:py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
-          {/* Image with "AVOID THIS" overlay */}
-          <div className="relative mb-8 max-w-md mx-auto">
-            <img 
-              src={avoidImage} 
-              alt="Medication costs comparison" 
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
-            <div className="absolute inset-0 flex items-center justify-end pr-4">
-              <div className="bg-black/50 rounded-lg px-8 py-6 backdrop-blur-sm text-right">
-                <div className="flex flex-col items-end">
-                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none transform scale-x-75 origin-right">AVOID</span>
-                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-none transform scale-x-75 origin-right">THIS</span>
+          {/* Side by side images with overlays */}
+          <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
+            {/* Image with "AVOID THIS" overlay */}
+            <div className="relative flex-1 max-w-md mx-auto md:mx-0">
+              <img 
+                src={avoidImage} 
+                alt="Medication costs comparison" 
+                className="w-full h-auto rounded-lg shadow-lg"
+              />
+              <div className="absolute inset-0 flex items-center justify-end pr-2">
+                <div className="bg-black/50 rounded-lg px-4 py-3 backdrop-blur-sm text-right">
+                  <div className="flex flex-col items-end">
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none transform scale-x-75 origin-right">AVOID</span>
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none transform scale-x-75 origin-right">THIS</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Image with "Join Pillar!" overlay */}
-          <div className="relative mb-8 max-w-md mx-auto">
-            <img 
-              src={joinImage} 
-              alt="Join Pillar Drug Club" 
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
-            <div className="absolute inset-0 flex items-center justify-end pr-4">
-              <div className="bg-black/50 rounded-lg px-8 py-6 backdrop-blur-sm text-right">
-                <div className="flex flex-col items-end">
-                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none transform scale-x-75 origin-right">JOIN</span>
-                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none transform scale-x-75 origin-right">PILLAR!</span>
+            {/* Image with "Join Pillar!" overlay */}
+            <div className="relative flex-1 max-w-md mx-auto md:mx-0">
+              <img 
+                src={joinImage} 
+                alt="Join Pillar Drug Club" 
+                className="w-full h-auto rounded-lg shadow-lg"
+              />
+              <div className="absolute inset-0 flex items-center justify-end pr-2">
+                <div className="bg-black/50 rounded-lg px-4 py-3 backdrop-blur-sm text-right">
+                  <div className="flex flex-col items-end">
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none transform scale-x-75 origin-right">JOIN</span>
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none transform scale-x-75 origin-right">PILLAR!</span>
+                  </div>
                 </div>
               </div>
             </div>
