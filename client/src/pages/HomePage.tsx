@@ -55,34 +55,36 @@ export default function HomePage() {
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
             {/* Image with "AVOID THIS" overlay */}
-            <div className="relative flex-1 max-w-md mx-auto md:mx-0">
+            <div className="relative flex-1 max-w-md mx-auto md:mx-0 overflow-hidden">
               <img 
                 src={avoidImage} 
                 alt="Medication costs comparison" 
-                className="w-full h-auto rounded-lg shadow-lg"
+                className="w-full rounded-lg shadow-lg"
+                style={{ height: '200px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
-                  <div className="flex flex-col" style={{ width: '130px' }}>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none" style={{ letterSpacing: '0.05em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none" style={{ letterSpacing: '0.35em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
+                  <div className="flex flex-col overflow-hidden" style={{ width: '115px' }}>
+                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-primary leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
+                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-white leading-none" style={{ letterSpacing: '0.10em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Image with "Join Pillar!" overlay */}
-            <div className="relative flex-1 max-w-md mx-auto md:mx-0">
+            <div className="relative flex-1 max-w-md mx-auto md:mx-0 overflow-hidden">
               <img 
                 src={joinImage} 
                 alt="Join Pillar Drug Club" 
-                className="w-full h-auto rounded-lg shadow-lg"
+                className="w-full rounded-lg shadow-lg"
+                style={{ height: '200px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
-                  <div className="flex flex-col" style={{ width: '160px' }}>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none" style={{ letterSpacing: '0.25em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
-                    <span className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-none" style={{ letterSpacing: '0.05em', display: 'block', width: '100%', textAlign: 'center' }}>PILLAR!</span>
+                  <div className="flex flex-col overflow-hidden" style={{ width: '140px' }}>
+                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-primary leading-none" style={{ letterSpacing: '0.08em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
+                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-primary leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>PILLAR!</span>
                   </div>
                 </div>
               </div>
