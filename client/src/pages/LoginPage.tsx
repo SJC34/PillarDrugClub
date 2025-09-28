@@ -47,7 +47,7 @@ export default function LoginPage() {
       
       toast({
         title: "Login Successful",
-        description: "Welcome back to pillar drug club!"
+        description: "Welcome back to Pillar Drug Club!"
       });
       
       setLocation("/dashboard");
@@ -68,7 +68,7 @@ export default function LoginPage() {
           <Link href="/">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">pillar drug club</span>
+              <span className="text-2xl font-bold text-gray-900">Pillar Drug Club</span>
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>

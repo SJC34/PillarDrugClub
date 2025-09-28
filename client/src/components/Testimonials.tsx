@@ -12,13 +12,13 @@ export default function Testimonials() {
   //todo: remove mock functionality
   const testimonials: Testimonial[] = [
     {
-      quote: "I'm saving over $200 a month on my blood pressure and cholesterol medications with pillar drug club. The membership fee pays for itself in the first month!",
+      quote: "I'm saving over $200 a month on my blood pressure and cholesterol medications with Pillar Drug Club. The membership fee pays for itself in the first month!",
       author: "Sarah J.",
       condition: "Hypertension & cholesterol",
       initials: "SJ"
     },
     {
-      quote: "As someone living with diabetes, my medication costs were breaking the bank. With pillar drug club, I'm paying less than half of what I used to pay with insurance.",
+      quote: "As someone living with diabetes, my medication costs were breaking the bank. With Pillar Drug Club, I'm paying less than half of what I used to pay with insurance.",
       author: "Robert C.",
       condition: "Type 2 diabetes",
       initials: "RC"
