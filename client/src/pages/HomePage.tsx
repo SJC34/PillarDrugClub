@@ -63,10 +63,10 @@ export default function HomePage() {
                 style={{ height: '265px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
-                <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
-                  <div className="flex flex-col overflow-hidden" style={{ width: '115px' }}>
-                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-white leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
-                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-primary leading-none" style={{ letterSpacing: '0.10em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
+                <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '12px 6px', width: 'fit-content' }}>
+                  <div className="flex flex-col overflow-hidden" style={{ width: '130px' }}>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.08em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
                   </div>
                 </div>
               </div>
@@ -81,10 +81,10 @@ export default function HomePage() {
                 style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 60%' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
-                <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
-                  <div className="flex flex-col overflow-hidden" style={{ width: '140px' }}>
-                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-white leading-none" style={{ letterSpacing: '0.08em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
-                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-primary leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>PILLAR!</span>
+                <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '12px 6px', width: 'fit-content' }}>
+                  <div className="flex flex-col overflow-hidden" style={{ width: '155px' }}>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none" style={{ letterSpacing: '0.06em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>PILLAR!</span>
                   </div>
                 </div>
               </div>
