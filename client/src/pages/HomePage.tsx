@@ -55,7 +55,9 @@ export default function HomePage() {
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
             {/* Image with "AVOID THIS" overlay */}
-            <div className="relative flex-1 max-w-md mx-auto md:mx-0 overflow-hidden">
+            <div className="flex-1 max-w-md mx-auto md:mx-0">
+              <p className="text-lg font-bold text-foreground mb-4 text-center">Who wants to wait in lines at the pharmacy?</p>
+              <div className="relative overflow-hidden">
               <img 
                 src={avoidImage} 
                 alt="Medication costs comparison" 
@@ -69,6 +71,7 @@ export default function HomePage() {
                     <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.04em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
                   </div>
                 </div>
+              </div>
               </div>
             </div>
 
