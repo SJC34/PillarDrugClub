@@ -14,6 +14,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
+import PriceBanner from "@/components/PriceBanner";
 
 function Router() {
   return (
@@ -38,6 +39,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background text-foreground">
+          <PriceBanner />
           <Header />
           <main className="flex-1">
             <Router />
