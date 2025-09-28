@@ -11,6 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import avoidImage from "@assets/IMG_6107_1759082772316.jpeg";
+import joinImage from "@assets/IMG_6108_1759083596981.jpeg";
 
 export default function HomePage() {
   const benefits = [
@@ -63,6 +64,23 @@ export default function HomePage() {
                 <div className="flex flex-col items-end">
                   <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none transform scale-x-75 origin-right">AVOID</span>
                   <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-none transform scale-x-75 origin-right">THIS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Image with "Join Pillar!" overlay */}
+          <div className="relative mb-8 max-w-md mx-auto">
+            <img 
+              src={joinImage} 
+              alt="Join Pillar Drug Club" 
+              className="w-full h-auto rounded-lg shadow-lg"
+            />
+            <div className="absolute inset-0 flex items-center justify-end pr-4">
+              <div className="bg-black/50 rounded-lg px-8 py-6 backdrop-blur-sm text-right">
+                <div className="flex flex-col items-end">
+                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none transform scale-x-75 origin-right">JOIN</span>
+                  <span className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-primary leading-none transform scale-x-75 origin-right">PILLAR!</span>
                 </div>
               </div>
             </div>
