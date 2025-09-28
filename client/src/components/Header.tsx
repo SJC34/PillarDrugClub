@@ -8,10 +8,10 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
 
   const navigation = [
-    { name: "Medications", href: "/medications" },
-    { name: "Cost Calculator", href: "/cost-calculator" },
-    { name: "Transfer", href: "/prescription-transfer" },
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "MEDICATIONS", href: "/medications" },
+    { name: "COST CALCULATOR", href: "/cost-calculator" },
+    { name: "TRANSFER", href: "/prescription-transfer" },
+    { name: "DASHBOARD", href: "/dashboard" },
   ];
 
   return (
@@ -38,7 +38,7 @@ export default function Header() {
           {/* Center - Brand name with pill symbol */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <span className="text-xl font-black text-foreground flex items-center gap-2" data-testid="text-logo">
-              Pillar Drug Club
+              PILLAR DRUG CLUB
               <Pill className="h-5 w-5 text-secondary" />
             </span>
           </div>
@@ -77,12 +77,12 @@ export default function Header() {
             <div className="hidden md:flex items-center space-x-3">
               <a href="/login">
                 <Button variant="ghost" size="sm" className="font-bold" data-testid="button-login">
-                  Sign in
+                  SIGN IN
                 </Button>
               </a>
               <a href="/register">
                 <Button size="sm" className="font-bold px-4" data-testid="button-signup">
-                  Get started
+                  GET STARTED
                 </Button>
               </a>
             </div>
@@ -98,7 +98,7 @@ export default function Header() {
                 <div className="px-6 py-4 border-b">
                   <div className="flex items-center gap-2">
                     <span className="text-xl font-black flex items-center gap-2">
-                      Pillar Drug Club
+                      PILLAR DRUG CLUB
                       <Pill className="h-5 w-5 text-secondary" />
                     </span>
                   </div>
@@ -119,12 +119,12 @@ export default function Header() {
                 <div className="px-6 py-6 border-t space-y-3">
                   <a href="/login" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="outline" className="w-full font-bold" data-testid="mobile-button-login">
-                      Sign in
+                      SIGN IN
                     </Button>
                   </a>
                   <a href="/register" onClick={() => setIsMenuOpen(false)}>
                     <Button className="w-full font-bold" data-testid="mobile-button-signup">
-                      Get started
+                      GET STARTED
                     </Button>
                   </a>
                 </div>
