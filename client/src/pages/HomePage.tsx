@@ -60,13 +60,13 @@ export default function HomePage() {
                 src={avoidImage} 
                 alt="Medication costs comparison" 
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '230px', objectFit: 'cover' }}
+                style={{ height: '265px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
                   <div className="flex flex-col overflow-hidden" style={{ width: '115px' }}>
-                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-primary leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
-                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-white leading-none" style={{ letterSpacing: '0.10em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
+                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-white leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
+                    <span className="text-xl md:text-2xl lg:text-3xl font-black text-primary leading-none" style={{ letterSpacing: '0.10em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
                   </div>
                 </div>
               </div>
@@ -78,7 +78,7 @@ export default function HomePage() {
                 src={joinImage} 
                 alt="Join Pillar Drug Club" 
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '230px', objectFit: 'cover' }}
+                style={{ height: '265px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '8px 4px', width: 'fit-content' }}>
