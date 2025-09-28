@@ -35,7 +35,7 @@ export default function Footer() {
             <div className="mb-6">
               <img 
                 src={logoImage} 
-                alt="PILLAR DRUG CLUB" 
+                alt="pillar drug club" 
                 className="h-12 w-auto"
               />
             </div>

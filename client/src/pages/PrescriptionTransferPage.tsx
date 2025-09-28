@@ -173,7 +173,7 @@ export default function PrescriptionTransferPage() {
             <Link href="/dashboard">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Pill className="h-8 w-8 text-primary" />
-                <span className="text-xl md:text-2xl font-bold text-foreground">PILLAR DRUG CLUB</span>
+                <span className="text-xl md:text-2xl font-bold text-foreground">pillar drug club</span>
               </div>
             </Link>
           </div>
@@ -213,7 +213,7 @@ export default function PrescriptionTransferPage() {
           <Link href="/dashboard">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-primary" />
-              <span className="text-xl md:text-2xl font-bold text-foreground">PILLAR DRUG CLUB</span>
+              <span className="text-xl md:text-2xl font-bold text-foreground">pillar drug club</span>
             </div>
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Prescription Transfer</h1>

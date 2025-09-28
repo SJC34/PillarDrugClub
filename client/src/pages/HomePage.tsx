@@ -66,11 +66,11 @@ export default function HomePage() {
                 className="w-full rounded-lg shadow-lg"
                 style={{ height: '265px', objectFit: 'cover' }}
               />
-              <div className="absolute inset-0 flex items-center justify-end pr-2">
-                <div className="bg-black/50 rounded-lg backdrop-blur-sm" style={{ padding: '12px 6px', width: 'fit-content' }}>
-                  <div className="flex flex-col overflow-hidden" style={{ width: '95px' }}>
-                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none" style={{ letterSpacing: '0.01em', display: 'block', width: '100%', textAlign: 'center' }}>AVOID</span>
-                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.04em', display: 'block', width: '100%', textAlign: 'center' }}>THIS</span>
+              <div className="absolute inset-0 flex items-center justify-end pr-4">
+                <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3">
+                  <div className="flex flex-col text-center min-w-[100px]">
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">AVOID</span>
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-tight tracking-wider">THIS</span>
                   </div>
                 </div>
               </div>
@@ -81,16 +81,16 @@ export default function HomePage() {
             <div className="relative flex-1 max-w-md mx-auto md:mx-0 overflow-hidden">
               <img 
                 src={joinImage} 
-                alt="Join PILLAR DRUG CLUB" 
+                alt="Join pillar drug club" 
                 className="w-full rounded-lg shadow-lg"
                 style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 60%' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <Link href="/register">
-                  <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate" style={{ padding: '12px 6px', width: 'fit-content' }}>
-                    <div className="flex flex-col overflow-hidden" style={{ width: '120px' }}>
-                      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-none" style={{ letterSpacing: '0.02em', display: 'block', width: '100%', textAlign: 'center' }}>JOIN</span>
-                      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-none" style={{ letterSpacing: '0.01em', display: 'block', width: '100%', textAlign: 'center' }}>PILLAR!</span>
+                  <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-4 py-3">
+                    <div className="flex flex-col text-center min-w-[120px]">
+                      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">JOIN</span>
+                      <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-tight tracking-wide">pillar!</span>
                     </div>
                   </div>
                 </Link>
@@ -190,7 +190,7 @@ export default function HomePage() {
           </p>
           <Link href="/register">
             <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-join-cta">
-              Join PILLAR DRUG CLUB
+              Join pillar drug club
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -202,7 +202,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <Pill className="h-6 w-6 text-primary" />
-            <span className="text-lg md:text-xl font-bold text-foreground">PILLAR DRUG CLUB</span>
+            <span className="text-lg md:text-xl font-bold text-foreground">pillar drug club</span>
           </div>
           <p className="text-muted-foreground font-bold mb-4 text-sm md:text-base">
             Transparent wholesale prescription pricing for everyone.

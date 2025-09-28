@@ -38,7 +38,7 @@ export default function Header() {
           {/* Center - Brand name with pill symbol and navigation */}
           <div className="flex items-center gap-8">
             <span className="text-xl font-black text-foreground flex items-center gap-2" data-testid="text-logo">
-              PILLAR DRUG CLUB
+              pillar drug club
               <Pill className="h-5 w-5 text-secondary" />
             </span>
             
@@ -96,7 +96,7 @@ export default function Header() {
                 <div className="px-6 py-4 border-b">
                   <div className="flex items-center gap-2">
                     <span className="text-xl font-black flex items-center gap-2">
-                      PILLAR DRUG CLUB
+                      pillar drug club
                       <Pill className="h-5 w-5 text-secondary" />
                     </span>
                   </div>
