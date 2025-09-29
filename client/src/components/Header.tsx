@@ -15,7 +15,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background backdrop-blur-lg border-b border-primary/20 shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-teal-600 backdrop-blur-lg border-b border-teal-700 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="flex h-20 items-center justify-between">
           {/* Left side - Menu button */}
@@ -37,9 +37,9 @@ export default function Header() {
 
           {/* Center - Brand name with pill symbol and navigation */}
           <div className="flex items-center gap-8">
-            <a href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
+            <a href="/" className="text-xl font-black text-white flex items-center gap-2 hover:text-teal-100 transition-colors" data-testid="text-logo">
               pillar drug club
-              <Pill className="h-5 w-5 text-secondary" />
+              <Pill className="h-5 w-5 text-teal-200" />
             </a>
             
             {/* Desktop Navigation - inline with header */}
@@ -48,7 +48,7 @@ export default function Header() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-sm font-bold text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
+                  className="text-sm font-bold text-teal-100 transition-colors hover:text-white whitespace-nowrap"
                   data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   {item.name}
@@ -66,20 +66,20 @@ export default function Header() {
               data-testid="button-theme-toggle"
             >
               {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
+                <Sun className="h-4 w-4 text-white" />
               ) : (
-                <Moon className="h-4 w-4" />
+                <Moon className="h-4 w-4 text-white" />
               )}
             </Button>
             
             <div className="hidden md:flex items-center space-x-3">
               <a href="/login">
-                <Button variant="ghost" size="sm" className="font-bold" data-testid="button-login">
+                <Button variant="ghost" size="sm" className="font-bold text-white hover:text-teal-100 hover:bg-teal-700" data-testid="button-login">
                   SIGN IN
                 </Button>
               </a>
               <a href="/register">
-                <Button size="sm" className="font-bold px-4" data-testid="button-signup">
+                <Button size="sm" className="font-bold px-4 bg-white text-teal-600 hover:bg-teal-50" data-testid="button-signup">
                   GET STARTED
                 </Button>
               </a>
@@ -91,13 +91,13 @@ export default function Header() {
         {isMenuOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} />
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-background shadow-xl">
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-teal-600 shadow-xl">
               <div className="flex flex-col h-full">
-                <div className="px-6 py-4 border-b">
+                <div className="px-6 py-4 border-b border-teal-700">
                   <div className="flex items-center gap-2">
-                    <a href="/" className="text-xl font-black flex items-center gap-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                    <a href="/" className="text-xl font-black flex items-center gap-2 text-white hover:text-teal-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
                       pillar drug club
-                      <Pill className="h-5 w-5 text-secondary" />
+                      <Pill className="h-5 w-5 text-teal-200" />
                     </a>
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-bold text-foreground hover:text-primary transition-colors py-2"
+                      className="block text-lg font-bold text-teal-100 hover:text-white transition-colors py-2"
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
@@ -114,14 +114,14 @@ export default function Header() {
                     </a>
                   ))}
                 </div>
-                <div className="px-6 py-6 border-t space-y-3">
+                <div className="px-6 py-6 border-t border-teal-700 space-y-3">
                   <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full font-bold" data-testid="mobile-button-login">
+                    <Button variant="outline" className="w-full font-bold text-white border-white hover:bg-white hover:text-teal-600" data-testid="mobile-button-login">
                       SIGN IN
                     </Button>
                   </a>
                   <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full font-bold" data-testid="mobile-button-signup">
+                    <Button className="w-full font-bold bg-white text-teal-600 hover:bg-teal-50" data-testid="mobile-button-signup">
                       GET STARTED
                     </Button>
                   </a>
