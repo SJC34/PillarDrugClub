@@ -29,6 +29,7 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
+import { PharmacySearch } from "@/components/PharmacySearch";
 
 const doctorFaxSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
@@ -68,6 +69,7 @@ export default function PrescriptionTransferPage() {
   const [activeTab, setActiveTab] = useState("doctor-fax");
   const [submissionStatus, setSubmissionStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+  const [selectedPharmacy, setSelectedPharmacy] = useState<any>(null);
   
   // Check authentication status
   const checkAuth = () => {
@@ -104,6 +106,23 @@ export default function PrescriptionTransferPage() {
   const pharmacyForm = useForm<PharmacyTransferForm>({
     resolver: zodResolver(pharmacyTransferSchema)
   });
+
+  // Handle pharmacy selection from search
+  const handlePharmacySelect = (pharmacy: any) => {
+    setSelectedPharmacy(pharmacy);
+    if (pharmacy) {
+      // Auto-populate form fields
+      const fullAddress = `${pharmacy.address}, ${pharmacy.city}, ${pharmacy.state} ${pharmacy.zipCode}`;
+      pharmacyForm.setValue("currentPharmacyName", pharmacy.name);
+      pharmacyForm.setValue("currentPharmacyPhone", pharmacy.phone || "");
+      pharmacyForm.setValue("currentPharmacyAddress", fullAddress);
+    } else {
+      // Clear form fields if pharmacy is deselected
+      pharmacyForm.setValue("currentPharmacyName", "");
+      pharmacyForm.setValue("currentPharmacyPhone", "");
+      pharmacyForm.setValue("currentPharmacyAddress", "");
+    }
+  };
 
   // Handle form submission with authentication check
   const handleDoctorSubmit = (e: React.FormEvent) => {
@@ -692,7 +711,20 @@ export default function PrescriptionTransferPage() {
                       <Building className="h-5 w-5" />
                       Current Pharmacy Information
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    {/* Pharmacy Search */}
+                    <PharmacySearch
+                      onPharmacySelect={handlePharmacySelect}
+                      selectedPharmacy={selectedPharmacy}
+                      className="mb-4"
+                    />
+
+                    {!selectedPharmacy && (
+                      <>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Or enter pharmacy information manually:
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="currentPharmacyName" className="text-sm md:text-base">Pharmacy Name</Label>
                         <Input
@@ -733,6 +765,8 @@ export default function PrescriptionTransferPage() {
                         <p className="text-xs md:text-sm text-destructive mt-1">{pharmacyForm.formState.errors.currentPharmacyAddress.message}</p>
                       )}
                     </div>
+                      </>
+                    )}
                   </div>
 
                   <Separator />

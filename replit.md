@@ -50,4 +50,6 @@ Preferred communication style: Simple, everyday language.
 
 **Geographic Services**: Likely integrates with geolocation APIs for doctor finder and delivery address validation features.
 
+**Healthcare Provider Database**: Integrates with the NLM (National Library of Medicine) Clinical Tables NPI database API for real-time search of doctors and pharmacies. The system searches both individual providers and organizations, auto-populating prescription transfer forms with verified names, addresses, and taxonomy information. Address data is parsed from the national database format into structured street, city, state, and ZIP components.
+
 **Healthcare Integration**: Designed to integrate with HealthWarehouse API for medication sourcing and inventory management.
