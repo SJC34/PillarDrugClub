@@ -99,8 +99,8 @@ export default function HomePage() {
           </div>
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Wholesale Prescription Prices
-            <span className="text-primary block">No Insurance Required</span>
+            Wholesale prescription prices
+            <span className="text-primary block">No insurance required</span>
           </h1>
           <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
             Join thousands of patients saving money on prescription medications with transparent wholesale pricing. 
