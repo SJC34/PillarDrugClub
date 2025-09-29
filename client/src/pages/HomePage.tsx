@@ -10,8 +10,8 @@ import {
   Check,
   ArrowRight
 } from "lucide-react";
-import avoidImage from "@assets/IMG_6107_1759082772316.jpeg";
-import joinImage from "@assets/IMG_6108_1759083596981.jpeg";
+import avoidImage from "@assets/stock_images/diverse_group_of_peo_8aff9a56.jpg";
+import joinImage from "@assets/stock_images/elderly_african_amer_74593c96.jpg";
 
 export default function HomePage() {
   const benefits = [
