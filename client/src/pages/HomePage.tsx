@@ -53,7 +53,7 @@ export default function HomePage() {
       <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
           {/* Question above both images */}
-          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Stuck in Lines at the Pharmacy?</p>
+          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Stuck in lines at the pharmacy?</p>
           
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
