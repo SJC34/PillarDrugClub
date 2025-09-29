@@ -91,13 +91,13 @@ export default function Header() {
         {isMenuOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} />
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-teal-500">
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-teal-600">
               <div className="flex flex-col h-full">
-                <div className="px-6 py-4 border-b border-teal-600">
+                <div className="px-6 py-4 border-b border-teal-700">
                   <div className="flex items-center gap-2">
                     <a href="/" className="text-xl font-black flex items-center gap-2 text-white hover:text-teal-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
                       pillar drug club
-                      <Pill className="h-5 w-5 text-teal-200" />
+                      <Pill className="h-5 w-5 text-white" />
                     </a>
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-bold text-white hover:!bg-teal-500 active:!bg-teal-400 transition-all py-3 px-4 rounded-lg"
+                      className="block text-lg font-bold text-white hover:!bg-teal-700 active:!bg-teal-800 transition-all py-3 px-4 rounded-lg"
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
@@ -114,14 +114,14 @@ export default function Header() {
                     </a>
                   ))}
                 </div>
-                <div className="px-6 py-6 border-t border-teal-600 space-y-3">
+                <div className="px-6 py-6 border-t border-teal-700 space-y-3">
                   <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full font-bold text-white border-white hover:bg-white hover:text-teal-600" data-testid="mobile-button-login">
+                    <Button variant="outline" className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" data-testid="mobile-button-login">
                       SIGN IN
                     </Button>
                   </a>
                   <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full font-bold bg-white text-teal-600 hover:bg-teal-50" data-testid="mobile-button-signup">
+                    <Button className="w-full font-bold !bg-white !text-teal-600 hover:!bg-teal-50" data-testid="mobile-button-signup">
                       GET STARTED
                     </Button>
                   </a>
