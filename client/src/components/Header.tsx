@@ -37,10 +37,10 @@ export default function Header() {
 
           {/* Center - Brand name with pill symbol and navigation */}
           <div className="flex items-center gap-8">
-            <span className="text-xl font-black text-foreground flex items-center gap-2" data-testid="text-logo">
+            <a href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
               pillar drug club
               <Pill className="h-5 w-5 text-secondary" />
-            </span>
+            </a>
             
             {/* Desktop Navigation - inline with header */}
             <nav className="hidden lg:flex items-center space-x-6">
@@ -95,10 +95,10 @@ export default function Header() {
               <div className="flex flex-col h-full">
                 <div className="px-6 py-4 border-b">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl font-black flex items-center gap-2">
+                    <a href="/" className="text-xl font-black flex items-center gap-2 hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                       pillar drug club
                       <Pill className="h-5 w-5 text-secondary" />
-                    </span>
+                    </a>
                   </div>
                 </div>
                 <div className="flex-1 px-6 py-6 space-y-6">
