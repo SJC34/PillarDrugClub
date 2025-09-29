@@ -163,8 +163,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {features.map((feature, idx) => {
               const Icon = feature.icon;
-              return (
-                <Card key={idx} className="text-center p-4 md:p-6 border-secondary/20 hover:border-secondary/40 transition-colors">
+              const isCalculator = feature.title === "Cost Calculator";
+              
+              const cardContent = (
+                <Card className={`text-center p-4 md:p-6 border-secondary/20 transition-colors ${isCalculator ? 'hover:border-primary/60 hover-elevate cursor-pointer' : 'hover:border-secondary/40'}`}>
                   <CardHeader className="pb-4">
                     <div className="mx-auto w-12 h-12 bg-gradient-to-br from-primary/10 to-secondary/15 rounded-lg flex items-center justify-center mb-4 border border-secondary/20">
                       <Icon className="h-6 w-6 text-primary" />
@@ -175,6 +177,18 @@ export default function HomePage() {
                     <CardDescription className="text-sm md:text-base font-bold">{feature.description}</CardDescription>
                   </CardContent>
                 </Card>
+              );
+              
+              return (
+                <div key={idx}>
+                  {isCalculator ? (
+                    <Link href="/cost-calculator" data-testid="link-cost-calculator-feature">
+                      {cardContent}
+                    </Link>
+                  ) : (
+                    cardContent
+                  )}
+                </div>
               );
             })}
           </div>
