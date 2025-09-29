@@ -36,35 +36,65 @@ export function DoctorSearch({ onDoctorSelect, selectedDoctor, className }: Doct
 
   // Format NPI API response for individual providers
   const formatIndividualProvider = (item: any): DoctorData => {
+    // API returns: [name, npi, taxonomy, fullAddress]
+    const fullAddress = item[3] || "";
+    const addressParts = parseAddress(fullAddress);
+    
     return {
-      npi: item[0] || "",
-      name: item[1] || "",
-      credential: item[2] || "",
-      address: item[3] || "",
-      city: item[4] || "",
-      state: item[5] || "",
-      zipCode: item[6] || "",
-      phone: item[7] || "",
-      fax: item[8] || "",
-      taxonomy: item[9] || "",
+      name: item[0] || "",
+      npi: item[1] || "",
+      taxonomy: item[2] || "",
+      address: addressParts.street,
+      city: addressParts.city,
+      state: addressParts.state,
+      zipCode: addressParts.zip,
+      phone: "",
+      fax: "",
       isOrganization: false
     };
   };
 
   // Format NPI API response for organizations
   const formatOrganization = (item: any): DoctorData => {
+    // API returns: [name, npi, taxonomy, fullAddress]
+    const fullAddress = item[3] || "";
+    const addressParts = parseAddress(fullAddress);
+    
     return {
-      npi: item[0] || "",
-      organizationName: item[1] || "",
-      name: item[1] || "", // Use organization name as display name
-      address: item[2] || "",
-      city: item[3] || "",
-      state: item[4] || "",
-      zipCode: item[5] || "",
-      phone: item[6] || "",
-      fax: item[7] || "",
-      taxonomy: item[8] || "",
+      name: item[0] || "",
+      organizationName: item[0] || "",
+      npi: item[1] || "",
+      taxonomy: item[2] || "",
+      address: addressParts.street,
+      city: addressParts.city,
+      state: addressParts.state,
+      zipCode: addressParts.zip,
+      phone: "",
+      fax: "",
       isOrganization: true
+    };
+  };
+  
+  // Parse full address string into components
+  const parseAddress = (fullAddress: string) => {
+    // Format: "STREET, CITY, STATE ZIP"
+    const parts = fullAddress.split(",").map(p => p.trim());
+    
+    if (parts.length >= 3) {
+      const street = parts[0];
+      const city = parts[1];
+      const stateZip = parts[2].split(" ");
+      const state = stateZip[0] || "";
+      const zip = stateZip.slice(1).join(" ");
+      
+      return { street, city, state, zip };
+    }
+    
+    return {
+      street: fullAddress,
+      city: "",
+      state: "",
+      zip: ""
     };
   };
 
