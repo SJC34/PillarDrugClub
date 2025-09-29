@@ -108,10 +108,16 @@ export function DoctorSearch({ onDoctorSelect, selectedDoctor, className }: Doct
         results.push(...organizations);
       }
 
-      // Filter out results without fax numbers and sort by relevance
-      const resultsWithFax = results.filter(doctor => doctor.fax && doctor.fax.trim() !== "");
+      // Sort results: prioritize those with fax numbers
+      const sortedResults = results.sort((a, b) => {
+        const aHasFax = a.fax && a.fax.trim() !== "";
+        const bHasFax = b.fax && b.fax.trim() !== "";
+        if (aHasFax && !bHasFax) return -1;
+        if (!aHasFax && bHasFax) return 1;
+        return 0;
+      });
       
-      setSearchResults(resultsWithFax);
+      setSearchResults(sortedResults);
       setShowResults(true);
     } catch (error) {
       console.error("Doctor search error:", error);
@@ -282,12 +288,14 @@ export function DoctorSearch({ onDoctorSelect, selectedDoctor, className }: Doct
                                 <span>{formatPhoneNumber(doctor.phone)}</span>
                               </div>
                             )}
-                            {doctor.fax && (
-                              <div className="flex items-center gap-1">
-                                <FileText className="h-3 w-3" />
+                            <div className="flex items-center gap-1">
+                              <FileText className="h-3 w-3" />
+                              {doctor.fax ? (
                                 <span>{formatPhoneNumber(doctor.fax)}</span>
-                              </div>
-                            )}
+                              ) : (
+                                <span className="text-muted-foreground/60 italic">No fax on file</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -305,7 +313,7 @@ export function DoctorSearch({ onDoctorSelect, selectedDoctor, className }: Doct
           <Card>
             <CardContent className="p-6 text-center">
               <p className="text-muted-foreground">
-                No doctors found with fax numbers for "{searchTerm}". 
+                No doctors found for "{searchTerm}". 
                 <br />
                 Try a different search term or enter doctor information manually below.
               </p>
