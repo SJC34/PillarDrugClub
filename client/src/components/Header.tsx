@@ -106,7 +106,7 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-bold text-teal-100 hover:text-white transition-colors py-2"
+                      className="block text-lg font-bold text-white hover:bg-teal-700 transition-colors py-3 px-4 rounded-lg"
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
