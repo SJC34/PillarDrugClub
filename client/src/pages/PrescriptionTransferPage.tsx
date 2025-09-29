@@ -28,6 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { DoctorSearch } from "@/components/DoctorSearch";
 
 const doctorFaxSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
@@ -48,6 +49,7 @@ const pharmacyTransferSchema = z.object({
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   medicationName: z.string().min(2, "Medication name is required"),
   dosage: z.string().min(1, "Dosage is required"),
+  quantity: z.string().min(1, "Quantity is required"),
   prescriptionNumber: z.string().min(1, "Prescription number is required"),
   currentPharmacyName: z.string().min(2, "Current pharmacy name is required"),
   currentPharmacyPhone: z.string().min(10, "Current pharmacy phone is required"),
@@ -65,6 +67,13 @@ export default function PrescriptionTransferPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("doctor-fax");
   const [submissionStatus, setSubmissionStatus] = useState<"idle" | "submitting" | "success">("idle");
+  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+  
+  // Check authentication status
+  const checkAuth = () => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    return !!user.id;
+  };
 
   const doctorForm = useForm<DoctorFaxForm>({
     resolver: zodResolver(doctorFaxSchema),
@@ -73,9 +82,46 @@ export default function PrescriptionTransferPage() {
     }
   });
 
+  // Handle doctor selection from search
+  const handleDoctorSelect = (doctor: any) => {
+    setSelectedDoctor(doctor);
+    if (doctor) {
+      // Auto-populate form fields
+      const fullAddress = `${doctor.address}, ${doctor.city}, ${doctor.state} ${doctor.zipCode}`;
+      doctorForm.setValue("doctorName", doctor.name);
+      doctorForm.setValue("doctorPhone", doctor.phone || "");
+      doctorForm.setValue("doctorFax", doctor.fax || "");
+      doctorForm.setValue("doctorAddress", fullAddress);
+    } else {
+      // Clear form fields if doctor is deselected
+      doctorForm.setValue("doctorName", "");
+      doctorForm.setValue("doctorPhone", "");
+      doctorForm.setValue("doctorFax", "");
+      doctorForm.setValue("doctorAddress", "");
+    }
+  };
+
   const pharmacyForm = useForm<PharmacyTransferForm>({
     resolver: zodResolver(pharmacyTransferSchema)
   });
+
+  // Handle form submission with authentication check
+  const handleDoctorSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Check authentication first
+    if (!checkAuth()) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to submit prescription requests.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // If authenticated, proceed with form validation and submission
+    doctorForm.handleSubmit(onDoctorSubmit)(e);
+  };
 
   const onDoctorSubmit = async (data: DoctorFaxForm) => {
     setSubmissionStatus("submitting");
@@ -118,6 +164,24 @@ export default function PrescriptionTransferPage() {
       });
       setSubmissionStatus("idle");
     }
+  };
+
+  // Handle pharmacy form submission with authentication check
+  const handlePharmacySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Check authentication first
+    if (!checkAuth()) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to submit transfer requests.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // If authenticated, proceed with form validation and submission
+    pharmacyForm.handleSubmit(onPharmacySubmit)(e);
   };
 
   const onPharmacySubmit = async (data: PharmacyTransferForm) => {
@@ -247,7 +311,7 @@ export default function PrescriptionTransferPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={doctorForm.handleSubmit(onDoctorSubmit)} className="space-y-6">
+                <form onSubmit={handleDoctorSubmit} className="space-y-6">
                   {/* Patient Information */}
                   <div>
                     <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
@@ -343,49 +407,97 @@ export default function PrescriptionTransferPage() {
                       <User className="h-5 w-5" />
                       Doctor Information
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="doctorName" className="text-sm md:text-base">Doctor Name</Label>
-                        <Input
-                          id="doctorName"
-                          placeholder="Dr. Sarah Johnson"
-                          {...doctorForm.register("doctorName")}
-                          data-testid="input-doctor-name"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
-                        {doctorForm.formState.errors.doctorName && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorName.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="doctorPhone" className="text-sm md:text-base">Phone Number</Label>
-                        <Input
-                          id="doctorPhone"
-                          placeholder="(555) 123-4567"
-                          {...doctorForm.register("doctorPhone")}
-                          data-testid="input-doctor-phone"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
-                        {doctorForm.formState.errors.doctorPhone && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorPhone.message}</p>
-                        )}
-                      </div>
+                    
+                    {/* Doctor Search */}
+                    <div className="mb-6">
+                      <DoctorSearch 
+                        onDoctorSelect={handleDoctorSelect}
+                        selectedDoctor={selectedDoctor}
+                        className="mb-4"
+                      />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                      <div>
-                        <Label htmlFor="doctorFax" className="text-sm md:text-base">Fax Number</Label>
-                        <Input
-                          id="doctorFax"
-                          placeholder="(555) 123-4568"
-                          {...doctorForm.register("doctorFax")}
-                          data-testid="input-doctor-fax"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
-                        {doctorForm.formState.errors.doctorFax && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorFax.message}</p>
-                        )}
+                    
+                    {/* Manual Entry Fields - shown only if no doctor selected or as fallback */}
+                    {!selectedDoctor && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                          Can't find your doctor? Enter their information manually below.
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="doctorName" className="text-sm md:text-base">Doctor Name</Label>
+                            <Input
+                              id="doctorName"
+                              placeholder="Dr. Sarah Johnson"
+                              {...doctorForm.register("doctorName")}
+                              data-testid="input-doctor-name"
+                              className="h-10 md:h-11 text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.doctorName && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorName.message}</p>
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="doctorPhone" className="text-sm md:text-base">Phone Number</Label>
+                            <Input
+                              id="doctorPhone"
+                              placeholder="(555) 123-4567"
+                              {...doctorForm.register("doctorPhone")}
+                              data-testid="input-doctor-phone"
+                              className="h-10 md:h-11 text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.doctorPhone && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorPhone.message}</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="doctorFax" className="text-sm md:text-base">Fax Number</Label>
+                            <Input
+                              id="doctorFax"
+                              placeholder="(555) 123-4568"
+                              {...doctorForm.register("doctorFax")}
+                              data-testid="input-doctor-fax"
+                              className="h-10 md:h-11 text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.doctorFax && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorFax.message}</p>
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="urgency" className="text-sm md:text-base">Request Urgency</Label>
+                            <Select onValueChange={(value) => doctorForm.setValue("urgency", value as any)}>
+                              <SelectTrigger data-testid="select-urgency" className="h-10 md:h-11">
+                                <SelectValue placeholder="Select urgency" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="routine">Routine (24-48 hours)</SelectItem>
+                                <SelectItem value="urgent">Urgent (Same day)</SelectItem>
+                                <SelectItem value="emergency">Emergency (Immediate)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="doctorAddress" className="text-sm md:text-base">Doctor Office Address</Label>
+                          <Textarea
+                            id="doctorAddress"
+                            placeholder="123 Medical Center Dr, City, State 12345"
+                            {...doctorForm.register("doctorAddress")}
+                            data-testid="textarea-doctor-address"
+                            className="min-h-[80px] md:min-h-[100px] text-sm md:text-base"
+                          />
+                          {doctorForm.formState.errors.doctorAddress && (
+                            <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorAddress.message}</p>
+                          )}
+                        </div>
                       </div>
-                      <div>
+                    )}
+                    
+                    {/* Urgency selector - always shown */}
+                    {selectedDoctor && (
+                      <div className="mt-4">
                         <Label htmlFor="urgency" className="text-sm md:text-base">Request Urgency</Label>
                         <Select onValueChange={(value) => doctorForm.setValue("urgency", value as any)}>
                           <SelectTrigger data-testid="select-urgency" className="h-10 md:h-11">
@@ -398,20 +510,7 @@ export default function PrescriptionTransferPage() {
                           </SelectContent>
                         </Select>
                       </div>
-                    </div>
-                    <div className="mt-4">
-                      <Label htmlFor="doctorAddress" className="text-sm md:text-base">Doctor Office Address</Label>
-                      <Textarea
-                        id="doctorAddress"
-                        placeholder="123 Medical Center Dr, City, State 12345"
-                        {...doctorForm.register("doctorAddress")}
-                        data-testid="textarea-doctor-address"
-                        className="min-h-[80px] md:min-h-[100px] text-sm md:text-base"
-                      />
-                      {doctorForm.formState.errors.doctorAddress && (
-                        <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorAddress.message}</p>
-                      )}
-                    </div>
+                    )}
                   </div>
 
                   <Separator />
@@ -469,7 +568,7 @@ export default function PrescriptionTransferPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={pharmacyForm.handleSubmit(onPharmacySubmit)} className="space-y-6">
+                <form onSubmit={handlePharmacySubmit} className="space-y-6">
                   {/* Patient Information */}
                   <div>
                     <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
