@@ -62,16 +62,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-6">
+    <div className="min-h-[calc(100vh-80px)] bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-6 pt-24">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Pill className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">Pillar Drug Club</span>
-            </div>
-          </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to access wholesale prescription pricing</p>
         </div>
