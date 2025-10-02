@@ -67,7 +67,7 @@ export default function HomePage() {
                 muted={true}
                 playsInline={true}
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '265px', objectFit: 'contain', backgroundColor: '#000' }}
+                style={{ height: '265px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-4">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3" style={{ height: '88px' }}>
@@ -89,7 +89,7 @@ export default function HomePage() {
                 muted={true}
                 playsInline={true}
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '265px', objectFit: 'contain', backgroundColor: '#000' }}
+                style={{ height: '265px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <Link href="/register">
