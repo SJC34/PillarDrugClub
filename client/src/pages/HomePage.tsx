@@ -89,7 +89,7 @@ export default function HomePage() {
                 muted={true}
                 playsInline={true}
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 40%', transform: 'scale(0.9)' }}
+                style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 40%' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <Link href="/register">
