@@ -52,4 +52,6 @@ Preferred communication style: Simple, everyday language.
 
 **Healthcare Provider Database**: Integrates with the NLM (National Library of Medicine) Clinical Tables NPI database API for real-time search of doctors and pharmacies. The system searches both individual providers and organizations, auto-populating prescription transfer forms with verified names, addresses, and taxonomy information. Address data is parsed from the national database format into structured street, city, state, and ZIP components.
 
+**E-Prescribing Network**: Configured to integrate with Surescripts, the nation's largest health information network connecting 1.6M+ healthcare providers and 99% of U.S. pharmacies. Integration planned through certified partner (DoseSpot recommended at $525/month for up to 500 prescriptions). Provides electronic prescription routing (NewRx), medication history access, pharmacy communication (RxChange), and prescription fill confirmations (RxFill). Requires Surescripts Business Associate Agreement (BAA), HIPAA compliance documentation, and DEA third-party audit for controlled substances (EPCS).
+
 **Healthcare Integration**: Designed to integrate with HealthWarehouse API for medication sourcing and inventory management.

@@ -246,17 +246,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send notification based on prescription type
       if (prescription.isTransfer && prescription.transferFromPharmacy) {
         console.log(`📞 Initiating pharmacy transfer from ${prescription.transferFromPharmacy} for prescription ${prescription.id}`);
-        // TODO: Integrate with pharmacy transfer system
+        // TODO: Integrate with Surescripts RxChange API for pharmacy transfers
       } else {
-        console.log(`📠 Sending e-fax request to prescriber for prescription ${prescription.id}`);
-        // TODO: Integrate with HIPAA-compliant e-fax service (iFax, SRFax, or InterFAX)
-        // Recommended: iFax API ($0.01/page) - https://www.ifaxapp.com/fax-api/
-        // Required: Sign BAA (Business Associate Agreement) for HIPAA compliance
-        // The fax should include: patient info, medication details, doctor contact
-        if (prescriptionData.prescriberFax) {
-          console.log(`  → Fax number: ${prescriptionData.prescriberFax}`);
+        console.log(`📋 Sending NewRx request via Surescripts network for prescription ${prescription.id}`);
+        // TODO: Integrate with Surescripts via certified partner (DoseSpot recommended)
+        // 
+        // SURESCRIPTS INTEGRATION OPTIONS:
+        // 
+        // Option 1: DoseSpot (Recommended)
+        //   - Cost: $525/month for up to 500 prescriptions (~$1.05/prescription)
+        //   - Timeline: Days to weeks for setup
+        //   - Features: Full API access, white-label UI, automatic certification
+        //   - URL: https://dosespot.com/full-integration/
+        //
+        // Option 2: Particle Health
+        //   - Access Surescripts medication history data
+        //   - 12-month patient medication records
+        //   - 99% pharmacy coverage
+        //   - URL: https://docs.particlehealth.com/docs/surescripts
+        //
+        // REQUIREMENTS:
+        //   - Surescripts Business Associate Agreement (BAA)
+        //   - DEA third-party audit for EPCS (controlled substances)
+        //   - HIPAA compliance documentation
+        //   - Provider identity proofing
+        //
+        // IMPLEMENTATION:
+        //   1. Sign up with DoseSpot or Particle Health
+        //   2. Obtain API credentials and add to environment secrets
+        //   3. Implement NCPDP NewRx transaction format
+        //   4. Map prescription data to Surescripts fields
+        //   5. Handle responses (RxFill, RxChange, CancelRx)
+        //
+        if (prescriptionData.prescriberNpi) {
+          console.log(`  → Prescriber NPI: ${prescriptionData.prescriberNpi}`);
           console.log(`  → Medication: ${prescriptionData.medicationName}`);
           console.log(`  → Patient: ${prescriptionData.patientName}`);
+          console.log(`  → Pharmacy network: Surescripts (1.6M providers, 99% U.S. pharmacies)`);
         }
       }
       
