@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { storage } from "./storage";
 import { insertUserSchema } from "@shared/schema";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
   insertCustomerSchema, 
   insertMedicationSchema,
@@ -28,6 +29,9 @@ if (process.env.STRIPE_SECRET_KEY) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Replit Auth (OAuth + session management)
+  await setupAuth(app);
+
   // Health check endpoints - respond immediately
   app.get("/api/ping", (req, res) => {
     res.status(200).json({ 
@@ -56,7 +60,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Authentication routes
+  // Get authenticated user (for Replit OAuth)
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      // Don't return password in response
+      const { password, ...userResponse } = user;
+      res.json(userResponse);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Legacy email/password authentication routes (for backward compatibility)
   app.post("/api/auth/register", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);

@@ -1,4 +1,4 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type User, type InsertUser, type UpsertUser } from "@shared/schema";
 import { 
   type Customer, type InsertCustomer,
   type Medication, type InsertMedication, type MedicationSearch,
@@ -20,6 +20,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  upsertUser(user: UpsertUser): Promise<User>; // For Replit OAuth
   updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined>;
   updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
 
@@ -269,6 +270,7 @@ export class MemStorage implements IStorage {
       password: insertUser.password, // In production, this should be hashed
       firstName: insertUser.firstName,
       lastName: insertUser.lastName,
+      profileImageUrl: null,
       phoneNumber: insertUser.phoneNumber || null,
       smsConsent: insertUser.smsConsent || "false",
       role: "client",
@@ -281,6 +283,47 @@ export class MemStorage implements IStorage {
     };
     this.users.set(id, user);
     return user;
+  }
+
+  async upsertUser(upsertData: UpsertUser): Promise<User> {
+    const existingUser = this.users.get(upsertData.id);
+    const now = new Date().toISOString();
+    
+    if (existingUser) {
+      // Update existing user
+      const updated: User = {
+        ...existingUser,
+        email: upsertData.email || existingUser.email,
+        firstName: upsertData.firstName || existingUser.firstName,
+        lastName: upsertData.lastName || existingUser.lastName,
+        profileImageUrl: upsertData.profileImageUrl || existingUser.profileImageUrl,
+        updatedAt: now
+      };
+      this.users.set(upsertData.id, updated);
+      return updated;
+    } else {
+      // Create new user from OAuth
+      const newUser: User = {
+        id: upsertData.id,
+        username: upsertData.email || null,
+        email: upsertData.email || null,
+        password: null, // OAuth users don't have passwords
+        firstName: upsertData.firstName || null,
+        lastName: upsertData.lastName || null,
+        profileImageUrl: upsertData.profileImageUrl || null,
+        phoneNumber: null,
+        smsConsent: "false",
+        role: "client",
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        subscriptionStatus: "incomplete",
+        isActive: "true",
+        createdAt: now,
+        updatedAt: now
+      };
+      this.users.set(upsertData.id, newUser);
+      return newUser;
+    }
   }
 
   async updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> {
