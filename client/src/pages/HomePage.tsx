@@ -11,7 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import avoidImage from "@assets/IMG_6107_1759082772316.jpeg";
-import joinImage from "@assets/IMG_6108_1759083596981.jpeg";
+import joinVideo from "@assets/join-pillar-video.mp4";
 
 export default function HomePage() {
   const benefits = [
@@ -77,11 +77,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Image with "Join pillar!" overlay */}
+            {/* Video with "Join pillar!" overlay */}
             <div className="relative flex-1 max-w-md mx-auto md:mx-0 overflow-hidden">
-              <img 
-                src={joinImage} 
-                alt="Join Pillar Drug Club" 
+              <video 
+                src={joinVideo} 
+                autoPlay={true}
+                loop={true}
+                muted={true}
+                playsInline={true}
                 className="w-full rounded-lg shadow-lg"
                 style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 60%' }}
               />
