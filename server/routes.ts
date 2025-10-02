@@ -246,8 +246,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send notification based on prescription type
       if (prescription.isTransfer && prescription.transferFromPharmacy) {
         console.log(`📞 Initiating pharmacy transfer from ${prescription.transferFromPharmacy} for prescription ${prescription.id}`);
+        // TODO: Integrate with pharmacy transfer system
       } else {
-        console.log(`📠 Sending fax request to prescriber for prescription ${prescription.id}`);
+        console.log(`📠 Sending e-fax request to prescriber for prescription ${prescription.id}`);
+        // TODO: Integrate with HIPAA-compliant e-fax service (iFax, SRFax, or InterFAX)
+        // Recommended: iFax API ($0.01/page) - https://www.ifaxapp.com/fax-api/
+        // Required: Sign BAA (Business Associate Agreement) for HIPAA compliance
+        // The fax should include: patient info, medication details, doctor contact
+        if (prescriptionData.prescriberFax) {
+          console.log(`  → Fax number: ${prescriptionData.prescriberFax}`);
+          console.log(`  → Medication: ${prescriptionData.medicationName}`);
+          console.log(`  → Patient: ${prescriptionData.patientName}`);
+        }
       }
       
       res.status(201).json({ 
@@ -383,17 +393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Prescription routes
-  app.post("/api/prescriptions", async (req, res) => {
-    try {
-      const prescriptionData = insertPrescriptionSchema.parse(req.body);
-      const prescription = await storage.createPrescription(prescriptionData);
-      res.status(201).json(prescription);
-    } catch (error) {
-      res.status(400).json({ error: "Invalid prescription data" });
-    }
-  });
-
+  // Prescription lookup route
   app.get("/api/prescriptions/:id", async (req, res) => {
     try {
       const prescription = await storage.getPrescription(req.params.id);
