@@ -211,6 +211,8 @@ export class MemStorage implements IStorage {
       password: "Spaceworm#25",
       firstName: "Seth",
       lastName: "Admin",
+      phoneNumber: null,
+      smsConsent: "false",
       role: "admin",
       stripeCustomerId: null,
       stripeSubscriptionId: null,
@@ -267,6 +269,8 @@ export class MemStorage implements IStorage {
       password: insertUser.password, // In production, this should be hashed
       firstName: insertUser.firstName,
       lastName: insertUser.lastName,
+      phoneNumber: insertUser.phoneNumber || null,
+      smsConsent: insertUser.smsConsent || "false",
       role: "client",
       stripeCustomerId: null,
       stripeSubscriptionId: null,

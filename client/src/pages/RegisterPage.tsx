@@ -18,9 +18,11 @@ const registerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
+  phoneNumber: z.string().min(10, "Please enter a valid phone number"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
-  acceptTerms: z.boolean().refine(val => val === true, "You must accept the terms and conditions")
+  acceptTerms: z.boolean().refine(val => val === true, "You must accept the terms and conditions"),
+  smsConsent: z.boolean()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"]
@@ -151,7 +153,9 @@ export default function RegisterPage() {
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
+          phoneNumber: data.phoneNumber,
           password: data.password,
+          smsConsent: data.smsConsent ? "true" : "false",
         }),
       });
 
@@ -357,6 +361,21 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="text-sm md:text-base">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  placeholder="(555) 123-4567"
+                  {...register("phoneNumber")}
+                  data-testid="input-phone-number"
+                  className="h-10 md:h-11"
+                />
+                {errors.phoneNumber && (
+                  <p className="text-xs md:text-sm text-destructive">{errors.phoneNumber.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm md:text-base">Password</Label>
                 <div className="relative">
                   <Input
@@ -420,6 +439,18 @@ export default function RegisterPage() {
 
               <div className="flex items-start space-x-3">
                 <Checkbox
+                  id="smsConsent"
+                  onCheckedChange={(checked) => setValue("smsConsent", checked as boolean)}
+                  data-testid="checkbox-sms-consent"
+                  className="mt-1"
+                />
+                <Label htmlFor="smsConsent" className="text-xs md:text-sm leading-relaxed">
+                  I consent to receive text messages about my prescriptions and account updates. Message and data rates may apply. Reply STOP to opt out.
+                </Label>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Checkbox
                   id="acceptTerms"
                   checked={acceptTerms}
                   onCheckedChange={(checked) => setValue("acceptTerms", checked as boolean)}
@@ -431,7 +462,7 @@ export default function RegisterPage() {
                   <a href="#" className="text-teal-600 hover:underline">
                     Terms of Service
                   </a>{" "}
-                  and{" "}
+                  (including SMS consent policies) and{" "}
                   <a href="#" className="text-teal-600 hover:underline">
                     Privacy Policy
                   </a>
