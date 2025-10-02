@@ -28,6 +28,8 @@ Preferred communication style: Simple, everyday language.
 
 **Responsive Design**: Comprehensive mobile-first responsive design implementation completed across the entire application. Features include mobile navigation overlay with touch-friendly targets, responsive grids that stack on mobile (grid-cols-1 sm:grid-cols-2 md:grid-cols-3), adaptive typography scaling, mobile-optimized input heights and form layouts, and progressive enhancement from mobile to desktop breakpoints. All major pages (HomePage, RegisterPage, CostCalculatorPage, PrescriptionTransferPage) have been optimized for mobile devices with proper spacing, readable text, and intuitive navigation patterns. Successfully tested across multiple viewport sizes (375px to 1200px+) with automated responsive testing confirming functionality.
 
+**Homepage Carousel**: The homepage features an auto-advancing carousel built with Embla Carousel showcasing three slides: (1) pharmacy line image demonstrating the problem of waiting in pharmacy lines, (2) "Avoid This" video with text overlay, and (3) "Join Pillar!" video with clickable call-to-action. Text overlays use reduced font sizing (text-2xl md:text-3xl) for better mobile spacing and visual balance. Carousel auto-advances every 5 seconds (25% slower than standard speed for better engagement), with navigation arrows visible on desktop. The implementation uses embla-carousel-autoplay plugin with pause-on-hover functionality for improved user experience.
+
 ## External Dependencies
 
 **Database Service**: Neon Database serverless PostgreSQL for primary data storage with connection pooling and automatic scaling.
