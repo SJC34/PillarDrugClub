@@ -13,7 +13,7 @@ import {
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
-import pharmacyLineImage from "@assets/E68175A4-9E6D-4F91-A35C-38C229C698E5_1759422334349.png";
+import joinVideo from "@assets/join-pillar-video.mp4";
 
 export default function HomePage() {
   const benefits = [
@@ -71,19 +71,6 @@ export default function HomePage() {
               className="w-full"
             >
               <CarouselContent>
-                {/* Slide 1 - Just the pharmacy line image */}
-                <CarouselItem>
-                  <div className="relative overflow-hidden">
-                    <img 
-                      src={pharmacyLineImage} 
-                      alt="Pharmacy line"
-                      className="w-full rounded-lg shadow-lg"
-                      style={{ height: '265px', objectFit: 'cover' }}
-                      data-testid="img-pharmacy-line"
-                    />
-                  </div>
-                </CarouselItem>
-
                 {/* Slide 2 - "Avoid This" video with text overlay */}
                 <CarouselItem>
                   <div className="relative overflow-hidden">
@@ -104,6 +91,32 @@ export default function HomePage() {
                           <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wider" data-testid="text-this">This</span>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </CarouselItem>
+
+                {/* Slide 3 - "Join Pillar!" video with text overlay */}
+                <CarouselItem>
+                  <div className="relative overflow-hidden">
+                    <video 
+                      src={joinVideo} 
+                      autoPlay={true}
+                      loop={true}
+                      muted={true}
+                      playsInline={true}
+                      className="w-full rounded-lg shadow-lg"
+                      style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 40%' }}
+                      data-testid="video-join-pillar"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
+                      <Link href="/register">
+                        <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-3 py-2">
+                          <div className="flex flex-col text-center min-w-[90px] justify-center">
+                            <span className="text-2xl md:text-3xl font-black text-white leading-tight tracking-wide" data-testid="text-join">Join</span>
+                            <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wide" data-testid="text-pillar">Pillar!</span>
+                          </div>
+                        </div>
+                      </Link>
                     </div>
                   </div>
                 </CarouselItem>
