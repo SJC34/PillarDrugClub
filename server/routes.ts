@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { storage } from "./storage";
 import { insertUserSchema } from "@shared/schema";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupSocialAuth, isAuthenticated as socialAuthCheck } from "./socialAuth";
 import { 
   insertCustomerSchema, 
   insertMedicationSchema,
@@ -29,8 +29,8 @@ if (process.env.STRIPE_SECRET_KEY) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup Replit Auth (OAuth + session management)
-  await setupAuth(app);
+  // Setup Social OAuth (Google, Apple, X)
+  await setupSocialAuth(app);
 
   // Health check endpoints - respond immediately
   app.get("/api/ping", (req, res) => {
@@ -60,10 +60,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Get authenticated user (for Replit OAuth)
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Get authenticated user (for OAuth)
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });

@@ -160,7 +160,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 className="w-full bg-white hover:bg-gray-50 text-gray-700"
-                onClick={() => window.location.href = '/api/login'}
+                onClick={() => window.location.href = '/api/auth/google'}
                 data-testid="button-google-login"
               >
                 <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -175,7 +175,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 className="w-full bg-white hover:bg-gray-50 text-black"
-                onClick={() => window.location.href = '/api/login'}
+                onClick={() => window.location.href = '/api/auth/apple'}
                 data-testid="button-apple-login"
               >
                 <FaApple className="mr-2 h-5 w-5" />
@@ -185,7 +185,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 className="w-full bg-black hover:bg-gray-900 text-white"
-                onClick={() => window.location.href = '/api/login'}
+                onClick={() => window.location.href = '/api/auth/twitter'}
                 data-testid="button-x-login"
               >
                 <FaXTwitter className="mr-2 h-5 w-5" />

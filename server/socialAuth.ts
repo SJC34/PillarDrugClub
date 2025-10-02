@@ -37,22 +37,43 @@ export function getSession() {
 }
 
 async function upsertUserFromProfile(profile: any, provider: string) {
+  const userId = `${provider}_${profile.id}`;
   const email = profile.emails?.[0]?.value || profile.email;
   const firstName = profile.name?.givenName || profile.given_name || profile.firstName || "";
   const lastName = profile.name?.familyName || profile.family_name || profile.lastName || "";
   const profileImageUrl = profile.photos?.[0]?.value || profile.picture || profile.profileImageUrl || "";
 
+  // If provider doesn't send email, try to get it from existing user
+  let finalEmail = email;
+  if (!finalEmail) {
+    try {
+      const existingUser = await storage.getUser(userId);
+      if (existingUser && existingUser.email) {
+        finalEmail = existingUser.email;
+      }
+    } catch (error) {
+      // User doesn't exist yet, and no email from provider
+    }
+  }
+
+  // If we still don't have an email, we can't proceed
+  if (!finalEmail) {
+    throw new Error(
+      `${provider} authentication failed: Email address is required but was not provided. Please ensure email permissions are granted.`
+    );
+  }
+
   await storage.upsertUser({
-    id: `${provider}_${profile.id}`,
-    email: email,
+    id: userId,
+    email: finalEmail,
     firstName: firstName,
     lastName: lastName,
     profileImageUrl: profileImageUrl,
   });
 
   return {
-    id: `${provider}_${profile.id}`,
-    email: email,
+    id: userId,
+    email: finalEmail,
     firstName: firstName,
     lastName: lastName,
     provider: provider,
