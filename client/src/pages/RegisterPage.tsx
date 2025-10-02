@@ -97,7 +97,7 @@ export default function RegisterPage() {
         <div className="max-w-md mx-auto w-full">
           <Card>
             <CardHeader className="text-center">
-              <Pill className="h-12 w-12 text-primary mx-auto mb-4" />
+              <Pill className="h-12 w-12 text-teal-600 mx-auto mb-4" />
               <CardTitle className="font-display">Configuration Required</CardTitle>
               <CardDescription>
                 Payment processing is not properly configured. Please contact support.
@@ -219,7 +219,7 @@ export default function RegisterPage() {
           <div className="text-center mb-6 md:mb-8">
             <Link href="/">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Pill className="h-8 w-8 text-primary" />
+                <Pill className="h-8 w-8 text-teal-600" />
                 <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
               </div>
             </Link>
@@ -255,7 +255,7 @@ export default function RegisterPage() {
             <Card className="border-secondary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-display">
-                  <CreditCard className="h-5 w-5 text-primary" />
+                  <CreditCard className="h-5 w-5 text-teal-600" />
                   Payment Information
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
@@ -265,7 +265,7 @@ export default function RegisterPage() {
               <CardContent>
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl md:text-3xl font-bold text-primary">$10</div>
+                    <div className="text-2xl md:text-3xl font-bold text-teal-600">$10</div>
                     <div className="text-sm md:text-base text-muted-foreground">per month</div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">Cancel anytime</div>
                   </div>
@@ -428,11 +428,11 @@ export default function RegisterPage() {
                 />
                 <Label htmlFor="acceptTerms" className="text-xs md:text-sm leading-relaxed">
                   I agree to the{" "}
-                  <a href="#" className="text-primary hover:underline">
+                  <a href="#" className="text-teal-600 hover:underline">
                     Terms of Service
                   </a>{" "}
                   and{" "}
-                  <a href="#" className="text-primary hover:underline">
+                  <a href="#" className="text-teal-600 hover:underline">
                     Privacy Policy
                   </a>
                 </Label>
@@ -455,7 +455,7 @@ export default function RegisterPage() {
               <div className="text-xs md:text-sm text-muted-foreground">
                 Already have an account?{" "}
                 <Link href="/login">
-                  <Button variant="ghost" className="p-0 h-auto font-semibold text-primary">
+                  <Button variant="ghost" className="p-0 h-auto font-semibold text-teal-600">
                     Sign in
                   </Button>
                 </Link>
