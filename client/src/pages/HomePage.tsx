@@ -70,8 +70,8 @@ export default function HomePage() {
                 style={{ height: '265px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-4">
-                <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3" style={{ height: '88px' }}>
-                  <div className="flex flex-col text-center min-w-[100px] justify-center h-full">
+                <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3" style={{ height: '88px', width: '160px' }}>
+                  <div className="flex flex-col text-center justify-center h-full">
                     <span className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-wide">Avoid</span>
                     <span className="text-3xl md:text-4xl lg:text-5xl font-black text-primary leading-tight tracking-wider">This</span>
                   </div>
@@ -93,8 +93,8 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <Link href="/register">
-                  <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-4 py-3" style={{ height: '88px' }}>
-                    <div className="flex flex-col text-center min-w-[120px] justify-center h-full">
+                  <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-4 py-3" style={{ height: '88px', width: '160px' }}>
+                    <div className="flex flex-col text-center justify-center h-full">
                       <span className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-wide">Join</span>
                       <span className="text-3xl md:text-4xl lg:text-5xl font-black text-primary leading-tight tracking-wide">Pillar!</span>
                     </div>
