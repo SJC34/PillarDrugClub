@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pill, Eye, EyeOff } from "lucide-react";
+import { FaGoogle, FaApple, FaGithub, FaXTwitter } from "react-icons/fa6";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -149,16 +150,49 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Social Login Button */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => window.location.href = '/api/login'}
-              data-testid="button-social-login"
-            >
-              Sign in with Google, Apple, GitHub, or X
-            </Button>
+            {/* Social Login Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => window.location.href = '/api/login'}
+                data-testid="button-google-login"
+              >
+                <FaGoogle className="mr-2 h-4 w-4" />
+                Google
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => window.location.href = '/api/login'}
+                data-testid="button-apple-login"
+              >
+                <FaApple className="mr-2 h-4 w-4" />
+                Apple
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => window.location.href = '/api/login'}
+                data-testid="button-github-login"
+              >
+                <FaGithub className="mr-2 h-4 w-4" />
+                GitHub
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => window.location.href = '/api/login'}
+                data-testid="button-x-login"
+              >
+                <FaXTwitter className="mr-2 h-4 w-4" />
+                X
+              </Button>
+            </div>
 
             <div className="mt-6 text-center space-y-2">
               <Link href="/forgot-password">
