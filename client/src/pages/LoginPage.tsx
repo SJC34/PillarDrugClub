@@ -155,17 +155,17 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-google-login"
               >
-                <FaGoogle className="mr-2 h-4 w-4" />
+                <FaGoogle className="mr-2 h-4 w-4 text-[#4285F4]" />
                 Google
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full bg-black hover:bg-gray-900 text-white border-black"
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-apple-login"
               >
@@ -175,7 +175,7 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full bg-[#24292e] hover:bg-[#1b1f23] text-white border-[#24292e]"
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-github-login"
               >
@@ -185,7 +185,7 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full bg-black hover:bg-gray-900 text-white border-black"
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-x-login"
               >
