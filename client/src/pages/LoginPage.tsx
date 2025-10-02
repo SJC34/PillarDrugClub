@@ -154,8 +154,7 @@ export default function LoginPage() {
             <div className="space-y-3">
               <Button
                 type="button"
-                variant="outline"
-                className="w-full bg-white hover:bg-gray-50 text-gray-700"
+                className="w-full bg-white hover:bg-gray-50 text-gray-700 border-0"
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-google-login"
               >
@@ -169,8 +168,7 @@ export default function LoginPage() {
               </Button>
               <Button
                 type="button"
-                variant="outline"
-                className="w-full bg-white hover:bg-gray-50 text-black"
+                className="w-full bg-white hover:bg-gray-50 text-black border-0"
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-apple-login"
               >
@@ -179,8 +177,7 @@ export default function LoginPage() {
               </Button>
               <Button
                 type="button"
-                variant="outline"
-                className="w-full bg-black hover:bg-gray-900 text-white"
+                className="w-full bg-black hover:bg-gray-900 text-white border-0"
                 onClick={() => window.location.href = '/api/login'}
                 data-testid="button-x-login"
               >
@@ -210,7 +207,7 @@ export default function LoginPage() {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/">
-            <Button variant="outline" data-testid="button-back-home">
+            <Button variant="secondary" data-testid="button-back-home">
               Back to Home
             </Button>
           </Link>

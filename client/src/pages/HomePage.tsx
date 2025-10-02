@@ -120,7 +120,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/cost-calculator">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-try-calculator">
+              <Button variant="secondary" size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-try-calculator">
                 Try Cost Calculator
               </Button>
             </Link>

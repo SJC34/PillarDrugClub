@@ -105,7 +105,7 @@ export default function RegisterPage() {
             </CardHeader>
             <CardContent className="text-center">
               <Link href="/login">
-                <Button variant="outline" className="w-full">
+                <Button variant="secondary" className="w-full">
                   Back to Login
                 </Button>
               </Link>
@@ -283,7 +283,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="text-center mt-6 md:mt-8">
-            <Button variant="outline" onClick={() => setStep('register')} data-testid="button-back-to-register" className="w-full sm:w-auto">
+            <Button variant="secondary" onClick={() => setStep('register')} data-testid="button-back-to-register" className="w-full sm:w-auto">
               Back to Registration
             </Button>
           </div>
@@ -467,7 +467,7 @@ export default function RegisterPage() {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/">
-            <Button variant="outline" data-testid="button-back-home" className="w-full sm:w-auto">
+            <Button variant="secondary" data-testid="button-back-home" className="w-full sm:w-auto">
               Back to Home
             </Button>
           </Link>
