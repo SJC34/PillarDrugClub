@@ -157,13 +157,19 @@ export default function PrescriptionTransferPage() {
   const onDoctorSubmit = async (data: DoctorFaxForm) => {
     setSubmissionStatus("submitting");
     try {
+      // Get user ID from localStorage
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      
       // Generate PDF and message template
       const response = await fetch('/api/prescriptions/generate-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          userId: user.id
+        })
       });
 
       if (!response.ok) {

@@ -51,7 +51,17 @@ export default function LoginPage() {
         description: "Welcome back to Pillar Drug Club!"
       });
       
-      setLocation("/dashboard");
+      // Redirect based on user role
+      const userRole = result.user.role || "client";
+      if (userRole === "admin") {
+        setLocation("/admin");
+      } else if (userRole === "broker") {
+        setLocation("/broker");
+      } else if (userRole === "company") {
+        setLocation("/company");
+      } else {
+        setLocation("/dashboard");
+      }
     } catch (error: any) {
       toast({
         title: "Login Failed",
