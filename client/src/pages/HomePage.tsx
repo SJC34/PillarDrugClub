@@ -10,7 +10,9 @@ import {
   Check,
   ArrowRight
 } from "lucide-react";
-import joinVideo from "@assets/join-pillar-video.mp4";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 import pharmacyLineImage from "@assets/E68175A4-9E6D-4F91-A35C-38C229C698E5_1759422334349.png";
 
 export default function HomePage() {
@@ -52,55 +54,63 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
-          {/* Question above both boxes */}
+          {/* Question above carousel */}
           <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Stuck in lines at the pharmacy?</p>
           
-          {/* Side by side boxes (stacked on mobile) */}
-          <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto md:items-center">
-            {/* Image with "Avoid This" overlay */}
-            <div className="flex-1 max-w-md mx-auto md:mx-0">
-              <div className="relative overflow-hidden">
-                <img 
-                  src={pharmacyLineImage} 
-                  alt="Pharmacy line"
-                  className="w-full rounded-lg shadow-lg"
-                  style={{ height: '265px', objectFit: 'cover' }}
-                  data-testid="img-pharmacy-line"
-                />
-                <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
-                  <div className="bg-black/50 rounded-lg backdrop-blur-sm px-3 py-2">
-                    <div className="flex flex-col text-center min-w-[90px] justify-center">
-                      <span className="text-2xl md:text-3xl font-black text-white leading-tight tracking-wide" data-testid="text-avoid">Avoid</span>
-                      <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wider" data-testid="text-this">This</span>
-                    </div>
+          {/* Carousel with pharmacy image and video */}
+          <div className="mb-8 max-w-2xl mx-auto">
+            <Carousel
+              opts={{ loop: true }}
+              plugins={[
+                Autoplay({
+                  delay: 5000,
+                  stopOnInteraction: false,
+                  stopOnMouseEnter: true,
+                })
+              ]}
+              className="w-full"
+            >
+              <CarouselContent>
+                {/* Slide 1 - Just the pharmacy line image */}
+                <CarouselItem>
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={pharmacyLineImage} 
+                      alt="Pharmacy line"
+                      className="w-full rounded-lg shadow-lg"
+                      style={{ height: '265px', objectFit: 'cover' }}
+                      data-testid="img-pharmacy-line"
+                    />
                   </div>
-                </div>
-              </div>
-            </div>
+                </CarouselItem>
 
-            {/* Video with "Join pillar!" overlay */}
-            <div className="relative flex-1 max-w-md mx-auto md:mx-0 overflow-hidden">
-              <video 
-                src={joinVideo} 
-                autoPlay={true}
-                loop={true}
-                muted={true}
-                playsInline={true}
-                className="w-full rounded-lg shadow-lg"
-                style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 40%' }}
-                data-testid="video-join-pillar"
-              />
-              <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
-                <Link href="/register">
-                  <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-3 py-2">
-                    <div className="flex flex-col text-center min-w-[90px] justify-center">
-                      <span className="text-2xl md:text-3xl font-black text-white leading-tight tracking-wide" data-testid="text-join">Join</span>
-                      <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wide" data-testid="text-pillar">Pillar!</span>
+                {/* Slide 2 - "Avoid This" video with text overlay */}
+                <CarouselItem>
+                  <div className="relative overflow-hidden">
+                    <video 
+                      src={avoidVideo} 
+                      autoPlay={true}
+                      loop={true}
+                      muted={true}
+                      playsInline={true}
+                      className="w-full rounded-lg shadow-lg"
+                      style={{ height: '265px', objectFit: 'cover' }}
+                      data-testid="video-avoid-this"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
+                      <div className="bg-black/50 rounded-lg backdrop-blur-sm px-3 py-2">
+                        <div className="flex flex-col text-center min-w-[90px] justify-center">
+                          <span className="text-2xl md:text-3xl font-black text-white leading-tight tracking-wide" data-testid="text-avoid">Avoid</span>
+                          <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wider" data-testid="text-this">This</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </Link>
-              </div>
-            </div>
+                </CarouselItem>
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex" />
+              <CarouselNext className="hidden md:flex" />
+            </Carousel>
           </div>
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
