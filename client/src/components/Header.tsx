@@ -90,14 +90,14 @@ export default function Header() {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-[100] md:hidden">
-            <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} />
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-teal-600 z-[101]">
+            <div className="fixed inset-0 bg-black/50 z-[100]" onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-[101]" style={{ backgroundColor: '#0d9488' }} data-testid="mobile-menu-panel">
               <div className="flex flex-col h-full">
                 <div className="px-6 py-4 border-b border-teal-700">
                   <div className="flex items-center gap-2">
-                    <a href="/" className="text-xl font-black flex items-center gap-2 text-white hover:text-teal-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                    <a href="/" className="text-xl font-black flex items-center gap-2 !text-white hover:!text-teal-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
                       pillar drug club
-                      <Pill className="h-5 w-5 text-white" />
+                      <Pill className="h-5 w-5 !text-white" />
                     </a>
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-bold text-white hover:!bg-teal-700 active:!bg-teal-800 transition-all py-3 px-4 rounded-lg"
+                      className="block text-lg font-bold !text-white hover:!bg-teal-700 active:!bg-teal-800 transition-all py-3 px-4 rounded-lg"
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
