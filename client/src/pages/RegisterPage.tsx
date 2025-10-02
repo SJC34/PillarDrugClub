@@ -445,7 +445,7 @@ export default function RegisterPage() {
                   className="mt-1"
                 />
                 <Label htmlFor="smsConsent" className="text-xs md:text-sm leading-relaxed">
-                  I consent to receive text messages about my prescriptions and account updates. Message and data rates may apply. Reply STOP to opt out.
+                  I consent to receive text messages about my prescriptions, orders, and account updates. Message frequency varies. Message and data rates may apply. Reply HELP for help or STOP to cancel.
                 </Label>
               </div>
 
