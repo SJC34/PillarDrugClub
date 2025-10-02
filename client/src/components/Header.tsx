@@ -10,7 +10,6 @@ export default function Header() {
   const navigation = [
     { name: "MEDICATIONS", href: "/medications" },
     { name: "COST CALCULATOR", href: "/cost-calculator" },
-    { name: "TRANSFER", href: "/prescription-transfer" },
     { name: "DASHBOARD", href: "/dashboard" },
   ];
 
