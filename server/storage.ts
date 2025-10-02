@@ -6,7 +6,8 @@ import {
   type Order, type InsertOrder, type OrderSearch,
   type Shipment, type InsertShipment,
   type Prescriber, type InsertPrescriber,
-  type Pharmacy, type InsertPharmacy
+  type Pharmacy, type InsertPharmacy,
+  type PrescriptionRequest, type InsertPrescriptionRequest
 } from "@shared/pharmacy-schema";
 import { randomUUID } from "crypto";
 
@@ -65,6 +66,13 @@ export interface IStorage {
   getPharmacyByName(name: string): Promise<Pharmacy | undefined>;
   searchPharmacies(query: string): Promise<Pharmacy[]>;
   createPharmacy(pharmacy: InsertPharmacy): Promise<Pharmacy>;
+
+  // Prescription Requests
+  getPrescriptionRequest(id: string): Promise<PrescriptionRequest | undefined>;
+  getAllPrescriptionRequests(): Promise<PrescriptionRequest[]>;
+  getUserPrescriptionRequests(userId: string): Promise<PrescriptionRequest[]>;
+  createPrescriptionRequest(request: InsertPrescriptionRequest): Promise<PrescriptionRequest>;
+  updatePrescriptionRequest(id: string, request: Partial<InsertPrescriptionRequest>): Promise<PrescriptionRequest | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -76,6 +84,7 @@ export class MemStorage implements IStorage {
   private shipments: Map<string, Shipment>;
   private prescribers: Map<string, Prescriber>;
   private pharmacies: Map<string, Pharmacy>;
+  private prescriptionRequests: Map<string, PrescriptionRequest>;
   private orderCounter: number;
 
   constructor() {
@@ -87,6 +96,7 @@ export class MemStorage implements IStorage {
     this.shipments = new Map();
     this.prescribers = new Map();
     this.pharmacies = new Map();
+    this.prescriptionRequests = new Map();
     this.orderCounter = 1000;
     this.seedMockData();
     this.importDataOnStartup();
@@ -190,6 +200,27 @@ export class MemStorage implements IStorage {
     ];
 
     sampleMedications.forEach(med => this.medications.set(med.id, med));
+
+    // Create admin user
+    const adminId = randomUUID();
+    const now = new Date().toISOString();
+    const adminUser: User = {
+      id: adminId,
+      username: "seth@pillardrugclub.com",
+      email: "seth@pillardrugclub.com",
+      password: "Spaceworm#25",
+      firstName: "Seth",
+      lastName: "Admin",
+      role: "admin",
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      subscriptionStatus: "active",
+      isActive: "true",
+      createdAt: now,
+      updatedAt: now
+    };
+    this.users.set(adminId, adminUser);
+    console.log('✅ Admin user created: seth@pillardrugclub.com');
   }
 
   async loadImportedMedications() {
@@ -236,6 +267,7 @@ export class MemStorage implements IStorage {
       password: insertUser.password, // In production, this should be hashed
       firstName: insertUser.firstName,
       lastName: insertUser.lastName,
+      role: "client",
       stripeCustomerId: null,
       stripeSubscriptionId: null,
       subscriptionStatus: "incomplete",
@@ -1154,6 +1186,49 @@ export class MemStorage implements IStorage {
     } catch (error) {
       console.error('❌ Error during initial data import:', error);
     }
+  }
+
+  // Prescription Requests
+  async getPrescriptionRequest(id: string): Promise<PrescriptionRequest | undefined> {
+    return this.prescriptionRequests.get(id);
+  }
+
+  async getAllPrescriptionRequests(): Promise<PrescriptionRequest[]> {
+    return Array.from(this.prescriptionRequests.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async getUserPrescriptionRequests(userId: string): Promise<PrescriptionRequest[]> {
+    return Array.from(this.prescriptionRequests.values())
+      .filter(req => req.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async createPrescriptionRequest(insertRequest: InsertPrescriptionRequest): Promise<PrescriptionRequest> {
+    const id = randomUUID();
+    const now = new Date().toISOString();
+    const request: PrescriptionRequest = {
+      ...insertRequest,
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.prescriptionRequests.set(id, request);
+    return request;
+  }
+
+  async updatePrescriptionRequest(id: string, updateData: Partial<InsertPrescriptionRequest>): Promise<PrescriptionRequest | undefined> {
+    const request = this.prescriptionRequests.get(id);
+    if (!request) return undefined;
+
+    const updated: PrescriptionRequest = {
+      ...request,
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    this.prescriptionRequests.set(id, updated);
+    return updated;
   }
 }
 

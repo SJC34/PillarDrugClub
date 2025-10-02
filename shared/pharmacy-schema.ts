@@ -1,6 +1,36 @@
 import { z } from "zod";
 import { createInsertSchema } from "drizzle-zod";
 
+// Prescription Request Schema (for PDF-based doctor fax requests)
+export const prescriptionRequestSchema = z.object({
+  id: z.string(),
+  userId: z.string().optional(),
+  patientName: z.string(),
+  dateOfBirth: z.string(),
+  medicationName: z.string(),
+  dosage: z.string(),
+  quantity: z.string(),
+  doctorName: z.string(),
+  doctorPhone: z.string(),
+  doctorFax: z.string().optional(),
+  doctorAddress: z.string(),
+  urgency: z.enum(["routine", "urgent", "emergency"]).default("routine"),
+  specialInstructions: z.string().optional(),
+  status: z.enum(["pending", "sent", "confirmed", "cancelled"]).default("pending"),
+  requestDate: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+export const insertPrescriptionRequestSchema = prescriptionRequestSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type PrescriptionRequest = z.infer<typeof prescriptionRequestSchema>;
+export type InsertPrescriptionRequest = z.infer<typeof insertPrescriptionRequestSchema>;
+
 // Customer Schema
 export const customerSchema = z.object({
   id: z.string(),

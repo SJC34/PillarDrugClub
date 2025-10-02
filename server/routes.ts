@@ -11,7 +11,8 @@ import {
   insertOrderSchema,
   insertShipmentSchema,
   medicationSearchSchema,
-  orderSearchSchema
+  orderSearchSchema,
+  insertPrescriptionRequestSchema
 } from "@shared/pharmacy-schema";
 import { generatePrescriptionRequestPDF, generateMessageTemplate } from "./pdf-generator";
 
@@ -308,6 +309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Validate request data
       const pdfRequestSchema = z.object({
+        userId: z.string().optional(),
         patientName: z.string().min(2, "Patient name is required"),
         dateOfBirth: z.string().min(1, "Date of birth is required"),
         medicationName: z.string().min(2, "Medication name is required"),
@@ -332,6 +334,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       };
 
+      // Save prescription request to storage
+      const prescriptionRequest = await storage.createPrescriptionRequest({
+        userId: validatedData.userId,
+        patientName: validatedData.patientName,
+        dateOfBirth: validatedData.dateOfBirth,
+        medicationName: validatedData.medicationName,
+        dosage: validatedData.dosage,
+        quantity: validatedData.quantity,
+        doctorName: validatedData.doctorName,
+        doctorPhone: validatedData.doctorPhone,
+        doctorFax: validatedData.doctorFax,
+        doctorAddress: validatedData.doctorAddress,
+        urgency: validatedData.urgency || "routine",
+        specialInstructions: validatedData.specialInstructions,
+        status: "pending",
+        requestDate: requestData.requestDate
+      });
+
+      console.log(`✅ Prescription request saved: ${prescriptionRequest.id}`);
+
       // Generate PDF
       const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
       
@@ -347,6 +369,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("PDF generation error:", error);
       res.status(500).json({ 
         error: "Failed to generate PDF", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Get all prescription requests (for admin dashboard)
+  app.get("/api/admin/prescription-requests", async (req, res) => {
+    try {
+      const requests = await storage.getAllPrescriptionRequests();
+      res.json({ requests });
+    } catch (error: any) {
+      console.error("Error fetching prescription requests:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch prescription requests", 
         message: error.message 
       });
     }
