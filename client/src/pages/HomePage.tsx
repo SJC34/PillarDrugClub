@@ -57,9 +57,8 @@ export default function HomePage() {
           
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto md:items-center">
-            {/* Video with "Avoid This" overlay */}
+            {/* Video without overlay */}
             <div className="flex-1 max-w-md mx-auto md:mx-0">
-              <div className="relative overflow-hidden">
               <video 
                 src={avoidVideo} 
                 autoPlay={true}
@@ -69,15 +68,6 @@ export default function HomePage() {
                 className="w-full rounded-lg shadow-lg"
                 style={{ height: '265px', objectFit: 'cover' }}
               />
-              <div className="absolute inset-0 flex items-center justify-center md:justify-end md:pr-[30%]">
-                <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3" style={{ height: '88px' }}>
-                  <div className="flex flex-col text-center min-w-[100px] justify-center h-full">
-                    <span className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-wide">Avoid</span>
-                    <span className="text-3xl md:text-4xl lg:text-5xl font-black text-primary leading-tight tracking-wider">This</span>
-                  </div>
-                </div>
-              </div>
-              </div>
             </div>
 
             {/* Video with "Join pillar!" overlay */}
