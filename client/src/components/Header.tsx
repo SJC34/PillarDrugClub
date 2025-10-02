@@ -101,12 +101,13 @@ export default function Header() {
                     </a>
                   </div>
                 </div>
-                <div className="flex-1 px-6 py-6 space-y-6">
+                <div className="flex-1 px-6 py-6 space-y-3">
                   {navigation.map((item) => (
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-bold !text-white hover:!bg-teal-700 active:!bg-teal-800 transition-all py-3 px-4 rounded-lg"
+                      className="block text-lg font-bold !text-white transition-all py-3 px-4 rounded-lg"
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
