@@ -25,7 +25,7 @@ export default function Header() {
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               data-testid="button-mobile-menu"
-              className="relative z-50"
+              className="relative z-[102]"
             >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -89,9 +89,9 @@ export default function Header() {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="fixed inset-0 z-40 md:hidden">
+          <div className="fixed inset-0 z-[100] md:hidden">
             <div className="fixed inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} />
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-teal-600">
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-teal-600 z-[101]">
               <div className="flex flex-col h-full">
                 <div className="px-6 py-4 border-b border-teal-700">
                   <div className="flex items-center gap-2">
