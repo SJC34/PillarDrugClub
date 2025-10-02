@@ -10,8 +10,8 @@ import {
   Check,
   ArrowRight
 } from "lucide-react";
-import avoidImage from "@assets/IMG_6107_1759082772316.jpeg";
-import joinVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
+import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
+import joinVideo from "@assets/join-pillar-video.mp4";
 
 export default function HomePage() {
   const benefits = [
@@ -57,14 +57,17 @@ export default function HomePage() {
           
           {/* Side by side images with overlays */}
           <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto md:items-center">
-            {/* Image with "Avoid This" overlay */}
+            {/* Video with "Avoid This" overlay */}
             <div className="flex-1 max-w-md mx-auto md:mx-0">
               <div className="relative overflow-hidden">
-              <img 
-                src={avoidImage} 
-                alt="Medication costs comparison" 
+              <video 
+                src={avoidVideo} 
+                autoPlay={true}
+                loop={true}
+                muted={true}
+                playsInline={true}
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '265px', objectFit: 'cover' }}
+                style={{ height: '265px', objectFit: 'contain', backgroundColor: '#000' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-4">
                 <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3" style={{ height: '88px' }}>
