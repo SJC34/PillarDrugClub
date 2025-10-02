@@ -12,6 +12,7 @@ import {
   medicationSearchSchema,
   orderSearchSchema
 } from "@shared/pharmacy-schema";
+import { generatePrescriptionRequestPDF, generateMessageTemplate } from "./pdf-generator";
 
 // Initialize Stripe with graceful fallback
 let stripe: Stripe | null = null;
@@ -278,8 +279,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         //   4. Map prescription data to Surescripts fields
         //   5. Handle responses (RxFill, RxChange, CancelRx)
         //
-        if (prescriptionData.prescriberNpi) {
-          console.log(`  → Prescriber NPI: ${prescriptionData.prescriberNpi}`);
+        if (prescriptionData.prescriber) {
+          console.log(`  → Prescriber: ${prescriptionData.prescriber}`);
           console.log(`  → Medication: ${prescriptionData.medicationName}`);
           console.log(`  → Patient: ${prescriptionData.patientName}`);
           console.log(`  → Pharmacy network: Surescripts (1.6M providers, 99% U.S. pharmacies)`);
@@ -296,6 +297,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Prescription creation error:", error);
       res.status(400).json({ 
         error: "Failed to create prescription request", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Generate PDF and message for prescription request
+  app.post("/api/prescriptions/generate-pdf", async (req, res) => {
+    try {
+      // Validate request data
+      const pdfRequestSchema = z.object({
+        patientName: z.string().min(2, "Patient name is required"),
+        dateOfBirth: z.string().min(1, "Date of birth is required"),
+        medicationName: z.string().min(2, "Medication name is required"),
+        dosage: z.string().min(1, "Dosage is required"),
+        quantity: z.string().min(1, "Quantity is required"),
+        doctorName: z.string().min(2, "Doctor name is required"),
+        doctorPhone: z.string().min(10, "Doctor phone is required"),
+        doctorFax: z.string().optional(),
+        doctorAddress: z.string().min(5, "Doctor address is required"),
+        urgency: z.enum(["routine", "urgent", "emergency"]).default("routine"),
+        specialInstructions: z.string().optional()
+      });
+
+      const validatedData = pdfRequestSchema.parse(req.body);
+      
+      const requestData = {
+        ...validatedData,
+        requestDate: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })
+      };
+
+      // Generate PDF
+      const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
+      
+      // Generate message template
+      const messageTemplate = generateMessageTemplate(requestData);
+
+      // Return PDF as downloadable file
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="prescription-request-${requestData.patientName.replace(/\s+/g, '-')}.pdf"`);
+      res.setHeader('X-Message-Template', Buffer.from(messageTemplate).toString('base64'));
+      res.send(pdfBuffer);
+    } catch (error: any) {
+      console.error("PDF generation error:", error);
+      res.status(500).json({ 
+        error: "Failed to generate PDF", 
         message: error.message 
       });
     }

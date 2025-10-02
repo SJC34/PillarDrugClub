@@ -9,6 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   Pill, 
   FileText, 
@@ -21,7 +28,9 @@ import {
   Send,
   ArrowRight,
   CheckCircle,
-  Clock
+  Clock,
+  Download,
+  Copy
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -70,6 +79,9 @@ export default function PrescriptionTransferPage() {
   const [submissionStatus, setSubmissionStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [selectedPharmacy, setSelectedPharmacy] = useState<any>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [messageTemplate, setMessageTemplate] = useState("");
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   
   // Check authentication status
   const checkAuth = () => {
@@ -145,44 +157,76 @@ export default function PrescriptionTransferPage() {
   const onDoctorSubmit = async (data: DoctorFaxForm) => {
     setSubmissionStatus("submitting");
     try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      
-      const prescriptionData = {
-        customerId: user.id,
-        medicationName: data.medicationName,
-        dosage: data.dosage,
-        quantity: parseInt(data.quantity) || 1,
-        prescriber: data.doctorName,
-        prescriberPhone: data.doctorPhone,
-        prescriberFax: data.doctorFax,
-        prescriberAddress: data.doctorAddress,
-        patientName: data.patientName,
-        patientDateOfBirth: data.dateOfBirth,
-        urgency: data.urgency,
-        specialInstructions: data.specialInstructions,
-        isTransfer: false,
-        status: "pending"
-      };
-
-      const response = await apiRequest("POST", "/api/prescriptions", prescriptionData);
-      const result = await response.json();
-      
-      toast({
-        title: "Prescription Request Sent",
-        description: result.message || "Your prescription request has been faxed to your doctor. They will respond within 24-48 hours.",
+      // Generate PDF and message template
+      const response = await fetch('/api/prescriptions/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      // Get message template from header
+      const messageTemplateBase64 = response.headers.get('X-Message-Template');
+      if (messageTemplateBase64) {
+        const decodedMessage = atob(messageTemplateBase64);
+        setMessageTemplate(decodedMessage);
+      }
+
+      // Get PDF blob
+      const blob = await response.blob();
+      setPdfBlob(blob);
       
       setSubmissionStatus("success");
-      doctorForm.reset();
+      setShowSuccessDialog(true);
+      
     } catch (error: any) {
       console.error("Doctor prescription request error:", error);
       toast({
         title: "Request Failed",
-        description: "Failed to send prescription request. Please try again.",
+        description: "Failed to generate prescription request. Please try again.",
         variant: "destructive"
       });
       setSubmissionStatus("idle");
     }
+  };
+
+  const handleDownloadPDF = () => {
+    if (pdfBlob) {
+      const url = window.URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prescription-request.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: "Your prescription request has been downloaded.",
+      });
+    }
+  };
+
+  const handleCopyMessage = () => {
+    navigator.clipboard.writeText(messageTemplate);
+    toast({
+      title: "Message Copied",
+      description: "The message has been copied to your clipboard.",
+    });
+  };
+
+  const handleCloseSuccessDialog = () => {
+    setShowSuccessDialog(false);
+    doctorForm.reset();
+    setMessageTemplate("");
+    setPdfBlob(null);
+    setSubmissionStatus("idle");
   };
 
   // Handle pharmacy form submission with authentication check
@@ -247,7 +291,7 @@ export default function PrescriptionTransferPage() {
     }
   };
 
-  if (submissionStatus === "success") {
+  if (submissionStatus === "success" && activeTab === "pharmacy-transfer") {
     return (
       <div className="min-h-screen px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -266,10 +310,7 @@ export default function PrescriptionTransferPage() {
               <CheckCircle className="h-12 w-12 md:h-16 md:w-16 text-green-600 mx-auto mb-4" />
               <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Request Submitted Successfully</h2>
               <p className="text-sm md:text-base text-muted-foreground mb-6">
-                {activeTab === "doctor-fax" 
-                  ? "Your prescription request has been sent to your doctor. You'll receive a confirmation once they respond."
-                  : "Your prescription transfer request has been submitted. We'll handle the transfer process for you."
-                }
+                Your prescription transfer request has been submitted. We'll handle the transfer process for you.
               </p>
               <div className="space-y-3">
                 <Link href="/dashboard">
@@ -869,6 +910,127 @@ export default function PrescriptionTransferPage() {
           </Card>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl">Request Ready!</DialogTitle>
+                <DialogDescription className="mt-1">
+                  Your prescription request has been prepared
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Step 1: Download PDF */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+                  1
+                </div>
+                <h4 className="font-semibold">Download Your Prescription Request</h4>
+              </div>
+              <p className="text-sm text-muted-foreground ml-8">
+                Click below to download the PDF with all your prescription details
+              </p>
+              <Button 
+                onClick={handleDownloadPDF} 
+                className="ml-8 w-full sm:w-auto"
+                data-testid="button-download-pdf"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+
+            <Separator />
+
+            {/* Step 2: Copy Message */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+                  2
+                </div>
+                <h4 className="font-semibold">Send to Your Doctor</h4>
+              </div>
+              <p className="text-sm text-muted-foreground ml-8">
+                Copy this message and send it to your doctor via your patient portal or email, along with the PDF
+              </p>
+              <div className="ml-8 space-y-2">
+                <div className="relative">
+                  <Textarea 
+                    value={messageTemplate} 
+                    readOnly 
+                    className="min-h-[200px] text-sm font-mono pr-12"
+                    data-testid="textarea-message-template"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="absolute top-2 right-2"
+                    onClick={handleCopyMessage}
+                    data-testid="button-copy-message"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Instructions */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+                  3
+                </div>
+                <h4 className="font-semibold">How to Send</h4>
+              </div>
+              <div className="ml-8 space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Log into your doctor's patient portal (e.g., MyChart, FollowMyHealth)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Or email your doctor's office with the message and PDF attachment</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Your doctor will send the prescription directly to Pillar Drug Club</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button 
+                onClick={handleCloseSuccessDialog} 
+                variant="outline" 
+                className="flex-1"
+                data-testid="button-close-dialog"
+              >
+                Done
+              </Button>
+              <Button 
+                onClick={handleDownloadPDF} 
+                className="flex-1"
+                data-testid="button-download-pdf-footer"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF Again
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
