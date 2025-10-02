@@ -26,6 +26,7 @@ export default function Header() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               data-testid="button-mobile-menu"
               className="relative z-[102]"
+              style={{ backgroundColor: 'rgba(13, 148, 136, 0.15)' }}
             >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
