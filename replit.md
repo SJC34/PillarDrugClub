@@ -20,7 +20,7 @@ Preferred communication style: Simple, everyday language.
 
 **Database Design**: PostgreSQL database using Drizzle ORM for type-safe database operations. The schema includes comprehensive models for users, customers, medications, prescriptions, orders, and shipments. The system supports complex medication data including NDC codes, pricing tiers, and inventory management.
 
-**Authentication & Authorization**: Session-based authentication system with role-based access control supporting multiple user types (clients, brokers, companies, admins). Each portal has specific permissions and feature access.
+**Authentication & Authorization**: Dual authentication system supporting both email/password and direct OAuth social login (Google, Apple, X/Twitter). Session-based authentication uses PostgreSQL session storage with role-based access control supporting multiple user types (clients, brokers, companies, admins). Each portal has specific permissions and feature access. OAuth implementation uses separate Passport strategies for each provider, with email fallback handling for returning users when providers don't re-send email addresses (common with Apple after first authorization and Twitter).
 
 **Payment Processing**: Integrated Stripe subscription system for membership management. Supports recurring billing for membership fees and handles subscription status tracking.
 
