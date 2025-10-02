@@ -90,7 +90,7 @@ export default function Header() {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-[100] md:hidden">
-            <div className="fixed inset-0 bg-black/50 z-[100]" onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
+            <div className="fixed inset-0 z-[100]" style={{ backgroundColor: 'rgba(13, 148, 136, 0.5)' }} onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
             <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-[101]" style={{ backgroundColor: '#0d9488' }} data-testid="mobile-menu-panel">
               <div className="flex flex-col h-full">
                 <div className="px-6 py-4 border-b border-teal-700">
