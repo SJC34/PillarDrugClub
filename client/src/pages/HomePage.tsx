@@ -11,7 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import avoidImage from "@assets/IMG_6107_1759082772316.jpeg";
-import joinVideo from "@assets/join-pillar-video.mp4";
+import joinVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 
 export default function HomePage() {
   const benefits = [
@@ -56,7 +56,7 @@ export default function HomePage() {
           <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Stuck in lines at the pharmacy?</p>
           
           {/* Side by side images with overlays */}
-          <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row gap-6 mb-8 max-w-4xl mx-auto md:items-center">
             {/* Image with "Avoid This" overlay */}
             <div className="flex-1 max-w-md mx-auto md:mx-0">
               <div className="relative overflow-hidden">
@@ -67,8 +67,8 @@ export default function HomePage() {
                 style={{ height: '265px', objectFit: 'cover' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-4">
-                <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3">
-                  <div className="flex flex-col text-center min-w-[100px]">
+                <div className="bg-black/50 rounded-lg backdrop-blur-sm px-4 py-3" style={{ height: '88px' }}>
+                  <div className="flex flex-col text-center min-w-[100px] justify-center h-full">
                     <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">Avoid</span>
                     <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-tight tracking-wider">This</span>
                   </div>
@@ -86,12 +86,12 @@ export default function HomePage() {
                 muted={true}
                 playsInline={true}
                 className="w-full rounded-lg shadow-lg"
-                style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 60%' }}
+                style={{ height: '265px', objectFit: 'contain', backgroundColor: '#000' }}
               />
               <div className="absolute inset-0 flex items-center justify-end pr-2">
                 <Link href="/register">
-                  <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-4 py-3">
-                    <div className="flex flex-col text-center min-w-[120px]">
+                  <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-4 py-3" style={{ height: '88px' }}>
+                    <div className="flex flex-col text-center min-w-[120px] justify-center h-full">
                       <span className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-wide">Join</span>
                       <span className="text-2xl md:text-3xl lg:text-4xl font-black text-primary leading-tight tracking-wide">Pillar!</span>
                     </div>
