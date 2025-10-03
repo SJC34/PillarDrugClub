@@ -212,14 +212,14 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center space-y-2">
               <Link href="/forgot-password">
-                <Button variant="link" className="text-sm">
+                <Button variant="ghost" className="text-sm">
                   Forgot your password?
                 </Button>
               </Link>
               <div className="text-sm text-gray-600">
                 Don't have an account?{" "}
                 <Link href="/register">
-                  <Button variant="link" className="p-0 h-auto font-semibold text-blue-600">
+                  <Button variant="ghost" className="p-0 h-auto font-semibold text-blue-600">
                     Join now
                   </Button>
                 </Link>
