@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,23 @@ export default function LoginPage() {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema)
   });
+
+  // Check for error parameter in URL (from OAuth failures)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    if (error) {
+      toast({
+        title: "Authentication Error",
+        description: error,
+        variant: "destructive"
+      });
+      // Clean up URL after a short delay to allow toast to render
+      setTimeout(() => {
+        window.history.replaceState({}, '', '/login');
+      }, 100);
+    }
+  }, [toast]);
 
   const onSubmit = async (data: LoginForm) => {
     try {

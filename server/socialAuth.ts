@@ -203,6 +203,26 @@ export async function setupSocialAuth(app: Express) {
     done(null, user);
   });
 
+  // Fallback routes for unconfigured OAuth providers
+  // These redirect back to login with an error parameter
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    app.get("/api/auth/google", (req, res) => {
+      res.redirect("/login?error=Google authentication is not available at this time.");
+    });
+  }
+
+  if (!process.env.APPLE_CLIENT_ID || !process.env.APPLE_TEAM_ID || !process.env.APPLE_KEY_ID || !process.env.APPLE_PRIVATE_KEY) {
+    app.get("/api/auth/apple", (req, res) => {
+      res.redirect("/login?error=Apple Sign In is not available at this time.");
+    });
+  }
+
+  if (!process.env.X_CONSUMER_KEY || !process.env.X_CONSUMER_SECRET) {
+    app.get("/api/auth/twitter", (req, res) => {
+      res.redirect("/login?error=X authentication is not available at this time.");
+    });
+  }
+
   // Logout route
   app.get("/api/auth/social-logout", (req, res) => {
     req.logout(() => {
