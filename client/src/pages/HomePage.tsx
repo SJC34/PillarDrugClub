@@ -131,6 +131,7 @@ export default function HomePage() {
             <span className="text-primary block">No insurance required</span>
           </h1>
           <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
+            Join the drug membership saving people thousands of dollars per year! 
             Annual medication supplies at true wholesale prices—zero markups, pure savings. 
             Home delivery nationwide for just $10/month.
           </p>
