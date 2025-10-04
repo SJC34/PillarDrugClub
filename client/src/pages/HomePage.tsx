@@ -80,7 +80,7 @@ export default function HomePage() {
                       loop={true}
                       muted={true}
                       playsInline={true}
-                      className="w-full rounded-lg shadow-lg h-[315px] md:h-[400px]"
+                      className="w-full rounded-lg shadow-lg h-[252px] md:h-[400px]"
                       style={{ objectFit: 'cover' }}
                       data-testid="video-avoid-this"
                     />
@@ -104,7 +104,7 @@ export default function HomePage() {
                       loop={true}
                       muted={true}
                       playsInline={true}
-                      className="w-full rounded-lg shadow-lg h-[315px] md:h-[400px]"
+                      className="w-full rounded-lg shadow-lg h-[252px] md:h-[400px]"
                       style={{ objectFit: 'cover', objectPosition: '40% 40%' }}
                       data-testid="video-join-pillar"
                     />
