@@ -14,9 +14,14 @@ import {
   Clock,
   CheckCircle,
   FileText,
-  ArrowRight
+  ArrowRight,
+  Download,
+  MessageSquare
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import type { PrescriptionRequest } from "@shared/pharmacy-schema";
 
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
@@ -59,6 +64,44 @@ export default function DashboardPage() {
         setSubscriptionStatus("error");
       });
   }, []);
+
+  // Fetch user's prescription requests
+  const { 
+    data: prescriptionRequestsData, 
+    isLoading: loadingRequests,
+    isError: requestsError,
+    error: requestsErrorDetails
+  } = useQuery<{ requests: PrescriptionRequest[] }>({
+    queryKey: ['/api/prescription-requests/user', user?.id],
+    enabled: !!user?.id,
+  });
+
+  const prescriptionRequests: PrescriptionRequest[] = prescriptionRequestsData?.requests || [];
+
+  // Text PDF to phone mutation
+  const textPdfMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      return apiRequest(`/api/prescription-requests/${requestId}/text`, 'POST');
+    },
+    onSuccess: () => {
+      // Invalidate prescription requests cache to refresh UI
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/prescription-requests/user', user?.id] 
+      });
+      
+      toast({
+        title: "SMS Sent",
+        description: "Prescription request PDF link sent to your phone",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Send SMS",
+        description: error.message || "Could not send SMS to your phone",
+        variant: "destructive",
+      });
+    },
+  });
 
   if (!user || subscriptionStatus === "loading") {
     return (
@@ -356,6 +399,117 @@ export default function DashboardPage() {
                 </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Prescription Requests */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Prescription Requests</CardTitle>
+            <CardDescription>
+              Your prescription request forms
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingRequests ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading prescription requests...</p>
+              </div>
+            ) : requestsError ? (
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-red-400 mx-auto mb-4" />
+                <p className="text-red-600 font-medium mb-2">Failed to load prescription requests</p>
+                <p className="text-gray-600 text-sm mb-4">
+                  {requestsErrorDetails?.message || "Please try again later"}
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => queryClient.invalidateQueries({ 
+                    queryKey: ['/api/prescription-requests/user', user?.id] 
+                  })}
+                  data-testid="button-retry-requests"
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : prescriptionRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">No prescription requests yet</p>
+                <Link href="/prescription-transfer">
+                  <Button variant="outline" data-testid="button-create-request">
+                    Create Request
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {prescriptionRequests.map((request: PrescriptionRequest) => (
+                  <Card key={request.id} className="hover:shadow-md transition-shadow" data-testid={`card-request-${request.id}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FileText className="h-5 w-5 text-blue-600" />
+                            <h4 className="font-semibold text-gray-900" data-testid={`text-medication-${request.id}`}>
+                              {request.medicationName}
+                            </h4>
+                            <Badge 
+                              variant={request.status === 'sent' ? 'default' : 'secondary'}
+                              data-testid={`badge-status-${request.id}`}
+                            >
+                              {request.status}
+                            </Badge>
+                          </div>
+                          <div className="space-y-1 text-sm text-gray-600">
+                            <p data-testid={`text-dosage-${request.id}`}>
+                              <span className="font-medium">Dosage:</span> {request.dosage}
+                            </p>
+                            <p data-testid={`text-quantity-${request.id}`}>
+                              <span className="font-medium">Quantity:</span> {request.quantity}
+                            </p>
+                            <p data-testid={`text-doctor-${request.id}`}>
+                              <span className="font-medium">Doctor:</span> {request.doctorName}
+                            </p>
+                            <p data-testid={`text-date-${request.id}`}>
+                              <span className="font-medium">Request Date:</span>{" "}
+                              {new Date(request.requestDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            data-testid={`button-download-${request.id}`}
+                          >
+                            <a
+                              href={`/api/prescription-requests/${request.id}/pdf`}
+                              download
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </a>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => textPdfMutation.mutate(request.id)}
+                            disabled={textPdfMutation.isPending}
+                            data-testid={`button-text-${request.id}`}
+                          >
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            {textPdfMutation.isPending ? "Sending..." : "Text"}
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
