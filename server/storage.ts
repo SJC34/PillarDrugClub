@@ -23,6 +23,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>; // For Replit OAuth
   updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined>;
   updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
+  updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined>;
 
   // Customers
   getCustomer(id: string): Promise<Customer | undefined>;
@@ -363,6 +364,32 @@ export class MemStorage implements IStorage {
     const updatedUser = {
       ...user,
       ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updateUserPrimaryDoctor(
+    id: string, 
+    doctor: { 
+      doctorId?: string; 
+      doctorName: string; 
+      doctorNpi?: string; 
+      doctorPhone?: string; 
+      doctorAddress?: any 
+    }
+  ): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = {
+      ...user,
+      primaryDoctorId: doctor.doctorId,
+      primaryDoctorName: doctor.doctorName,
+      primaryDoctorNpi: doctor.doctorNpi,
+      primaryDoctorPhone: doctor.doctorPhone,
+      primaryDoctorAddress: doctor.doctorAddress,
       updatedAt: new Date().toISOString()
     };
     this.users.set(id, updatedUser);

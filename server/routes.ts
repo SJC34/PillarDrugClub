@@ -774,6 +774,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's current medications (active prescriptions)
+  app.get("/api/users/:userId/medications", async (req, res) => {
+    try {
+      // For now, return mock data since we need customer ID mapping
+      // In production, this would fetch real prescription data
+      res.json({ medications: [] });
+    } catch (error: any) {
+      console.error("Error fetching user medications:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch medications", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Get user's primary doctor information
+  app.get("/api/users/:userId/primary-doctor", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (!user.primaryDoctorId) {
+        return res.json({ doctor: null });
+      }
+
+      const doctor = {
+        id: user.primaryDoctorId,
+        name: user.primaryDoctorName,
+        npi: user.primaryDoctorNpi,
+        phone: user.primaryDoctorPhone,
+        address: user.primaryDoctorAddress
+      };
+
+      res.json({ doctor });
+    } catch (error: any) {
+      console.error("Error fetching primary doctor:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch primary doctor", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Update user's primary doctor
+  app.put("/api/users/:userId/primary-doctor", async (req, res) => {
+    try {
+      const { doctorId, doctorName, doctorNpi, doctorPhone, doctorAddress } = req.body;
+      
+      if (!doctorName) {
+        return res.status(400).json({ error: "Doctor name is required" });
+      }
+
+      await storage.updateUserPrimaryDoctor(req.params.userId, {
+        doctorId,
+        doctorName,
+        doctorNpi,
+        doctorPhone,
+        doctorAddress
+      });
+
+      res.json({ 
+        success: true, 
+        message: "Primary doctor updated successfully" 
+      });
+    } catch (error: any) {
+      console.error("Error updating primary doctor:", error);
+      res.status(500).json({ 
+        error: "Failed to update primary doctor", 
+        message: error.message 
+      });
+    }
+  });
+
   // Get prescriptions for a customer
   app.get("/api/customers/:customerId/prescriptions", async (req, res) => {
     try {
