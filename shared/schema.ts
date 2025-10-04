@@ -30,6 +30,11 @@ export const users = pgTable("users", {
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionStatus: text("subscription_status", { enum: ["active", "canceled", "past_due", "incomplete"] }).default("incomplete"),
   isActive: text("is_active").default("true"),
+  primaryDoctorId: text("primary_doctor_id"),
+  primaryDoctorName: text("primary_doctor_name"),
+  primaryDoctorNpi: text("primary_doctor_npi"),
+  primaryDoctorPhone: text("primary_doctor_phone"),
+  primaryDoctorAddress: jsonb("primary_doctor_address"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
