@@ -131,8 +131,8 @@ export default function HomePage() {
             <span className="text-primary block">No insurance required</span>
           </h1>
           <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
-            Join thousands of patients saving money on prescription medications with transparent wholesale pricing. 
-            Get access to real costs and home delivery for just $10/month.
+            Annual medication supplies at true wholesale prices—zero markups, pure savings. 
+            Home delivery nationwide for just $10/month.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
