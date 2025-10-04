@@ -18,7 +18,7 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="flex h-20 items-center justify-between">
           {/* Left side - Menu button */}
-          <div className="flex items-center">
+          <div className="flex items-center md:hidden">
             <Button
               variant="ghost"
               size="icon"
