@@ -72,15 +72,15 @@ export default function HomePage() {
             >
               <CarouselContent>
                 {/* Slide 1 - "Avoid This" video with text overlay */}
-                <CarouselItem className="md:[&>div]:scale-[0.8] md:[&>div]:origin-center">
-                  <div className="relative overflow-visible">
+                <CarouselItem>
+                  <div className="relative overflow-hidden">
                     <video 
                       src={avoidVideo} 
                       autoPlay={true}
                       loop={true}
                       muted={true}
                       playsInline={true}
-                      className="w-full rounded-lg shadow-lg h-[265px]"
+                      className="w-full rounded-lg shadow-lg h-[350px] md:h-[400px]"
                       style={{ objectFit: 'cover' }}
                       data-testid="video-avoid-this"
                     />
@@ -96,15 +96,15 @@ export default function HomePage() {
                 </CarouselItem>
 
                 {/* Slide 2 - "Join Pillar!" video with text overlay */}
-                <CarouselItem className="md:[&>div]:scale-[0.8] md:[&>div]:origin-center">
-                  <div className="relative overflow-visible">
+                <CarouselItem>
+                  <div className="relative overflow-hidden">
                     <video 
                       src={joinVideo} 
                       autoPlay={true}
                       loop={true}
                       muted={true}
                       playsInline={true}
-                      className="w-full rounded-lg shadow-lg h-[265px]"
+                      className="w-full rounded-lg shadow-lg h-[350px] md:h-[400px]"
                       style={{ objectFit: 'cover', objectPosition: '40% 40%' }}
                       data-testid="video-join-pillar"
                     />
