@@ -735,10 +735,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "User has no phone number on file" });
       }
 
-      // Generate download link
-      const downloadUrl = `${req.protocol}://${req.get('host')}/api/prescription-requests/${request.id}/pdf`;
+      // Generate download link - use full URL for SMS
+      const host = req.get('host');
+      const protocol = host?.includes('replit.dev') || host?.includes('replit.app') ? 'https' : req.protocol;
+      const downloadUrl = `${protocol}://${host}/api/prescription-requests/${request.id}/pdf`;
       
-      const smsMessage = `Pillar Drug Club: Your prescription request form for ${request.medicationName} is ready. Download: ${downloadUrl}`;
+      // Short, clear SMS message
+      const smsMessage = `Pillar Drug Club: ${request.medicationName} prescription form ready. Download here: ${downloadUrl}`;
       
       const success = await sendSMS(user.phoneNumber, smsMessage);
       

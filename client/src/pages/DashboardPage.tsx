@@ -81,7 +81,7 @@ export default function DashboardPage() {
   // Text PDF to phone mutation
   const textPdfMutation = useMutation({
     mutationFn: async (requestId: string) => {
-      return apiRequest(`/api/prescription-requests/${requestId}/text`, 'POST');
+      return apiRequest('POST', `/api/prescription-requests/${requestId}/text`);
     },
     onSuccess: () => {
       // Invalidate prescription requests cache to refresh UI

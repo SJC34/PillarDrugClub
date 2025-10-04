@@ -21,7 +21,7 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ 
       size: 'LETTER',
-      margins: { top: 40, bottom: 40, left: 50, right: 50 }
+      margins: { top: 50, bottom: 50, left: 60, right: 60 }
     });
     
     const chunks: Buffer[] = [];
@@ -30,75 +30,113 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    // Header
-    doc.fontSize(20)
-       .fillColor('#0d9488')
-       .text('Pillar Drug Club', { align: 'center' });
+    // Brand Colors (matching website - HSL to RGB conversion)
+    const BRAND_PRIMARY = '#2BABA2';      // HSL(177, 65%, 48%) - Teal
+    const BRAND_SECONDARY = '#0A736D';    // HSL(177, 85%, 25%) - Dark Teal
+    const BRAND_FOREGROUND = '#1C2F2E';   // HSL(177, 25%, 12%) - Very Dark Teal
+    const BRAND_LIGHT_BG = '#E5F5F4';     // Light teal background
+    const BRAND_MUTED = '#5A7A78';        // Muted teal for secondary text
+
+    // Header with brand styling
+    doc.fontSize(24)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('PILLAR DRUG CLUB', { align: 'center' });
     
-    doc.fontSize(16)
-       .fillColor('#111827')
+    doc.moveDown(0.3);
+    doc.fontSize(14)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
        .text('Prescription Request Form', { align: 'center' });
     
-    doc.moveDown(1);
+    doc.moveDown(0.5);
+    doc.fontSize(9)
+       .fillColor(BRAND_MUTED)
+       .text('Wholesale Prescription Pharmacy', { align: 'center' });
     
-    // Introduction
+    doc.moveDown(1.5);
+    
+    // Introduction with clean styling
     doc.fontSize(10)
-       .fillColor('#374151')
-       .text('To have your prescriptions filled, please complete the information below and share this form', 50, doc.y, { align: 'left' })
-       .text('with your healthcare provider to complete Step 4.', 50, doc.y, { align: 'left' });
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('To have your prescriptions filled, please share this form with your healthcare provider to complete Step 4.', {
+         align: 'left',
+         width: 492
+       });
     
     doc.moveDown(1.5);
 
-    // Patient Information Box
-    doc.rect(50, doc.y, 512, 60)
-       .fillAndStroke('#f0fdfa', '#0d9488');
+    // Patient Information Box (branded)
+    const patientBoxY = doc.y;
+    doc.roundedRect(60, patientBoxY, 492, 70, 4)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
     
-    const patientBoxY = doc.y + 10;
     doc.fontSize(11)
-       .fillColor('#0d9488')
-       .text('Patient Information (Completed)', 60, patientBoxY, { underline: true });
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('PATIENT INFORMATION', 75, patientBoxY + 15);
     
-    doc.fontSize(9)
-       .fillColor('#111827')
-       .text(`Name: ${data.patientName}`, 60, patientBoxY + 18)
-       .text(`Date of Birth: ${data.dateOfBirth}`, 60, patientBoxY + 32);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Name: ${data.patientName}`, 75, patientBoxY + 35)
+       .text(`Date of Birth: ${data.dateOfBirth}`, 75, patientBoxY + 50);
     
     if (data.patientEmail) {
-      doc.text(`Email: ${data.patientEmail}`, 300, patientBoxY + 18);
+      doc.text(`Email: ${data.patientEmail}`, 320, patientBoxY + 35);
     }
     
-    doc.moveDown(3);
+    doc.moveDown(4);
 
-    // Step 1 & 2 - Medication Information
+    // Step 1 & 2 - Medication Information (clean section)
     doc.fontSize(11)
-       .fillColor('#0d9488')
-       .text('Step 1 & 2: Requested Medication (Completed)', { underline: true });
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('STEP 1 & 2: REQUESTED MEDICATION');
     
-    doc.moveDown(0.5);
+    doc.moveDown(0.8);
     doc.fontSize(10)
-       .fillColor('#111827')
-       .text(`Medication: ${data.medicationName}`)
-       .text(`Dosage: ${data.dosage}`)
-       .text(`Quantity: ${data.quantity}`);
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Medication: `, { continued: true })
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text(data.medicationName);
+    
+    doc.font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Dosage: `, { continued: true })
+       .font('Helvetica-Bold')
+       .text(data.dosage);
+    
+    doc.font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Quantity: `, { continued: true })
+       .font('Helvetica-Bold')
+       .text(data.quantity);
     
     if (data.specialInstructions) {
-      doc.moveDown(0.3);
+      doc.moveDown(0.5);
       doc.fontSize(9)
-         .fillColor('#6b7280')
-         .text(`Special Instructions: ${data.specialInstructions}`, { width: 500 });
+         .font('Helvetica')
+         .fillColor(BRAND_MUTED)
+         .text(`Special Instructions: ${data.specialInstructions}`, { width: 492 });
     }
     
-    doc.moveDown(1.5);
+    doc.moveDown(1.8);
 
-    // Step 3 - Doctor Information
+    // Step 3 - Doctor Information (clean section)
     doc.fontSize(11)
-       .fillColor('#0d9488')
-       .text('Step 3: Prescriber Information (Completed)', { underline: true });
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('STEP 3: PRESCRIBER INFORMATION');
     
-    doc.moveDown(0.5);
+    doc.moveDown(0.8);
     doc.fontSize(10)
-       .fillColor('#111827')
-       .text(`Doctor Name: ${data.doctorName}`)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Doctor: ${data.doctorName}`)
        .text(`Phone: ${data.doctorPhone}`);
     
     if (data.doctorFax) {
@@ -111,63 +149,80 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     
     doc.moveDown(2);
 
-    // Step 4 - Provider Instructions (Critical Section)
-    doc.rect(50, doc.y, 512, 150)
-       .fillAndStroke('#fef3c7', '#f59e0b');
+    // Step 4 - Provider Instructions (Critical Section with teal branding)
+    const step4BoxY = doc.y;
+    doc.roundedRect(60, step4BoxY, 492, 155, 4)
+       .lineWidth(2)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_SECONDARY);
     
-    const providerBoxY = doc.y + 12;
     doc.fontSize(12)
-       .fillColor('#f59e0b')
-       .text('Step 4: Healthcare Providers - Please Submit Electronic Prescription to:', 60, providerBoxY, { underline: true, width: 480 });
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('STEP 4: HEALTHCARE PROVIDER INSTRUCTIONS', 75, step4BoxY + 15, { width: 462 });
     
-    doc.moveDown(1.5);
+    doc.moveDown(1.2);
     doc.fontSize(10)
-       .fillColor('#111827')
-       .text('Perform pharmacy search for:', 60, doc.y)
-       .fontSize(11)
-       .fillColor('#0d9488')
-       .text('"Pillar Drug Club"', 60, doc.y);
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Please submit electronic prescription via Surescripts eRx Network to:', 75, doc.y, { width: 462 });
     
-    doc.moveDown(0.5);
-    doc.fontSize(10)
-       .fillColor('#111827')
-       .text('NCPDP ID: ', 60, doc.y, { continued: true })
-       .fontSize(11)
-       .fillColor('#0d9488')
-       .text('[To be provided - Contact Pillar Drug Club]');
+    doc.moveDown(0.8);
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('Pillar Drug Club', 75, doc.y)
+       .fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Search pharmacy directory for "Pillar Drug Club"', 75, doc.y);
     
     doc.moveDown(1);
-    doc.fontSize(10)
-       .fillColor('#dc2626')
-       .text('IMPORTANT: Providers MUST INCLUDE THE PATIENT\'S EMAIL ADDRESS', 60, doc.y, { width: 480 })
-       .fontSize(9)
-       .fillColor('#374151')
-       .text(`(${data.patientEmail || 'Patient email required'})`, 60, doc.y, { width: 480 })
-       .text('Our pharmacy system requires an email address to match new prescriptions with patients.', 60, doc.y, { width: 480 });
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('CRITICAL: Include patient email in prescription', 75, doc.y, { width: 462 });
     
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Email: ${data.patientEmail || 'REQUIRED'}`, 75, doc.y, { width: 462 })
+       .text('Our pharmacy system matches prescriptions to patients via email address.', 75, doc.y, { width: 462 });
+
     doc.moveDown(2.5);
 
-    // Privacy Disclaimer Box
+    // Privacy Disclaimer Box (clean branded style)
     const disclaimerBoxY = doc.y;
-    doc.rect(350, disclaimerBoxY, 212, 100)
-       .fillAndStroke('#f9fafb', '#d1d5db');
+    doc.roundedRect(60, disclaimerBoxY, 492, 75, 4)
+       .lineWidth(1)
+       .strokeColor(BRAND_PRIMARY)
+       .fillOpacity(0.05)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY)
+       .fillOpacity(1);
     
-    doc.fontSize(7)
-       .fillColor('#6b7280')
-       .text('This document contains information that is', 360, disclaimerBoxY + 8, { width: 192, align: 'left' })
-       .text('privileged, confidential and/or may contain', 360, doc.y, { width: 192, align: 'left' })
-       .text('protected health information (PHI). We are', 360, doc.y, { width: 192, align: 'left' })
-       .text('required to safeguard PHI by applicable law.', 360, doc.y, { width: 192, align: 'left' })
-       .text('The information in this document is for the', 360, doc.y, { width: 192, align: 'left' })
-       .text('sole use of the person(s) or company named', 360, doc.y, { width: 192, align: 'left' })
-       .text('above. Proper consent to disclose PHI', 360, doc.y, { width: 192, align: 'left' })
-       .text('between these parties has been obtained.', 360, doc.y, { width: 192, align: 'left' });
-
-    // Footer
     doc.fontSize(8)
-       .fillColor('#6b7280')
-       .text(`Request Date: ${data.requestDate}`, 50, 740, { align: 'left' })
-       .text('Pillar Drug Club - Wholesale Prescription Pharmacy', 50, 752, { align: 'center' });
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('CONFIDENTIAL MEDICAL INFORMATION', 75, disclaimerBoxY + 12, { width: 462 });
+    
+    doc.fontSize(7.5)
+       .font('Helvetica')
+       .fillColor(BRAND_MUTED)
+       .text('This document contains protected health information (PHI) that is privileged and confidential. ', 75, disclaimerBoxY + 27, { width: 462 })
+       .text('The information is for the sole use of the named patient and healthcare provider. We are required ', 75, doc.y, { width: 462 })
+       .text('to safeguard PHI by applicable law. Proper consent to disclose PHI has been obtained.', 75, doc.y, { width: 462 });
+
+    // Footer with brand colors
+    doc.fontSize(8)
+       .font('Helvetica')
+       .fillColor(BRAND_MUTED)
+       .text(`Request Date: ${new Date(data.requestDate).toLocaleDateString()}`, 60, 730, { align: 'left' });
+    
+    doc.fontSize(8)
+       .fillColor(BRAND_PRIMARY)
+       .text('PILLAR DRUG CLUB', 60, 745, { align: 'center' })
+       .fontSize(7)
+       .fillColor(BRAND_MUTED)
+       .text('Wholesale Prescription Pharmacy', 60, 756, { align: 'center' });
 
     doc.end();
   });
