@@ -72,8 +72,8 @@ export default function HomePage() {
             >
               <CarouselContent>
                 {/* Slide 1 - "Avoid This" video with text overlay */}
-                <CarouselItem>
-                  <div className="relative overflow-hidden">
+                <CarouselItem className="md:[&>div]:scale-[0.8] md:[&>div]:origin-center">
+                  <div className="relative overflow-visible">
                     <video 
                       src={avoidVideo} 
                       autoPlay={true}
@@ -96,8 +96,8 @@ export default function HomePage() {
                 </CarouselItem>
 
                 {/* Slide 2 - "Join Pillar!" video with text overlay */}
-                <CarouselItem>
-                  <div className="relative overflow-hidden">
+                <CarouselItem className="md:[&>div]:scale-[0.8] md:[&>div]:origin-center">
+                  <div className="relative overflow-visible">
                     <video 
                       src={joinVideo} 
                       autoPlay={true}
@@ -136,13 +136,13 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
-              <Button size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-join-hero">
+              <Button size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4 focus-visible:outline-none" data-testid="button-join-hero">
                 Start Saving Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="/cost-calculator">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-try-calculator">
+              <Button variant="secondary" size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4 focus-visible:outline-none" data-testid="button-try-calculator">
                 Try Cost Calculator
               </Button>
             </Link>
@@ -173,7 +173,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <Link href="/register">
-                <Button className="w-full font-bold" size="lg" data-testid="button-subscribe-pricing">
+                <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-pricing">
                   Start Membership
                 </Button>
               </Link>
@@ -231,7 +231,7 @@ export default function HomePage() {
             Join thousands of patients who have already saved money on their prescriptions.
           </p>
           <Link href="/register">
-            <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg font-bold px-8 py-4" data-testid="button-join-cta">
+            <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg font-bold px-8 py-4 focus-visible:outline-none" data-testid="button-join-cta">
               Join Pillar Drug Club
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
