@@ -127,6 +127,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user information (for multi-step registration after social auth)
+  app.patch("/api/users/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { phoneNumber, smsConsent, firstName, lastName } = req.body;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Update user with provided fields
+      const updates: any = {};
+      if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
+      if (smsConsent !== undefined) updates.smsConsent = smsConsent;
+      if (firstName !== undefined) updates.firstName = firstName;
+      if (lastName !== undefined) updates.lastName = lastName;
+      updates.updatedAt = new Date();
+
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      // Don't return password in response
+      const { password, ...userResponse } = updatedUser;
+      res.json(userResponse);
+    } catch (error: any) {
+      console.error("User update error:", error);
+      res.status(500).json({ error: "Failed to update user", message: error.message });
+    }
+  });
+
+  // Simple prescription transfer endpoint for registration flow
+  app.post("/api/prescriptions/transfer", async (req, res) => {
+    try {
+      const transferData = z.object({
+        userId: z.string(),
+        patientName: z.string(),
+        dateOfBirth: z.string().optional(),
+        medicationName: z.string(),
+        dosage: z.string().optional(),
+        quantity: z.string().optional(),
+        prescriptionNumber: z.string(),
+        currentPharmacyName: z.string(),
+        currentPharmacyPhone: z.string().optional(),
+        currentPharmacyAddress: z.string().optional(),
+        lastFillDate: z.string().optional(),
+        refillsRemaining: z.string().optional()
+      }).parse(req.body);
+
+      // Save the transfer request
+      const prescription = await storage.createPrescription({
+        userId: transferData.userId,
+        patientName: transferData.patientName,
+        medicationName: transferData.medicationName,
+        dosage: transferData.dosage,
+        quantity: transferData.quantity,
+        isTransfer: "true",
+        transferFromPharmacy: transferData.currentPharmacyName,
+        transferFromPhone: transferData.currentPharmacyPhone,
+        status: "pending"
+      });
+
+      console.log(`📞 Prescription transfer request saved for ${transferData.patientName}`);
+      
+      res.status(201).json({ 
+        prescription,
+        message: "Transfer request saved successfully"
+      });
+    } catch (error: any) {
+      console.error("Transfer request error:", error);
+      res.status(400).json({ 
+        error: "Failed to save transfer request", 
+        message: error.message 
+      });
+    }
+  });
+
   // Stripe subscription route for $10/month membership
   app.post("/api/create-subscription", async (req, res) => {
     try {
