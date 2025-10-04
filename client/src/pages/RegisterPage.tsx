@@ -338,6 +338,7 @@ export default function RegisterPage() {
               dosage: data.dosage,
               quantity: data.quantity,
               doctorName: data.doctorName,
+              doctorEmail: data.doctorEmail || "",
               doctorPhone: data.doctorPhone || "",
               doctorFax: data.doctorFax || "",
               doctorAddress: data.doctorAddress || "",
@@ -844,6 +845,17 @@ export default function RegisterPage() {
                             placeholder="Dr. Jane Smith"
                             {...step3Form.register("doctorName")}
                             data-testid="input-doctor-name"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="doctorEmail">Doctor Email</Label>
+                          <Input
+                            id="doctorEmail"
+                            type="email"
+                            placeholder="doctor@example.com"
+                            {...step3Form.register("doctorEmail")}
+                            data-testid="input-doctor-email"
                           />
                         </div>
 

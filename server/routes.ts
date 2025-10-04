@@ -16,6 +16,8 @@ import {
   insertPrescriptionRequestSchema
 } from "@shared/pharmacy-schema";
 import { generatePrescriptionRequestPDF, generateMessageTemplate } from "./pdf-generator";
+import { sendSMS } from "./twilio";
+import { sendEmail } from "./resend";
 
 // Initialize Stripe with graceful fallback
 let stripe: Stripe | null = null;
@@ -415,14 +417,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const pdfRequestSchema = z.object({
         userId: z.string().optional(),
         patientName: z.string().min(2, "Patient name is required"),
-        dateOfBirth: z.string().min(1, "Date of birth is required"),
+        dateOfBirth: z.string().optional(),
         medicationName: z.string().min(2, "Medication name is required"),
         dosage: z.string().min(1, "Dosage is required"),
         quantity: z.string().min(1, "Quantity is required"),
         doctorName: z.string().min(2, "Doctor name is required"),
-        doctorPhone: z.string().min(10, "Doctor phone is required"),
+        doctorPhone: z.string().optional(),
+        doctorEmail: z.string().email().optional(),
         doctorFax: z.string().optional(),
-        doctorAddress: z.string().min(5, "Doctor address is required"),
+        doctorAddress: z.string().optional(),
         urgency: z.enum(["routine", "urgent", "emergency"]).default("routine"),
         specialInstructions: z.string().optional()
       });
@@ -431,6 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const requestData = {
         ...validatedData,
+        dateOfBirth: validatedData.dateOfBirth || "",
         requestDate: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long', 
@@ -442,14 +446,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const prescriptionRequest = await storage.createPrescriptionRequest({
         userId: validatedData.userId,
         patientName: validatedData.patientName,
-        dateOfBirth: validatedData.dateOfBirth,
+        dateOfBirth: validatedData.dateOfBirth || "",
         medicationName: validatedData.medicationName,
         dosage: validatedData.dosage,
         quantity: validatedData.quantity,
         doctorName: validatedData.doctorName,
-        doctorPhone: validatedData.doctorPhone,
+        doctorPhone: validatedData.doctorPhone || "",
         doctorFax: validatedData.doctorFax,
-        doctorAddress: validatedData.doctorAddress,
+        doctorAddress: validatedData.doctorAddress || "",
         urgency: validatedData.urgency || "routine",
         specialInstructions: validatedData.specialInstructions,
         status: "pending",
@@ -463,6 +467,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Generate message template
       const messageTemplate = generateMessageTemplate(requestData);
+
+      // Send notifications to doctor (async, don't wait for response)
+      const notificationPromises: Promise<any>[] = [];
+      
+      // Send SMS if doctor phone is provided
+      if (validatedData.doctorPhone) {
+        const smsMessage = `Pillar Drug Club: Prescription request for ${validatedData.patientName} - ${validatedData.medicationName} ${validatedData.dosage}. Please check your email or fax for details.`;
+        notificationPromises.push(
+          sendSMS(validatedData.doctorPhone, smsMessage)
+            .then(success => {
+              if (success) {
+                console.log(`✅ SMS notification sent to doctor: ${validatedData.doctorPhone}`);
+              } else {
+                console.warn(`⚠️ Failed to send SMS to doctor: ${validatedData.doctorPhone}`);
+              }
+            })
+            .catch(err => console.error('SMS error:', err))
+        );
+      }
+
+      // Send email if doctor email is provided
+      if (validatedData.doctorEmail) {
+        const emailSubject = `Prescription Request for ${validatedData.patientName}`;
+        const emailBody = `
+          <h2>Prescription Request</h2>
+          <p>Dear ${validatedData.doctorName},</p>
+          <p>Your patient <strong>${validatedData.patientName}</strong> is requesting a prescription through Pillar Drug Club.</p>
+          
+          <h3>Prescription Details:</h3>
+          <ul>
+            <li><strong>Medication:</strong> ${validatedData.medicationName}</li>
+            <li><strong>Dosage:</strong> ${validatedData.dosage}</li>
+            <li><strong>Quantity:</strong> ${validatedData.quantity}</li>
+            <li><strong>Urgency:</strong> ${validatedData.urgency}</li>
+            ${validatedData.specialInstructions ? `<li><strong>Special Instructions:</strong> ${validatedData.specialInstructions}</li>` : ''}
+          </ul>
+          
+          <p>Please review this request and send the prescription to:</p>
+          <p><strong>Pillar Drug Club</strong><br/>
+          Fax: ${validatedData.doctorFax || '(Will be provided)'}<br/>
+          Or use your e-prescribing system</p>
+          
+          <p>Thank you for your attention to this matter.</p>
+          <p>Best regards,<br/>Pillar Drug Club</p>
+        `;
+        
+        notificationPromises.push(
+          sendEmail(validatedData.doctorEmail, emailSubject, emailBody)
+            .then(success => {
+              if (success) {
+                console.log(`✅ Email notification sent to doctor: ${validatedData.doctorEmail}`);
+              } else {
+                console.warn(`⚠️ Failed to send email to doctor: ${validatedData.doctorEmail}`);
+              }
+            })
+            .catch(err => console.error('Email error:', err))
+        );
+      }
+
+      // Process notifications in background (don't block response)
+      if (notificationPromises.length > 0) {
+        Promise.all(notificationPromises).catch(err => 
+          console.error('Error processing notifications:', err)
+        );
+      }
 
       // Return PDF as downloadable file
       res.setHeader('Content-Type', 'application/pdf');
