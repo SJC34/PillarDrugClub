@@ -96,8 +96,8 @@ export default function HomePage() {
                 </CarouselItem>
 
                 {/* Slide 3 - "Join Pillar!" video with text overlay */}
-                <CarouselItem>
-                  <div className="relative overflow-hidden">
+                <CarouselItem className="md:[&>div]:scale-75 md:[&>div]:origin-center">
+                  <div className="relative overflow-visible">
                     <video 
                       src={joinVideo} 
                       autoPlay={true}
