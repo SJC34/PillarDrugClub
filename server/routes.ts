@@ -649,6 +649,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's prescription requests
+  app.get("/api/prescription-requests/user/:userId", async (req, res) => {
+    try {
+      const requests = await storage.getUserPrescriptionRequests(req.params.userId);
+      res.json({ requests });
+    } catch (error: any) {
+      console.error("Error fetching user prescription requests:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch prescription requests", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Regenerate and download PDF for a specific prescription request
+  app.get("/api/prescription-requests/:id/pdf", async (req, res) => {
+    try {
+      const requests = await storage.getAllPrescriptionRequests();
+      const request = requests.find(r => r.id === req.params.id);
+      
+      if (!request) {
+        return res.status(404).json({ error: "Prescription request not found" });
+      }
+
+      // Get patient email if userId is available
+      let patientEmail = '';
+      if (request.userId) {
+        const user = await storage.getUser(request.userId);
+        if (user) {
+          patientEmail = user.email;
+        }
+      }
+
+      const requestData = {
+        patientName: request.patientName,
+        patientEmail,
+        dateOfBirth: request.dateOfBirth,
+        medicationName: request.medicationName,
+        dosage: request.dosage,
+        quantity: request.quantity,
+        doctorName: request.doctorName,
+        doctorPhone: request.doctorPhone,
+        doctorFax: request.doctorFax,
+        doctorAddress: request.doctorAddress,
+        urgency: request.urgency,
+        specialInstructions: request.specialInstructions,
+        requestDate: request.requestDate
+      };
+
+      const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="prescription-request-${request.patientName.replace(/\s+/g, '-')}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error: any) {
+      console.error("Error regenerating PDF:", error);
+      res.status(500).json({ 
+        error: "Failed to generate PDF", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Send prescription request PDF link via SMS
+  app.post("/api/prescription-requests/:id/text", async (req, res) => {
+    try {
+      const requests = await storage.getAllPrescriptionRequests();
+      const request = requests.find(r => r.id === req.params.id);
+      
+      if (!request) {
+        return res.status(404).json({ error: "Prescription request not found" });
+      }
+
+      if (!request.userId) {
+        return res.status(400).json({ error: "No user associated with this prescription request" });
+      }
+
+      const user = await storage.getUser(request.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (!user.phoneNumber) {
+        return res.status(400).json({ error: "User has no phone number on file" });
+      }
+
+      // Generate download link
+      const downloadUrl = `${req.protocol}://${req.get('host')}/api/prescription-requests/${request.id}/pdf`;
+      
+      const smsMessage = `Pillar Drug Club: Your prescription request form for ${request.medicationName} is ready. Download: ${downloadUrl}`;
+      
+      const success = await sendSMS(user.phoneNumber, smsMessage);
+      
+      if (success) {
+        console.log(`✅ Prescription request PDF link sent to: ${user.phoneNumber}`);
+        res.json({ success: true, message: "PDF link sent to your phone" });
+      } else {
+        res.status(500).json({ error: "Failed to send SMS" });
+      }
+    } catch (error: any) {
+      console.error("Error sending prescription request SMS:", error);
+      res.status(500).json({ 
+        error: "Failed to send SMS", 
+        message: error.message 
+      });
+    }
+  });
+
   // Get all prescription requests (for admin dashboard)
   app.get("/api/admin/prescription-requests", async (req, res) => {
     try {
