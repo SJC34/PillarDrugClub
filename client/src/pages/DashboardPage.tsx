@@ -16,7 +16,10 @@ import {
   FileText,
   ArrowRight,
   Download,
-  MessageSquare
+  MessageSquare,
+  Plus,
+  X,
+  Edit
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -28,6 +31,7 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("loading");
+  const [showDoctorSearch, setShowDoctorSearch] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in
@@ -78,6 +82,28 @@ export default function DashboardPage() {
 
   const prescriptionRequests: PrescriptionRequest[] = prescriptionRequestsData?.requests || [];
 
+  // Fetch user's primary doctor
+  const { 
+    data: primaryDoctorData,
+    isLoading: loadingDoctor
+  } = useQuery<{ doctor: any }>({
+    queryKey: [`/api/users/${user?.id}/primary-doctor`],
+    enabled: !!user?.id,
+  });
+
+  const primaryDoctor = primaryDoctorData?.doctor;
+
+  // Fetch user's current medications
+  const { 
+    data: medicationsData,
+    isLoading: loadingMedications
+  } = useQuery<{ medications: any[] }>({
+    queryKey: [`/api/users/${user?.id}/medications`],
+    enabled: !!user?.id,
+  });
+
+  const medications = medicationsData?.medications || [];
+
   // Text PDF to phone mutation
   const textPdfMutation = useMutation({
     mutationFn: async (requestId: string) => {
@@ -98,6 +124,30 @@ export default function DashboardPage() {
       toast({
         title: "Failed to Send SMS",
         description: error.message || "Could not send SMS to your phone",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update primary doctor mutation
+  const updateDoctorMutation = useMutation({
+    mutationFn: async (doctorData: any) => {
+      return apiRequest('PUT', `/api/users/${user?.id}/primary-doctor`, doctorData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/users/${user?.id}/primary-doctor`] 
+      });
+      setShowDoctorSearch(false);
+      toast({
+        title: "Doctor Updated",
+        description: "Your primary care physician has been updated",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Update Doctor",
+        description: error.message || "Could not update your primary doctor",
         variant: "destructive",
       });
     },
@@ -401,6 +451,174 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Current Medications */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Current Medications</CardTitle>
+            <CardDescription>
+              Your active prescriptions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingMedications ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading medications...</p>
+              </div>
+            ) : medications.length === 0 ? (
+              <div className="text-center py-8">
+                <Pill className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">No active medications on file</p>
+                <Link href="/prescription-transfer">
+                  <Button variant="outline" data-testid="button-add-medication">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Medication
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {medications.map((med: any, idx: number) => (
+                  <div 
+                    key={idx} 
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    data-testid={`medication-${idx}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Pill className="h-5 w-5 text-blue-600" />
+                      <div>
+                        <p className="font-medium text-gray-900">{med.name}</p>
+                        <p className="text-sm text-gray-600">{med.dosage} - {med.refills} refills remaining</p>
+                      </div>
+                    </div>
+                    <Badge variant="secondary">{med.status}</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Current Doctor/Provider */}
+        <Card className="mt-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Primary Care Physician</CardTitle>
+                <CardDescription>
+                  Your current doctor or healthcare provider
+                </CardDescription>
+              </div>
+              {primaryDoctor && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowDoctorSearch(true)}
+                  data-testid="button-change-doctor"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Change Doctor
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {loadingDoctor ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading doctor information...</p>
+              </div>
+            ) : !primaryDoctor ? (
+              <div className="text-center py-8">
+                <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">No primary care physician on file</p>
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowDoctorSearch(true)}
+                  data-testid="button-add-doctor"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Doctor
+                </Button>
+              </div>
+            ) : (
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <User className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1" data-testid="text-doctor-name">
+                      {primaryDoctor.name}
+                    </h4>
+                    {primaryDoctor.npi && (
+                      <p className="text-sm text-gray-600 mb-1">
+                        <span className="font-medium">NPI:</span> {primaryDoctor.npi}
+                      </p>
+                    )}
+                    {primaryDoctor.phone && (
+                      <p className="text-sm text-gray-600 mb-1">
+                        <span className="font-medium">Phone:</span> {primaryDoctor.phone}
+                      </p>
+                    )}
+                    {primaryDoctor.address && (
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Address:</span>{" "}
+                        {typeof primaryDoctor.address === 'string' 
+                          ? primaryDoctor.address 
+                          : `${primaryDoctor.address.street}, ${primaryDoctor.address.city}, ${primaryDoctor.address.state} ${primaryDoctor.address.zipCode}`
+                        }
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Doctor Search Modal */}
+        {showDoctorSearch && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Search for Doctor</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowDoctorSearch(false)}
+                    data-testid="button-close-search"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CardDescription>
+                  Search for your primary care physician
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center py-8 text-gray-600">
+                    <p className="mb-4">Doctor search functionality coming soon.</p>
+                    <p className="text-sm text-gray-500">
+                      For now, you can add doctor information during prescription requests.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowDoctorSearch(false)}
+                    data-testid="button-cancel-search"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Prescription Requests */}
         <Card className="mt-8">
