@@ -73,7 +73,7 @@ export async function sendEmailWithAttachment(
       html: html,
       attachments: [{
         filename: attachment.filename,
-        content: attachment.content
+        content: attachment.content.toString('base64')
       }]
     });
     
