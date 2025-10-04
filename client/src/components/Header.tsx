@@ -16,9 +16,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background backdrop-blur-lg border-b border-primary/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        <div className="flex h-16 items-center justify-between">
-          {/* Left side - Hamburger (mobile) or Brand + Navigation (desktop) */}
-          <div className="flex items-center gap-3 md:gap-8">
+        <div className="flex h-16 items-center justify-between lg:justify-evenly">
+          {/* Left side - Hamburger (mobile) or Brand (desktop) */}
+          <div className="flex items-center gap-3">
             {/* Mobile menu button */}
             <Button
               variant="ghost"
@@ -35,28 +35,28 @@ export default function Header() {
             </Button>
 
             {/* Brand name with pill symbol */}
-            <a href="/" className="text-lg md:text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
+            <a href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
               pillar drug club
               <Pill className="h-5 w-5 text-secondary" />
             </a>
-            
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6">
-              {navigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-xs xl:text-sm font-bold text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
-                  data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                >
-                  {item.name}
-                </a>
-              ))}
-            </nav>
           </div>
+            
+          {/* Desktop Navigation - centered */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            {navigation.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="text-sm font-bold text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
+                data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                {item.name}
+              </a>
+            ))}
+          </nav>
 
           {/* Right side - Dark mode toggle and auth buttons */}
-          <div className="flex items-center space-x-2 md:space-x-3">
+          <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
               size="icon"
