@@ -138,10 +138,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Update user with provided fields
+      // Update user with provided fields, normalizing types
       const updates: any = {};
       if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
-      if (smsConsent !== undefined) updates.smsConsent = smsConsent;
+      if (smsConsent !== undefined) {
+        // Normalize smsConsent to string "true" or "false" (database expects text type)
+        updates.smsConsent = smsConsent === true || smsConsent === "true" ? "true" : "false";
+      }
       if (firstName !== undefined) updates.firstName = firstName;
       if (lastName !== undefined) updates.lastName = lastName;
       updates.updatedAt = new Date();
