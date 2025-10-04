@@ -16,15 +16,16 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background backdrop-blur-lg border-b border-primary/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        <div className="flex h-20 items-center justify-between">
-          {/* Left side - Menu button */}
-          <div className="flex items-center md:hidden">
+        <div className="flex h-16 items-center justify-between">
+          {/* Left side - Hamburger (mobile) or Brand + Navigation (desktop) */}
+          <div className="flex items-center gap-8">
+            {/* Mobile menu button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               data-testid="button-mobile-menu"
-              className="relative z-[102]"
+              className="relative z-[102] md:hidden"
             >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -32,16 +33,14 @@ export default function Header() {
                 <Menu className="h-5 w-5" />
               )}
             </Button>
-          </div>
 
-          {/* Center - Brand name with pill symbol and navigation */}
-          <div className="flex items-center gap-8">
+            {/* Brand name with pill symbol */}
             <a href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
               pillar drug club
               <Pill className="h-5 w-5 text-secondary" />
             </a>
             
-            {/* Desktop Navigation - inline with header */}
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-6">
               {navigation.map((item) => (
                 <a
@@ -57,7 +56,7 @@ export default function Header() {
           </div>
 
           {/* Right side - Dark mode toggle and auth buttons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
               size="icon"
