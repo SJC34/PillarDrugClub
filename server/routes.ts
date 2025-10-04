@@ -17,7 +17,7 @@ import {
 } from "@shared/pharmacy-schema";
 import { generatePrescriptionRequestPDF, generateMessageTemplate } from "./pdf-generator";
 import { sendSMS } from "./twilio";
-import { sendEmail } from "./resend";
+import { sendEmail, sendEmailWithAttachment } from "./resend";
 
 // Initialize Stripe with graceful fallback
 let stripe: Stripe | null = null;
@@ -432,8 +432,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validatedData = pdfRequestSchema.parse(req.body);
       
+      // Fetch patient email if userId is provided
+      let patientEmail = '';
+      let patientPhone = '';
+      if (validatedData.userId) {
+        const user = await storage.getUser(validatedData.userId);
+        if (user) {
+          patientEmail = user.email;
+          patientPhone = user.phoneNumber || '';
+        }
+      }
+      
       const requestData = {
         ...validatedData,
+        patientEmail,
         dateOfBirth: validatedData.dateOfBirth || "",
         requestDate: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
@@ -468,36 +480,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate message template
       const messageTemplate = generateMessageTemplate(requestData);
 
-      // Send notifications to doctor (async, don't block response)
+      // Send notifications to patient, doctor (async, don't block response)
       const sendNotifications = async () => {
         const notificationPromises: Promise<any>[] = [];
         
-        // Send SMS if doctor phone is provided
-        if (validatedData.doctorPhone && validatedData.doctorPhone.trim().length > 0) {
-          const smsMessage = `Pillar Drug Club: Prescription request for ${validatedData.patientName} - ${validatedData.medicationName} ${validatedData.dosage}. Please check your email or fax for details.`;
+        // Send PDF to patient via email
+        if (patientEmail && patientEmail.trim().length > 0) {
+          const patientEmailSubject = `Your Prescription Request Form - Pillar Drug Club`;
+          const patientEmailBody = `
+            <h2>Your Prescription Request Form</h2>
+            <p>Dear ${validatedData.patientName},</p>
+            <p>Thank you for your prescription request. We've attached your completed prescription request form.</p>
+            
+            <h3>What to do next:</h3>
+            <ol>
+              <li>Review the attached PDF form</li>
+              <li>Forward this email with the form to your doctor</li>
+              <li>Or upload the form to your doctor's secure portal</li>
+              <li>Your doctor will electronically submit the prescription to Pillar Drug Club</li>
+            </ol>
+            
+            <h3>Requested Medication:</h3>
+            <ul>
+              <li><strong>Medication:</strong> ${validatedData.medicationName}</li>
+              <li><strong>Dosage:</strong> ${validatedData.dosage}</li>
+              <li><strong>Quantity:</strong> ${validatedData.quantity}</li>
+            </ul>
+            
+            <p>If you have any questions, please contact us.</p>
+            <p>Best regards,<br/>Pillar Drug Club Team</p>
+          `;
+          
           notificationPromises.push(
-            sendSMS(validatedData.doctorPhone, smsMessage)
+            sendEmailWithAttachment(
+              patientEmail,
+              patientEmailSubject,
+              patientEmailBody,
+              {
+                filename: `prescription-request-${validatedData.patientName.replace(/\s+/g, '-')}.pdf`,
+                content: pdfBuffer
+              }
+            )
               .then(success => {
                 if (success) {
-                  console.log(`✅ SMS notification sent to doctor: ${validatedData.doctorPhone}`);
+                  console.log(`✅ PDF sent to patient: ${patientEmail}`);
                 } else {
-                  console.warn(`⚠️ Failed to send SMS to doctor: ${validatedData.doctorPhone}`);
+                  console.warn(`⚠️ Failed to send PDF to patient: ${patientEmail}`);
                 }
               })
               .catch(err => {
-                console.error('SMS notification error:', err);
+                console.error('Patient email error:', err);
                 return false;
               })
           );
         }
-
-        // Send email if doctor email is provided
+        
+        // Send SMS to patient with instructions
+        if (patientPhone && patientPhone.trim().length > 0) {
+          const patientSmsMessage = `Pillar Drug Club: Your prescription request form has been emailed to you. Please forward it to your doctor ${validatedData.doctorName} or upload to their secure portal.`;
+          notificationPromises.push(
+            sendSMS(patientPhone, patientSmsMessage)
+              .then(success => {
+                if (success) {
+                  console.log(`✅ SMS sent to patient: ${patientPhone}`);
+                } else {
+                  console.warn(`⚠️ Failed to send SMS to patient: ${patientPhone}`);
+                }
+              })
+              .catch(err => {
+                console.error('Patient SMS error:', err);
+                return false;
+              })
+          );
+        }
+        
+        // Send PDF to doctor via email
         if (validatedData.doctorEmail && validatedData.doctorEmail.trim().length > 0) {
-          const emailSubject = `Prescription Request for ${validatedData.patientName}`;
-          const emailBody = `
+          const doctorEmailSubject = `Prescription Request for ${validatedData.patientName}`;
+          const doctorEmailBody = `
             <h2>Prescription Request</h2>
             <p>Dear ${validatedData.doctorName},</p>
-            <p>Your patient <strong>${validatedData.patientName}</strong> is requesting a prescription through Pillar Drug Club.</p>
+            <p>Your patient <strong>${validatedData.patientName}</strong> is requesting a prescription through Pillar Drug Club, their wholesale pharmacy.</p>
             
             <h3>Prescription Details:</h3>
             <ul>
@@ -508,26 +571,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ${validatedData.specialInstructions ? `<li><strong>Special Instructions:</strong> ${validatedData.specialInstructions}</li>` : ''}
             </ul>
             
-            <p>Please review this request and send the prescription to:</p>
+            <p><strong>Please review the attached prescription request form and submit electronically to:</strong></p>
             <p><strong>Pillar Drug Club</strong><br/>
-            Fax: ${validatedData.doctorFax || '(Will be provided)'}<br/>
-            Or use your e-prescribing system</p>
+            Search pharmacy: "Pillar Drug Club"<br/>
+            <strong>IMPORTANT:</strong> Include patient email: ${patientEmail || validatedData.patientName}<br/>
+            Or fax: ${validatedData.doctorFax || '(Contact Pillar Drug Club)'}</p>
             
             <p>Thank you for your attention to this matter.</p>
             <p>Best regards,<br/>Pillar Drug Club</p>
           `;
           
           notificationPromises.push(
-            sendEmail(validatedData.doctorEmail, emailSubject, emailBody)
+            sendEmailWithAttachment(
+              validatedData.doctorEmail,
+              doctorEmailSubject,
+              doctorEmailBody,
+              {
+                filename: `prescription-request-${validatedData.patientName.replace(/\s+/g, '-')}.pdf`,
+                content: pdfBuffer
+              }
+            )
               .then(success => {
                 if (success) {
-                  console.log(`✅ Email notification sent to doctor: ${validatedData.doctorEmail}`);
+                  console.log(`✅ PDF sent to doctor: ${validatedData.doctorEmail}`);
                 } else {
-                  console.warn(`⚠️ Failed to send email to doctor: ${validatedData.doctorEmail}`);
+                  console.warn(`⚠️ Failed to send PDF to doctor: ${validatedData.doctorEmail}`);
                 }
               })
               .catch(err => {
-                console.error('Email notification error:', err);
+                console.error('Doctor email error:', err);
+                return false;
+              })
+          );
+        }
+        
+        // Send SMS to doctor
+        if (validatedData.doctorPhone && validatedData.doctorPhone.trim().length > 0) {
+          const doctorSmsMessage = `Pillar Drug Club: Prescription request for ${validatedData.patientName} - ${validatedData.medicationName} ${validatedData.dosage}. Please check your email for the prescription request form.`;
+          notificationPromises.push(
+            sendSMS(validatedData.doctorPhone, doctorSmsMessage)
+              .then(success => {
+                if (success) {
+                  console.log(`✅ SMS sent to doctor: ${validatedData.doctorPhone}`);
+                } else {
+                  console.warn(`⚠️ Failed to send SMS to doctor: ${validatedData.doctorPhone}`);
+                }
+              })
+              .catch(err => {
+                console.error('Doctor SMS error:', err);
                 return false;
               })
           );

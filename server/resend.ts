@@ -56,3 +56,31 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
     return false;
   }
 }
+
+export async function sendEmailWithAttachment(
+  to: string, 
+  subject: string, 
+  html: string, 
+  attachment: { filename: string; content: Buffer }
+): Promise<boolean> {
+  try {
+    const { client, fromEmail } = await getUncachableResendClient();
+    
+    await client.emails.send({
+      from: fromEmail,
+      to: to,
+      subject: subject,
+      html: html,
+      attachments: [{
+        filename: attachment.filename,
+        content: attachment.content
+      }]
+    });
+    
+    console.log(`✅ Email with attachment sent to ${to}`);
+    return true;
+  } catch (error) {
+    console.error('Failed to send email with attachment:', error);
+    return false;
+  }
+}
