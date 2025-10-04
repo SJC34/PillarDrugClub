@@ -71,7 +71,7 @@ export default function HomePage() {
               className="w-full"
             >
               <CarouselContent>
-                {/* Slide 2 - "Avoid This" video with text overlay */}
+                {/* Slide 1 - "Avoid This" video with text overlay */}
                 <CarouselItem>
                   <div className="relative overflow-hidden">
                     <video 
@@ -80,8 +80,8 @@ export default function HomePage() {
                       loop={true}
                       muted={true}
                       playsInline={true}
-                      className="w-full rounded-lg shadow-lg"
-                      style={{ height: '265px', objectFit: 'cover' }}
+                      className="w-full rounded-lg shadow-lg h-[265px] md:h-[318px]"
+                      style={{ objectFit: 'cover' }}
                       data-testid="video-avoid-this"
                     />
                     <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
@@ -95,17 +95,17 @@ export default function HomePage() {
                   </div>
                 </CarouselItem>
 
-                {/* Slide 3 - "Join Pillar!" video with text overlay */}
-                <CarouselItem className="md:[&>div]:scale-75 md:[&>div]:origin-center">
-                  <div className="relative overflow-visible">
+                {/* Slide 2 - "Join Pillar!" video with text overlay */}
+                <CarouselItem>
+                  <div className="relative overflow-hidden">
                     <video 
                       src={joinVideo} 
                       autoPlay={true}
                       loop={true}
                       muted={true}
                       playsInline={true}
-                      className="w-full rounded-lg shadow-lg"
-                      style={{ height: '265px', objectFit: 'cover', objectPosition: '40% 40%' }}
+                      className="w-full rounded-lg shadow-lg h-[265px] md:h-[318px]"
+                      style={{ objectFit: 'cover', objectPosition: '40% 40%' }}
                       data-testid="video-join-pillar"
                     />
                     <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
@@ -121,8 +121,6 @@ export default function HomePage() {
                   </div>
                 </CarouselItem>
               </CarouselContent>
-              <CarouselPrevious className="hidden md:flex" />
-              <CarouselNext className="hidden md:flex" />
             </Carousel>
           </div>
           
