@@ -39,6 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { PharmacySearch } from "@/components/PharmacySearch";
+import { useAuth } from "@/hooks/useAuth";
 
 const doctorFaxSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
@@ -75,6 +76,7 @@ type PharmacyTransferForm = z.infer<typeof pharmacyTransferSchema>;
 export default function PrescriptionTransferPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("doctor-fax");
   const [submissionStatus, setSubmissionStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
@@ -82,12 +84,6 @@ export default function PrescriptionTransferPage() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [messageTemplate, setMessageTemplate] = useState("");
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
-  
-  // Check authentication status
-  const checkAuth = () => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    return !!user.id;
-  };
 
   const doctorForm = useForm<DoctorFaxForm>({
     resolver: zodResolver(doctorFaxSchema),
@@ -141,12 +137,13 @@ export default function PrescriptionTransferPage() {
     e.preventDefault();
     
     // Check authentication first
-    if (!checkAuth()) {
+    if (!isAuthenticated || !user) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to submit prescription requests.",
         variant: "destructive"
       });
+      setLocation("/login");
       return;
     }
     
@@ -157,8 +154,9 @@ export default function PrescriptionTransferPage() {
   const onDoctorSubmit = async (data: DoctorFaxForm) => {
     setSubmissionStatus("submitting");
     try {
-      // Get user ID from localStorage
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (!user?.id) {
+        throw new Error("User not authenticated");
+      }
       
       // Generate PDF and message template
       const response = await fetch('/api/prescriptions/generate-pdf', {
@@ -166,6 +164,7 @@ export default function PrescriptionTransferPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           ...data,
           userId: user.id
@@ -240,12 +239,13 @@ export default function PrescriptionTransferPage() {
     e.preventDefault();
     
     // Check authentication first
-    if (!checkAuth()) {
+    if (!isAuthenticated || !user) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to submit transfer requests.",
         variant: "destructive"
       });
+      setLocation("/login");
       return;
     }
     
@@ -256,7 +256,9 @@ export default function PrescriptionTransferPage() {
   const onPharmacySubmit = async (data: PharmacyTransferForm) => {
     setSubmissionStatus("submitting");
     try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (!user?.id) {
+        throw new Error("User not authenticated");
+      }
       
       const prescriptionData = {
         customerId: user.id,

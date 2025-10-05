@@ -25,18 +25,20 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { PrescriptionRequest } from "@shared/pharmacy-schema";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("loading");
   const [showDoctorSearch, setShowDoctorSearch] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in
-    const userStr = localStorage.getItem("user");
-    if (!userStr) {
+    if (authLoading) return;
+    
+    if (!isAuthenticated) {
       toast({
         title: "Authentication Required",
         description: "Please log in to access your dashboard.",
@@ -46,11 +48,10 @@ export default function DashboardPage() {
       return;
     }
 
-    const userData = JSON.parse(userStr);
-    setUser(userData);
+    if (!user?.id) return;
 
     // Check subscription status
-    fetch(`/api/subscription-status/${userData.id}`)
+    fetch(`/api/subscription-status/${user.id}`)
       .then(res => res.json())
       .then(data => {
         setSubscriptionStatus(data.subscriptionStatus);
@@ -67,7 +68,7 @@ export default function DashboardPage() {
         console.error("Error checking subscription:", error);
         setSubscriptionStatus("error");
       });
-  }, []);
+  }, [authLoading, isAuthenticated, user]);
 
   // Fetch user's prescription requests
   const { 

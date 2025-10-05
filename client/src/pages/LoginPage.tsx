@@ -51,6 +51,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(data),
       });
 
@@ -59,9 +60,6 @@ export default function LoginPage() {
       if (!response.ok) {
         throw new Error(result.error || "Login failed");
       }
-
-      // Store user info in localStorage (in production, use proper session management)
-      localStorage.setItem("user", JSON.stringify(result.user));
       
       toast({
         title: "Login Successful",

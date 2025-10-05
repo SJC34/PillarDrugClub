@@ -83,8 +83,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Legacy email/password authentication routes (for backward compatibility)
-  app.post("/api/auth/register", async (req, res) => {
+  // Email/password authentication routes with session management
+  app.post("/api/auth/register", async (req: any, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
       
@@ -97,16 +97,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create user
       const user = await storage.createUser(userData);
       
-      // Don't return password in response
-      const { password, ...userResponse } = user;
-      res.status(201).json({ user: userResponse });
+      // Create session for the newly registered user
+      req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName }, (err: any) => {
+        if (err) {
+          console.error("Session creation error:", err);
+          return res.status(500).json({ error: "Registration successful but session creation failed" });
+        }
+        
+        // Don't return password in response
+        const { password, ...userResponse } = user;
+        res.status(201).json({ user: userResponse });
+      });
     } catch (error: any) {
       console.error("Registration error:", error);
       res.status(400).json({ error: "Registration failed", message: error.message });
     }
   });
 
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", async (req: any, res) => {
     try {
       const { email, password } = req.body;
       
@@ -120,13 +128,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid email or password" });
       }
       
-      // Don't return password in response
-      const { password: _, ...userResponse } = user;
-      res.json({ user: userResponse });
+      // Establish session using passport
+      req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName }, (err: any) => {
+        if (err) {
+          console.error("Session creation error:", err);
+          return res.status(500).json({ error: "Login failed - could not create session" });
+        }
+        
+        // Don't return password in response
+        const { password: _, ...userResponse } = user;
+        res.json({ user: userResponse });
+      });
     } catch (error: any) {
       console.error("Login error:", error);
       res.status(500).json({ error: "Login failed", message: error.message });
     }
+  });
+
+  // Logout endpoint
+  app.post("/api/auth/logout", async (req: any, res) => {
+    req.logout((err: any) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      req.session.destroy((err: any) => {
+        if (err) {
+          return res.status(500).json({ error: "Session destruction failed" });
+        }
+        res.json({ message: "Logged out successfully" });
+      });
+    });
   });
 
   // Update user information (for multi-step registration after social auth)

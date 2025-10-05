@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Pill, Check, CreditCard } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
@@ -76,6 +77,8 @@ export default function SubscriptionPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 
   const benefits = [
     "Access wholesale prescription pricing",
@@ -87,9 +90,11 @@ export default function SubscriptionPage() {
   ];
 
   useEffect(() => {
-    // Get user from localStorage
-    const userStr = localStorage.getItem("user");
-    if (!userStr) {
+    // Wait for auth to load
+    if (authLoading) return;
+    
+    // Check if user is logged in
+    if (!isAuthenticated || !user) {
       toast({
         title: "Authentication Required",
         description: "Please log in to subscribe.",
@@ -98,8 +103,6 @@ export default function SubscriptionPage() {
       setLocation("/login");
       return;
     }
-
-    const user = JSON.parse(userStr);
 
     // Create subscription as soon as the page loads
     apiRequest("POST", "/api/create-subscription", { userId: user.id })
@@ -122,7 +125,7 @@ export default function SubscriptionPage() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [authLoading, isAuthenticated, user]);
 
   if (isLoading) {
     return (
