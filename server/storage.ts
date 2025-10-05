@@ -205,7 +205,7 @@ export class MemStorage implements IStorage {
 
     // Create admin user
     const adminId = randomUUID();
-    const now = new Date().toISOString();
+    const now = new Date();
     const adminUser: User = {
       id: adminId,
       username: "seth@pillardrugclub.com",
@@ -213,6 +213,7 @@ export class MemStorage implements IStorage {
       password: "Spaceworm#25",
       firstName: "Seth",
       lastName: "Admin",
+      dateOfBirth: null,
       phoneNumber: null,
       smsConsent: "false",
       role: "admin",
@@ -220,6 +221,13 @@ export class MemStorage implements IStorage {
       stripeSubscriptionId: null,
       subscriptionStatus: "active",
       isActive: "true",
+      profileImageUrl: null,
+      drugAllergies: null,
+      primaryDoctorId: null,
+      primaryDoctorName: null,
+      primaryDoctorNpi: null,
+      primaryDoctorPhone: null,
+      primaryDoctorAddress: null,
       createdAt: now,
       updatedAt: now
     };
@@ -235,6 +243,7 @@ export class MemStorage implements IStorage {
       password: "password123",
       firstName: "SJC",
       lastName: "Pharmacy",
+      dateOfBirth: null,
       phoneNumber: "4238393523",
       smsConsent: "false",
       role: "client",
@@ -243,6 +252,7 @@ export class MemStorage implements IStorage {
       subscriptionStatus: "active",
       isActive: "true",
       profileImageUrl: null,
+      drugAllergies: null,
       primaryDoctorId: null,
       primaryDoctorName: null,
       primaryDoctorNpi: null,
@@ -291,22 +301,29 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const now = new Date().toISOString();
+    const now = new Date();
     const user: User = { 
       id,
-      username: insertUser.email, // Use email as username for simplicity
-      email: insertUser.email,
-      password: insertUser.password, // In production, this should be hashed
-      firstName: insertUser.firstName,
-      lastName: insertUser.lastName,
+      username: insertUser.email ?? null, // Use email as username for simplicity
+      email: insertUser.email ?? null,
+      password: insertUser.password ?? null, // In production, this should be hashed
+      firstName: insertUser.firstName ?? null,
+      lastName: insertUser.lastName ?? null,
       profileImageUrl: null,
-      phoneNumber: insertUser.phoneNumber || null,
-      smsConsent: insertUser.smsConsent || "false",
+      phoneNumber: insertUser.phoneNumber ?? null,
+      smsConsent: insertUser.smsConsent ?? "false",
       role: "client",
       stripeCustomerId: null,
       stripeSubscriptionId: null,
       subscriptionStatus: "incomplete",
       isActive: "true",
+      drugAllergies: null,
+      primaryDoctorId: null,
+      primaryDoctorName: null,
+      primaryDoctorNpi: null,
+      primaryDoctorPhone: null,
+      primaryDoctorAddress: null,
+      dateOfBirth: insertUser.dateOfBirth ?? null,
       createdAt: now,
       updatedAt: now
     };
@@ -315,8 +332,8 @@ export class MemStorage implements IStorage {
   }
 
   async upsertUser(upsertData: UpsertUser): Promise<User> {
-    const existingUser = this.users.get(upsertData.id);
-    const now = new Date().toISOString();
+    const existingUser = this.users.get(upsertData.id ?? "");
+    const now = new Date();
     
     if (existingUser) {
       // Update existing user
@@ -328,18 +345,19 @@ export class MemStorage implements IStorage {
         profileImageUrl: upsertData.profileImageUrl || existingUser.profileImageUrl,
         updatedAt: now
       };
-      this.users.set(upsertData.id, updated);
+      this.users.set(upsertData.id ?? "", updated);
       return updated;
     } else {
       // Create new user from OAuth
       const newUser: User = {
-        id: upsertData.id,
-        username: upsertData.email || null,
-        email: upsertData.email || null,
+        id: upsertData.id ?? randomUUID(),
+        username: upsertData.email ?? null,
+        email: upsertData.email ?? null,
         password: null, // OAuth users don't have passwords
-        firstName: upsertData.firstName || null,
-        lastName: upsertData.lastName || null,
-        profileImageUrl: upsertData.profileImageUrl || null,
+        firstName: upsertData.firstName ?? null,
+        lastName: upsertData.lastName ?? null,
+        profileImageUrl: upsertData.profileImageUrl ?? null,
+        dateOfBirth: null,
         phoneNumber: null,
         smsConsent: "false",
         role: "client",
@@ -347,10 +365,16 @@ export class MemStorage implements IStorage {
         stripeSubscriptionId: null,
         subscriptionStatus: "incomplete",
         isActive: "true",
+        drugAllergies: null,
+        primaryDoctorId: null,
+        primaryDoctorName: null,
+        primaryDoctorNpi: null,
+        primaryDoctorPhone: null,
+        primaryDoctorAddress: null,
         createdAt: now,
         updatedAt: now
       };
-      this.users.set(upsertData.id, newUser);
+      this.users.set(upsertData.id ?? "", newUser);
       return newUser;
     }
   }
@@ -365,7 +389,7 @@ export class MemStorage implements IStorage {
       stripeSubscriptionId,
       // Only set status to active if we have a subscription ID
       subscriptionStatus: stripeSubscriptionId ? "incomplete" as const : user.subscriptionStatus,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date()
     };
     this.users.set(id, updatedUser);
     return updatedUser;
@@ -378,7 +402,7 @@ export class MemStorage implements IStorage {
     const updatedUser = {
       ...user,
       subscriptionStatus: status,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date()
     };
     this.users.set(id, updatedUser);
     return updatedUser;
@@ -393,7 +417,7 @@ export class MemStorage implements IStorage {
     const updatedUser = {
       ...user,
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date()
     };
     this.users.set(id, updatedUser);
     return updatedUser;
@@ -414,12 +438,12 @@ export class MemStorage implements IStorage {
     
     const updatedUser = {
       ...user,
-      primaryDoctorId: doctor.doctorId,
+      primaryDoctorId: doctor.doctorId || null,
       primaryDoctorName: doctor.doctorName,
-      primaryDoctorNpi: doctor.doctorNpi,
-      primaryDoctorPhone: doctor.doctorPhone,
-      primaryDoctorAddress: doctor.doctorAddress,
-      updatedAt: new Date().toISOString()
+      primaryDoctorNpi: doctor.doctorNpi || null,
+      primaryDoctorPhone: doctor.doctorPhone || null,
+      primaryDoctorAddress: doctor.doctorAddress || null,
+      updatedAt: new Date()
     };
     this.users.set(id, updatedUser);
     return updatedUser;

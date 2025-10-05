@@ -23,7 +23,7 @@ import { sendEmail, sendEmailWithAttachment } from "./resend";
 let stripe: Stripe | null = null;
 if (process.env.STRIPE_SECRET_KEY) {
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2023-10-16",
+    apiVersion: "2025-08-27.basil",
   });
   console.log('✅ Stripe initialized successfully');
 } else {
@@ -89,7 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userData = insertUserSchema.parse(req.body);
       
       // Check if user already exists
-      const existingUser = await storage.getUserByEmail(userData.email);
+      const existingUser = await storage.getUserByEmail(userData.email || "");
       if (existingUser) {
         return res.status(400).json({ error: "User already exists with this email" });
       }
@@ -215,17 +215,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sendText: z.boolean().optional().default(false)
       }).parse(req.body);
 
-      // Save the transfer request
-      const prescription = await storage.createPrescription({
+      // Save the transfer request as a prescription request
+      const prescription = await storage.createPrescriptionRequest({
         userId: transferData.userId,
         patientName: transferData.patientName,
+        dateOfBirth: transferData.dateOfBirth || "",
         medicationName: transferData.medicationName,
-        dosage: transferData.dosage,
-        quantity: transferData.quantity,
-        isTransfer: "true",
-        transferFromPharmacy: transferData.currentPharmacyName,
-        transferFromPhone: transferData.currentPharmacyPhone,
-        status: "pending"
+        dosage: transferData.dosage || "",
+        quantity: transferData.quantity || "30",
+        doctorName: "",
+        doctorPhone: "",
+        doctorFax: "",
+        doctorAddress: "",
+        urgency: "routine",
+        specialInstructions: `Transfer from ${transferData.currentPharmacyName}. Prescription #: ${transferData.prescriptionNumber}`,
+        status: "pending",
+        requestDate: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })
       });
 
       console.log(`📞 Prescription transfer request saved for ${transferData.patientName}`);
@@ -237,20 +246,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Check if user has a primary doctor
         if (user.primaryDoctorName && user.primaryDoctorPhone) {
           // Generate PDF for doctor
+          const doctorAddress = user.primaryDoctorAddress as any;
           const requestData = {
             patientName: transferData.patientName,
-            patientEmail: user.email,
+            patientEmail: user.email || "",
             dateOfBirth: transferData.dateOfBirth || "",
             medicationName: transferData.medicationName,
             dosage: transferData.dosage || "",
             quantity: transferData.quantity || "30",
-            doctorName: user.primaryDoctorName,
-            doctorPhone: user.primaryDoctorPhone,
+            doctorName: user.primaryDoctorName || "",
+            doctorPhone: user.primaryDoctorPhone || "",
             doctorFax: "",
-            doctorAddress: user.primaryDoctorAddress ? 
-              `${user.primaryDoctorAddress.street || ""}, ${user.primaryDoctorAddress.city || ""}, ${user.primaryDoctorAddress.state || ""} ${user.primaryDoctorAddress.zipCode || ""}`.trim() : 
+            doctorAddress: doctorAddress ? 
+              `${doctorAddress.street || ""}, ${doctorAddress.city || ""}, ${doctorAddress.state || ""} ${doctorAddress.zipCode || ""}`.trim() : 
               "",
-            urgency: "routine",
+            urgency: "routine" as const,
             specialInstructions: `Transfer from ${transferData.currentPharmacyName}. Prescription #: ${transferData.prescriptionNumber}`,
             requestDate: new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
@@ -266,15 +276,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const notifications: Promise<any>[] = [];
 
           // Send email if requested
-          if (transferData.sendEmail) {
+          if (transferData.sendEmail && user.email) {
             notifications.push(
-              sendEmailWithAttachment({
-                to: user.email,
-                subject: "Prescription Transfer Request - Forward to Your Doctor",
-                text: `Hi ${transferData.patientName},\n\nYour prescription transfer request for ${transferData.medicationName} has been submitted.\n\nAttached is a prescription request form. Please forward this email with the attachment to your doctor (${user.primaryDoctorName}) to authorize the transfer.\n\nAlternatively, you can download the form from your dashboard and send it to your doctor.\n\nBest regards,\nPillar Drug Club`,
-                attachmentBuffer: pdfBuffer,
-                attachmentFilename: `prescription-transfer-${transferData.patientName.replace(/\s+/g, '-')}.pdf`
-              })
+              sendEmailWithAttachment(
+                user.email,
+                "Prescription Transfer Request - Forward to Your Doctor",
+                `Hi ${transferData.patientName},\n\nYour prescription transfer request for ${transferData.medicationName} has been submitted.\n\nAttached is a prescription request form. Please forward this email with the attachment to your doctor (${user.primaryDoctorName}) to authorize the transfer.\n\nAlternatively, you can download the form from your dashboard and send it to your doctor.\n\nBest regards,\nPillar Drug Club`,
+                {
+                  filename: `prescription-transfer-${transferData.patientName.replace(/\s+/g, '-')}.pdf`,
+                  content: pdfBuffer
+                }
+              )
             );
           }
 
@@ -291,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Send notifications if any were requested
           if (notifications.length > 0) {
             Promise.allSettled(notifications).then(results => {
-              const labels = [];
+              const labels: string[] = [];
               if (transferData.sendEmail) labels.push('Patient Email');
               if (transferData.sendText) labels.push('Patient SMS');
 
@@ -362,7 +374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let customerId = user.stripeCustomerId;
       if (!customerId) {
         const customer = await stripe.customers.create({
-          email: user.email,
+          email: user.email || undefined,
           name: `${user.firstName} ${user.lastName}`,
           metadata: {
             userId: userId
@@ -414,7 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get the client secret from the payment intent
       const invoice = subscription.latest_invoice as Stripe.Invoice;
-      const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+      const paymentIntent = (invoice as any).payment_intent as Stripe.PaymentIntent;
       
       if (!paymentIntent || !paymentIntent.client_secret) {
         throw new Error('Failed to create payment intent for subscription');
@@ -512,7 +524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         case 'invoice.payment_succeeded': {
           const invoice = event.data.object as Stripe.Invoice;
-          const subscriptionId = invoice.subscription as string;
+          const subscriptionId = (invoice as any).subscription as string;
           
           if (subscriptionId && invoice.customer_email) {
             // Find user by Stripe subscription ID and mark as active
@@ -532,7 +544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         case 'invoice.payment_failed': {
           const invoice = event.data.object as Stripe.Invoice;
-          const subscriptionId = invoice.subscription as string;
+          const subscriptionId = (invoice as any).subscription as string;
           
           if (subscriptionId) {
             const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -722,15 +734,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (validatedData.userId) {
         const user = await storage.getUser(validatedData.userId);
         if (user) {
-          patientEmail = user.email;
+          patientEmail = user.email || '';
           patientPhone = user.phoneNumber || '';
         }
       }
       
       const requestData = {
-        ...validatedData,
+        patientName: validatedData.patientName,
         patientEmail,
         dateOfBirth: validatedData.dateOfBirth || "",
+        medicationName: validatedData.medicationName,
+        dosage: validatedData.dosage,
+        quantity: validatedData.quantity,
+        doctorName: validatedData.doctorName,
+        doctorPhone: validatedData.doctorPhone || "",
+        doctorFax: validatedData.doctorFax || "",
+        doctorAddress: validatedData.doctorAddress || "",
+        urgency: validatedData.urgency || "routine",
+        specialInstructions: validatedData.specialInstructions || "",
         requestDate: new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long', 
@@ -962,7 +983,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (request.userId) {
         const user = await storage.getUser(request.userId);
         if (user) {
-          patientEmail = user.email;
+          patientEmail = user.email || '';
         }
       }
 
