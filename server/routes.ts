@@ -208,7 +208,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentPharmacyPhone: z.string().optional(),
         currentPharmacyAddress: z.string().optional(),
         lastFillDate: z.string().optional(),
-        refillsRemaining: z.string().optional()
+        refillsRemaining: z.string().optional(),
+        sendEmail: z.boolean().optional().default(true),
+        sendText: z.boolean().optional().default(false)
       }).parse(req.body);
 
       // Save the transfer request
@@ -258,41 +260,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
           const messageTemplate = generateMessageTemplate(requestData);
 
-          // Send notifications asynchronously (don't block response)
-          Promise.allSettled([
-            // Send email to patient with PDF to forward to doctor
-            sendEmailWithAttachment({
-              to: user.email,
-              subject: "Prescription Transfer Request - Forward to Your Doctor",
-              text: `Hi ${transferData.patientName},\n\nYour prescription transfer request for ${transferData.medicationName} has been submitted.\n\nAttached is a prescription request form. Please forward this email with the attachment to your doctor (${user.primaryDoctorName}) to authorize the transfer.\n\nAlternatively, you can download the form from your dashboard and send it to your doctor.\n\nBest regards,\nPillar Drug Club`,
-              attachmentBuffer: pdfBuffer,
-              attachmentFilename: `prescription-transfer-${transferData.patientName.replace(/\s+/g, '-')}.pdf`
-            }),
-            // Send SMS to patient if consented
-            user.smsConsent === "true" && user.phoneNumber ? 
+          // Build notification promises based on user preferences
+          const notifications: Promise<any>[] = [];
+
+          // Send email if requested
+          if (transferData.sendEmail) {
+            notifications.push(
+              sendEmailWithAttachment({
+                to: user.email,
+                subject: "Prescription Transfer Request - Forward to Your Doctor",
+                text: `Hi ${transferData.patientName},\n\nYour prescription transfer request for ${transferData.medicationName} has been submitted.\n\nAttached is a prescription request form. Please forward this email with the attachment to your doctor (${user.primaryDoctorName}) to authorize the transfer.\n\nAlternatively, you can download the form from your dashboard and send it to your doctor.\n\nBest regards,\nPillar Drug Club`,
+                attachmentBuffer: pdfBuffer,
+                attachmentFilename: `prescription-transfer-${transferData.patientName.replace(/\s+/g, '-')}.pdf`
+              })
+            );
+          }
+
+          // Send SMS if requested and user has consented
+          if (transferData.sendText && user.smsConsent === "true" && user.phoneNumber) {
+            notifications.push(
               sendSMS(
                 user.phoneNumber,
-                `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted. Check your email for the form to forward to your doctor.`
-              ) : 
-              Promise.resolve()
-          ]).then(results => {
-            results.forEach((result, index) => {
-              const labels = ['Patient Email', 'Patient SMS'];
-              if (result.status === 'fulfilled') {
-                console.log(`✅ ${labels[index]} notification sent`);
-              } else if (result.status === 'rejected') {
-                console.error(`❌ ${labels[index]} notification failed:`, result.reason);
-              }
-            });
-          }).catch(err => {
-            console.error('Unexpected notification error:', err);
-          });
+                `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted. ${transferData.sendEmail ? 'Check your email for the form to forward to your doctor.' : 'You can download the form from your dashboard.'}`
+              )
+            );
+          }
 
-          console.log('📧 Transfer notifications queued');
+          // Send notifications if any were requested
+          if (notifications.length > 0) {
+            Promise.allSettled(notifications).then(results => {
+              const labels = [];
+              if (transferData.sendEmail) labels.push('Patient Email');
+              if (transferData.sendText) labels.push('Patient SMS');
+
+              results.forEach((result, index) => {
+                if (result.status === 'fulfilled') {
+                  console.log(`✅ ${labels[index]} notification sent`);
+                } else if (result.status === 'rejected') {
+                  console.error(`❌ ${labels[index]} notification failed:`, result.reason);
+                }
+              });
+            }).catch(err => {
+              console.error('Unexpected notification error:', err);
+            });
+
+            console.log('📧 Transfer notifications queued');
+          }
         }
 
-        // Send SMS to patient even if no doctor (if consented)
-        else if (user.smsConsent === "true" && user.phoneNumber) {
+        // If no doctor but text was requested and user consented
+        else if (transferData.sendText && user.smsConsent === "true" && user.phoneNumber) {
           sendSMS(
             user.phoneNumber,
             `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted and is being processed.`

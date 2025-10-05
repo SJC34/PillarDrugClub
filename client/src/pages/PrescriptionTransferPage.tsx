@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -67,7 +68,9 @@ const pharmacyTransferSchema = z.object({
   currentPharmacyAddress: z.string().min(5, "Current pharmacy address is required"),
   lastFillDate: z.string().min(1, "Last fill date is required"),
   refillsRemaining: z.string().min(1, "Refills remaining is required"),
-  transferReason: z.string().optional()
+  transferReason: z.string().optional(),
+  sendEmail: z.boolean().default(true),
+  sendText: z.boolean().default(false)
 });
 
 type DoctorFaxForm = z.infer<typeof doctorFaxSchema>;
@@ -112,7 +115,11 @@ export default function PrescriptionTransferPage() {
   };
 
   const pharmacyForm = useForm<PharmacyTransferForm>({
-    resolver: zodResolver(pharmacyTransferSchema)
+    resolver: zodResolver(pharmacyTransferSchema),
+    defaultValues: {
+      sendEmail: true,
+      sendText: false
+    }
   });
 
   // Handle pharmacy selection from search
@@ -260,25 +267,25 @@ export default function PrescriptionTransferPage() {
         throw new Error("User not authenticated");
       }
       
-      const prescriptionData = {
-        customerId: user.id,
+      const transferData = {
+        userId: user.id,
+        patientName: data.patientName,
+        dateOfBirth: data.dateOfBirth,
         medicationName: data.medicationName,
         dosage: data.dosage,
-        quantity: parseInt(data.quantity) || 1,
+        quantity: data.quantity,
         prescriptionNumber: data.prescriptionNumber,
-        transferFromPharmacy: data.currentPharmacyName,
-        transferFromPharmacyPhone: data.currentPharmacyPhone,
-        transferFromPharmacyAddress: data.currentPharmacyAddress,
-        patientName: data.patientName,
-        patientDateOfBirth: data.dateOfBirth,
+        currentPharmacyName: data.currentPharmacyName,
+        currentPharmacyPhone: data.currentPharmacyPhone,
+        currentPharmacyAddress: data.currentPharmacyAddress,
         lastFillDate: data.lastFillDate,
-        refillsRemaining: parseInt(data.refillsRemaining) || 0,
+        refillsRemaining: data.refillsRemaining,
         transferReason: data.transferReason,
-        isTransfer: true,
-        status: "pending"
+        sendEmail: data.sendEmail,
+        sendText: data.sendText
       };
 
-      const response = await apiRequest("POST", "/api/prescriptions", prescriptionData);
+      const response = await apiRequest("POST", "/api/prescriptions/transfer", transferData);
       const result = await response.json();
       
       toast({
@@ -830,6 +837,39 @@ export default function PrescriptionTransferPage() {
                       data-testid="textarea-transfer-reason"
                       className="min-h-[80px] md:min-h-[100px] text-sm md:text-base"
                     />
+                  </div>
+
+                  <Separator />
+
+                  {/* Notification Preferences */}
+                  <div>
+                    <Label className="text-sm md:text-base mb-3 block">How would you like to receive the prescription form?</Label>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="sendEmail"
+                          checked={pharmacyForm.watch("sendEmail")}
+                          onCheckedChange={(checked) => pharmacyForm.setValue("sendEmail", !!checked)}
+                          data-testid="checkbox-send-email"
+                        />
+                        <Label htmlFor="sendEmail" className="text-sm md:text-base font-normal cursor-pointer">
+                          <Mail className="h-4 w-4 inline mr-2" />
+                          Email me the form
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="sendText"
+                          checked={pharmacyForm.watch("sendText")}
+                          onCheckedChange={(checked) => pharmacyForm.setValue("sendText", !!checked)}
+                          data-testid="checkbox-send-text"
+                        />
+                        <Label htmlFor="sendText" className="text-sm md:text-base font-normal cursor-pointer">
+                          <Phone className="h-4 w-4 inline mr-2" />
+                          Text me a notification
+                        </Label>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
