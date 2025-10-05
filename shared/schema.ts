@@ -22,6 +22,7 @@ export const users = pgTable("users", {
   password: text("password"), // Optional - only for email/password auth
   firstName: text("first_name"),
   lastName: text("last_name"),
+  dateOfBirth: text("date_of_birth"),
   profileImageUrl: text("profile_image_url"), // From Replit OAuth
   phoneNumber: text("phone_number"),
   smsConsent: text("sms_consent").default("false"),
@@ -46,6 +47,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   firstName: true,
   lastName: true,
+  dateOfBirth: true,
   phoneNumber: true,
   smsConsent: true,
 });
