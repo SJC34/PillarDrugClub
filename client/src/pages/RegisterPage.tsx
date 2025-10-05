@@ -33,6 +33,7 @@ const step2DetailsSchema = z.object({
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
   password: z.string().min(8, "Password must be at least 8 characters").optional(),
   confirmPassword: z.string().optional(),
+  drugAllergies: z.string().optional(),
   smsConsent: z.boolean()
 });
 
@@ -260,7 +261,8 @@ export default function RegisterPage() {
           phoneNumber: data.phoneNumber,
           smsConsent: data.smsConsent ? "true" : "false",
           firstName: data.firstName,
-          lastName: data.lastName
+          lastName: data.lastName,
+          drugAllergies: data.drugAllergies ? data.drugAllergies.split(',').map(a => a.trim()).filter(Boolean) : []
         });
 
         if (!response.ok) {
@@ -286,6 +288,7 @@ export default function RegisterPage() {
             phoneNumber: data.phoneNumber,
             password: data.password,
             smsConsent: data.smsConsent ? "true" : "false",
+            drugAllergies: data.drugAllergies ? data.drugAllergies.split(',').map(a => a.trim()).filter(Boolean) : []
           }),
         });
 
@@ -687,6 +690,20 @@ export default function RegisterPage() {
                     </div>
                   </>
                 )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="drugAllergies" className="text-sm md:text-base">Drug Allergies (Optional)</Label>
+                  <Textarea
+                    id="drugAllergies"
+                    placeholder="Enter any drug allergies, separated by commas (e.g., Penicillin, Sulfa drugs)"
+                    {...step2Form.register("drugAllergies")}
+                    data-testid="input-drug-allergies"
+                    className="min-h-[80px] resize-none"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    List any medications you are allergic to. This helps us ensure your safety.
+                  </p>
+                </div>
 
                 <div className="flex items-start space-x-3">
                   <Checkbox
