@@ -57,7 +57,9 @@ const doctorFaxSchema = z.object({
   doctorFax: z.string().min(10, "Doctor fax is required"),
   doctorAddress: z.string().min(5, "Doctor address is required"),
   urgency: z.enum(["routine", "urgent", "emergency"]),
-  specialInstructions: z.string().optional()
+  specialInstructions: z.string().optional(),
+  sendEmail: z.boolean().default(true),
+  sendText: z.boolean().default(false)
 });
 
 const pharmacyTransferSchema = z.object({
@@ -97,7 +99,9 @@ export default function PrescriptionTransferPage() {
   const doctorForm = useForm<DoctorFaxForm>({
     resolver: zodResolver(doctorFaxSchema),
     defaultValues: {
-      urgency: "routine"
+      urgency: "routine",
+      sendEmail: true,
+      sendText: false
     }
   });
 
@@ -678,6 +682,39 @@ export default function PrescriptionTransferPage() {
                       data-testid="textarea-special-instructions"
                       className="min-h-[80px] md:min-h-[100px] text-sm md:text-base"
                     />
+                  </div>
+
+                  <Separator />
+
+                  {/* Notification Preferences */}
+                  <div>
+                    <Label className="text-sm md:text-base mb-3 block">How would you like to receive the prescription form?</Label>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="doctorSendEmail"
+                          checked={doctorForm.watch("sendEmail")}
+                          onCheckedChange={(checked) => doctorForm.setValue("sendEmail", !!checked)}
+                          data-testid="checkbox-doctor-send-email"
+                        />
+                        <Label htmlFor="doctorSendEmail" className="text-sm md:text-base font-normal cursor-pointer">
+                          <Mail className="h-4 w-4 inline mr-2" />
+                          Email me the form
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="doctorSendText"
+                          checked={doctorForm.watch("sendText")}
+                          onCheckedChange={(checked) => doctorForm.setValue("sendText", !!checked)}
+                          data-testid="checkbox-doctor-send-text"
+                        />
+                        <Label htmlFor="doctorSendText" className="text-sm md:text-base font-normal cursor-pointer">
+                          <Phone className="h-4 w-4 inline mr-2" />
+                          Text me a notification
+                        </Label>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
