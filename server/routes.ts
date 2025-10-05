@@ -364,32 +364,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const customer = await stripe.customers.create({
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
+          metadata: {
+            userId: userId
+          }
         });
         customerId = customer.id;
+        // Save customer ID immediately
+        await storage.updateUserStripeInfo(userId, customerId, null);
       }
       
-      // Create a payment intent for the subscription (simplified approach)
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: 1000, // $10.00 in cents
-        currency: "usd",
+      // Create or retrieve the product and price
+      // In production, you'd create these once via Stripe Dashboard or a setup script
+      // For now, we'll use a hardcoded price ID or create it dynamically
+      let priceId = process.env.STRIPE_PRICE_ID;
+      
+      if (!priceId) {
+        // Create product and price if not configured
+        const product = await stripe.products.create({
+          name: 'Pillar Drug Club Membership',
+          description: 'Monthly membership for wholesale prescription pricing',
+        });
+        
+        const price = await stripe.prices.create({
+          product: product.id,
+          unit_amount: 1000, // $10.00 in cents
+          currency: 'usd',
+          recurring: {
+            interval: 'month',
+          },
+        });
+        
+        priceId = price.id;
+        console.log(`✅ Created Stripe product and price: ${priceId}`);
+      }
+      
+      // Create the subscription
+      const subscription = await stripe.subscriptions.create({
         customer: customerId,
-        automatic_payment_methods: {
-          enabled: true,
+        items: [{ price: priceId }],
+        payment_behavior: 'default_incomplete',
+        payment_settings: {
+          save_default_payment_method: 'on_subscription',
         },
+        expand: ['latest_invoice.payment_intent'],
         metadata: {
-          type: "subscription",
-          amount: "10.00",
-          interval: "month",
           userId: userId
         }
       });
       
-      // Update user with Stripe info (using payment intent ID as subscription ID for now)
-      await storage.updateUserStripeInfo(userId, customerId, paymentIntent.id);
+      // Get the client secret from the payment intent
+      const invoice = subscription.latest_invoice as Stripe.Invoice;
+      const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+      
+      if (!paymentIntent || !paymentIntent.client_secret) {
+        throw new Error('Failed to create payment intent for subscription');
+      }
+      
+      // Update user with subscription info
+      await storage.updateUserStripeInfo(userId, customerId, subscription.id);
+      
+      console.log(`✅ Created subscription ${subscription.id} for user ${userId}`);
       
       res.json({ 
         clientSecret: paymentIntent.client_secret,
-        subscriptionId: paymentIntent.id
+        subscriptionId: subscription.id
       });
     } catch (error: any) {
       console.error("Stripe subscription error:", error);
@@ -397,6 +435,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Error creating subscription", 
         message: error.message 
       });
+    }
+  });
+
+  // Stripe webhook endpoint for subscription events
+  app.post("/api/webhooks/stripe", async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ error: "Stripe not configured" });
+    }
+
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!sig) {
+      return res.status(400).json({ error: "Missing stripe-signature header" });
+    }
+
+    let event: Stripe.Event;
+
+    try {
+      // Verify webhook signature if secret is configured
+      if (webhookSecret) {
+        event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      } else {
+        // In development, accept events without verification
+        event = req.body as Stripe.Event;
+        console.warn('⚠️ Webhook signature verification skipped - configure STRIPE_WEBHOOK_SECRET for production');
+      }
+    } catch (err: any) {
+      console.error('Webhook signature verification failed:', err.message);
+      return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+    }
+
+    // Handle the event
+    try {
+      switch (event.type) {
+        case 'customer.subscription.created':
+        case 'customer.subscription.updated': {
+          const subscription = event.data.object as Stripe.Subscription;
+          const userId = subscription.metadata.userId;
+          
+          if (userId) {
+            let status: "active" | "canceled" | "past_due" | "incomplete";
+            
+            switch (subscription.status) {
+              case 'active':
+                status = 'active';
+                break;
+              case 'past_due':
+                status = 'past_due';
+                break;
+              case 'canceled':
+              case 'unpaid':
+                status = 'canceled';
+                break;
+              default:
+                status = 'incomplete';
+            }
+            
+            await storage.updateSubscriptionStatus(userId, status);
+            console.log(`✅ Updated subscription status for user ${userId}: ${status}`);
+          }
+          break;
+        }
+        
+        case 'customer.subscription.deleted': {
+          const subscription = event.data.object as Stripe.Subscription;
+          const userId = subscription.metadata.userId;
+          
+          if (userId) {
+            await storage.updateSubscriptionStatus(userId, 'canceled');
+            console.log(`✅ Subscription canceled for user ${userId}`);
+          }
+          break;
+        }
+        
+        case 'invoice.payment_succeeded': {
+          const invoice = event.data.object as Stripe.Invoice;
+          const subscriptionId = invoice.subscription as string;
+          
+          if (subscriptionId && invoice.customer_email) {
+            // Find user by Stripe subscription ID and mark as active
+            console.log(`✅ Payment succeeded for subscription ${subscriptionId}`);
+            
+            // Get subscription to access userId from metadata
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+            const userId = subscription.metadata.userId;
+            
+            if (userId) {
+              await storage.updateSubscriptionStatus(userId, 'active');
+              console.log(`✅ Activated subscription for user ${userId}`);
+            }
+          }
+          break;
+        }
+        
+        case 'invoice.payment_failed': {
+          const invoice = event.data.object as Stripe.Invoice;
+          const subscriptionId = invoice.subscription as string;
+          
+          if (subscriptionId) {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+            const userId = subscription.metadata.userId;
+            
+            if (userId) {
+              await storage.updateSubscriptionStatus(userId, 'past_due');
+              console.log(`⚠️ Payment failed for user ${userId}, marked as past_due`);
+            }
+          }
+          break;
+        }
+        
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
+      }
+      
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('Error processing webhook:', error);
+      res.status(500).json({ error: 'Webhook processing failed' });
     }
   });
 
@@ -410,8 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ 
         subscriptionStatus: user.subscriptionStatus,
-        // Allow access for demo purposes even with incomplete status
-        hasAccess: user.subscriptionStatus === "active" || user.subscriptionStatus === "incomplete"
+        hasAccess: user.subscriptionStatus === "active"
       });
     } catch (error: any) {
       console.error("Subscription status error:", error);

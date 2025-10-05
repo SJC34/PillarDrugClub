@@ -21,7 +21,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>; // For Replit OAuth
-  updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined>;
+  updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string | null): Promise<User | undefined>;
   updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
   updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined>;
 
@@ -355,7 +355,7 @@ export class MemStorage implements IStorage {
     }
   }
 
-  async updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> {
+  async updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string | null): Promise<User | undefined> {
     const user = this.users.get(id);
     if (!user) return undefined;
     
@@ -363,7 +363,8 @@ export class MemStorage implements IStorage {
       ...user,
       stripeCustomerId,
       stripeSubscriptionId,
-      subscriptionStatus: "active" as const,
+      // Only set status to active if we have a subscription ID
+      subscriptionStatus: stripeSubscriptionId ? "incomplete" as const : user.subscriptionStatus,
       updatedAt: new Date().toISOString()
     };
     this.users.set(id, updatedUser);
