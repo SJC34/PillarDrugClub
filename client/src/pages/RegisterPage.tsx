@@ -21,6 +21,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { PharmacySearch } from "@/components/PharmacySearch";
 import { MedicationSearch } from "@/components/MedicationSearch";
+import { handleDateInputChange } from "@/lib/dateFormatter";
 
 // Schemas for different steps
 const step1SocialSchema = z.object({
@@ -30,6 +31,7 @@ const step1SocialSchema = z.object({
 const step2DetailsSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
   email: z.string().email("Please enter a valid email address").optional(),
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
   password: z.string().min(8, "Password must be at least 8 characters").optional(),
@@ -271,6 +273,7 @@ export default function RegisterPage() {
         // Update user with additional details
         const response = await apiRequest("PATCH", `/api/users/${registeredUser.id}`, {
           phoneNumber: data.phoneNumber,
+          dateOfBirth: data.dateOfBirth,
           smsConsent: data.smsConsent ? "true" : "false",
           firstName: data.firstName,
           lastName: data.lastName,
@@ -296,6 +299,7 @@ export default function RegisterPage() {
           body: JSON.stringify({
             firstName: data.firstName,
             lastName: data.lastName,
+            dateOfBirth: data.dateOfBirth,
             email: data.email,
             phoneNumber: data.phoneNumber,
             password: data.password,
@@ -348,7 +352,7 @@ export default function RegisterPage() {
             },
             body: JSON.stringify({
               patientName: `${registeredUser.firstName} ${registeredUser.lastName}`,
-              dateOfBirth: "", // Will be collected later if needed
+              dateOfBirth: registeredUser.dateOfBirth || "",
               medicationName: data.medicationName,
               dosage: data.dosage,
               quantity: data.quantity,
@@ -379,7 +383,7 @@ export default function RegisterPage() {
           // Submit transfer request
           const response = await apiRequest("POST", "/api/prescriptions/transfer", {
             patientName: `${registeredUser.firstName} ${registeredUser.lastName}`,
-            dateOfBirth: "", // Will be collected later if needed
+            dateOfBirth: registeredUser.dateOfBirth || "",
             medicationName: data.medicationName,
             dosage: data.dosage || "",
             quantity: data.quantity || "",
@@ -398,31 +402,17 @@ export default function RegisterPage() {
         }
       }
 
-      // Move to payment step
-      try {
-        const subscriptionResponse = await apiRequest("POST", "/api/create-subscription", { 
-          userId: registeredUser.id 
-        });
-        const subscriptionData = await subscriptionResponse.json();
+      // Move to payment step - this is REQUIRED to complete registration
+      const subscriptionResponse = await apiRequest("POST", "/api/create-subscription", { 
+        userId: registeredUser.id 
+      });
+      const subscriptionData = await subscriptionResponse.json();
 
-        if (subscriptionData.clientSecret) {
-          setClientSecret(subscriptionData.clientSecret);
-          setCurrentStep(4);
-        } else {
-          throw new Error("Failed to initialize payment");
-        }
-      } catch (subscriptionError: any) {
-        console.error("Subscription creation failed:", subscriptionError);
-        
-        toast({
-          title: "Payment Setup Unavailable",
-          description: "You can complete payment later from your dashboard.",
-          variant: "default"
-        });
-        
-        setTimeout(() => {
-          setLocation("/dashboard");
-        }, 2000);
+      if (subscriptionData.clientSecret) {
+        setClientSecret(subscriptionData.clientSecret);
+        setCurrentStep(4);
+      } else {
+        throw new Error("Payment setup failed. Please try again or contact support.");
       }
     } catch (error: any) {
       toast({
@@ -634,6 +624,22 @@ export default function RegisterPage() {
                   />
                   {step2Form.formState.errors.phoneNumber && (
                     <p className="text-xs md:text-sm text-destructive">{step2Form.formState.errors.phoneNumber.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dateOfBirth" className="text-sm md:text-base">Date of Birth</Label>
+                  <Input
+                    id="dateOfBirth"
+                    placeholder="MM/DD/YYYY"
+                    maxLength={10}
+                    {...step2Form.register("dateOfBirth")}
+                    onChange={(e) => handleDateInputChange(e, (value) => step2Form.setValue("dateOfBirth", value))}
+                    data-testid="input-date-of-birth"
+                    className="h-10 md:h-11"
+                  />
+                  {step2Form.formState.errors.dateOfBirth && (
+                    <p className="text-xs md:text-sm text-destructive">{step2Form.formState.errors.dateOfBirth.message}</p>
                   )}
                 </div>
 
