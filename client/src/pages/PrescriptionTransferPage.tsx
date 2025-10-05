@@ -46,6 +46,7 @@ import { handleDateInputChange } from "@/lib/dateFormatter";
 const doctorFaxSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
+  drugAllergies: z.string().optional(),
   medicationName: z.string().min(2, "Medication name is required"),
   dosage: z.string().min(1, "Dosage is required"),
   quantity: z.string().min(1, "Quantity is required"),
@@ -60,6 +61,7 @@ const doctorFaxSchema = z.object({
 const pharmacyTransferSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
+  drugAllergies: z.string().optional(),
   medicationName: z.string().min(2, "Medication name is required"),
   dosage: z.string().min(1, "Dosage is required"),
   quantity: z.string().min(1, "Quantity is required"),
@@ -424,6 +426,19 @@ export default function PrescriptionTransferPage() {
                         )}
                       </div>
                     </div>
+                    <div className="mt-4">
+                      <Label htmlFor="drugAllergies" className="text-sm md:text-base">Drug Allergies (Optional)</Label>
+                      <Textarea
+                        id="drugAllergies"
+                        placeholder="Enter any drug allergies, separated by commas (e.g., Penicillin, Sulfa drugs)"
+                        {...doctorForm.register("drugAllergies")}
+                        data-testid="input-drug-allergies"
+                        className="min-h-[60px] resize-none text-sm md:text-base"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        List any medications you are allergic to for safety.
+                      </p>
+                    </div>
                   </div>
 
                   <Separator />
@@ -682,6 +697,19 @@ export default function PrescriptionTransferPage() {
                           <p className="text-xs md:text-sm text-destructive mt-1">{pharmacyForm.formState.errors.dateOfBirth.message}</p>
                         )}
                       </div>
+                    </div>
+                    <div className="mt-4">
+                      <Label htmlFor="transferDrugAllergies" className="text-sm md:text-base">Drug Allergies (Optional)</Label>
+                      <Textarea
+                        id="transferDrugAllergies"
+                        placeholder="Enter any drug allergies, separated by commas (e.g., Penicillin, Sulfa drugs)"
+                        {...pharmacyForm.register("drugAllergies")}
+                        data-testid="input-transfer-drug-allergies"
+                        className="min-h-[60px] resize-none text-sm md:text-base"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        List any medications you are allergic to for safety.
+                      </p>
                     </div>
                   </div>
 
