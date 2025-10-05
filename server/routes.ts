@@ -164,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/users/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
-      const { phoneNumber, smsConsent, firstName, lastName } = req.body;
+      const { phoneNumber, smsConsent, firstName, lastName, dateOfBirth, drugAllergies } = req.body;
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -180,6 +180,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       if (firstName !== undefined) updates.firstName = firstName;
       if (lastName !== undefined) updates.lastName = lastName;
+      if (dateOfBirth !== undefined) updates.dateOfBirth = dateOfBirth;
+      if (drugAllergies !== undefined) updates.drugAllergies = drugAllergies;
       updates.updatedAt = new Date();
 
       const updatedUser = await storage.updateUser(userId, updates);
