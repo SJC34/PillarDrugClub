@@ -41,8 +41,7 @@ export interface IStorage {
   // Prescriptions
   getPrescription(id: string): Promise<Prescription | undefined>;
   getCustomerPrescriptions(customerId: string): Promise<Prescription[]>;
-  createPrescription(prescription: InsertPrescription): Promise<Prescription>;
-  updatePrescription(id: string, prescription: Partial<InsertPrescription>): Promise<Prescription | undefined>;
+  // createPrescription and updatePrescription removed - use PrescriptionRequest instead
 
   // Orders
   getOrder(id: string): Promise<Order | undefined>;
@@ -575,31 +574,8 @@ export class MemStorage implements IStorage {
     );
   }
 
-  async createPrescription(insertPrescription: InsertPrescription): Promise<Prescription> {
-    const id = randomUUID();
-    const now = new Date().toISOString();
-    const prescription: Prescription = { 
-      ...insertPrescription, 
-      id, 
-      createdAt: now, 
-      updatedAt: now 
-    };
-    this.prescriptions.set(id, prescription);
-    return prescription;
-  }
-
-  async updatePrescription(id: string, updateData: Partial<InsertPrescription>): Promise<Prescription | undefined> {
-    const prescription = this.prescriptions.get(id);
-    if (!prescription) return undefined;
-    
-    const updated: Prescription = {
-      ...prescription,
-      ...updateData,
-      updatedAt: new Date().toISOString()
-    };
-    this.prescriptions.set(id, updated);
-    return updated;
-  }
+  // createPrescription and updatePrescription methods removed
+  // The prescription transfer flow now uses PrescriptionRequest instead
 
   // Order methods
   async getOrder(id: string): Promise<Order | undefined> {

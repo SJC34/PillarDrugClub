@@ -642,9 +642,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Prescription transfer endpoints
+  // Prescription transfer endpoints (Legacy - use /api/prescription-transfers instead)
   app.post("/api/prescriptions", async (req, res) => {
     try {
+      // This endpoint is deprecated - prescription transfer flow now uses PrescriptionRequest
+      return res.status(410).json({ error: "This endpoint is deprecated. Please use /api/prescription-transfers instead." });
+      
+      /*
       const prescriptionData = insertPrescriptionSchema.parse(req.body);
       const prescription = await storage.createPrescription(prescriptionData);
       
@@ -697,6 +701,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ? "Pharmacy transfer request submitted successfully" 
           : "Doctor fax request submitted successfully"
       });
+      */
     } catch (error: any) {
       console.error("Prescription creation error:", error);
       res.status(400).json({ 
