@@ -445,7 +445,7 @@ export default function PrescriptionTransferPage() {
                   Request New Prescription from Doctor
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
-                  We'll fax your doctor to request a new prescription for you. This typically takes 24-48 hours.
+                  Get a prescription request form to send to your doctor. You can download it or text it to your phone, then forward it to your doctor via their patient portal or email.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -690,12 +690,12 @@ export default function PrescriptionTransferPage() {
                       {submissionStatus === "submitting" ? (
                         <>
                           <Clock className="h-4 w-4 mr-2 animate-spin" />
-                          Sending Fax...
+                          Generating Form...
                         </>
                       ) : (
                         <>
-                          <Send className="h-4 w-4 mr-2" />
-                          Send Prescription Request
+                          <FileText className="h-4 w-4 mr-2" />
+                          Get Prescription Request
                         </>
                       )}
                     </Button>
