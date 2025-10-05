@@ -225,6 +225,34 @@ export class MemStorage implements IStorage {
     };
     this.users.set(adminId, adminUser);
     console.log('✅ Admin user created: seth@pillardrugclub.com');
+
+    // Create SJC Pharmacy test user
+    const sjcId = randomUUID();
+    const sjcUser: User = {
+      id: sjcId,
+      username: "sjcpharmacy@gmail.com",
+      email: "sjcpharmacy@gmail.com",
+      password: "password123",
+      firstName: "SJC",
+      lastName: "Pharmacy",
+      phoneNumber: "4238393523",
+      smsConsent: "false",
+      role: "client",
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      subscriptionStatus: "active",
+      isActive: "true",
+      profileImageUrl: null,
+      primaryDoctorId: null,
+      primaryDoctorName: null,
+      primaryDoctorNpi: null,
+      primaryDoctorPhone: null,
+      primaryDoctorAddress: null,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.users.set(sjcId, sjcUser);
+    console.log('✅ SJC Pharmacy test user created: sjcpharmacy@gmail.com');
   }
 
   async loadImportedMedications() {
