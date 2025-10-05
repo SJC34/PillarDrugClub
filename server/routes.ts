@@ -210,9 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentPharmacyPhone: z.string().optional(),
         currentPharmacyAddress: z.string().optional(),
         lastFillDate: z.string().optional(),
-        refillsRemaining: z.string().optional(),
-        sendEmail: z.boolean().optional().default(true),
-        sendText: z.boolean().optional().default(false)
+        refillsRemaining: z.string().optional()
       }).parse(req.body);
 
       // Save the transfer request as a prescription request
@@ -272,11 +270,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
           const messageTemplate = generateMessageTemplate(requestData);
 
-          // Build notification promises based on user preferences
+          // Build notification promises - always send both email and text
           const notifications: Promise<any>[] = [];
 
-          // Send email if requested
-          if (transferData.sendEmail && user.email) {
+          // Always send email if user has email
+          if (user.email) {
             notifications.push(
               sendEmailWithAttachment(
                 user.email,
@@ -290,22 +288,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             );
           }
 
-          // Send SMS if requested and user has consented
-          if (transferData.sendText && user.smsConsent === "true" && user.phoneNumber) {
+          // Always send SMS if user has consented and has phone number
+          if (user.smsConsent === "true" && user.phoneNumber) {
             notifications.push(
               sendSMS(
                 user.phoneNumber,
-                `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted. ${transferData.sendEmail ? 'Check your email for the form to forward to your doctor.' : 'You can download the form from your dashboard.'}`
+                `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted. Check your email for the form to forward to your doctor.`
               )
             );
           }
 
-          // Send notifications if any were requested
+          // Send notifications if any are queued
           if (notifications.length > 0) {
             Promise.allSettled(notifications).then(results => {
               const labels: string[] = [];
-              if (transferData.sendEmail) labels.push('Patient Email');
-              if (transferData.sendText) labels.push('Patient SMS');
+              if (user.email) labels.push('Patient Email');
+              if (user.smsConsent === "true" && user.phoneNumber) labels.push('Patient SMS');
 
               results.forEach((result, index) => {
                 if (result.status === 'fulfilled') {
@@ -322,8 +320,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
 
-        // If no doctor but text was requested and user consented
-        else if (transferData.sendText && user.smsConsent === "true" && user.phoneNumber) {
+        // If no doctor but user has consented to SMS
+        else if (user.smsConsent === "true" && user.phoneNumber) {
           sendSMS(
             user.phoneNumber,
             `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted and is being processed.`

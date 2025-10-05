@@ -341,9 +341,7 @@ export default function PrescriptionTransferPage() {
         currentPharmacyAddress: data.currentPharmacyAddress,
         lastFillDate: data.lastFillDate,
         refillsRemaining: data.refillsRemaining,
-        transferReason: data.transferReason,
-        sendEmail: data.sendEmail,
-        sendText: data.sendText
+        transferReason: data.transferReason
       };
 
       const response = await apiRequest("POST", "/api/prescriptions/transfer", transferData);
