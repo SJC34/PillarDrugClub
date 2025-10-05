@@ -949,6 +949,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="prescription-request-${requestData.patientName.replace(/\s+/g, '-')}.pdf"`);
       res.setHeader('X-Message-Template', Buffer.from(messageTemplate).toString('base64'));
+      res.setHeader('X-Prescription-Request-Id', prescriptionRequest.id);
       res.send(pdfBuffer);
     } catch (error: any) {
       console.error("PDF generation error:", error);

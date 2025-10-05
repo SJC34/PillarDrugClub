@@ -31,7 +31,8 @@ import {
   CheckCircle,
   Clock,
   Download,
-  Copy
+  Copy,
+  MessageSquare
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,6 +43,7 @@ import { DoctorSearch } from "@/components/DoctorSearch";
 import { PharmacySearch } from "@/components/PharmacySearch";
 import { useAuth } from "@/hooks/useAuth";
 import { handleDateInputChange } from "@/lib/dateFormatter";
+import { useMutation } from "@tanstack/react-query";
 
 const doctorFaxSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
@@ -90,12 +92,33 @@ export default function PrescriptionTransferPage() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [messageTemplate, setMessageTemplate] = useState("");
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [prescriptionRequestId, setPrescriptionRequestId] = useState<string>("");
 
   const doctorForm = useForm<DoctorFaxForm>({
     resolver: zodResolver(doctorFaxSchema),
     defaultValues: {
       urgency: "routine"
     }
+  });
+
+  // Text PDF to phone mutation
+  const textPdfMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      return apiRequest('POST', `/api/prescription-requests/${requestId}/text`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "SMS Sent",
+        description: "Prescription request PDF link sent to your phone",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Send SMS",
+        description: error.message || "Could not send SMS to your phone",
+        variant: "destructive",
+      });
+    },
   });
 
   // Handle doctor selection from search
@@ -222,6 +245,12 @@ export default function PrescriptionTransferPage() {
         setMessageTemplate(decodedMessage);
       }
 
+      // Get prescription request ID from header
+      const requestId = response.headers.get('X-Prescription-Request-Id');
+      if (requestId) {
+        setPrescriptionRequestId(requestId);
+      }
+
       // Get PDF blob
       const blob = await response.blob();
       setPdfBlob(blob);
@@ -271,6 +300,7 @@ export default function PrescriptionTransferPage() {
     doctorForm.reset();
     setMessageTemplate("");
     setPdfBlob(null);
+    setPrescriptionRequestId("");
     setSubmissionStatus("idle");
   };
 
@@ -1040,25 +1070,37 @@ export default function PrescriptionTransferPage() {
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Step 1: Download PDF */}
+            {/* Step 1: Download or Text PDF */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
                   1
                 </div>
-                <h4 className="font-semibold">Download Your Prescription Request</h4>
+                <h4 className="font-semibold">Get Your Prescription Request</h4>
               </div>
               <p className="text-sm text-muted-foreground ml-8">
-                Click below to download the PDF with all your prescription details
+                Download the PDF or text it to your phone
               </p>
-              <Button 
-                onClick={handleDownloadPDF} 
-                className="ml-8 w-full sm:w-auto"
-                data-testid="button-download-pdf"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download PDF
-              </Button>
+              <div className="ml-8 flex flex-col sm:flex-row gap-2">
+                <Button 
+                  onClick={handleDownloadPDF} 
+                  className="flex-1 sm:flex-none sm:w-auto"
+                  data-testid="button-download-pdf"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
+                <Button 
+                  onClick={() => prescriptionRequestId && textPdfMutation.mutate(prescriptionRequestId)}
+                  disabled={!prescriptionRequestId || textPdfMutation.isPending}
+                  variant="outline"
+                  className="flex-1 sm:flex-none sm:w-auto"
+                  data-testid="button-text-pdf"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  {textPdfMutation.isPending ? "Sending..." : "Text to Phone"}
+                </Button>
+              </div>
             </div>
 
             <Separator />
