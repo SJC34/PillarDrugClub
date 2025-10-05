@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -124,6 +124,36 @@ export default function PrescriptionTransferPage() {
       sendText: false
     }
   });
+
+  // Prepopulate forms with user data when authenticated
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      const allergies = user.drugAllergies?.join(', ') || '';
+      
+      // Prepopulate doctor fax form
+      if (fullName) {
+        doctorForm.setValue("patientName", fullName);
+      }
+      if (user.dateOfBirth) {
+        doctorForm.setValue("dateOfBirth", user.dateOfBirth);
+      }
+      if (allergies) {
+        doctorForm.setValue("drugAllergies", allergies);
+      }
+      
+      // Prepopulate pharmacy transfer form
+      if (fullName) {
+        pharmacyForm.setValue("patientName", fullName);
+      }
+      if (user.dateOfBirth) {
+        pharmacyForm.setValue("dateOfBirth", user.dateOfBirth);
+      }
+      if (allergies) {
+        pharmacyForm.setValue("drugAllergies", allergies);
+      }
+    }
+  }, [user, isAuthenticated]);
 
   // Handle pharmacy selection from search
   const handlePharmacySelect = (pharmacy: any) => {
