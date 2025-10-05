@@ -242,7 +242,7 @@ export class MemStorage implements IStorage {
       password: "password123",
       firstName: "SJC",
       lastName: "Pharmacy",
-      dateOfBirth: null,
+      dateOfBirth: "04/21/1992",
       phoneNumber: "4238393523",
       smsConsent: "false",
       role: "client",
