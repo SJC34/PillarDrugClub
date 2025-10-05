@@ -20,6 +20,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { PharmacySearch } from "@/components/PharmacySearch";
+import { MedicationSearch } from "@/components/MedicationSearch";
 
 // Schemas for different steps
 const step1SocialSchema = z.object({
@@ -157,6 +158,7 @@ export default function RegisterPage() {
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [selectedPharmacy, setSelectedPharmacy] = useState<any>(null);
+  const [selectedMedication, setSelectedMedication] = useState<any>(null);
   const { toast } = useToast();
 
   // Forms for each step
@@ -248,6 +250,15 @@ export default function RegisterPage() {
       step3Form.setValue("currentPharmacyName", pharmacy.name);
       step3Form.setValue("currentPharmacyPhone", pharmacy.phone || "");
       step3Form.setValue("currentPharmacyAddress", fullAddress);
+    }
+  };
+
+  // Handle medication selection
+  const handleMedicationSelect = (medication: any) => {
+    setSelectedMedication(medication);
+    if (medication) {
+      step3Form.setValue("medicationName", medication.name);
+      step3Form.setValue("dosage", medication.strength || "");
     }
   };
 
@@ -816,6 +827,14 @@ export default function RegisterPage() {
                     </h3>
 
                     <div className="space-y-4">
+                      <div>
+                        <Label className="mb-2 block">Search for Medication</Label>
+                        <MedicationSearch 
+                          onSelect={handleMedicationSelect} 
+                          selectedMedication={selectedMedication}
+                        />
+                      </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="medicationName">Medication Name *</Label>
@@ -937,6 +956,14 @@ export default function RegisterPage() {
                     </h3>
 
                     <div className="space-y-4">
+                      <div>
+                        <Label className="mb-2 block">Search for Medication</Label>
+                        <MedicationSearch 
+                          onSelect={handleMedicationSelect} 
+                          selectedMedication={selectedMedication}
+                        />
+                      </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="transferMedicationName">Medication Name *</Label>
