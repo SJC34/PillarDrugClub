@@ -35,6 +35,7 @@ export const users = pgTable("users", {
   primaryDoctorNpi: text("primary_doctor_npi"),
   primaryDoctorPhone: text("primary_doctor_phone"),
   primaryDoctorAddress: jsonb("primary_doctor_address"),
+  drugAllergies: text("drug_allergies").array(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
