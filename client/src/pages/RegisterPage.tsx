@@ -45,6 +45,7 @@ const step3RxPreferenceSchema = z.object({
   dosage: z.string().optional(),
   quantity: z.string().optional(),
   doctorName: z.string().optional(),
+  doctorEmail: z.string().optional(),
   doctorPhone: z.string().optional(),
   doctorFax: z.string().optional(),
   doctorAddress: z.string().optional(),
