@@ -4,6 +4,11 @@ import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
 
 const app = express();
+
+// Stripe webhook needs raw body for signature verification
+app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }));
+
+// Apply JSON parsing to all other routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
