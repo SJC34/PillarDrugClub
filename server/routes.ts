@@ -225,6 +225,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       console.log(`📞 Prescription transfer request saved for ${transferData.patientName}`);
+
+      // Get user information for notifications
+      const user = await storage.getUser(transferData.userId);
+      
+      if (user) {
+        // Check if user has a primary doctor
+        if (user.primaryDoctorName && user.primaryDoctorPhone) {
+          // Generate PDF for doctor
+          const requestData = {
+            patientName: transferData.patientName,
+            patientEmail: user.email,
+            dateOfBirth: transferData.dateOfBirth || "",
+            medicationName: transferData.medicationName,
+            dosage: transferData.dosage || "",
+            quantity: transferData.quantity || "30",
+            doctorName: user.primaryDoctorName,
+            doctorPhone: user.primaryDoctorPhone,
+            doctorFax: "",
+            doctorAddress: user.primaryDoctorAddress ? 
+              `${user.primaryDoctorAddress.street || ""}, ${user.primaryDoctorAddress.city || ""}, ${user.primaryDoctorAddress.state || ""} ${user.primaryDoctorAddress.zipCode || ""}`.trim() : 
+              "",
+            urgency: "routine",
+            specialInstructions: `Transfer from ${transferData.currentPharmacyName}. Prescription #: ${transferData.prescriptionNumber}`,
+            requestDate: new Date().toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })
+          };
+
+          const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
+          const messageTemplate = generateMessageTemplate(requestData);
+
+          // Send notifications asynchronously (don't block response)
+          Promise.allSettled([
+            // Send email to patient with PDF to forward to doctor
+            sendEmailWithAttachment({
+              to: user.email,
+              subject: "Prescription Transfer Request - Forward to Your Doctor",
+              text: `Hi ${transferData.patientName},\n\nYour prescription transfer request for ${transferData.medicationName} has been submitted.\n\nAttached is a prescription request form. Please forward this email with the attachment to your doctor (${user.primaryDoctorName}) to authorize the transfer.\n\nAlternatively, you can download the form from your dashboard and send it to your doctor.\n\nBest regards,\nPillar Drug Club`,
+              attachmentBuffer: pdfBuffer,
+              attachmentFilename: `prescription-transfer-${transferData.patientName.replace(/\s+/g, '-')}.pdf`
+            }),
+            // Send SMS to patient if consented
+            user.smsConsent === "true" && user.phoneNumber ? 
+              sendSMS(
+                user.phoneNumber,
+                `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted. Check your email for the form to forward to your doctor.`
+              ) : 
+              Promise.resolve()
+          ]).then(results => {
+            results.forEach((result, index) => {
+              const labels = ['Patient Email', 'Patient SMS'];
+              if (result.status === 'fulfilled') {
+                console.log(`✅ ${labels[index]} notification sent`);
+              } else if (result.status === 'rejected') {
+                console.error(`❌ ${labels[index]} notification failed:`, result.reason);
+              }
+            });
+          }).catch(err => {
+            console.error('Unexpected notification error:', err);
+          });
+
+          console.log('📧 Transfer notifications queued');
+        }
+
+        // Send SMS to patient even if no doctor (if consented)
+        else if (user.smsConsent === "true" && user.phoneNumber) {
+          sendSMS(
+            user.phoneNumber,
+            `Pillar Drug Club: Your prescription transfer for ${transferData.medicationName} has been submitted and is being processed.`
+          ).then(() => {
+            console.log('✅ Patient SMS notification sent');
+          }).catch(err => {
+            console.error('❌ Patient SMS notification failed:', err);
+          });
+        }
+      }
       
       res.status(201).json({ 
         prescription,
