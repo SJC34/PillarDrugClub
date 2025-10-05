@@ -41,6 +41,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { PharmacySearch } from "@/components/PharmacySearch";
 import { useAuth } from "@/hooks/useAuth";
+import { handleDateInputChange } from "@/lib/dateFormatter";
 
 const doctorFaxSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
@@ -411,8 +412,10 @@ export default function PrescriptionTransferPage() {
                         <Label htmlFor="dateOfBirth" className="text-sm md:text-base">Date of Birth</Label>
                         <Input
                           id="dateOfBirth"
-                          type="date"
+                          placeholder="MM/DD/YYYY"
+                          maxLength={10}
                           {...doctorForm.register("dateOfBirth")}
+                          onChange={(e) => handleDateInputChange(e, (value) => doctorForm.setValue("dateOfBirth", value))}
                           data-testid="input-date-of-birth"
                           className="h-10 md:h-11 text-sm md:text-base"
                         />
@@ -668,8 +671,10 @@ export default function PrescriptionTransferPage() {
                         <Label htmlFor="transferDateOfBirth" className="text-sm md:text-base">Date of Birth</Label>
                         <Input
                           id="transferDateOfBirth"
-                          type="date"
+                          placeholder="MM/DD/YYYY"
+                          maxLength={10}
                           {...pharmacyForm.register("dateOfBirth")}
+                          onChange={(e) => handleDateInputChange(e, (value) => pharmacyForm.setValue("dateOfBirth", value))}
                           data-testid="input-transfer-date-of-birth"
                           className="h-10 md:h-11 text-sm md:text-base"
                         />
