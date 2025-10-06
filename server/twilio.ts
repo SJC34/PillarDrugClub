@@ -37,8 +37,10 @@ async function getCredentials() {
 
 export async function getTwilioClient() {
   const { accountSid, apiKey, apiKeySecret } = await getCredentials();
-  return twilio(apiKey, apiKeySecret, {
-  accountSid: accountSid
+  // Use Auth Token if apiKey is actually an auth token (starts with account SID gets used as username)
+  // Twilio accepts either (AccountSID, AuthToken) or (APIKey, APIKeySecret)
+  return twilio(accountSid, apiKey, {
+    accountSid: accountSid
   });
 }
 
