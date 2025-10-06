@@ -21,13 +21,22 @@ import { sendEmail, sendEmailWithAttachment } from "./resend";
 
 // Initialize Stripe with graceful fallback
 let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-08-27.basil",
-  });
-  console.log('✅ Stripe initialized successfully');
+if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_')) {
+  try {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-08-27.basil",
+    });
+    console.log('✅ Stripe initialized successfully');
+  } catch (error) {
+    console.error('❌ Stripe initialization failed:', error);
+    console.warn('⚠️ Stripe not configured - payment features will be limited');
+  }
 } else {
-  console.warn('⚠️ Stripe not configured - payment features will be limited');
+  if (process.env.STRIPE_SECRET_KEY) {
+    console.warn('⚠️ Invalid Stripe secret key format (must start with sk_) - payment features will be limited');
+  } else {
+    console.warn('⚠️ Stripe not configured - payment features will be limited');
+  }
 }
 
 export async function registerRoutes(app: Express, server: Server): Promise<void> {
