@@ -12,6 +12,7 @@ import RegisterPage from "@/pages/RegisterPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import DashboardPage from "@/pages/DashboardPage";
 import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
+import SettingsPage from "@/pages/SettingsPage";
 import AdminPortalPage from "@/pages/AdminPortalPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/register" component={RegisterPage} />
       <Route path="/subscribe" component={SubscriptionPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/settings" component={SettingsPage} />
       <Route path="/admin" component={AdminPortalPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />

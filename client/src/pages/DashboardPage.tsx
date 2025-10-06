@@ -219,11 +219,11 @@ export default function DashboardPage() {
       color: "bg-green-50 text-green-600"
     },
     {
-      title: "Order History",
-      description: "View past orders",
-      icon: Package,
-      href: "/orders",
-      color: "bg-purple-50 text-purple-600"
+      title: "Account Settings",
+      description: "Update phone number and address",
+      icon: Settings,
+      href: "/settings",
+      color: "bg-gray-50 text-gray-600"
     }
   ];
 
