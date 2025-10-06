@@ -55,6 +55,12 @@ export default function LoginPage() {
         body: JSON.stringify(data),
       });
 
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server error - please try again later");
+      }
+
       const result = await response.json();
 
       if (!response.ok) {
@@ -78,6 +84,7 @@ export default function LoginPage() {
         setLocation("/dashboard");
       }
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Login Failed",
         description: error.message || "Invalid email or password. Please try again.",
