@@ -729,7 +729,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         urgency: z.enum(["routine", "urgent", "emergency"]).default("routine"),
         specialInstructions: z.string().optional(),
         sendEmail: z.boolean().optional().default(true),
-        sendText: z.boolean().optional().default(false)
+        sendText: z.boolean().optional().default(false),
+        downloadForm: z.boolean().optional().default(false)
       });
 
       const validatedData = pdfRequestSchema.parse(req.body);
