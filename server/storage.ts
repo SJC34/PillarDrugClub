@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type UpsertUser } from "@shared/schema";
+import { type User, type InsertUser, type UpsertUser, users } from "@shared/schema";
 import { 
   type Customer, type InsertCustomer,
   type Medication, type InsertMedication, type MedicationSearch,
@@ -10,6 +10,8 @@ import {
   type PrescriptionRequest, type InsertPrescriptionRequest
 } from "@shared/pharmacy-schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -1360,4 +1362,101 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DbStorage extends MemStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const result = await db.insert(users).values({
+      username: insertUser.email ?? null,
+      email: insertUser.email ?? null,
+      password: insertUser.password ?? null,
+      firstName: insertUser.firstName ?? null,
+      lastName: insertUser.lastName ?? null,
+      dateOfBirth: insertUser.dateOfBirth ?? null,
+      phoneNumber: insertUser.phoneNumber ?? null,
+      smsConsent: insertUser.smsConsent ?? "false",
+      role: "client",
+    }).returning();
+    return result[0];
+  }
+
+  async upsertUser(upsertUser: UpsertUser): Promise<User> {
+    const existing = await this.getUserByEmail(upsertUser.email ?? "");
+    if (existing) {
+      const result = await db.update(users)
+        .set({
+          firstName: upsertUser.firstName ?? existing.firstName,
+          lastName: upsertUser.lastName ?? existing.lastName,
+          profileImageUrl: upsertUser.profileImageUrl ?? existing.profileImageUrl,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, existing.id))
+        .returning();
+      return result[0];
+    } else {
+      const result = await db.insert(users).values({
+        id: upsertUser.id,
+        email: upsertUser.email ?? null,
+        firstName: upsertUser.firstName ?? null,
+        lastName: upsertUser.lastName ?? null,
+        profileImageUrl: upsertUser.profileImageUrl ?? null,
+        username: upsertUser.email ?? null,
+        role: "client",
+      }).returning();
+      return result[0];
+    }
+  }
+
+  async updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string | null): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        stripeCustomerId,
+        stripeSubscriptionId,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        subscriptionStatus: status,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        primaryDoctorId: doctor.doctorId ?? null,
+        primaryDoctorName: doctor.doctorName,
+        primaryDoctorNpi: doctor.doctorNpi ?? null,
+        primaryDoctorPhone: doctor.doctorPhone ?? null,
+        primaryDoctorAddress: doctor.doctorAddress ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+}
+
+export const storage = new DbStorage();
