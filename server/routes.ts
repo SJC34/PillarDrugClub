@@ -96,7 +96,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       
       // Find user by email
       const user = await storage.getUserByEmail(email);
-      if (!user || user.password !== password) { // In production, use proper password hashing
+      if (!user || !user.password) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      // Verify password using bcrypt
+      const dbStorage = storage as any;
+      const isValidPassword = await dbStorage.verifyPassword(password, user.password);
+      if (!isValidPassword) {
         return res.status(401).json({ error: "Invalid email or password" });
       }
       

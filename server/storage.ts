@@ -12,6 +12,7 @@ import {
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcrypt";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -79,16 +80,16 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private customers: Map<string, Customer>;
-  private medications: Map<string, Medication>;
-  private prescriptions: Map<string, Prescription>;
-  private orders: Map<string, Order>;
-  private shipments: Map<string, Shipment>;
-  private prescribers: Map<string, Prescriber>;
-  private pharmacies: Map<string, Pharmacy>;
-  private prescriptionRequests: Map<string, PrescriptionRequest>;
-  private orderCounter: number;
+  protected users: Map<string, User>;
+  protected customers: Map<string, Customer>;
+  protected medications: Map<string, Medication>;
+  protected prescriptions: Map<string, Prescription>;
+  protected orders: Map<string, Order>;
+  protected shipments: Map<string, Shipment>;
+  protected prescribers: Map<string, Prescriber>;
+  protected pharmacies: Map<string, Pharmacy>;
+  protected prescriptionRequests: Map<string, PrescriptionRequest>;
+  protected orderCounter: number;
 
   constructor() {
     this.users = new Map();
@@ -1305,7 +1306,7 @@ export class MemStorage implements IStorage {
     console.log(`✅ Successfully imported ${importedCount} pharmacies`);
   }
 
-  private async importDataOnStartup(): Promise<void> {
+  protected async importDataOnStartup(): Promise<void> {
     // Import prescribers and pharmacies on startup
     console.log('🔄 Starting initial data import...');
     
@@ -1363,6 +1364,17 @@ export class MemStorage implements IStorage {
 }
 
 export class DbStorage extends MemStorage {
+  constructor() {
+    super();
+    // Clear in-memory users to force database usage
+    this.users.clear();
+  }
+
+  async initializeData(): Promise<void> {
+    // Only import pharmacy data, skip user seeding since we use database
+    await this.importDataOnStartup();
+  }
+
   async getUser(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return result[0];
@@ -1379,10 +1391,15 @@ export class DbStorage extends MemStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Hash password before storing
+    const hashedPassword = insertUser.password 
+      ? await bcrypt.hash(insertUser.password, 10)
+      : null;
+    
     const result = await db.insert(users).values({
       username: insertUser.email ?? null,
       email: insertUser.email ?? null,
-      password: insertUser.password ?? null,
+      password: hashedPassword,
       firstName: insertUser.firstName ?? null,
       lastName: insertUser.lastName ?? null,
       dateOfBirth: insertUser.dateOfBirth ?? null,
@@ -1456,6 +1473,11 @@ export class DbStorage extends MemStorage {
       .where(eq(users.id, id))
       .returning();
     return result[0];
+  }
+  
+  // Helper method to verify password
+  async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(plainPassword, hashedPassword);
   }
 }
 
