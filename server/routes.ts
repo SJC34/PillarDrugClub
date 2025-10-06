@@ -689,6 +689,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const pdfRequestSchema = z.object({
         userId: z.string().optional(),
         patientName: z.string().min(2, "Patient name is required"),
+        patientEmail: z.string().optional(),
+        patientPhone: z.string().optional(),
         dateOfBirth: z.string().optional(),
         medicationName: z.string().min(2, "Medication name is required"),
         dosage: z.string().min(1, "Dosage is required"),
@@ -707,14 +709,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
       const validatedData = pdfRequestSchema.parse(req.body);
       
-      // Fetch patient email if userId is provided
-      let patientEmail = '';
-      let patientPhone = '';
+      // Fetch patient email/phone from request or from user profile if userId is provided
+      let patientEmail = validatedData.patientEmail || '';
+      let patientPhone = validatedData.patientPhone || '';
       if (validatedData.userId) {
         const user = await storage.getUser(validatedData.userId);
         if (user) {
-          patientEmail = user.email || '';
-          patientPhone = user.phoneNumber || '';
+          // Use user profile data if not provided in request
+          if (!patientEmail) patientEmail = user.email || '';
+          if (!patientPhone) patientPhone = user.phoneNumber || '';
         }
       }
       
@@ -764,8 +767,11 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       // Generate message template
       const messageTemplate = generateMessageTemplate(requestData);
 
+      console.log(`🔔 Starting notification process - sendEmail: ${validatedData.sendEmail}, sendText: ${validatedData.sendText}`);
+      
       // Send notifications to patient, doctor (async, don't block response)
       const sendNotifications = async () => {
+        console.log(`📬 Inside sendNotifications function`);
         const notificationPromises: Promise<any>[] = [];
         
         // Send PDF to patient via email (only if sendEmail is true)
@@ -820,7 +826,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         }
         
         // Send SMS to patient with instructions (only if sendText is true)
+        console.log(`📱 SMS check: sendText=${validatedData.sendText}, phone="${patientPhone}", length=${patientPhone.trim().length}`);
         if (validatedData.sendText && patientPhone && patientPhone.trim().length > 0) {
+          console.log(`📤 Attempting to send SMS to: ${patientPhone}`);
           const patientSmsMessage = `Pillar Drug Club: Your prescription request form has been emailed to you. Please forward it to your doctor ${validatedData.doctorName} or upload to their secure portal.`;
           notificationPromises.push(
             sendSMS(patientPhone, patientSmsMessage)
@@ -836,6 +844,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
                 return false;
               })
           );
+        } else {
+          console.log(`⚠️ SMS not sent: conditions not met`);
         }
 
         // Wait for all notifications to complete or fail
