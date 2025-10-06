@@ -126,32 +126,6 @@ const PaymentForm = ({ clientSecret, onSuccess }: { clientSecret: string; onSucc
 };
 
 export default function RegisterPage() {
-  // Check for Stripe configuration
-  if (!STRIPE_PUBLIC_KEY) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-8">
-        <div className="max-w-md mx-auto w-full">
-          <Card>
-            <CardHeader className="text-center">
-              <Pill className="h-12 w-12 text-teal-600 mx-auto mb-4" />
-              <CardTitle className="font-display">Configuration Required</CardTitle>
-              <CardDescription>
-                Payment processing is not properly configured. Please contact support.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <Link href="/login">
-                <Button variant="secondary" className="w-full">
-                  Back to Login
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const [authMethod, setAuthMethod] = useState<"social" | "email">("social");
@@ -402,7 +376,18 @@ export default function RegisterPage() {
         }
       }
 
-      // Move to payment step - this is REQUIRED to complete registration
+      // Check if Stripe is configured
+      if (!STRIPE_PUBLIC_KEY) {
+        // Skip payment step if Stripe is not configured
+        toast({
+          title: "Registration Complete!",
+          description: "Welcome to Pillar Drug Club! You can subscribe later to access wholesale pricing.",
+        });
+        setLocation("/dashboard");
+        return;
+      }
+
+      // Move to payment step
       const subscriptionResponse = await apiRequest("POST", "/api/create-subscription", { 
         userId: registeredUser.id 
       });

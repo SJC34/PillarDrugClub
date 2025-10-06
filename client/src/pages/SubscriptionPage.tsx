@@ -11,10 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-}
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+const stripePromise = STRIPE_PUBLIC_KEY ? loadStripe(STRIPE_PUBLIC_KEY) : null;
 
 const SubscribeForm = () => {
   const stripe = useStripe();
@@ -104,6 +102,12 @@ export default function SubscriptionPage() {
       return;
     }
 
+    // Check if Stripe is configured
+    if (!STRIPE_PUBLIC_KEY) {
+      setIsLoading(false);
+      return;
+    }
+
     // Create subscription as soon as the page loads
     apiRequest("POST", "/api/create-subscription", { userId: user.id })
       .then((res) => res.json())
@@ -134,6 +138,35 @@ export default function SubscriptionPage() {
           <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-gray-600">Setting up your subscription...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show message if Stripe is not configured
+  if (!STRIPE_PUBLIC_KEY) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <Pill className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+            <CardTitle>Subscription Not Available</CardTitle>
+            <CardDescription>
+              Payment processing is not currently configured. Please contact support for assistance.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-3">
+            <Link href="/dashboard">
+              <Button className="w-full" data-testid="button-dashboard">
+                Go to Dashboard
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" className="w-full" data-testid="button-home">
+                Back to Home
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     );
   }
