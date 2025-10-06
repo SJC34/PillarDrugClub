@@ -17,6 +17,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Pill, 
   FileText, 
@@ -94,6 +104,7 @@ export default function PrescriptionTransferPage() {
   const [messageTemplate, setMessageTemplate] = useState("");
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [prescriptionRequestId, setPrescriptionRequestId] = useState<string>("");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const doctorForm = useForm<DoctorFaxForm>({
     resolver: zodResolver(doctorFaxSchema),
@@ -213,8 +224,21 @@ export default function PrescriptionTransferPage() {
       return;
     }
     
-    // If authenticated, proceed with form validation and submission
-    doctorForm.handleSubmit(onDoctorSubmit)(e);
+    // Validate form first
+    const isValid = doctorForm.trigger();
+    if (!isValid) {
+      return;
+    }
+    
+    // Show confirmation dialog
+    setShowConfirmDialog(true);
+  };
+
+  // Confirm and submit the form
+  const confirmDoctorSubmit = () => {
+    setShowConfirmDialog(false);
+    const data = doctorForm.getValues();
+    onDoctorSubmit(data);
   };
 
   const onDoctorSubmit = async (data: DoctorFaxForm) => {
@@ -1214,6 +1238,24 @@ export default function PrescriptionTransferPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent data-testid="dialog-confirm-prescription">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Prescription Request</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to generate the prescription request? This will create a PDF and send notifications based on your selected options.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-confirmation">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDoctorSubmit} data-testid="button-confirm-prescription">
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
