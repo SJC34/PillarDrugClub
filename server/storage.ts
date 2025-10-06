@@ -227,6 +227,7 @@ export class MemStorage implements IStorage {
       primaryDoctorNpi: null,
       primaryDoctorPhone: null,
       primaryDoctorAddress: null,
+      userAddress: null,
       createdAt: now,
       updatedAt: now
     };
@@ -257,6 +258,7 @@ export class MemStorage implements IStorage {
       primaryDoctorNpi: null,
       primaryDoctorPhone: null,
       primaryDoctorAddress: null,
+      userAddress: null,
       createdAt: now,
       updatedAt: now
     };
@@ -322,6 +324,7 @@ export class MemStorage implements IStorage {
       primaryDoctorNpi: null,
       primaryDoctorPhone: null,
       primaryDoctorAddress: null,
+      userAddress: null,
       dateOfBirth: insertUser.dateOfBirth ?? null,
       createdAt: now,
       updatedAt: now
@@ -370,6 +373,7 @@ export class MemStorage implements IStorage {
         primaryDoctorNpi: null,
         primaryDoctorPhone: null,
         primaryDoctorAddress: null,
+        userAddress: null,
         createdAt: now,
         updatedAt: now
       };

@@ -16,7 +16,9 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 const settingsSchema = z.object({
-  phoneNumber: z.string().min(10, "Please enter a valid phone number"),
+  phoneNumber: z.string()
+    .min(10, "Please enter a valid phone number")
+    .regex(/^[\+]?[(]?[0-9]{1,3}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,4}[-\s\.]?[0-9]{1,9}$/, "Please enter a valid phone number"),
   smsConsent: z.boolean(),
   street: z.string().optional(),
   city: z.string().optional(),
@@ -61,7 +63,7 @@ export default function SettingsPage() {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Settings Updated",
         description: "Your settings have been saved successfully.",
