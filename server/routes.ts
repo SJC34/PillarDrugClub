@@ -1329,4 +1329,28 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       res.status(500).json({ error: "Internal server error" });
     }
   });
+
+  app.post("/api/test/sms", async (req, res) => {
+    try {
+      const { phoneNumber, message } = req.body;
+      console.log(`📱 Sending SMS to: ${phoneNumber}`);
+      console.log(`📱 Message: ${message}`);
+      
+      if (!phoneNumber || !message) {
+        return res.status(400).json({ error: "Phone number and message are required" });
+      }
+      
+      const success = await sendSMS(phoneNumber, message);
+      console.log(`📱 SMS send result: ${success}`);
+      
+      if (success) {
+        res.json({ success: true, message: "SMS sent successfully" });
+      } else {
+        res.status(500).json({ error: "Failed to send SMS" });
+      }
+    } catch (error: any) {
+      console.error("📱 Test SMS error:", error);
+      res.status(500).json({ error: "Failed to send SMS", message: error.message });
+    }
+  });
 }
