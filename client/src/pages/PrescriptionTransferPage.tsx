@@ -199,6 +199,9 @@ export default function PrescriptionTransferPage() {
   const handleDoctorSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log("handleDoctorSubmit called");
+    console.log("Form errors:", doctorForm.formState.errors);
+    
     // Check authentication first
     if (!isAuthenticated || !user) {
       toast({
@@ -215,6 +218,7 @@ export default function PrescriptionTransferPage() {
   };
 
   const onDoctorSubmit = async (data: DoctorFaxForm) => {
+    console.log("Form submitted with data:", data);
     setSubmissionStatus("submitting");
     try {
       if (!user?.id) {
@@ -234,8 +238,12 @@ export default function PrescriptionTransferPage() {
         })
       });
 
+      console.log("Response status:", response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to generate PDF');
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Server error:", errorData);
+        throw new Error(errorData.message || 'Failed to generate PDF');
       }
 
       // Get message template from header
