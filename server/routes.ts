@@ -566,7 +566,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       
       res.json({ 
         subscriptionStatus: user.subscriptionStatus,
-        hasAccess: user.subscriptionStatus === "active"
+        hasAccess: true // Allow all users to bypass subscription requirement
       });
     } catch (error: any) {
       console.error("Subscription status error:", error);
