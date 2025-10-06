@@ -49,12 +49,8 @@ export async function getTwilioFromPhoneNumber() {
 
 export async function sendSMS(to: string, message: string): Promise<boolean> {
   try {
-    console.log(`📲 sendSMS called - to: ${to}`);
-    console.log(`📲 Getting Twilio client...`);
     const client = await getTwilioClient();
-    console.log(`📲 Getting from phone number...`);
     const fromNumber = await getTwilioFromPhoneNumber();
-    console.log(`📲 Sending message from ${fromNumber} to ${to}`);
     
     const result = await client.messages.create({
       body: message,
@@ -62,10 +58,10 @@ export async function sendSMS(to: string, message: string): Promise<boolean> {
       to: to
     });
     
-    console.log(`✅ SMS sent successfully! SID: ${result.sid}`);
+    console.log(`✅ SMS sent successfully to ${to}`);
     return true;
   } catch (error) {
-    console.error('❌ Failed to send SMS:', error);
+    console.error('Failed to send SMS:', error);
     return false;
   }
 }
