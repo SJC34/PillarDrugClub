@@ -108,11 +108,11 @@ export class MemStorage implements IStorage {
 
   async initializeData(): Promise<void> {
     // Initialize data after server is listening to avoid blocking health checks
-    this.seedMockData();
+    await this.seedMockData();
     await this.importDataOnStartup();
   }
 
-  private seedMockData() {
+  private async seedMockData() {
     // Add some sample medications (will be supplemented with imported data)
     const sampleMedications: Medication[] = [
       {
@@ -211,14 +211,15 @@ export class MemStorage implements IStorage {
 
     sampleMedications.forEach(med => this.medications.set(med.id, med));
 
-    // Create admin user
+    // Create admin user with hashed password
     const adminId = randomUUID();
     const now = new Date();
+    const hashedAdminPassword = await bcrypt.hash("Spaceworm#25", 10);
     const adminUser: User = {
       id: adminId,
       username: "seth@pillardrugclub.com",
       email: "seth@pillardrugclub.com",
-      password: "Spaceworm#25",
+      password: hashedAdminPassword,
       firstName: "Seth",
       lastName: "Admin",
       dateOfBirth: null,
@@ -243,13 +244,14 @@ export class MemStorage implements IStorage {
     this.users.set(adminId, adminUser);
     console.log('✅ Admin user created: seth@pillardrugclub.com');
 
-    // Create SJC Pharmacy test user
+    // Create SJC Pharmacy test user with hashed password
     const sjcId = randomUUID();
+    const hashedSjcPassword = await bcrypt.hash("password123", 10);
     const sjcUser: User = {
       id: sjcId,
       username: "sjcpharmacy@gmail.com",
       email: "sjcpharmacy@gmail.com",
-      password: "password123",
+      password: hashedSjcPassword,
       firstName: "SJC",
       lastName: "Pharmacy",
       dateOfBirth: "04/21/1992",
@@ -1371,8 +1373,55 @@ export class DbStorage extends MemStorage {
   }
 
   async initializeData(): Promise<void> {
-    // Only import pharmacy data, skip user seeding since we use database
+    // Import pharmacy data
     await this.importDataOnStartup();
+    
+    // Seed test users if they don't exist
+    await this.seedTestUsers();
+  }
+  
+  private async seedTestUsers(): Promise<void> {
+    try {
+      // Create admin user if doesn't exist
+      const existingAdmin = await this.getUserByEmail("seth@pillardrugclub.com");
+      if (!existingAdmin) {
+        const hashedAdminPassword = await bcrypt.hash("Spaceworm#25", 10);
+        await db.insert(users).values({
+          username: "seth@pillardrugclub.com",
+          email: "seth@pillardrugclub.com",
+          password: hashedAdminPassword,
+          firstName: "Seth",
+          lastName: "Admin",
+          role: "admin",
+          subscriptionStatus: "active",
+          isActive: "true",
+          smsConsent: "false",
+        });
+        console.log('✅ Admin user created: seth@pillardrugclub.com');
+      }
+
+      // Create SJC Pharmacy test user if doesn't exist
+      const existingSjc = await this.getUserByEmail("sjcpharmacy@gmail.com");
+      if (!existingSjc) {
+        const hashedSjcPassword = await bcrypt.hash("password123", 10);
+        await db.insert(users).values({
+          username: "sjcpharmacy@gmail.com",
+          email: "sjcpharmacy@gmail.com",
+          password: hashedSjcPassword,
+          firstName: "SJC",
+          lastName: "Pharmacy",
+          dateOfBirth: "04/21/1992",
+          phoneNumber: "4238393523",
+          role: "client",
+          subscriptionStatus: "active",
+          isActive: "true",
+          smsConsent: "false",
+        });
+        console.log('✅ SJC Pharmacy test user created: sjcpharmacy@gmail.com');
+      }
+    } catch (error) {
+      console.error('Error seeding test users:', error);
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
