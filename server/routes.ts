@@ -629,6 +629,31 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Manual test user seeding endpoint (for production setup)
+  app.post("/api/admin/seed-users", async (req, res) => {
+    try {
+      console.log("🔄 Manual user seeding triggered...");
+      const dbStorage = storage as any;
+      if (dbStorage.seedTestUsers) {
+        await dbStorage.seedTestUsers();
+        res.json({ 
+          status: "success", 
+          message: "Test users seeded successfully"
+        });
+      } else {
+        res.status(400).json({
+          error: "User seeding not available for current storage implementation"
+        });
+      }
+    } catch (error: any) {
+      console.error("Manual user seeding error:", error);
+      res.status(500).json({ 
+        error: "Failed to seed users", 
+        message: error.message 
+      });
+    }
+  });
+
   // Prescription transfer endpoints (Legacy - use /api/prescription-transfers instead)
   app.post("/api/prescriptions", async (req, res) => {
     try {
