@@ -864,57 +864,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
               })
           );
         }
-        
-        // Send PDF to doctor via email
-        if (validatedData.doctorEmail && validatedData.doctorEmail.trim().length > 0) {
-          const doctorEmailSubject = `Prescription Request for ${validatedData.patientName}`;
-          const doctorEmailBody = `
-            <h2>Prescription Request</h2>
-            <p>Dear ${validatedData.doctorName},</p>
-            <p>Your patient <strong>${validatedData.patientName}</strong> is requesting a prescription through Pillar Drug Club, their wholesale pharmacy.</p>
-            
-            <h3>Prescription Details:</h3>
-            <ul>
-              <li><strong>Medication:</strong> ${validatedData.medicationName}</li>
-              <li><strong>Dosage:</strong> ${validatedData.dosage}</li>
-              <li><strong>Quantity:</strong> ${validatedData.quantity}</li>
-              <li><strong>Urgency:</strong> ${validatedData.urgency}</li>
-              ${validatedData.specialInstructions ? `<li><strong>Special Instructions:</strong> ${validatedData.specialInstructions}</li>` : ''}
-            </ul>
-            
-            <p><strong>Please review the attached prescription request form and submit electronically to:</strong></p>
-            <p><strong>Pillar Drug Club</strong><br/>
-            Search pharmacy: "Pillar Drug Club"<br/>
-            <strong>IMPORTANT:</strong> Include patient email: ${patientEmail || validatedData.patientName}<br/>
-            Or fax: ${validatedData.doctorFax || '(Contact Pillar Drug Club)'}</p>
-            
-            <p>Thank you for your attention to this matter.</p>
-            <p>Best regards,<br/>Pillar Drug Club</p>
-          `;
-          
-          notificationPromises.push(
-            sendEmailWithAttachment(
-              validatedData.doctorEmail,
-              doctorEmailSubject,
-              doctorEmailBody,
-              {
-                filename: `prescription-request-${validatedData.patientName.replace(/\s+/g, '-')}.pdf`,
-                content: pdfBuffer
-              }
-            )
-              .then(success => {
-                if (success) {
-                  console.log(`✅ PDF sent to doctor: ${validatedData.doctorEmail}`);
-                } else {
-                  console.warn(`⚠️ Failed to send PDF to doctor: ${validatedData.doctorEmail}`);
-                }
-              })
-              .catch(err => {
-                console.error('Doctor email error:', err);
-                return false;
-              })
-          );
-        }
 
         // Wait for all notifications to complete or fail
         if (notificationPromises.length > 0) {

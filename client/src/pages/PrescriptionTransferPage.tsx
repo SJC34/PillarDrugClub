@@ -59,7 +59,8 @@ const doctorFaxSchema = z.object({
   urgency: z.enum(["routine", "urgent", "emergency"]),
   specialInstructions: z.string().optional(),
   sendEmail: z.boolean().default(true),
-  sendText: z.boolean().default(false)
+  sendText: z.boolean().default(false),
+  downloadForm: z.boolean().default(false)
 });
 
 const pharmacyTransferSchema = z.object({
@@ -99,7 +100,8 @@ export default function PrescriptionTransferPage() {
     defaultValues: {
       urgency: "routine",
       sendEmail: true,
-      sendText: false
+      sendText: false,
+      downloadForm: false
     }
   });
 
@@ -252,6 +254,18 @@ export default function PrescriptionTransferPage() {
       // Get PDF blob
       const blob = await response.blob();
       setPdfBlob(blob);
+      
+      // If download form is checked, trigger download immediately
+      if (data.downloadForm) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `prescription-request.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
       
       setSubmissionStatus("success");
       setShowSuccessDialog(true);
@@ -704,6 +718,18 @@ export default function PrescriptionTransferPage() {
                         <Label htmlFor="doctorSendText" className="text-sm md:text-base font-normal cursor-pointer">
                           <Phone className="h-4 w-4 inline mr-2" />
                           Text me a notification
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="doctorDownloadForm"
+                          checked={doctorForm.watch("downloadForm")}
+                          onCheckedChange={(checked) => doctorForm.setValue("downloadForm", !!checked)}
+                          data-testid="checkbox-doctor-download-form"
+                        />
+                        <Label htmlFor="doctorDownloadForm" className="text-sm md:text-base font-normal cursor-pointer">
+                          <Download className="h-4 w-4 inline mr-2" />
+                          Download form
                         </Label>
                       </div>
                     </div>
