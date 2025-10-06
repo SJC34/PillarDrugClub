@@ -915,25 +915,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
               })
           );
         }
-        
-        // Send SMS to doctor
-        if (validatedData.doctorPhone && validatedData.doctorPhone.trim().length > 0) {
-          const doctorSmsMessage = `Pillar Drug Club: Prescription request for ${validatedData.patientName} - ${validatedData.medicationName} ${validatedData.dosage}. Please check your email for the prescription request form.`;
-          notificationPromises.push(
-            sendSMS(validatedData.doctorPhone, doctorSmsMessage)
-              .then(success => {
-                if (success) {
-                  console.log(`✅ SMS sent to doctor: ${validatedData.doctorPhone}`);
-                } else {
-                  console.warn(`⚠️ Failed to send SMS to doctor: ${validatedData.doctorPhone}`);
-                }
-              })
-              .catch(err => {
-                console.error('Doctor SMS error:', err);
-                return false;
-              })
-          );
-        }
 
         // Wait for all notifications to complete or fail
         if (notificationPromises.length > 0) {
