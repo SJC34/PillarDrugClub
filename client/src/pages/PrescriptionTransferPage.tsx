@@ -749,6 +749,10 @@ export default function PrescriptionTransferPage() {
                       className="flex-1 h-11 md:h-12 text-sm md:text-base" 
                       disabled={submissionStatus === "submitting"}
                       data-testid="button-submit-doctor-fax"
+                      onClick={(e) => {
+                        console.log("Button clicked!");
+                        console.log("Form errors:", doctorForm.formState.errors);
+                      }}
                     >
                       {submissionStatus === "submitting" ? (
                         <>
