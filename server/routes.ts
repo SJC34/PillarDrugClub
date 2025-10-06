@@ -1353,4 +1353,28 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       res.status(500).json({ error: "Failed to send SMS", message: error.message });
     }
   });
+
+  app.post("/api/test/email", async (req, res) => {
+    try {
+      const { to, subject, message } = req.body;
+      console.log(`📧 Sending email to: ${to}`);
+      console.log(`📧 Subject: ${subject}`);
+      
+      if (!to || !subject || !message) {
+        return res.status(400).json({ error: "To, subject, and message are required" });
+      }
+      
+      const success = await sendEmail(to, subject, message);
+      console.log(`📧 Email send result: ${success}`);
+      
+      if (success) {
+        res.json({ success: true, message: "Email sent successfully" });
+      } else {
+        res.status(500).json({ error: "Failed to send email" });
+      }
+    } catch (error: any) {
+      console.error("📧 Test email error:", error);
+      res.status(500).json({ error: "Failed to send email", message: error.message });
+    }
+  });
 }
