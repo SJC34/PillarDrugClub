@@ -5,19 +5,19 @@ import { storage } from "./storage";
 
 const app = express();
 
-// CRITICAL: Add health check endpoint FIRST, before any middleware
+// CRITICAL: Add health check endpoints FIRST, before any middleware
 // This ensures Replit deployment health checks get immediate responses
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json({ 
-    status: "ok", 
-    service: "pillar-drug-club",
+    status: "healthy",
     timestamp: new Date().toISOString()
   });
 });
 
-app.get("/health", (req, res) => {
+app.get("/api/ping", (req, res) => {
   res.status(200).json({ 
-    status: "healthy",
+    status: "ok", 
+    service: "pillar-drug-club",
     timestamp: new Date().toISOString()
   });
 });

@@ -34,34 +34,6 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Setup Social OAuth (Google, Apple, X) - non-blocking initialization
   await setupSocialAuth(app);
 
-  // Health check endpoints - respond immediately
-  app.get("/api/ping", (req, res) => {
-    res.status(200).json({ 
-      status: "ok", 
-      service: "pillar-drug-club",
-      timestamp: new Date().toISOString(),
-      ready: true
-    });
-  });
-
-  app.get("/health", (req, res) => {
-    res.json({ 
-      status: "healthy", 
-      uptime: process.uptime(),
-      memory: process.memoryUsage(),
-      timestamp: new Date().toISOString()
-    });
-  });
-
-  app.get("/api/health", (req, res) => {
-    res.json({ 
-      status: "ok",
-      api: "healthy",
-      database: "connected",
-      timestamp: new Date().toISOString()
-    });
-  });
-
   // Get authenticated user (for OAuth)
   app.get('/api/auth/user', async (req: any, res) => {
     try {
@@ -1346,10 +1318,5 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });
     }
-  });
-
-  // Health check endpoint
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "healthy", timestamp: new Date().toISOString() });
   });
 }
