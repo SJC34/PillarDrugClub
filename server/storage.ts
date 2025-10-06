@@ -99,8 +99,14 @@ export class MemStorage implements IStorage {
     this.pharmacies = new Map();
     this.prescriptionRequests = new Map();
     this.orderCounter = 1000;
+    // Removed auto-import to prevent blocking server startup for health checks
+    // Data will be seeded and imported after server is listening
+  }
+
+  async initializeData(): Promise<void> {
+    // Initialize data after server is listening to avoid blocking health checks
     this.seedMockData();
-    this.importDataOnStartup();
+    await this.importDataOnStartup();
   }
 
   private seedMockData() {

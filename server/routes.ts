@@ -30,8 +30,8 @@ if (process.env.STRIPE_SECRET_KEY) {
   console.warn('⚠️ Stripe not configured - payment features will be limited');
 }
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup Social OAuth (Google, Apple, X)
+export async function registerRoutes(app: Express, server: Server): Promise<void> {
+  // Setup Social OAuth (Google, Apple, X) - non-blocking initialization
   await setupSocialAuth(app);
 
   // Health check endpoints - respond immediately
@@ -1352,8 +1352,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/health", (req, res) => {
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
   });
-
-  const httpServer = createServer(app);
-
-  return httpServer;
 }
