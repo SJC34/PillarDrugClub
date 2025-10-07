@@ -981,23 +981,37 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Send prescription request PDF link via SMS
   app.post("/api/prescription-requests/:id/text", async (req, res) => {
     try {
+      console.log(`📱 SMS request received for prescription ID: ${req.params.id}`);
+      
       const requests = await storage.getAllPrescriptionRequests();
+      console.log(`📋 Found ${requests.length} total prescription requests`);
+      
       const request = requests.find(r => r.id === req.params.id);
       
       if (!request) {
+        console.log(`❌ Prescription request not found: ${req.params.id}`);
         return res.status(404).json({ error: "Prescription request not found" });
       }
 
+      console.log(`✅ Found prescription request for ${request.patientName}, medication: ${request.medicationName}`);
+
       if (!request.userId) {
+        console.log(`❌ No user ID associated with prescription request`);
         return res.status(400).json({ error: "No user associated with this prescription request" });
       }
 
+      console.log(`👤 Looking up user: ${request.userId}`);
       const user = await storage.getUser(request.userId);
+      
       if (!user) {
+        console.log(`❌ User not found: ${request.userId}`);
         return res.status(404).json({ error: "User not found" });
       }
 
+      console.log(`👤 Found user: ${user.email}, phone: ${user.phoneNumber}`);
+
       if (!user.phoneNumber) {
+        console.log(`❌ User has no phone number: ${user.email}`);
         return res.status(400).json({ error: "User has no phone number on file" });
       }
 
@@ -1005,6 +1019,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const host = req.get('host');
       const protocol = host?.includes('replit.dev') || host?.includes('replit.app') ? 'https' : req.protocol;
       const downloadUrl = `${protocol}://${host}/api/prescription-requests/${request.id}/pdf`;
+      
+      console.log(`📲 Sending SMS to ${user.phoneNumber} with download link: ${downloadUrl}`);
       
       // Short, clear SMS message
       const smsMessage = `Pillar Drug Club: ${request.medicationName} prescription form ready. Download here: ${downloadUrl}`;
@@ -1015,6 +1031,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         console.log(`✅ Prescription request PDF link sent to: ${user.phoneNumber}`);
         res.json({ success: true, message: "PDF link sent to your phone" });
       } else {
+        console.log(`❌ Failed to send SMS to: ${user.phoneNumber}`);
         res.status(500).json({ error: "Failed to send SMS" });
       }
     } catch (error: any) {
