@@ -3,36 +3,51 @@ import twilio from 'twilio';
 let connectionSettings: any;
 
 async function getCredentials() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
-  const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
-    : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
-    : null;
+  // Try connector API first
+  try {
+    const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
+    const xReplitToken = process.env.REPL_IDENTITY 
+      ? 'repl ' + process.env.REPL_IDENTITY 
+      : process.env.WEB_REPL_RENEWAL 
+      ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+      : null;
 
-  if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
-  }
+    if (xReplitToken && hostname) {
+      connectionSettings = await fetch(
+        'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=twilio',
+        {
+          headers: {
+            'Accept': 'application/json',
+            'X_REPLIT_TOKEN': xReplitToken
+          }
+        }
+      ).then(res => res.json()).then(data => data.items?.[0]);
 
-  connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=twilio',
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X_REPLIT_TOKEN': xReplitToken
+      if (connectionSettings?.settings?.account_sid && connectionSettings?.settings?.api_key && connectionSettings?.settings?.api_key_secret) {
+        return {
+          accountSid: connectionSettings.settings.account_sid,
+          apiKey: connectionSettings.settings.api_key,
+          apiKeySecret: connectionSettings.settings.api_key_secret,
+          phoneNumber: connectionSettings.settings.phone_number
+        };
       }
     }
-  ).then(res => res.json()).then(data => data.items?.[0]);
-
-  if (!connectionSettings || (!connectionSettings.settings.account_sid || !connectionSettings.settings.api_key || !connectionSettings.settings.api_key_secret)) {
-    throw new Error('Twilio not connected');
+  } catch (connectorError) {
+    console.log('Connector API not available, falling back to environment variables');
   }
-  return {
-    accountSid: connectionSettings.settings.account_sid,
-    apiKey: connectionSettings.settings.api_key,
-    apiKeySecret: connectionSettings.settings.api_key_secret,
-    phoneNumber: connectionSettings.settings.phone_number
-  };
+
+  // Fallback to environment variables
+  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+    console.log('✅ Using Twilio credentials from environment variables');
+    return {
+      accountSid: process.env.TWILIO_ACCOUNT_SID,
+      apiKey: process.env.TWILIO_AUTH_TOKEN,
+      apiKeySecret: process.env.TWILIO_AUTH_TOKEN, // Auth token can be used as both
+      phoneNumber: process.env.TWILIO_PHONE_NUMBER
+    };
+  }
+
+  throw new Error('Twilio credentials not found. Please configure TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER');
 }
 
 export async function getTwilioClient() {
