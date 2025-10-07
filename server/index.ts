@@ -64,47 +64,22 @@ app.use((req, res, next) => {
   // Other ports are firewalled. Default to 5000 if not specified.
   const port = parseInt(process.env.PORT || '5000', 10);
   
-  // Create HTTP server FIRST so health checks can work immediately
+  // Create HTTP server
   const { createServer } = await import("http");
   const server = createServer(app);
   
-  // Start listening IMMEDIATELY to pass health checks
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, async () => {
-    log(`✅ Server listening on port ${port} - ready for health checks`);
-    log(`🚀 Initializing routes and services in background...`);
-    
-    // Initialize routes AFTER server is listening (non-blocking for health checks)
-    try {
-      await registerRoutes(app, server);
-      log(`✅ Routes and authentication initialized`);
-    } catch (error) {
-      log(`⚠️ Warning: Route initialization encountered issues: ${error}`);
-      // Continue serving even if some routes fail - critical for health checks
-    }
+  // Initialize ALL middleware and routes BEFORE starting the server
+  // This ensures health checks work immediately when server starts listening
+  try {
+    log(`🚀 Initializing routes and authentication...`);
+    await registerRoutes(app, server);
+    log(`✅ Routes and authentication initialized`);
+  } catch (error) {
+    log(`❌ Error: Route initialization failed: ${error}`);
+    process.exit(1);
+  }
 
-    // Initialize storage data AFTER server is ready
-    try {
-      log(`🔄 Initializing storage data...`);
-      await storage.initializeData();
-      log(`✅ Storage data initialized`);
-    } catch (error) {
-      log(`⚠️ Warning: Storage initialization encountered issues: ${error}`);
-    }
-  });
-
-  // Error handler
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  // Setup Vite for development or static serving for production
+  // Setup Vite for development or static serving for production BEFORE listening
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
     log(`✅ Vite dev server ready`);
@@ -113,5 +88,26 @@ app.use((req, res, next) => {
     log(`✅ Static files configured`);
   }
 
-  log(`✅ Application fully initialized and ready`);
+  // Error handler (must be registered after routes)
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    throw err;
+  });
+
+  // Initialize storage data in background (non-blocking)
+  // This can happen while server is starting
+  storage.initializeData()
+    .then(() => log(`✅ Storage data initialized`))
+    .catch((error) => log(`⚠️ Warning: Storage initialization encountered issues: ${error}`));
+
+  // Start listening AFTER all critical middleware is ready
+  server.listen({
+    port,
+    host: "0.0.0.0",
+  }, () => {
+    log(`✅ Server listening on port ${port}`);
+    log(`✅ Application fully initialized and ready`);
+  });
 })();
