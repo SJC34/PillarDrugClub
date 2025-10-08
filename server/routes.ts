@@ -1192,7 +1192,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         console.log(`📦 RxNorm response:`, JSON.stringify(data).substring(0, 200));
         
         // Extract medication names from RxNorm response, filtering out entries without names
-        const medications = data.approximateGroup?.candidate
+        const candidates = data.approximateGroup?.candidate
           ?.filter((item: any) => item.name && item.name.trim().length > 0)
           ?.map((item: any) => ({
             name: item.name,
@@ -1200,7 +1200,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
             score: item.score
           })) || [];
 
-        console.log(`✅ Returning ${medications.length} medications from RxNorm`);
+        // Deduplicate by rxcui (RxNorm often returns duplicates)
+        const seen = new Set<string>();
+        const medications = candidates.filter((med: any) => {
+          if (seen.has(med.rxcui)) return false;
+          seen.add(med.rxcui);
+          return true;
+        });
+
+        console.log(`✅ Returning ${medications.length} unique medications from RxNorm`);
 
         return res.json({ medications });
       }
