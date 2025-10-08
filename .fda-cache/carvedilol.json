@@ -1,0 +1,10 @@
+{
+  "medicationName": "Carvedilol",
+  "dosingInfo": {
+    "dosesPerDay": 2,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Take with food. Individualize dosage and monitor during up-titration. ( 2 ) Heart failure: Start at 3.125 mg twice daily and increase to 6.25, 12.5, and then 25 mg twice daily over intervals of at least 2 weeks. Maintain lower doses if higher doses are not tolerated. ( 2.1 ) Left ventricular dysfunction following myocardial infarction: Start at 6.25 mg twice daily and increase to 12.5 mg then 25 mg twice daily after intervals of 3 to 10 days. A lower starting dose or ",
+    "fetchedAt": "2025-10-08T17:40:23.955Z"
+  },
+  "fetchedAt": "2025-10-08T17:40:24.118Z"
+}

@@ -1,0 +1,10 @@
+{
+  "medicationName": "Cromolyn",
+  "dosingInfo": {
+    "dosesPerDay": 4,
+    "isShortCourse": true,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION NOT FOR INHALATION OR INJECTION. SEE DIRECTIONS FOR USE. The usual starting dose is as follows: Adults and Adolescents (13 Years and Older) Two ampules four times daily, taken one-half hour before meals and at bedtime. Children 2-12 Years One ampule four times daily, taken one-half hour before meals and at bedtime. Pediatric Patients Under 2 Years Not recommended. If satisfactory control of symptoms is not achieved within two to three weeks, the dosage may be increased ",
+    "fetchedAt": "2025-10-08T17:41:19.359Z"
+  },
+  "fetchedAt": "2025-10-08T17:41:19.536Z"
+}

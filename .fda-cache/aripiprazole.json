@@ -1,0 +1,10 @@
+{
+  "medicationName": "Aripiprazole",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Initial Dose Recommended Dose Maximum Dose Schizophrenia – adults (2.1) 10 to 15 mg/day 10 to 15 mg/day 30 mg/day Schizophrenia – adolescents (2.1) 2 mg/day 10 mg/day 30 mg/day Irritability associated with autistic disorder – pediatric patients (2.4) 2 mg/day 5 to 10 mg/day 15 mg/day Tourette’s disorder – (2.5) Patients <50 kg 2 mg/day 5 mg/day 10 mg/day Patients ≥50 kg 2 mg/day 10 mg/day 20 mg/day •Oral formulations: Administer once daily without regard to meals (2) ",
+    "fetchedAt": "2025-10-08T17:39:09.684Z"
+  },
+  "fetchedAt": "2025-10-08T17:39:09.964Z"
+}

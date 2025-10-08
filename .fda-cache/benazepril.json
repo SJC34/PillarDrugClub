@@ -1,0 +1,10 @@
+{
+  "medicationName": "Benazepril",
+  "dosingInfo": {
+    "dosesPerDay": 2,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION • Adult Patients: Initiate with 10 mg once daily (or 5 mg if patient is on diuretic). Titrate to 40 mg daily based on blood pressure response. ( 2.1 ) • Pediatric patients age 6 years and above with glomerular filtration rate (GFR) >30 mL/min/1.73 m 2 : Initiate with 0.2 mg/kg once daily. Maximum dose is 0.6 mg/kg once daily. • Renal Impairment: Initiate with 5 mg once daily in patients with GFR <30 mL/min/1.73 m 2 (serum creatinine >3 mg/dL) ( 2 .2) 2.1 Recommended D",
+    "fetchedAt": "2025-10-08T17:39:34.465Z"
+  },
+  "fetchedAt": "2025-10-08T17:39:34.625Z"
+}

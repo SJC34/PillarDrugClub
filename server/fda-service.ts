@@ -1,4 +1,6 @@
 import memoize from 'memoizee';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 interface FDALabelResponse {
   results?: Array<{
@@ -12,9 +14,71 @@ interface FDALabelResponse {
 }
 
 interface DosingInfo {
-  dosesPerDay: number | null;
+  dosesPerDay: number | undefined;
   isShortCourse: boolean;
   rawDosageText: string;
+  fetchedAt: string;
+}
+
+interface CachedFDAResponse {
+  medicationName: string;
+  dosingInfo: DosingInfo;
+  fetchedAt: string;
+}
+
+// Disk cache directory
+const CACHE_DIR = path.join(process.cwd(), '.fda-cache');
+
+// Ensure cache directory exists
+async function ensureCacheDir() {
+  try {
+    await fs.mkdir(CACHE_DIR, { recursive: true });
+  } catch (error) {
+    console.error('Failed to create FDA cache directory:', error);
+  }
+}
+
+// Get cache file path for a medication
+function getCacheFilePath(medicationName: string): string {
+  const sanitized = medicationName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  return path.join(CACHE_DIR, `${sanitized}.json`);
+}
+
+// Load cached FDA response from disk
+async function loadFromDiskCache(medicationName: string): Promise<DosingInfo | null> {
+  try {
+    const filePath = getCacheFilePath(medicationName);
+    const data = await fs.readFile(filePath, 'utf-8');
+    const cached: CachedFDAResponse = JSON.parse(data);
+    
+    // Check if cache is less than 30 days old
+    const cacheAge = Date.now() - new Date(cached.fetchedAt).getTime();
+    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+    
+    if (cacheAge < thirtyDays) {
+      console.log(`📦 Loaded FDA data from disk cache for ${medicationName}`);
+      return cached.dosingInfo;
+    }
+  } catch (error) {
+    // Cache miss or error - will fetch from API
+  }
+  return null;
+}
+
+// Save FDA response to disk cache
+async function saveToDiskCache(medicationName: string, dosingInfo: DosingInfo): Promise<void> {
+  try {
+    await ensureCacheDir();
+    const filePath = getCacheFilePath(medicationName);
+    const cached: CachedFDAResponse = {
+      medicationName,
+      dosingInfo,
+      fetchedAt: new Date().toISOString()
+    };
+    await fs.writeFile(filePath, JSON.stringify(cached, null, 2));
+  } catch (error) {
+    console.error(`Failed to save FDA cache for ${medicationName}:`, error);
+  }
 }
 
 // Short-course medication categories and keywords
@@ -74,7 +138,7 @@ function isShortCourseMedication(medicationName: string, category?: string): boo
 /**
  * Extract doses per day from FDA dosage text
  */
-function extractDosesPerDay(dosageText: string): number | null {
+function extractDosesPerDay(dosageText: string): number | undefined {
   const text = dosageText.toLowerCase();
   
   // Common dosing patterns
@@ -107,13 +171,22 @@ function extractDosesPerDay(dosageText: string): number | null {
   if (text.includes('three times daily') || text.includes('three times a day')) return 3;
   if (text.includes('four times daily') || text.includes('four times a day')) return 4;
   
-  return null;
+  return undefined;
 }
 
 /**
- * Fetch dosing information from openFDA API
+ * Fetch dosing information from openFDA API (with disk cache)
  */
 async function fetchFDADosingInfo(medicationName: string): Promise<DosingInfo> {
+  // First try to load from disk cache
+  const cached = await loadFromDiskCache(medicationName);
+  if (cached) {
+    return cached;
+  }
+  
+  // Cache miss - fetch from FDA API
+  const fetchedAt = new Date().toISOString();
+  
   try {
     const searchQuery = medicationName.split(/\s+/)[0]; // Use first word for search
     const url = `https://api.fda.gov/drug/label.json?search=openfda.generic_name:"${searchQuery}"&limit=1`;
@@ -122,13 +195,17 @@ async function fetchFDADosingInfo(medicationName: string): Promise<DosingInfo> {
     
     if (!response.ok) {
       console.log(`⚠️ FDA API returned ${response.status} for ${medicationName}`);
-      return { dosesPerDay: null, isShortCourse: false, rawDosageText: '' };
+      const emptyResult = { dosesPerDay: undefined, isShortCourse: false, rawDosageText: '', fetchedAt };
+      await saveToDiskCache(medicationName, emptyResult);
+      return emptyResult;
     }
     
     const data: FDALabelResponse = await response.json();
     
     if (!data.results || data.results.length === 0) {
-      return { dosesPerDay: null, isShortCourse: false, rawDosageText: '' };
+      const emptyResult = { dosesPerDay: undefined, isShortCourse: false, rawDosageText: '', fetchedAt };
+      await saveToDiskCache(medicationName, emptyResult);
+      return emptyResult;
     }
     
     const result = data.results[0];
@@ -143,14 +220,22 @@ async function fetchFDADosingInfo(medicationName: string): Promise<DosingInfo> {
     
     const dosesPerDay = extractDosesPerDay(dosageText);
     
-    return {
+    const dosingInfo = {
       dosesPerDay,
       isShortCourse,
-      rawDosageText: dosageText.substring(0, 500) // Truncate for storage
+      rawDosageText: dosageText.substring(0, 500), // Truncate for storage
+      fetchedAt
     };
+    
+    // Save to disk cache
+    await saveToDiskCache(medicationName, dosingInfo);
+    
+    return dosingInfo;
   } catch (error) {
     console.error(`❌ Error fetching FDA data for ${medicationName}:`, error);
-    return { dosesPerDay: null, isShortCourse: false, rawDosageText: '' };
+    const emptyResult = { dosesPerDay: undefined, isShortCourse: false, rawDosageText: '', fetchedAt };
+    await saveToDiskCache(medicationName, emptyResult);
+    return emptyResult;
   }
 }
 
@@ -166,17 +251,17 @@ export const getFDADosingInfo = memoize(fetchFDADosingInfo, {
  */
 export function calculateAnnualPrice(
   unitPrice: number,
-  dosesPerDay: number | null,
+  dosesPerDay: number | undefined,
   isShortCourse: boolean
-): number | null {
+): number | undefined {
   // Don't calculate annual price for short-course medications
   if (isShortCourse) {
-    return null;
+    return undefined;
   }
   
   // Need doses per day to calculate annual price
   if (!dosesPerDay) {
-    return null;
+    return undefined;
   }
   
   // Annual supply: doses per day × 365 days × unit price
@@ -191,18 +276,27 @@ export async function determineMedicationPricing(
   unitPrice: number,
   category?: string
 ): Promise<{
-  dosesPerDay: number | null;
+  dosesPerDay: number | undefined;
   isShortCourse: boolean;
-  annualPrice: number | null;
+  annualPrice: number | undefined;
+  fdaMetadata?: {
+    rawDosageText: string;
+    fetchedAt: string;
+  };
 }> {
   // First check by name/category
   const isShortCourseByName = isShortCourseMedication(medicationName, category);
   
   if (isShortCourseByName) {
+    const fetchedAt = new Date().toISOString();
     return {
-      dosesPerDay: null,
+      dosesPerDay: undefined,
       isShortCourse: true,
-      annualPrice: null
+      annualPrice: undefined,
+      fdaMetadata: {
+        rawDosageText: '',
+        fetchedAt
+      }
     };
   }
   
@@ -218,6 +312,10 @@ export async function determineMedicationPricing(
   return {
     dosesPerDay: fdaInfo.dosesPerDay,
     isShortCourse: fdaInfo.isShortCourse || isShortCourseByName,
-    annualPrice
+    annualPrice,
+    fdaMetadata: {
+      rawDosageText: fdaInfo.rawDosageText,
+      fetchedAt: fdaInfo.fetchedAt
+    }
   };
 }

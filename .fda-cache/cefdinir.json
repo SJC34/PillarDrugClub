@@ -1,0 +1,10 @@
+{
+  "medicationName": "Cefdinir",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION (see INDICATIONS AND USAGE for Indicated Pathogens) The recommended dosage and duration of treatment for infections in pediatric patients are described in the following chart; the total daily dose for all infections is 14 mg/kg, up to a maximum dose of 600 mg per day. Once-daily dosing for 10 days is as effective as BID dosing. Once-daily dosing has not been studied in skin infections; therefore, cefdinir for oral suspension should be administered twice daily in this in",
+    "fetchedAt": "2025-10-08T17:40:26.889Z"
+  },
+  "fetchedAt": "2025-10-08T17:40:27.053Z"
+}

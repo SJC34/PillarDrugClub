@@ -20,6 +20,9 @@ interface Medication {
   description: string;
   price: number;
   wholesalePrice: number;
+  annualPrice?: number;
+  dosesPerDay?: number;
+  isShortCourse: boolean;
   inStock: boolean;
   quantity: number;
   requiresPrescription: boolean;
@@ -239,22 +242,55 @@ export default function MedicationsPage() {
                         </div>
 
                         <div className="border-t pt-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm text-muted-foreground line-through">
-                              Retail: ${medication.price.toFixed(2)}
-                            </span>
-                            <Badge className="bg-primary/10 text-primary border-primary">
-                              Save {Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}%
-                            </Badge>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-2xl font-bold text-primary">
-                              ${medication.wholesalePrice.toFixed(2)}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              Wholesale Price
-                            </span>
-                          </div>
+                          {medication.annualPrice && !medication.isShortCourse ? (
+                            <>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm text-muted-foreground line-through">
+                                  Retail (yearly): ${(medication.price * (medication.dosesPerDay || 1) * 365).toFixed(2)}
+                                </span>
+                                <Badge className="bg-primary/10 text-primary border-primary">
+                                  Save {Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}%
+                                </Badge>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-2xl font-bold text-primary">
+                                  ${medication.annualPrice.toFixed(2)}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  Annual Supply
+                                </span>
+                              </div>
+                              {medication.dosesPerDay && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {medication.dosesPerDay} dose{medication.dosesPerDay > 1 ? 's' : ''}/day × 365 days
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm text-muted-foreground line-through">
+                                  Retail: ${medication.price.toFixed(2)}
+                                </span>
+                                <Badge className="bg-primary/10 text-primary border-primary">
+                                  Save {Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}%
+                                </Badge>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-2xl font-bold text-primary">
+                                  ${medication.wholesalePrice.toFixed(2)}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {medication.isShortCourse ? 'Per Unit' : 'Wholesale Price'}
+                                </span>
+                              </div>
+                              {medication.isShortCourse && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Short-course medication
+                                </p>
+                              )}
+                            </>
+                          )}
                         </div>
 
                         <p className="text-sm text-muted-foreground line-clamp-2">

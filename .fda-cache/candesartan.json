@@ -1,0 +1,10 @@
+{
+  "medicationName": "Candesartan",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Starting Dose Target Dose Adult Hypertension (2.1) 16 mg tablet once daily 8 to 32 mg tablet total daily dose Pediatric Hypertension (1 to ˂6 years) (2.2) 0.2 mg/kg oral suspension once daily 0.05 to 0.4 mg/kg oral suspension once daily or consider divided dose Pediatric Hypertension (6 to ˂17 years) (2.2) <50 kg 4 to 8 mg tablet once daily >50 kg 8 to 16 mg tablet once daily <50 kg 4 to 16 mg tablet once daily or consider divided dose >50 kg 4 to 32 mg tablet once da",
+    "fetchedAt": "2025-10-08T17:40:15.043Z"
+  },
+  "fetchedAt": "2025-10-08T17:40:15.204Z"
+}

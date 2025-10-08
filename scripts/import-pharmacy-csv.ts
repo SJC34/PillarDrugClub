@@ -1,4 +1,5 @@
 import type { Medication } from "@shared/pharmacy-schema";
+import { determineMedicationPricing } from '../server/fda-service';
 
 interface PharmacyCSVRow {
   drugDescription: string;
@@ -152,6 +153,7 @@ export function parsePharmacyCSV(csvContent: string): Medication[] {
       description: drugDescription,
       price: unitPrice,
       wholesalePrice: wholesalePrice,
+      isShortCourse: false, // Will be updated during FDA enrichment
       inStock: true,
       quantity: 1000,
       requiresPrescription: true,
@@ -169,6 +171,61 @@ export function parsePharmacyCSV(csvContent: string): Medication[] {
   return medications;
 }
 
+/**
+ * Enrich medications with FDA dosing data and annual pricing
+ * Uses rate limiting to respect openFDA's 240 req/min limit (3 req/s)
+ */
+async function enrichMedicationsWithFDAData(medications: Medication[]): Promise<Medication[]> {
+  console.log('🔄 Enriching medications with FDA dosing data...');
+  
+  let enriched = 0;
+  let skipped = 0;
+  const enrichedMedications: Medication[] = [];
+  
+  // Process medications sequentially with 330ms delay between requests (3 req/s)
+  for (let i = 0; i < medications.length; i++) {
+    const med = medications[i];
+    
+    try {
+      const pricingInfo = await determineMedicationPricing(
+        med.name,
+        med.price,
+        med.category
+      );
+      
+      if (pricingInfo.annualPrice || pricingInfo.isShortCourse) {
+        enriched++;
+      } else {
+        skipped++;
+      }
+      
+      enrichedMedications.push({
+        ...med,
+        dosesPerDay: pricingInfo.dosesPerDay,
+        isShortCourse: pricingInfo.isShortCourse,
+        annualPrice: pricingInfo.annualPrice,
+        fdaMetadata: pricingInfo.fdaMetadata
+      });
+      
+      // Log progress every 50 medications
+      if ((i + 1) % 50 === 0) {
+        console.log(`📊 Progress: ${i + 1}/${medications.length} medications processed`);
+      }
+      
+      // Rate limit: 330ms delay = ~3 requests per second
+      if (i < medications.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 330));
+      }
+    } catch (error) {
+      console.error(`Failed to enrich ${med.name}:`, error);
+      enrichedMedications.push(med);
+    }
+  }
+  
+  console.log(`✅ Enriched ${enriched} medications with FDA data, ${skipped} without dosing info`);
+  return enrichedMedications;
+}
+
 export async function importMedicationsFromCSV(): Promise<Medication[]> {
   try {
     // Read the CSV file
@@ -182,7 +239,10 @@ export async function importMedicationsFromCSV(): Promise<Medication[]> {
     const medications = parsePharmacyCSV(csvContent);
     console.log(`✅ Parsed ${medications.length} medications from CSV`);
     
-    return medications;
+    // Enrich with FDA data (this may take several minutes due to rate limiting)
+    const enrichedMedications = await enrichMedicationsWithFDAData(medications);
+    
+    return enrichedMedications;
   } catch (error) {
     console.error('❌ Error importing medications from CSV:', error);
     return [];

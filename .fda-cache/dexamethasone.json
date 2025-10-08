@@ -1,0 +1,10 @@
+{
+  "medicationName": "Dexamethasone",
+  "dosingInfo": {
+    "dosesPerDay": 3,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION For Oral Administration The initial dosage varies from 0.75 to 9 mg a day depending on the disease being treated. It Should Be Emphasized That Dosage Requirements Are Variable And Must Be Individualized On The Basis Of The Disease Under Treatment And The Response Of The Patient. After a favorable response is noted, the proper maintenance dosage should be determined by decreasing the initial drug dosage in small decrements at appropriate time intervals until the lowest d",
+    "fetchedAt": "2025-10-08T17:41:42.274Z"
+  },
+  "fetchedAt": "2025-10-08T17:41:42.430Z"
+}
