@@ -76,8 +76,11 @@ export const medicationSchema = z.object({
   manufacturer: z.string(),
   category: z.string(),
   description: z.string(),
-  price: z.number().positive(),
+  price: z.number().positive(), // Per-unit price (per tablet, per inhaler, etc.)
   wholesalePrice: z.number().positive(),
+  annualPrice: z.number().positive().optional(), // Annual supply price (doses/day × 365 × unit price)
+  dosesPerDay: z.number().positive().optional(), // Typical doses per day from FDA package insert
+  isShortCourse: z.boolean().default(false), // True for antibiotics, inhalers, etc. (excluded from annual pricing)
   inStock: z.boolean().default(true),
   quantity: z.number().int().min(0),
   requiresPrescription: z.boolean().default(true),
