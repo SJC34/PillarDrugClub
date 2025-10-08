@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Calculator, Search, DollarSign, TrendingDown, Calendar, Pill, Plus, X } from "lucide-react";
 import { Link } from "wouter";
+import { MedicationSearch } from "@/components/MedicationSearch";
 
 interface Medication {
   id: string;
@@ -144,56 +145,55 @@ export default function CostCalculatorPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="relative">
-              <Input
+            <div className="relative mb-4">
+              <MedicationSearch
                 placeholder="Search for medications..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-4 h-11 md:h-12 text-base"
-                data-testid="input-medication-search"
+                onChange={setSearchQuery}
+                className="h-11 md:h-12"
               />
-              
-              {/* Search Results */}
-              {searchQuery && (
-                <div className="absolute z-10 w-full bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {isLoading ? (
-                    <div className="p-4 text-center text-muted-foreground text-sm md:text-base">Searching...</div>
-                  ) : searchResults?.medications?.length > 0 ? (
-                    <div className="py-2">
-                      {searchResults.medications.map((medication: Medication) => (
-                        <button
-                          key={medication.id}
-                          onClick={() => addMedication(medication)}
-                          className="w-full px-4 py-3 text-left hover:bg-muted transition-colors border-b last:border-b-0 min-h-[60px] touch-manipulation"
-                          data-testid={`button-add-medication-${medication.id}`}
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium text-foreground text-sm md:text-base truncate">{medication.name}</div>
-                              <div className="text-xs md:text-sm text-muted-foreground truncate">
-                                {medication.genericName} - {medication.strength}
-                              </div>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                              <div className="text-xs md:text-sm text-primary font-bold">
-                                ${medication.wholesalePrice.toFixed(2)}/tablet
-                              </div>
-                              <div className="text-xs text-muted-foreground line-through">
-                                ${medication.price.toFixed(2)}
-                              </div>
+            </div>
+            
+            {/* Search Results with Pricing */}
+            {searchQuery && (
+              <div className="bg-muted/30 border rounded-md max-h-60 overflow-y-auto">
+                {isLoading ? (
+                  <div className="p-4 text-center text-muted-foreground text-sm md:text-base">Searching catalog...</div>
+                ) : searchResults?.medications?.length > 0 ? (
+                  <div className="py-2">
+                    {searchResults.medications.map((medication: Medication) => (
+                      <button
+                        key={medication.id}
+                        onClick={() => addMedication(medication)}
+                        className="w-full px-4 py-3 text-left hover:bg-muted transition-colors border-b last:border-b-0 min-h-[60px] touch-manipulation"
+                        data-testid={`button-add-medication-${medication.id}`}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-foreground text-sm md:text-base truncate">{medication.name}</div>
+                            <div className="text-xs md:text-sm text-muted-foreground truncate">
+                              {medication.genericName} - {medication.strength}
                             </div>
                           </div>
-                        </button>
-                      ))}
-                    </div>
-                  ) : searchQuery ? (
-                    <div className="p-4 text-center text-muted-foreground text-sm md:text-base">
-                      No medications found for "{searchQuery}"
-                    </div>
-                  ) : null}
-                </div>
-              )}
-            </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-xs md:text-sm text-primary font-bold">
+                              ${medication.wholesalePrice.toFixed(2)}/tablet
+                            </div>
+                            <div className="text-xs text-muted-foreground line-through">
+                              ${medication.price.toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : searchQuery ? (
+                  <div className="p-4 text-center text-muted-foreground text-sm md:text-base">
+                    No medications found in catalog for "{searchQuery}"
+                  </div>
+                ) : null}
+              </div>
+            )}
           </CardContent>
         </Card>
 
