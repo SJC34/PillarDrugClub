@@ -279,12 +279,12 @@ export class MemStorage implements IStorage {
 
   async loadImportedMedications() {
     try {
-      // Import medications from Excel file after server startup
-      const { importMedicationsFromExcel } = await import('../scripts/import-medications');
-      await importMedicationsFromExcel();
-      console.log(`✅ Loaded medications: ${this.medications.size} total`);
+      // Import medications from DailyMed (FDA database)
+      const { importMedicationsFromDailyMed } = await import('../scripts/import-dailymed');
+      await importMedicationsFromDailyMed();
+      console.log(`✅ Loaded medications from DailyMed: ${this.medications.size} total`);
     } catch (error) {
-      console.log('⚠️  Could not load imported medications:', error);
+      console.log('⚠️  Could not load DailyMed medications:', error);
       console.log('Using sample medications only');
     }
   }
@@ -1309,12 +1309,13 @@ export class MemStorage implements IStorage {
   }
 
   protected async importDataOnStartup(): Promise<void> {
-    // Import prescribers and pharmacies on startup
+    // Import prescribers, pharmacies, and medications on startup
     console.log('🔄 Starting initial data import...');
     
     try {
       await this.importInitialPrescribers();
       await this.importInitialPharmacies();
+      await this.loadImportedMedications();
       console.log('✅ Initial data import completed successfully');
     } catch (error) {
       console.error('❌ Error during initial data import:', error);
