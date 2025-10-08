@@ -1164,51 +1164,28 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Medication routes
   app.get("/api/medications/search", async (req, res) => {
     try {
-      // If simple 'q' parameter is provided, use RxNorm API for drug name search
+      // If simple 'q' parameter is provided, search CSV medications
       if (req.query.q && typeof req.query.q === 'string') {
         const query = req.query.q as string;
         
-        console.log(`💊 RxNorm medication search request: "${query}"`);
+        console.log(`💊 CSV medication search request: "${query}"`);
         
         if (!query.trim() || query.length < 2) {
           console.log(`⚠️ Query too short: "${query}"`);
           return res.json({ medications: [] });
         }
 
-        // Use RxNorm API for drug search (free, no API key required)
-        const rxnormUrl = `https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=${encodeURIComponent(query)}&maxEntries=10`;
+        // Search local CSV medications
+        const result = await storage.searchMedications({ query, page: 1, limit: 20 });
         
-        console.log(`🔍 Calling RxNorm API: ${rxnormUrl}`);
-        
-        const response = await fetch(rxnormUrl);
-        
-        if (!response.ok) {
-          console.error(`❌ RxNorm API error: ${response.status}`);
-          return res.json({ medications: [] });
-        }
+        // Format results to match what frontend expects (name, rxcui, score)
+        const medications = result.medications.map((med, index) => ({
+          name: med.name,
+          rxcui: med.id, // Use medication ID as rxcui
+          score: String(100 - index) // Simple relevance score
+        }));
 
-        const data = await response.json();
-        
-        console.log(`📦 RxNorm response:`, JSON.stringify(data).substring(0, 200));
-        
-        // Extract medication names from RxNorm response, filtering out entries without names
-        const candidates = data.approximateGroup?.candidate
-          ?.filter((item: any) => item.name && item.name.trim().length > 0)
-          ?.map((item: any) => ({
-            name: item.name,
-            rxcui: item.rxcui,
-            score: item.score
-          })) || [];
-
-        // Deduplicate by rxcui (RxNorm often returns duplicates)
-        const seen = new Set<string>();
-        const medications = candidates.filter((med: any) => {
-          if (seen.has(med.rxcui)) return false;
-          seen.add(med.rxcui);
-          return true;
-        });
-
-        console.log(`✅ Returning ${medications.length} unique medications from RxNorm`);
+        console.log(`✅ Returning ${medications.length} medications from CSV`);
 
         return res.json({ medications });
       }
