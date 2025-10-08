@@ -51,6 +51,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { PharmacySearch } from "@/components/PharmacySearch";
+import { MedicationSearch } from "@/components/MedicationSearch";
 import { useAuth } from "@/hooks/useAuth";
 import { handleDateInputChange } from "@/lib/dateFormatter";
 import { useMutation } from "@tanstack/react-query";
@@ -589,12 +590,10 @@ export default function PrescriptionTransferPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="medicationName" className="text-sm md:text-base">Medication Name</Label>
-                        <Input
-                          id="medicationName"
-                          placeholder="Lisinopril"
-                          {...doctorForm.register("medicationName")}
-                          data-testid="input-medication-name"
-                          className="h-10 md:h-11 text-sm md:text-base"
+                        <MedicationSearch
+                          value={doctorForm.watch("medicationName") || ""}
+                          onChange={(value) => doctorForm.setValue("medicationName", value)}
+                          placeholder="Search medications (e.g., Lisinopril)"
                         />
                         {doctorForm.formState.errors.medicationName && (
                           <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.medicationName.message}</p>
@@ -906,12 +905,10 @@ export default function PrescriptionTransferPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="transferMedicationName" className="text-sm md:text-base">Medication Name</Label>
-                        <Input
-                          id="transferMedicationName"
-                          placeholder="Lisinopril"
-                          {...pharmacyForm.register("medicationName")}
-                          data-testid="input-transfer-medication-name"
-                          className="h-10 md:h-11 text-sm md:text-base"
+                        <MedicationSearch
+                          value={pharmacyForm.watch("medicationName") || ""}
+                          onChange={(value) => pharmacyForm.setValue("medicationName", value)}
+                          placeholder="Search medications (e.g., Lisinopril)"
                         />
                         {pharmacyForm.formState.errors.medicationName && (
                           <p className="text-xs md:text-sm text-destructive mt-1">{pharmacyForm.formState.errors.medicationName.message}</p>
