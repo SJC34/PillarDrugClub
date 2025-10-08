@@ -1,0 +1,10 @@
+{
+  "medicationName": "Febuxostat",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Recommended dosage is 40 mg or 80 mg once daily. The recommended starting dosage is 40 mg once daily. For patients who do not achieve a serum uric acid (sUA) less than 6 mg/dL after 2 weeks, the recommended dosage is 80 mg once daily. ( 2.1 ) Patients with severe renal impairment: Limit the dosage to 40 mg once daily. ( 2.2 , 8.6 ) Flare prophylaxis is recommended upon initiation of febuxostat tablets. ( 2.4 ) Can be administered without regard to food or antacid use.",
+    "fetchedAt": "2025-10-08T17:51:41.070Z"
+  },
+  "fetchedAt": "2025-10-08T17:51:41.234Z"
+}

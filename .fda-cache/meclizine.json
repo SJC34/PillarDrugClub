@@ -1,0 +1,10 @@
+{
+  "medicationName": "Meclizine",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "Directions take dose one hour before travel starts tablets can be chewed or swallowed whole with water adults & children 12 years and over: take 1-2 tablets once daily children under 12 years: ask a doctor",
+    "fetchedAt": "2025-10-08T17:54:19.926Z"
+  },
+  "fetchedAt": "2025-10-08T17:54:20.082Z"
+}

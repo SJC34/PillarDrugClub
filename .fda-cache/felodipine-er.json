@@ -1,0 +1,10 @@
+{
+  "medicationName": "Felodipine Er",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION The recommended starting dose is 5 mg once a day. Depending on the patient's response, the dosage can be decreased to 2.5 mg or increased to 10 mg once a day. These adjustments should occur generally at intervals of not less than 2 weeks. The recommended dosage range is 2.5 to 10 mg once daily. In clinical trials, doses above 10 mg daily showed an increased blood pressure response but a large increase in the rate of peripheral edema and other vasodilatory adverse events",
+    "fetchedAt": "2025-10-08T17:51:41.896Z"
+  },
+  "fetchedAt": "2025-10-08T17:51:42.057Z"
+}

@@ -1,0 +1,10 @@
+{
+  "medicationName": "Escitalopram Solution",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Indication and Population Recommended Dosage MDD in Adults ( 2.1 ) Initial: 10 mg once daily Recommended: 10 mg once daily Maximum: 20 mg once daily MDD in Pediatric Patients 12 years and older ( 2.1 ) Initial: 10 mg once daily Recommended: 10 mg once daily Maximum: 20 mg once daily GAD in Adults ( 2.2 ) Initial: 10 mg once daily Recommended: 10 mg once daily Maximum: 20 mg once daily No additional benefits were seen at 20 mg once daily ( 2.1 ) Administer once daily, ",
+    "fetchedAt": "2025-10-08T17:42:39.997Z"
+  },
+  "fetchedAt": "2025-10-08T17:42:40.162Z"
+}

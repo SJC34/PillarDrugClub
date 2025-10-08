@@ -1,0 +1,10 @@
+{
+  "medicationName": "Gabapentin",
+  "dosingInfo": {
+    "dosesPerDay": 3,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMlNlSTRATION Postherpetic Neuralgia (2.1) Dose can be titrated up as needed to a dose of 1800 mg/day Day 1: Single 300 mg dose Day 2: 600 mg/day (i.e., 300 mg two times a day) Day 3: 900 mg/day (i.e., 300 mg three times a day) Epilepsy with Partial Onset Seizures (2.2) Patients 12 years of age and older: starting dose is 300 mg three times daily; may be titrated up to 600 mg three times daily Patients 3 to 11 years of age: starting dose range is 10 to 15 mg/kg/day, given in three ",
+    "fetchedAt": "2025-10-08T17:52:19.077Z"
+  },
+  "fetchedAt": "2025-10-08T17:52:19.243Z"
+}

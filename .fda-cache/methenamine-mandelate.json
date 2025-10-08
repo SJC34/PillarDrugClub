@@ -1,0 +1,10 @@
+{
+  "medicationName": "Methenamine Mandelate",
+  "dosingInfo": {
+    "dosesPerDay": 2,
+    "isShortCourse": false,
+    "rawDosageText": "Directions: Adults and children 12 years and over: take 2 tablets with a full glass of water 3 times a day. Drink plenty of fluids. Children under 12 years: ask a doctor",
+    "fetchedAt": "2025-10-08T17:54:35.881Z"
+  },
+  "fetchedAt": "2025-10-08T17:54:36.033Z"
+}

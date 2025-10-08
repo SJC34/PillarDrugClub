@@ -1,0 +1,10 @@
+{
+  "medicationName": "Hydroxyurea",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Individualize treatment based on tumor type, disease state, response to treatment, patient risk factors, and current clinical practice standards. (2.1) Renal impairment: Reduce the dose of hydroxyurea by 50% in patients with creatinine clearance less than 60 mL/min. ( 2.3 , 8.6, 12.3 ) 2.1 Dosing Information Hydroxyurea is used alone or in conjunction with other antitumor agents or radiation therapy to treat neoplastic diseases. Individualize treatment based on tumor ",
+    "fetchedAt": "2025-10-08T17:52:49.101Z"
+  },
+  "fetchedAt": "2025-10-08T17:52:49.265Z"
+}

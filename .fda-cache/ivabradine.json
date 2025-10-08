@@ -1,0 +1,10 @@
+{
+  "medicationName": "Ivabradine",
+  "dosingInfo": {
+    "dosesPerDay": 2,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Adult patients ● Starting dose is 2.5 (vulnerable adults) or 5 mg twice daily with food. After 2 weeks of treatment, adjust dose based on heart rate. The maximum dose is 7.5 mg twice daily. ( 2.1 ) 2.1 Adults The recommended starting dose of ivabradine tablets is 5 mg twice daily with food. Assess patient after two weeks and adjust dose to achieve a resting heart rate between 50 and 60 beats per minute (bpm) as shown in Table 1. Thereafter, adjust dose as needed based",
+    "fetchedAt": "2025-10-08T17:53:12.286Z"
+  },
+  "fetchedAt": "2025-10-08T17:53:12.443Z"
+}

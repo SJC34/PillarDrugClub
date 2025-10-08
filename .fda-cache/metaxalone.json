@@ -1,0 +1,10 @@
+{
+  "medicationName": "Metaxalone",
+  "dosingInfo": {
+    "dosesPerDay": 4,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION The recommended dose for adults and children over 12 years of age is one 800 mg tablet three to four times a day.",
+    "fetchedAt": "2025-10-08T17:54:31.241Z"
+  },
+  "fetchedAt": "2025-10-08T17:54:31.401Z"
+}

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, jsonb, index, integer, numeric, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -65,3 +65,42 @@ export const upsertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+// Medications table
+export const medications = pgTable("medications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ndc: varchar("ndc").notNull(),
+  name: text("name").notNull(),
+  genericName: text("generic_name").notNull(),
+  brandName: text("brand_name"),
+  strength: text("strength").notNull(),
+  dosageForm: text("dosage_form").notNull(),
+  manufacturer: text("manufacturer").notNull(),
+  category: text("category").notNull(),
+  description: text("description").notNull(),
+  price: numeric("price").notNull(),
+  wholesalePrice: numeric("wholesale_price").notNull(),
+  annualPrice: numeric("annual_price"),
+  dosesPerDay: numeric("doses_per_day"),
+  isShortCourse: boolean("is_short_course").notNull().default(false),
+  fdaMetadata: jsonb("fda_metadata"),
+  inStock: boolean("in_stock").notNull().default(true),
+  quantity: integer("quantity").notNull().default(0),
+  requiresPrescription: boolean("requires_prescription").notNull().default(true),
+  controlledSubstance: boolean("controlled_substance").notNull().default(false),
+  imageUrl: text("image_url"),
+  sideEffects: text("side_effects").array().default(sql`'{}'::text[]`),
+  warnings: text("warnings").array().default(sql`'{}'::text[]`),
+  interactions: text("interactions").array().default(sql`'{}'::text[]`),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertMedicationSchema = createInsertSchema(medications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertMedication = z.infer<typeof insertMedicationSchema>;
+export type Medication = typeof medications.$inferSelect;

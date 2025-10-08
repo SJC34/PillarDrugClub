@@ -1,0 +1,10 @@
+{
+  "medicationName": "Heather",
+  "dosingInfo": {
+    "dosesPerDay": 10,
+    "isShortCourse": false,
+    "rawDosageText": "Directions: Adults & children ages 12 years and over: Take 10 drops under the tongue 2-3 times a day, or as directed by your healthcare professional. Consult a physician for use in children under 12 years of age.",
+    "fetchedAt": "2025-10-08T17:52:37.330Z"
+  },
+  "fetchedAt": "2025-10-08T17:52:37.481Z"
+}

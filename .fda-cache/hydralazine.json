@@ -1,0 +1,10 @@
+{
+  "medicationName": "Hydralazine",
+  "dosingInfo": {
+    "dosesPerDay": 4,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION Initiate therapy in gradually increasing dosages; adjust according to individual response. Start with 10 mg four times daily for the first 2 to 4 days, increase to 25 mg four times daily for the balance of the first week. For the second and subsequent weeks, increase dosage to 50 mg four times daily. For maintenance, adjust dosage to the lowest effective levels. The incidence of toxic reactions, particularly the L.E. cell syndrome, is high in the group of patients recei",
+    "fetchedAt": "2025-10-08T17:52:38.618Z"
+  },
+  "fetchedAt": "2025-10-08T17:52:38.772Z"
+}

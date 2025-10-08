@@ -1,0 +1,10 @@
+{
+  "medicationName": "Imatinib Mesylate",
+  "dosingInfo": {
+    "dosesPerDay": 24,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Adults with Ph+ CML CP ( 2.2 ): 400 mg/day Adults with Ph+ CML AP or BC ( 2.2 ): 600 mg/day Pediatrics with Ph+ CML CP ( 2.3 ): 340 mg/m 2 /day Adults with Ph+ ALL ( 2.4 ): 600 mg/day Pediatrics with Ph+ ALL ( 2.5 ) 340 mg/m 2 /day Adults with MDS/MPD ( 2.6 ): 400 mg/day Adults with ASM ( 2.7 ): 100 mg/day or 400 mg/day Adults with HES/CEL ( 2.8 ): 100 mg/day or 400 mg/day Adults with DFSP ( 2.9 ): 800 mg/day Adults with metastatic and/or unresectable GIST ( 2.10 ): 4",
+    "fetchedAt": "2025-10-08T17:52:56.462Z"
+  },
+  "fetchedAt": "2025-10-08T17:52:56.697Z"
+}

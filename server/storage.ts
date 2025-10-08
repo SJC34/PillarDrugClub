@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type UpsertUser, users } from "@shared/schema";
+import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication } from "@shared/schema";
 import { 
   type Customer, type InsertCustomer,
   type Medication, type InsertMedication, type MedicationSearch,
@@ -1375,8 +1375,9 @@ export class MemStorage implements IStorage {
 export class DbStorage extends MemStorage {
   constructor() {
     super();
-    // Clear in-memory users to force database usage
+    // Clear in-memory users and medications to force database usage
     this.users.clear();
+    this.medications.clear();
   }
 
   async initializeData(): Promise<void> {
@@ -1385,6 +1386,24 @@ export class DbStorage extends MemStorage {
     
     // Seed test users if they don't exist
     await this.seedTestUsers();
+  }
+
+  async loadImportedMedications() {
+    try {
+      // Import medications from pharmacy CSV
+      const { importMedicationsFromCSV } = await import('../scripts/import-pharmacy-csv');
+      const medications = await importMedicationsFromCSV();
+      
+      // Save medications to database (not in-memory Map)
+      for (const med of medications) {
+        await this.createMedication(med);
+      }
+      
+      console.log(`✅ Loaded ${medications.length} medications from pharmacy CSV to database`);
+    } catch (error) {
+      console.log('⚠️  Could not load pharmacy CSV medications:', error);
+      console.log('Using sample medications only');
+    }
   }
   
   private async seedTestUsers(): Promise<void> {
@@ -1534,6 +1553,132 @@ export class DbStorage extends MemStorage {
   // Helper method to verify password
   async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  // Medication database methods
+  async getMedication(id: string): Promise<Medication | undefined> {
+    const result = await db.select().from(medicationsTable).where(eq(medicationsTable.id, id)).limit(1);
+    if (!result[0]) return undefined;
+    
+    // Convert database types to application types
+    return this.convertDBMedicationToAppMedication(result[0]);
+  }
+
+  async getMedicationByNdc(ndc: string): Promise<Medication | undefined> {
+    const result = await db.select().from(medicationsTable).where(eq(medicationsTable.ndc, ndc)).limit(1);
+    if (!result[0]) return undefined;
+    
+    return this.convertDBMedicationToAppMedication(result[0]);
+  }
+
+  async createMedication(insertMedication: InsertMedication): Promise<Medication> {
+    const result = await db.insert(medicationsTable).values({
+      ndc: insertMedication.ndc,
+      name: insertMedication.name,
+      genericName: insertMedication.genericName,
+      brandName: insertMedication.brandName ?? null,
+      strength: insertMedication.strength,
+      dosageForm: insertMedication.dosageForm,
+      manufacturer: insertMedication.manufacturer,
+      category: insertMedication.category,
+      description: insertMedication.description,
+      price: String(insertMedication.price),
+      wholesalePrice: String(insertMedication.wholesalePrice),
+      annualPrice: insertMedication.annualPrice ? String(insertMedication.annualPrice) : null,
+      dosesPerDay: insertMedication.dosesPerDay ? String(insertMedication.dosesPerDay) : null,
+      isShortCourse: insertMedication.isShortCourse,
+      fdaMetadata: insertMedication.fdaMetadata ?? null,
+      inStock: insertMedication.inStock,
+      quantity: insertMedication.quantity,
+      requiresPrescription: insertMedication.requiresPrescription,
+      controlledSubstance: insertMedication.controlledSubstance,
+      imageUrl: insertMedication.imageUrl ?? null,
+      sideEffects: insertMedication.sideEffects ?? [],
+      warnings: insertMedication.warnings ?? [],
+      interactions: insertMedication.interactions ?? [],
+    }).returning();
+    
+    return this.convertDBMedicationToAppMedication(result[0]);
+  }
+
+  async searchMedications(params: MedicationSearch): Promise<{ medications: Medication[]; total: number }> {
+    // Build query with filters
+    let query = db.select().from(medicationsTable);
+    
+    // Note: For a production app, you'd want to use proper SQL filtering
+    // For now, we'll get all and filter in memory (same as MemStorage)
+    const allMedications = await query;
+    const convertedMeds = allMedications.map(med => this.convertDBMedicationToAppMedication(med));
+    
+    // Apply filters (same logic as MemStorage)
+    let filteredMeds = convertedMeds;
+    
+    if (params.query) {
+      const searchTerm = params.query.toLowerCase();
+      filteredMeds = filteredMeds.filter(med =>
+        med.name.toLowerCase().includes(searchTerm) ||
+        med.genericName.toLowerCase().includes(searchTerm) ||
+        (med.brandName && med.brandName.toLowerCase().includes(searchTerm)) ||
+        med.category.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (params.category) {
+      filteredMeds = filteredMeds.filter(med => med.category === params.category);
+    }
+
+    if (params.minPrice !== undefined) {
+      filteredMeds = filteredMeds.filter(med => med.wholesalePrice >= params.minPrice!);
+    }
+
+    if (params.maxPrice !== undefined) {
+      filteredMeds = filteredMeds.filter(med => med.wholesalePrice <= params.maxPrice!);
+    }
+
+    if (params.inStockOnly) {
+      filteredMeds = filteredMeds.filter(med => med.inStock && med.quantity > 0);
+    }
+
+    if (params.requiresPrescription !== undefined) {
+      filteredMeds = filteredMeds.filter(med => med.requiresPrescription === params.requiresPrescription);
+    }
+
+    const total = filteredMeds.length;
+    const offset = (params.page - 1) * params.limit;
+    const paginatedMeds = filteredMeds.slice(offset, offset + params.limit);
+
+    return { medications: paginatedMeds, total };
+  }
+
+  private convertDBMedicationToAppMedication(dbMed: any): Medication {
+    return {
+      id: dbMed.id,
+      ndc: dbMed.ndc,
+      name: dbMed.name,
+      genericName: dbMed.genericName,
+      brandName: dbMed.brandName ?? undefined,
+      strength: dbMed.strength,
+      dosageForm: dbMed.dosageForm,
+      manufacturer: dbMed.manufacturer,
+      category: dbMed.category,
+      description: dbMed.description,
+      price: parseFloat(dbMed.price),
+      wholesalePrice: parseFloat(dbMed.wholesalePrice),
+      annualPrice: dbMed.annualPrice ? parseFloat(dbMed.annualPrice) : undefined,
+      dosesPerDay: dbMed.dosesPerDay ? parseFloat(dbMed.dosesPerDay) : undefined,
+      isShortCourse: dbMed.isShortCourse,
+      fdaMetadata: dbMed.fdaMetadata ?? undefined,
+      inStock: dbMed.inStock,
+      quantity: dbMed.quantity,
+      requiresPrescription: dbMed.requiresPrescription,
+      controlledSubstance: dbMed.controlledSubstance,
+      imageUrl: dbMed.imageUrl ?? undefined,
+      sideEffects: dbMed.sideEffects ?? [],
+      warnings: dbMed.warnings ?? [],
+      interactions: dbMed.interactions ?? [],
+      createdAt: dbMed.createdAt.toISOString(),
+      updatedAt: dbMed.updatedAt.toISOString(),
+    };
   }
 }
 

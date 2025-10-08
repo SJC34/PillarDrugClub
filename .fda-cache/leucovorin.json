@@ -1,0 +1,10 @@
+{
+  "medicationName": "Leucovorin",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION Advanced Colorectal Cancer Either of the following two regimens is recommended: 1. Leucovorin is administered at 200 mg/m 2 by slow intravenous injection over a minimum of 3 minutes, followed by 5-fluorouracil at 370 mg/m 2 by intravenous injection. 2. Leucovorin is administered at 20 mg/m 2 by intravenous injection followed by 5-fluorouracil at 425 mg/m 2 by intravenous injection. 5-Fluorouracil and leucovorin should be administered separately to avoid the formation of",
+    "fetchedAt": "2025-10-08T17:53:37.665Z"
+  },
+  "fetchedAt": "2025-10-08T17:53:37.824Z"
+}

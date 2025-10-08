@@ -1,0 +1,10 @@
+{
+  "medicationName": "Mycophenolate Mofetil",
+  "dosingInfo": {
+    "dosesPerDay": 2,
+    "isShortCourse": true,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION ADULTS DOSAGE Kidney Transplant 1 g twice daily, orally ( 2.2 ) Heart Transplant 1.5 g twice daily orally ( 2.3 ) Liver Transplant 1.5 g twice daily orally ( 2.4 ) PEDIATRICS Kidney Transplant 600 mg/m 2 orally twice daily, up to maximum of 2 g daily ( 2.2 ) Heart Transplant 600 mg/m 2 orally twice daily, (starting dose) up to a maximum of 900 mg/m 2 twice daily (3 g) ( 2.3 ) Liver Transplant 600 mg/m 2 orally twice daily,daily (starting dose) up to a maximum of 900 m",
+    "fetchedAt": "2025-10-08T17:55:04.079Z"
+  },
+  "fetchedAt": "2025-10-08T17:55:04.249Z"
+}
