@@ -119,15 +119,20 @@ export default function PrescriptionTransferPage() {
   // Text PDF to phone mutation
   const textPdfMutation = useMutation({
     mutationFn: async (requestId: string) => {
-      return apiRequest('POST', `/api/prescription-requests/${requestId}/text`);
+      console.log('📱 Sending SMS for prescription request:', requestId);
+      const response = await apiRequest('POST', `/api/prescription-requests/${requestId}/text`);
+      console.log('✅ SMS response:', response);
+      return response;
     },
     onSuccess: () => {
+      console.log('✅ SMS sent successfully');
       toast({
         title: "SMS Sent",
         description: "Prescription request PDF link sent to your phone",
       });
     },
     onError: (error: any) => {
+      console.error('❌ SMS error:', error);
       toast({
         title: "Failed to Send SMS",
         description: error.message || "Could not send SMS to your phone",
@@ -279,8 +284,12 @@ export default function PrescriptionTransferPage() {
 
       // Get prescription request ID from header
       const requestId = response.headers.get('X-Prescription-Request-Id');
+      console.log('📋 Prescription Request ID from server:', requestId);
       if (requestId) {
         setPrescriptionRequestId(requestId);
+        console.log('✅ Prescription Request ID saved:', requestId);
+      } else {
+        console.error('❌ No Prescription Request ID in response headers');
       }
 
       // Get PDF blob
@@ -314,6 +323,7 @@ export default function PrescriptionTransferPage() {
   };
 
   const handleDownloadPDF = () => {
+    console.log('📥 Download PDF clicked, pdfBlob exists:', !!pdfBlob);
     if (pdfBlob) {
       const url = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
@@ -328,7 +338,32 @@ export default function PrescriptionTransferPage() {
         title: "PDF Downloaded",
         description: "Your prescription request has been downloaded.",
       });
+    } else {
+      console.error('❌ No PDF blob available');
+      toast({
+        title: "Download Failed",
+        description: "PDF not available. Please try again.",
+        variant: "destructive"
+      });
     }
+  };
+
+  const handleTextToPhone = () => {
+    console.log('📱 Text to Phone button clicked');
+    console.log('   - Prescription Request ID:', prescriptionRequestId);
+    console.log('   - Mutation pending:', textPdfMutation.isPending);
+    
+    if (!prescriptionRequestId) {
+      console.error('❌ No prescription request ID available');
+      toast({
+        title: "Error",
+        description: "Prescription request ID not found. Please try submitting again.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    textPdfMutation.mutate(prescriptionRequestId);
   };
 
   const handleCopyMessage = () => {
@@ -1145,7 +1180,7 @@ export default function PrescriptionTransferPage() {
                   Download PDF
                 </Button>
                 <Button 
-                  onClick={() => prescriptionRequestId && textPdfMutation.mutate(prescriptionRequestId)}
+                  onClick={handleTextToPhone}
                   disabled={!prescriptionRequestId || textPdfMutation.isPending}
                   variant="outline"
                   className="flex-1 sm:flex-none sm:w-auto"
