@@ -1,172 +1,158 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Search, Pill, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Search, Pill, CheckCircle, Loader2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 interface Medication {
-  id: string;
   name: string;
-  genericName: string;
-  brandName?: string;
-  category: string;
-  dosageForm: string;
-  strength: string;
-  price: number;
-  requiresPrescription: boolean;
+  rxcui: string;
+  score: string;
 }
 
 interface MedicationSearchProps {
-  onSelect: (medication: Medication) => void;
-  selectedMedication?: Medication | null;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
-export function MedicationSearch({ onSelect, selectedMedication }: MedicationSearchProps) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Medication[]>([]);
+export function MedicationSearch({ value, onChange, placeholder = "Search medications...", className }: MedicationSearchProps) {
+  const [searchTerm, setSearchTerm] = useState(value);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<Medication[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const handleSearch = async () => {
-    if (!query.trim()) return;
-    
+  useEffect(() => {
+    setSearchTerm(value);
+  }, [value]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const searchMedications = async (term: string) => {
+    if (!term.trim() || term.length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
     setIsSearching(true);
+
     try {
-      const params = new URLSearchParams({ query: query.trim(), limit: "10" });
-      const response = await fetch(`/api/medications/search?${params}`);
+      const response = await fetch(`/api/medications/search?q=${encodeURIComponent(term)}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to search medications');
+      }
+
       const data = await response.json();
-      setResults(data.medications || []);
+      setSearchResults(data.medications || []);
+      setShowResults(true);
     } catch (error) {
-      console.error("Medication search error:", error);
-      setResults([]);
+      console.error('Medication search error:', error);
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch();
-    }
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm) {
+        searchMedications(searchTerm);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearchTerm(newValue);
+    onChange(newValue);
+  };
+
+  const handleSelectMedication = (medication: Medication) => {
+    onChange(medication.name);
+    setSearchTerm(medication.name);
+    setShowResults(false);
+  };
+
+  const handleClear = () => {
+    onChange("");
+    setSearchTerm("");
+    setSearchResults([]);
+    setShowResults(false);
   };
 
   return (
-    <div className="space-y-4">
-      {selectedMedication ? (
-        <Card className="border-primary/50 bg-primary/5">
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold text-foreground">{selectedMedication.name}</h3>
-                </div>
-                <div className="space-y-1 text-sm text-muted-foreground">
-                  <p><span className="font-medium">Generic:</span> {selectedMedication.genericName}</p>
-                  {selectedMedication.brandName && (
-                    <p><span className="font-medium">Brand:</span> {selectedMedication.brandName}</p>
-                  )}
-                  <p><span className="font-medium">Form:</span> {selectedMedication.dosageForm}</p>
-                  <p><span className="font-medium">Strength:</span> {selectedMedication.strength}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="secondary">{selectedMedication.category}</Badge>
-                    {selectedMedication.requiresPrescription && (
-                      <Badge variant="outline">Rx Required</Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => onSelect(null as any)}
-                data-testid="button-clear-medication"
-              >
-                Change
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by medication name..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="pl-10"
-                data-testid="input-search-medication"
-              />
-            </div>
-            <Button
-              type="button"
-              onClick={handleSearch}
-              disabled={isSearching || !query.trim()}
-              data-testid="button-search-medication"
-            >
-              {isSearching ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Search className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+    <div ref={wrapperRef} className={cn("relative", className)}>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="text"
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={() => searchTerm && searchResults.length > 0 && setShowResults(true)}
+          placeholder={placeholder}
+          className="pl-9 pr-9"
+          data-testid="input-medication-search"
+        />
+        {searchTerm && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+            onClick={handleClear}
+            data-testid="button-clear-medication"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        )}
+        {isSearching && (
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+        )}
+      </div>
 
-          {results.length > 0 && (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {results.map((medication) => (
-                <Card
-                  key={medication.id}
-                  className="hover-elevate active-elevate-2 cursor-pointer transition-shadow"
-                  onClick={() => {
-                    onSelect(medication);
-                    setQuery("");
-                    setResults([]);
-                  }}
-                  data-testid={`medication-result-${medication.id}`}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Pill className="h-4 w-4 text-primary" />
-                          <h4 className="font-semibold text-foreground">{medication.name}</h4>
-                        </div>
-                        <div className="space-y-1 text-sm text-muted-foreground">
-                          <p><span className="font-medium">Generic:</span> {medication.genericName}</p>
-                          <p><span className="font-medium">Form:</span> {medication.dosageForm} - {medication.strength}</p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <Badge variant="secondary" className="text-xs">{medication.category}</Badge>
-                            {medication.requiresPrescription && (
-                              <Badge variant="outline" className="text-xs">Rx Required</Badge>
-                            )}
-                            <span className="text-xs font-semibold text-primary ml-auto">
-                              ${medication.price.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+      {showResults && searchResults.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg">
+          <Command>
+            <CommandList>
+              <CommandGroup>
+                {searchResults.map((medication) => (
+                  <CommandItem
+                    key={medication.rxcui}
+                    value={medication.name}
+                    onSelect={() => handleSelectMedication(medication)}
+                    className="cursor-pointer"
+                    data-testid={`medication-result-${medication.rxcui}`}
+                  >
+                    <Pill className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>{medication.name}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </div>
+      )}
 
-          {query && results.length === 0 && !isSearching && (
-            <Card className="border-dashed">
-              <CardContent className="p-6 text-center text-muted-foreground">
-                <Pill className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No medications found. Try a different search term.</p>
-              </CardContent>
-            </Card>
-          )}
-        </>
+      {showResults && searchResults.length === 0 && searchTerm.length >= 2 && !isSearching && (
+        <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg p-4 text-sm text-muted-foreground text-center">
+          No medications found for "{searchTerm}"
+        </div>
       )}
     </div>
   );
