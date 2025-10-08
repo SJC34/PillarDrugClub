@@ -1435,4 +1435,39 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       res.status(500).json({ error: "Failed to send email", message: error.message });
     }
   });
+
+  // Search medications using RxNorm API
+  app.get("/api/medications/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      
+      if (!query || query.trim().length < 2) {
+        return res.json({ medications: [] });
+      }
+
+      // Use RxNorm API for drug search (free, no API key required)
+      const rxnormUrl = `https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=${encodeURIComponent(query)}&maxEntries=10`;
+      
+      const response = await fetch(rxnormUrl);
+      
+      if (!response.ok) {
+        console.error(`RxNorm API error: ${response.status}`);
+        return res.json({ medications: [] });
+      }
+
+      const data = await response.json();
+      
+      // Extract medication names from RxNorm response
+      const medications = data.approximateGroup?.candidate?.map((item: any) => ({
+        name: item.name,
+        rxcui: item.rxcui,
+        score: item.score
+      })) || [];
+
+      res.json({ medications });
+    } catch (error: any) {
+      console.error("Medication search error:", error);
+      res.json({ medications: [] });
+    }
+  });
 }
