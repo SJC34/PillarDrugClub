@@ -40,7 +40,7 @@ export function MedicationSearch({ value, onChange, placeholder = "Search medica
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const searchMedications = async (term: string) => {
+  const searchMedications = async (term: string, signal?: AbortSignal) => {
     if (!term.trim() || term.length < 2) {
       setSearchResults([]);
       setShowResults(false);
@@ -50,31 +50,44 @@ export function MedicationSearch({ value, onChange, placeholder = "Search medica
     setIsSearching(true);
 
     try {
-      const response = await fetch(`/api/medications/search?q=${encodeURIComponent(term)}`);
+      const response = await fetch(`/api/medications/search?q=${encodeURIComponent(term)}`, { signal });
       
       if (!response.ok) {
-        throw new Error('Failed to search medications');
+        console.error('Medication search failed with status:', response.status);
+        setSearchResults([]);
+        setShowResults(false);
+        return;
       }
 
       const data = await response.json();
       setSearchResults(data.medications || []);
-      setShowResults(true);
-    } catch (error) {
+      setShowResults(data.medications && data.medications.length > 0);
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        // Request was aborted, ignore
+        return;
+      }
       console.error('Medication search error:', error);
       setSearchResults([]);
+      setShowResults(false);
     } finally {
       setIsSearching(false);
     }
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const timeoutId = setTimeout(() => {
       if (searchTerm) {
-        searchMedications(searchTerm);
+        searchMedications(searchTerm, abortController.signal);
       }
     }, 300);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      abortController.abort();
+    };
   }, [searchTerm]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

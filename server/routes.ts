@@ -1164,6 +1164,48 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Medication routes
   app.get("/api/medications/search", async (req, res) => {
     try {
+      // If simple 'q' parameter is provided, use RxNorm API for drug name search
+      if (req.query.q && typeof req.query.q === 'string') {
+        const query = req.query.q as string;
+        
+        console.log(`💊 RxNorm medication search request: "${query}"`);
+        
+        if (!query.trim() || query.length < 2) {
+          console.log(`⚠️ Query too short: "${query}"`);
+          return res.json({ medications: [] });
+        }
+
+        // Use RxNorm API for drug search (free, no API key required)
+        const rxnormUrl = `https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=${encodeURIComponent(query)}&maxEntries=10`;
+        
+        console.log(`🔍 Calling RxNorm API: ${rxnormUrl}`);
+        
+        const response = await fetch(rxnormUrl);
+        
+        if (!response.ok) {
+          console.error(`❌ RxNorm API error: ${response.status}`);
+          return res.json({ medications: [] });
+        }
+
+        const data = await response.json();
+        
+        console.log(`📦 RxNorm response:`, JSON.stringify(data).substring(0, 200));
+        
+        // Extract medication names from RxNorm response, filtering out entries without names
+        const medications = data.approximateGroup?.candidate
+          ?.filter((item: any) => item.name && item.name.trim().length > 0)
+          ?.map((item: any) => ({
+            name: item.name,
+            rxcui: item.rxcui,
+            score: item.score
+          })) || [];
+
+        console.log(`✅ Returning ${medications.length} medications from RxNorm`);
+
+        return res.json({ medications });
+      }
+      
+      // Otherwise, use local medication database search
       // Convert query string parameters to proper types
       const convertedQuery = {
         ...req.query,
@@ -1433,41 +1475,6 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     } catch (error: any) {
       console.error("📧 Test email error:", error);
       res.status(500).json({ error: "Failed to send email", message: error.message });
-    }
-  });
-
-  // Search medications using RxNorm API
-  app.get("/api/medications/search", async (req, res) => {
-    try {
-      const query = req.query.q as string;
-      
-      if (!query || query.trim().length < 2) {
-        return res.json({ medications: [] });
-      }
-
-      // Use RxNorm API for drug search (free, no API key required)
-      const rxnormUrl = `https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=${encodeURIComponent(query)}&maxEntries=10`;
-      
-      const response = await fetch(rxnormUrl);
-      
-      if (!response.ok) {
-        console.error(`RxNorm API error: ${response.status}`);
-        return res.json({ medications: [] });
-      }
-
-      const data = await response.json();
-      
-      // Extract medication names from RxNorm response
-      const medications = data.approximateGroup?.candidate?.map((item: any) => ({
-        name: item.name,
-        rxcui: item.rxcui,
-        score: item.score
-      })) || [];
-
-      res.json({ medications });
-    } catch (error: any) {
-      console.error("Medication search error:", error);
-      res.json({ medications: [] });
     }
   });
 }
