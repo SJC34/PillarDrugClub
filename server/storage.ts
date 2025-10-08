@@ -279,12 +279,18 @@ export class MemStorage implements IStorage {
 
   async loadImportedMedications() {
     try {
-      // Import medications from DailyMed (FDA database)
-      const { importMedicationsFromDailyMed } = await import('../scripts/import-dailymed');
-      await importMedicationsFromDailyMed();
-      console.log(`✅ Loaded medications from DailyMed: ${this.medications.size} total`);
+      // Import medications from pharmacy CSV
+      const { importMedicationsFromCSV } = await import('../scripts/import-pharmacy-csv');
+      const medications = await importMedicationsFromCSV();
+      
+      // Add medications to storage
+      for (const med of medications) {
+        this.medications.set(med.id, med);
+      }
+      
+      console.log(`✅ Loaded medications from pharmacy CSV: ${this.medications.size} total`);
     } catch (error) {
-      console.log('⚠️  Could not load DailyMed medications:', error);
+      console.log('⚠️  Could not load pharmacy CSV medications:', error);
       console.log('Using sample medications only');
     }
   }
