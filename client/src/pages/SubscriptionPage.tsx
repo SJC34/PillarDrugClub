@@ -87,8 +87,7 @@ export default function SubscriptionPage() {
     "No insurance required",
     "Home delivery nationwide",
     "Real cost calculator",
-    "Transparent pricing",
-    "Cancel anytime"
+    "Transparent pricing"
   ];
 
   useEffect(() => {
@@ -298,7 +297,7 @@ export default function SubscriptionPage() {
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-2">Money-Back Guarantee</h4>
                 <p className="text-sm text-gray-600">
-                  Not satisfied? Cancel anytime in your first 30 days for a full refund.
+                  Not satisfied? Get a full refund within your first 30 days.
                 </p>
               </div>
             </CardContent>
@@ -320,7 +319,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div className="text-gray-600">per month</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {selectedPlan === 'basic' ? '1-3 medications' : '4+ medications'} • Cancel anytime
+                    {selectedPlan === 'basic' ? '1-3 medications' : '4+ medications'}
                   </div>
                 </div>
               </div>

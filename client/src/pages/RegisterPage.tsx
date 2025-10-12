@@ -203,8 +203,7 @@ export default function RegisterPage() {
     "No insurance required", 
     "Home delivery nationwide",
     "Real cost calculator",
-    "Transparent pricing",
-    "Cancel anytime"
+    "Transparent pricing"
   ];
 
   // Handle doctor selection
@@ -1126,7 +1125,7 @@ export default function RegisterPage() {
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl md:text-3xl font-bold text-teal-600">$25</div>
                     <div className="text-sm md:text-base text-muted-foreground">per month</div>
-                    <div className="text-xs md:text-sm text-muted-foreground mt-1">Plus Plan (4+ meds) • Cancel anytime</div>
+                    <div className="text-xs md:text-sm text-muted-foreground mt-1">Plus Plan (4+ meds)</div>
                   </div>
                 </div>
 

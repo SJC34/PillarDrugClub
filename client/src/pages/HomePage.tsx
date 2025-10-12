@@ -21,8 +21,7 @@ export default function HomePage() {
     "No insurance required",
     "Home delivery nationwide", 
     "Real cost calculator",
-    "Transparent pricing",
-    "Cancel anytime"
+    "Transparent pricing"
   ];
 
   const features = [
@@ -210,7 +209,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-          <p className="text-sm text-muted-foreground mt-6 font-bold">Cancel anytime • No hidden fees • Save thousands per year</p>
+          <p className="text-sm text-muted-foreground mt-6 font-bold">No hidden fees • Save thousands per year</p>
         </div>
       </section>
 
