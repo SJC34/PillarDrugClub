@@ -17,6 +17,8 @@ import AdminPortalPage from "@/pages/AdminPortalPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import AdminUsersPage from "@/pages/AdminUsersPage";
 import AdminFinancialPage from "@/pages/AdminFinancialPage";
+import AdminCommunicationsPage from "@/pages/AdminCommunicationsPage";
+import AdminReportsPage from "@/pages/AdminReportsPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
@@ -44,6 +46,8 @@ function Router() {
       <Route path="/admin/dashboard" component={AdminDashboardPage} />
       <Route path="/admin/users" component={AdminUsersPage} />
       <Route path="/admin/financial" component={AdminFinancialPage} />
+      <Route path="/admin/communications" component={AdminCommunicationsPage} />
+      <Route path="/admin/reports" component={AdminReportsPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />
