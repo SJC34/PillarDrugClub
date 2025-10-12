@@ -161,7 +161,10 @@ export default function MedicationDetailsPage() {
 
             <div className="flex gap-4">
               {medication.requiresPrescription ? (
-                <Link href={`/order/prescription/${medication.id}`} className="flex-1">
+                <Link 
+                  href={`/prescription-transfer?medicationName=${encodeURIComponent(medication.name)}&dosage=${encodeURIComponent(medication.strength)}&quantity=30`} 
+                  className="flex-1"
+                >
                   <Button 
                     size="lg" 
                     className="w-full"

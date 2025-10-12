@@ -195,6 +195,27 @@ export default function PrescriptionTransferPage() {
     }
   }, [user, isAuthenticated]);
 
+  // Prepopulate medication fields from URL parameters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const medicationName = params.get('medicationName');
+    const dosage = params.get('dosage');
+    const quantity = params.get('quantity');
+
+    if (medicationName) {
+      doctorForm.setValue("medicationName", medicationName);
+      pharmacyForm.setValue("medicationName", medicationName);
+    }
+    if (dosage) {
+      doctorForm.setValue("dosage", dosage);
+      pharmacyForm.setValue("dosage", dosage);
+    }
+    if (quantity) {
+      doctorForm.setValue("quantity", quantity);
+      pharmacyForm.setValue("quantity", quantity);
+    }
+  }, []);
+
   // Handle pharmacy selection from search
   const handlePharmacySelect = (pharmacy: any) => {
     setSelectedPharmacy(pharmacy);
