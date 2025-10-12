@@ -571,7 +571,7 @@ export default function PrescriptionTransferPage() {
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-3 italic">
-                      💡 Tip: Ask your doctor to write the prescription as "#365 tablets, no refills" for maximum savings on chronic medications.
+                      Tip: Ask your doctor to write the prescription as "#365 tablets, no refills" for maximum savings on chronic medications.
                     </p>
                   </div>
                 </div>
@@ -678,158 +678,176 @@ export default function PrescriptionTransferPage() {
                           Medication Information
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="medicationName" className="text-sm md:text-base">Medication Name</Label>
-                        <MedicationSearch
-                          value={doctorForm.watch("medicationName") || ""}
-                          onChange={(value) => doctorForm.setValue("medicationName", value)}
-                          placeholder="Search medications (e.g., Lisinopril)"
-                        />
-                        {doctorForm.formState.errors.medicationName && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.medicationName.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="dosage" className="text-sm md:text-base">Dosage</Label>
-                        <Input
-                          id="dosage"
-                          placeholder="10mg"
-                          {...doctorForm.register("dosage")}
-                          data-testid="input-dosage"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
-                        {doctorForm.formState.errors.dosage && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.dosage.message}</p>
-                        )}
-                      </div>
-                      <div className="sm:col-span-2 lg:col-span-1">
-                        <Label htmlFor="quantity" className="text-sm md:text-base">Quantity</Label>
-                        <Input
-                          id="quantity"
-                          placeholder="30 tablets"
-                          {...doctorForm.register("quantity")}
-                          data-testid="input-quantity"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
-                        {doctorForm.formState.errors.quantity && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.quantity.message}</p>
-                        )}
+                          <div>
+                            <Label htmlFor="medicationName" className="text-sm md:text-base">Medication Name</Label>
+                            <MedicationSearch
+                              value={doctorForm.watch("medicationName") || ""}
+                              onChange={(value) => doctorForm.setValue("medicationName", value)}
+                              placeholder="Search medications (e.g., Lisinopril)"
+                            />
+                            {doctorForm.formState.errors.medicationName && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.medicationName.message}</p>
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="dosage" className="text-sm md:text-base">Dosage</Label>
+                            <Input
+                              id="dosage"
+                              placeholder="10mg"
+                              {...doctorForm.register("dosage")}
+                              data-testid="input-dosage"
+                              className="h-10 md:h-11 text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.dosage && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.dosage.message}</p>
+                            )}
+                          </div>
+                          <div className="sm:col-span-2 lg:col-span-1">
+                            <Label htmlFor="quantity" className="text-sm md:text-base">Quantity</Label>
+                            <Input
+                              id="quantity"
+                              placeholder="30 tablets"
+                              {...doctorForm.register("quantity")}
+                              data-testid="input-quantity"
+                              className="h-10 md:h-11 text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.quantity && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.quantity.message}</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <Separator />
 
-                  {/* Doctor Information */}
-                  <div>
-                    <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      Doctor Information
-                    </h3>
-                    
-                    {/* Doctor Search */}
-                    <div className="mb-6">
-                      <DoctorSearch 
-                        onDoctorSelect={handleDoctorSelect}
-                        selectedDoctor={selectedDoctor}
-                        className="mb-4"
-                      />
+                  {/* Step 3: Doctor Information */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+                    {/* Left: Step 3 Indicator */}
+                    <div className="lg:col-span-3">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                          3
+                        </div>
+                        <div className="hidden lg:block">
+                          <p className="font-semibold text-sm text-foreground">Doctor Info</p>
+                          <p className="text-xs text-muted-foreground mt-1">Who will prescribe</p>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Right: Doctor Form Fields */}
+                    <div className="lg:col-span-9">
+                      <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2 lg:hidden">
+                        <User className="h-5 w-5" />
+                        Doctor Information
+                      </h3>
                     
-                    {/* Manual Entry Fields - shown only if no doctor selected or as fallback */}
-                    {!selectedDoctor && (
-                      <div className="space-y-4">
-                        <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-                          Can't find your doctor? Enter their information manually below.
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="doctorName" className="text-sm md:text-base">Doctor Name</Label>
-                            <Input
-                              id="doctorName"
-                              placeholder="Dr. Sarah Johnson"
-                              {...doctorForm.register("doctorName")}
-                              data-testid="input-doctor-name"
-                              className="h-10 md:h-11 text-sm md:text-base"
-                            />
-                            {doctorForm.formState.errors.doctorName && (
-                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorName.message}</p>
-                            )}
-                          </div>
-                          <div>
-                            <Label htmlFor="doctorPhone" className="text-sm md:text-base">Phone Number</Label>
-                            <Input
-                              id="doctorPhone"
-                              placeholder="(555) 123-4567"
-                              {...doctorForm.register("doctorPhone")}
-                              data-testid="input-doctor-phone"
-                              className="h-10 md:h-11 text-sm md:text-base"
-                            />
-                            {doctorForm.formState.errors.doctorPhone && (
-                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorPhone.message}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="doctorFax" className="text-sm md:text-base">Fax Number</Label>
-                            <Input
-                              id="doctorFax"
-                              placeholder="(555) 123-4568"
-                              {...doctorForm.register("doctorFax")}
-                              data-testid="input-doctor-fax"
-                              className="h-10 md:h-11 text-sm md:text-base"
-                            />
-                            {doctorForm.formState.errors.doctorFax && (
-                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorFax.message}</p>
-                            )}
-                          </div>
-                          <div>
-                            <Label htmlFor="urgency" className="text-sm md:text-base">Request Urgency</Label>
-                            <Select onValueChange={(value) => doctorForm.setValue("urgency", value as any)}>
-                              <SelectTrigger data-testid="select-urgency" className="h-10 md:h-11">
-                                <SelectValue placeholder="Select urgency" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="routine">Routine (24-48 hours)</SelectItem>
-                                <SelectItem value="urgent">Urgent (Same day)</SelectItem>
-                                <SelectItem value="emergency">Emergency (Immediate)</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="doctorAddress" className="text-sm md:text-base">Doctor Office Address</Label>
-                          <Textarea
-                            id="doctorAddress"
-                            placeholder="123 Medical Center Dr, City, State 12345"
-                            {...doctorForm.register("doctorAddress")}
-                            data-testid="textarea-doctor-address"
-                            className="min-h-[80px] md:min-h-[100px] text-sm md:text-base"
-                          />
-                          {doctorForm.formState.errors.doctorAddress && (
-                            <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorAddress.message}</p>
-                          )}
-                        </div>
+                      {/* Doctor Search */}
+                      <div className="mb-6">
+                        <DoctorSearch 
+                          onDoctorSelect={handleDoctorSelect}
+                          selectedDoctor={selectedDoctor}
+                          className="mb-4"
+                        />
                       </div>
-                    )}
                     
-                    {/* Urgency selector - always shown */}
-                    {selectedDoctor && (
-                      <div className="mt-4">
-                        <Label htmlFor="urgency" className="text-sm md:text-base">Request Urgency</Label>
-                        <Select onValueChange={(value) => doctorForm.setValue("urgency", value as any)}>
-                          <SelectTrigger data-testid="select-urgency" className="h-10 md:h-11">
-                            <SelectValue placeholder="Select urgency" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="routine">Routine (24-48 hours)</SelectItem>
-                            <SelectItem value="urgent">Urgent (Same day)</SelectItem>
-                            <SelectItem value="emergency">Emergency (Immediate)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
+                      {/* Manual Entry Fields - shown only if no doctor selected or as fallback */}
+                      {!selectedDoctor && (
+                        <div className="space-y-4">
+                          <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                            Can't find your doctor? Enter their information manually below.
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="doctorName" className="text-sm md:text-base">Doctor Name</Label>
+                              <Input
+                                id="doctorName"
+                                placeholder="Dr. Sarah Johnson"
+                                {...doctorForm.register("doctorName")}
+                                data-testid="input-doctor-name"
+                                className="h-10 md:h-11 text-sm md:text-base"
+                              />
+                              {doctorForm.formState.errors.doctorName && (
+                                <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorName.message}</p>
+                              )}
+                            </div>
+                            <div>
+                              <Label htmlFor="doctorPhone" className="text-sm md:text-base">Phone Number</Label>
+                              <Input
+                                id="doctorPhone"
+                                placeholder="(555) 123-4567"
+                                {...doctorForm.register("doctorPhone")}
+                                data-testid="input-doctor-phone"
+                                className="h-10 md:h-11 text-sm md:text-base"
+                              />
+                              {doctorForm.formState.errors.doctorPhone && (
+                                <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorPhone.message}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="doctorFax" className="text-sm md:text-base">Fax Number</Label>
+                              <Input
+                                id="doctorFax"
+                                placeholder="(555) 123-4568"
+                                {...doctorForm.register("doctorFax")}
+                                data-testid="input-doctor-fax"
+                                className="h-10 md:h-11 text-sm md:text-base"
+                              />
+                              {doctorForm.formState.errors.doctorFax && (
+                                <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorFax.message}</p>
+                              )}
+                            </div>
+                            <div>
+                              <Label htmlFor="urgency" className="text-sm md:text-base">Request Urgency</Label>
+                              <Select onValueChange={(value) => doctorForm.setValue("urgency", value as any)}>
+                                <SelectTrigger data-testid="select-urgency" className="h-10 md:h-11">
+                                  <SelectValue placeholder="Select urgency" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="routine">Routine (24-48 hours)</SelectItem>
+                                  <SelectItem value="urgent">Urgent (Same day)</SelectItem>
+                                  <SelectItem value="emergency">Emergency (Immediate)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div>
+                            <Label htmlFor="doctorAddress" className="text-sm md:text-base">Doctor Office Address</Label>
+                            <Textarea
+                              id="doctorAddress"
+                              placeholder="123 Medical Center Dr, City, State 12345"
+                              {...doctorForm.register("doctorAddress")}
+                              data-testid="textarea-doctor-address"
+                              className="min-h-[80px] md:min-h-[100px] text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.doctorAddress && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorAddress.message}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    
+                      {/* Urgency selector - always shown */}
+                      {selectedDoctor && (
+                        <div className="mt-4">
+                          <Label htmlFor="urgency" className="text-sm md:text-base">Request Urgency</Label>
+                          <Select onValueChange={(value) => doctorForm.setValue("urgency", value as any)}>
+                            <SelectTrigger data-testid="select-urgency" className="h-10 md:h-11">
+                              <SelectValue placeholder="Select urgency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="routine">Routine (24-48 hours)</SelectItem>
+                              <SelectItem value="urgent">Urgent (Same day)</SelectItem>
+                              <SelectItem value="emergency">Emergency (Immediate)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <Separator />
