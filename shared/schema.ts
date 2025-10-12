@@ -223,3 +223,39 @@ export const insertShipmentSchema = createInsertSchema(shipments).omit({
 
 export type InsertShipment = z.infer<typeof insertShipmentSchema>;
 export type Shipment = typeof shipments.$inferSelect;
+
+// Refill requests table
+export const refillRequests = pgTable("refill_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  prescriptionId: varchar("prescription_id").notNull().references(() => prescriptions.id, { onDelete: "cascade" }),
+  medicationName: text("medication_name").notNull(),
+  dosage: text("dosage").notNull(),
+  quantity: integer("quantity").notNull(),
+  status: text("status", { 
+    enum: ["pending", "approved", "rejected", "filled", "cancelled"] 
+  }).default("pending"),
+  priority: text("priority", { enum: ["routine", "urgent", "emergency"] }).default("routine"),
+  dueDate: text("due_date"), // When refill is due based on days supply
+  requestedDate: text("requested_date").notNull(),
+  approvedDate: text("approved_date"),
+  filledDate: text("filled_date"),
+  orderId: varchar("order_id").references(() => orders.id), // Links to order when filled
+  doctorName: text("doctor_name"),
+  doctorPhone: text("doctor_phone"),
+  pharmacyNotes: text("pharmacy_notes"),
+  patientNotes: text("patient_notes"),
+  autoRequested: boolean("auto_requested").default(false), // True if automatically triggered
+  reminderSent: boolean("reminder_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertRefillRequestSchema = createInsertSchema(refillRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertRefillRequest = z.infer<typeof insertRefillRequestSchema>;
+export type RefillRequest = typeof refillRequests.$inferSelect;
