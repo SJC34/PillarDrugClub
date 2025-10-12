@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pill, Phone, MapPin, User, Save, ArrowLeft } from "lucide-react";
+import { Pill, Phone, MapPin, User, Save, ArrowLeft, Calendar } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 const settingsSchema = z.object({
+  dateOfBirth: z.string().optional(),
   phoneNumber: z.string()
     .min(10, "Please enter a valid phone number")
     .regex(/^[\+]?[(]?[0-9]{1,3}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,4}[-\s\.]?[0-9]{1,9}$/, "Please enter a valid phone number"),
@@ -36,6 +37,7 @@ export default function SettingsPage() {
   const form = useForm<SettingsForm>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
+      dateOfBirth: user?.dateOfBirth || "",
       phoneNumber: user?.phoneNumber || "",
       smsConsent: user?.smsConsent === "true",
       street: (user?.userAddress as any)?.street || "",
@@ -57,6 +59,7 @@ export default function SettingsPage() {
       };
 
       return apiRequest("PATCH", `/api/users/${user.id}`, {
+        dateOfBirth: data.dateOfBirth,
         phoneNumber: data.phoneNumber,
         smsConsent: data.smsConsent,
         userAddress,
@@ -107,6 +110,41 @@ export default function SettingsPage() {
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)}>
+          {/* Personal Information */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <User className="h-5 w-5 text-primary" />
+                Personal Information
+              </CardTitle>
+              <CardDescription className="text-sm md:text-base">
+                Update your personal details
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="dateOfBirth" className="text-sm md:text-base">
+                  Date of Birth
+                </Label>
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  {...form.register("dateOfBirth")}
+                  data-testid="input-date-of-birth"
+                  className="h-10 md:h-11"
+                />
+                {form.formState.errors.dateOfBirth && (
+                  <p className="text-xs md:text-sm text-destructive mt-1">
+                    {form.formState.errors.dateOfBirth.message}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Required for prescription requests and pharmacy records
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Contact Information */}
           <Card className="mb-6">
             <CardHeader>
