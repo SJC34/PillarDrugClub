@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Shield, 
   FileText,
@@ -10,7 +11,9 @@ import {
   User,
   Phone,
   Calendar,
-  Clock
+  Clock,
+  Package,
+  Truck
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -50,7 +53,12 @@ export default function AdminPortalPage() {
     queryKey: ["/api/admin/prescription-requests"],
   });
 
+  const { data: ordersData, isLoading: ordersLoading } = useQuery<{ orders: any[] }>({
+    queryKey: ["/api/orders/search"],
+  });
+
   const requests = data?.requests || [];
+  const orders = ordersData?.orders || [];
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
@@ -156,89 +164,165 @@ export default function AdminPortalPage() {
           </Card>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
+        <Tabs defaultValue="prescriptions" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="prescriptions" data-testid="tab-prescriptions">
+              <FileText className="h-4 w-4 mr-2" />
               Prescription Requests
-            </CardTitle>
-            <CardDescription>
-              All prescription requests submitted by patients
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="p-8 text-center text-muted-foreground">Loading requests...</div>
-            ) : requests.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">No prescription requests yet</div>
-            ) : (
-              <div className="space-y-4">
-                {requests.map((request) => (
-                  <Card key={request.id} className="hover-elevate" data-testid={`card-request-${request.id}`}>
-                    <CardContent className="p-4 md:p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <User className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Patient</span>
-                          </div>
-                          <p className="font-semibold text-foreground">{request.patientName}</p>
-                          <p className="text-sm text-muted-foreground">DOB: {request.dateOfBirth}</p>
-                        </div>
-                        
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Pill className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Medication</span>
-                          </div>
-                          <p className="font-semibold text-foreground">{request.medicationName}</p>
-                          <p className="text-sm text-muted-foreground">{request.dosage} - Qty: {request.quantity}</p>
-                        </div>
+            </TabsTrigger>
+            <TabsTrigger value="orders" data-testid="tab-orders">
+              <Package className="h-4 w-4 mr-2" />
+              Orders
+            </TabsTrigger>
+          </TabsList>
 
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Phone className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Doctor</span>
-                          </div>
-                          <p className="font-semibold text-foreground">{request.doctorName}</p>
-                          <p className="text-sm text-muted-foreground">{request.doctorPhone}</p>
-                        </div>
+          <TabsContent value="prescriptions">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Prescription Requests
+                </CardTitle>
+                <CardDescription>
+                  All prescription requests submitted by patients
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="p-8 text-center text-muted-foreground">Loading requests...</div>
+                ) : requests.length === 0 ? (
+                  <div className="p-8 text-center text-muted-foreground">No prescription requests yet</div>
+                ) : (
+                  <div className="space-y-4">
+                    {requests.map((request) => (
+                      <Card key={request.id} className="hover-elevate" data-testid={`card-request-${request.id}`}>
+                        <CardContent className="p-4 md:p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Patient</span>
+                              </div>
+                              <p className="font-semibold text-foreground">{request.patientName}</p>
+                              <p className="text-sm text-muted-foreground">DOB: {request.dateOfBirth}</p>
+                            </div>
+                            
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Pill className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Medication</span>
+                              </div>
+                              <p className="font-semibold text-foreground">{request.medicationName}</p>
+                              <p className="text-sm text-muted-foreground">{request.dosage} - Qty: {request.quantity}</p>
+                            </div>
 
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Urgency</span>
-                          </div>
-                          <Badge className={getUrgencyColor(request.urgency)}>
-                            {request.urgency}
-                          </Badge>
-                        </div>
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Phone className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Doctor</span>
+                              </div>
+                              <p className="font-semibold text-foreground">{request.doctorName}</p>
+                              <p className="text-sm text-muted-foreground">{request.doctorPhone}</p>
+                            </div>
 
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Shield className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Status</span>
-                          </div>
-                          <Badge className={getStatusColor(request.status)}>
-                            {request.status}
-                          </Badge>
-                        </div>
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Urgency</span>
+                              </div>
+                              <Badge className={getUrgencyColor(request.urgency)}>
+                                {request.urgency}
+                              </Badge>
+                            </div>
 
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Date</span>
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Shield className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Status</span>
+                              </div>
+                              <Badge className={getStatusColor(request.status)}>
+                                {request.status}
+                              </Badge>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Date</span>
+                              </div>
+                              <p className="font-semibold text-foreground">{request.requestDate}</p>
+                            </div>
                           </div>
-                          <p className="font-semibold text-foreground">{request.requestDate}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="orders">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Orders
+                </CardTitle>
+                <CardDescription>
+                  All orders placed by customers
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {ordersLoading ? (
+                  <div className="p-8 text-center text-muted-foreground">Loading orders...</div>
+                ) : orders.length === 0 ? (
+                  <div className="p-8 text-center text-muted-foreground">No orders yet</div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <Card key={order.id} className="hover-elevate" data-testid={`card-order-${order.id}`}>
+                        <CardContent className="p-4 md:p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div>
+                              <p className="font-semibold text-lg">Order #{order.orderNumber}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(order.createdAt).toLocaleDateString('en-US', {
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </p>
+                            </div>
+                            <Badge variant={order.status === 'delivered' ? 'default' : 'secondary'}>
+                              {order.status.replace(/_/g, ' ')}
+                            </Badge>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-sm text-muted-foreground mb-1">Items</p>
+                              <p className="font-medium">{order.items?.length || 0} items</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground mb-1">Total</p>
+                              <p className="font-medium">${parseFloat(order.total).toFixed(2)}</p>
+                            </div>
+                            <div className="flex items-end justify-end md:justify-start">
+                              <Link href={`/orders/${order.id}`}>
+                                <Button variant="outline" size="sm">View Details</Button>
+                              </Link>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
