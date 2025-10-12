@@ -137,10 +137,33 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
          .text(`Special Instructions: ${data.specialInstructions}`, leftColX, instrY, { width: colWidth });
     }
     
+    // Step 3 - Doctor Information (left column, below medication)
+    doc.moveDown(1);
+    const step3Y = doc.y;
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('STEP 3: PRESCRIBER INFORMATION', leftColX, step3Y, { width: colWidth });
+    
+    doc.moveDown(0.5);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Doctor: ${data.doctorName}`, leftColX, doc.y, { width: colWidth });
+    doc.text(`Phone: ${data.doctorPhone}`, leftColX, doc.y, { width: colWidth });
+    
+    if (data.doctorFax) {
+      doc.text(`Fax: ${data.doctorFax}`, leftColX, doc.y, { width: colWidth });
+    }
+    
+    if (data.doctorAddress) {
+      doc.text(`Address: ${data.doctorAddress}`, leftColX, doc.y, { width: colWidth });
+    }
+    
     const leftColEndY = doc.y;
 
     // Right Column: Savings Information Section (highlighted box)
-    const savingsBoxHeight = 125;
+    const savingsBoxHeight = 90;
     doc.roundedRect(rightColX, twoColumnY, colWidth, savingsBoxHeight, 4)
        .lineWidth(2)
        .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
@@ -153,19 +176,19 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     doc.fontSize(9)
        .font('Helvetica-Bold')
        .fillColor(BRAND_FOREGROUND)
-       .text('Example: Levothyroxine 25mcg', rightColX + 10, twoColumnY + 32, { width: colWidth - 20 });
+       .text('Example: Levothyroxine 25mcg', rightColX + 10, twoColumnY + 30, { width: colWidth - 20 });
     
     doc.fontSize(9)
        .font('Helvetica-Bold')
        .fillColor(BRAND_MUTED)
-       .text('Traditional Insurance: ', rightColX + 10, twoColumnY + 47, { continued: true })
+       .text('Traditional Insurance: ', rightColX + 10, twoColumnY + 43, { continued: true })
        .font('Helvetica')
        .text('$120/year', { width: colWidth - 20 });
     
     doc.fontSize(9)
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text('Pillar Wholesale: ', rightColX + 10, twoColumnY + 60, { continued: true })
+       .text('Pillar Wholesale: ', rightColX + 10, twoColumnY + 56, { continued: true })
        .font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
        .text('$7.30/year', { width: colWidth - 20 });
@@ -173,35 +196,37 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     doc.fontSize(10)
        .font('Helvetica-Bold')
        .fillColor(BRAND_SECONDARY)
-       .text('Patient Saves $112.70/year', rightColX + 10, twoColumnY + 75, { width: colWidth - 20 });
+       .text('Patient Saves $112.70/year', rightColX + 10, twoColumnY + 71, { width: colWidth - 20 });
+
+    // Right Column: Prescription Writing Example (below savings box)
+    const boxGap = 15;
+    const rxExampleY = twoColumnY + savingsBoxHeight + boxGap;
+    const rxExampleBoxHeight = 65;
+    doc.roundedRect(rightColX, rxExampleY, colWidth, rxExampleBoxHeight, 4)
+       .lineWidth(2)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_SECONDARY);
     
-    const rightColEndY = twoColumnY + savingsBoxHeight;
+    doc.fontSize(10)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('HOW TO WRITE THE RX:', rightColX + 10, rxExampleY + 10, { width: colWidth - 20 });
+    
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('#365', rightColX + 10, rxExampleY + 30, { width: colWidth - 20 });
+    
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('REFILLS: 0', rightColX + 10, rxExampleY + 48, { width: colWidth - 20 });
+    
+    // Right column ends at bottom of second box
+    // savingsBoxHeight (90) + gap (15) + rxExampleBoxHeight (65) = 170
+    const rightColEndY = twoColumnY + savingsBoxHeight + boxGap + rxExampleBoxHeight;
     
     // Move down past the two-column section (use the taller column)
     doc.y = Math.max(leftColEndY, rightColEndY) + 20;
-
-    // Step 3 - Doctor Information (clean section)
-    doc.fontSize(11)
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_SECONDARY)
-       .text('STEP 3: PRESCRIBER INFORMATION');
-    
-    doc.moveDown(0.8);
-    doc.fontSize(10)
-       .font('Helvetica')
-       .fillColor(BRAND_FOREGROUND)
-       .text(`Doctor: ${data.doctorName}`)
-       .text(`Phone: ${data.doctorPhone}`);
-    
-    if (data.doctorFax) {
-      doc.text(`Fax: ${data.doctorFax}`);
-    }
-    
-    if (data.doctorAddress) {
-      doc.text(`Address: ${data.doctorAddress}`);
-    }
-    
-    doc.moveDown(2);
 
     // Step 4 - Provider Instructions (Critical Section with teal branding)
     const step4BoxY = doc.y;
