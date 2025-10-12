@@ -1,0 +1,10 @@
+{
+  "medicationName": "Verapamil Er",
+  "dosingInfo": {
+    "dosesPerDay": 3,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION The dose of verapamil must be individualized by titration. The usefulness and safety of dosages exceeding 480 mg/day have not been established; therefore, this daily dosage should not be exceeded. Since the half-life of verapamil increases during chronic dosing, maximum response may be delayed. Angina: Clinical trials show that the usual dose is 80 mg to 120 mg three times a day. However, 40 mg three times a day may be warranted in patients who may have an increased res",
+    "fetchedAt": "2025-10-08T18:11:53.596Z"
+  },
+  "fetchedAt": "2025-10-08T18:11:53.759Z"
+}

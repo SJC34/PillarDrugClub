@@ -1,0 +1,10 @@
+{
+  "medicationName": "Risperidone",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Table 1. Recommended Daily Dosage by Indication Initial Dose Titration (Increments) Target Dose Effective Dose Range Schizophrenia: adults ( 2.1 ) 2 mg 1 to 2 mg 4 to 8 mg 4 to 16 mg Schizophrenia: adolescents ( 2.2 ) 0.5 mg 0.5 to 1 mg 3 mg 1 to 6 mg Bipolar mania: adults ( 2.2 ) 2 to 3 mg 1 mg 1 to 6 mg 1 to 6 mg Bipolar mania: children and adolescents ( 2.2 ) 0.5 mg 0.5 to 1 mg 1 to 2.5 mg 1 to 6 mg Irritability in autistic disorder ( 2.3 ) 0.25 mg Can increase to ",
+    "fetchedAt": "2025-10-08T18:09:53.900Z"
+  },
+  "fetchedAt": "2025-10-08T18:09:54.071Z"
+}

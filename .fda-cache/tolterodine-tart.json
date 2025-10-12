@@ -1,0 +1,10 @@
+{
+  "medicationName": "Tolterodine Tart",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION • 4 mg capsules taken orally once daily with water and swallowed whole. ( 2.1 ) • 2 mg capsules taken orally once daily with water and swallowed whole in the presence of: o mild to moderate hepatic impairment (Child-Pugh class A or B) ( 2.2 ) o severe renal impairment [Creatinine Clearance (CCr) 10-30 mL/min] ( 2.2 ) o drugs that are potent CYP3A4 inhibitors. ( 2.2 ) • Tolterodine tartrate extended-release capsules are not recommended for use in patients with CCr <10 ",
+    "fetchedAt": "2025-10-08T18:11:07.792Z"
+  },
+  "fetchedAt": "2025-10-08T18:11:07.950Z"
+}

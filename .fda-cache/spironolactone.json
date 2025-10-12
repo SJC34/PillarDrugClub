@@ -1,0 +1,10 @@
+{
+  "medicationName": "Spironolactone",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Heart Failure: Initiate treatment at 25 mg once daily ( 2.2 ). Hypertension: Initiate treatment at 25 mg to 100 mg daily in either single or divided doses ( 2.3 ). Edema: Initiate therapy in a hospital setting and titrate slowly. The recommended initial daily dose is 100 mg in single or divided doses ( 2. 4). Primary hyperaldosteronism: Initiate treatment at 100 mg to 400 mg in preparation for surgery. In patients unsuitable for surgery use the lowest effective dosage",
+    "fetchedAt": "2025-10-08T18:10:26.238Z"
+  },
+  "fetchedAt": "2025-10-08T18:10:26.397Z"
+}

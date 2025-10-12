@@ -1,0 +1,10 @@
+{
+  "medicationName": "Temozolomide",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": true,
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Administer either orally or intravenously. ( 2.4 ) Newly Diagnosed Glioblastoma : 75 mg/m 2 once daily for 42 to 49 days concomitant with focal radiotherapy followed by initial maintenance dose of 150 mg/m 2 once daily for Days 1 to 5 of each 28-day cycle for 6 cycles. May increase maintenance dose to 200 mg/m 2 for Cycles 2 to 6 based on toxicity. ( 2.1 ) Provide Pneumocystis pneumonia (PCP) prophylaxis during concomitant phase and continue in patients who develop ly",
+    "fetchedAt": "2025-10-08T18:10:50.697Z"
+  },
+  "fetchedAt": "2025-10-08T18:10:50.855Z"
+}

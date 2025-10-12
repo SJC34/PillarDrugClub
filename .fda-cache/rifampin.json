@@ -1,0 +1,10 @@
+{
+  "medicationName": "Rifampin",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": true,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION Rifampin can be administered by the oral route or by IV infusion (see INDICATIONS AND USAGE ). IV doses are the same as those for oral. See CLINICAL PHARMACOLOGY for dosing information in patients with renal failure. Tuberculosis Adults: 10 mg/kg, in a single daily administration, not to exceed 600 mg/day, oral or IV Pediatric Patients: 10–20 mg/kg, not to exceed 600 mg/day, oral or IV It is recommended that oral rifampin be administered once daily, either 1 hour before",
+    "fetchedAt": "2025-10-08T18:09:50.792Z"
+  },
+  "fetchedAt": "2025-10-08T18:09:50.957Z"
+}

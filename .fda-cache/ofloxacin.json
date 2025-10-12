@@ -1,0 +1,10 @@
+{
+  "medicationName": "Ofloxacin",
+  "dosingInfo": {
+    "dosesPerDay": 1,
+    "isShortCourse": false,
+    "rawDosageText": "DOSAGE AND ADMINISTRATION Otitis Externa: The recommended dosage regimen for the treatment of otitis externa is: For pediatric patients (from 6 months to 13 years old): Five drops (0.25 mL, 0.75 mg ofloxacin) instilled into the affected ear once daily for seven days. For patients 13 years and older: Ten drops (0.5 mL, 1.5 mg ofloxacin) instilled into the affected ear once daily for seven days. The solution should be warmed by holding the bottle in the hand for one or two minutes to avoid dizzine",
+    "fetchedAt": "2025-10-08T18:08:22.540Z"
+  },
+  "fetchedAt": "2025-10-08T18:08:22.699Z"
+}
