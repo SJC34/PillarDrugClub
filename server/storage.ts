@@ -28,6 +28,7 @@ export interface IStorage {
   updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string | null): Promise<User | undefined>;
   updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
   updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined>;
+  updateUserAllergies(id: string, allergies: string[]): Promise<User | undefined>;
   getAllUsers(filters?: { search?: string; role?: string; status?: string; page?: number; limit?: number }): Promise<{ users: User[]; total: number }>;
 
   // Cart
@@ -524,6 +525,19 @@ export class MemStorage implements IStorage {
       primaryDoctorNpi: doctor.doctorNpi || null,
       primaryDoctorPhone: doctor.doctorPhone || null,
       primaryDoctorAddress: doctor.doctorAddress || null,
+      updatedAt: new Date()
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updateUserAllergies(id: string, allergies: string[]): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = {
+      ...user,
+      drugAllergies: allergies,
       updatedAt: new Date()
     };
     this.users.set(id, updatedUser);
@@ -1925,6 +1939,17 @@ export class DbStorage extends MemStorage {
         primaryDoctorNpi: doctor.doctorNpi ?? null,
         primaryDoctorPhone: doctor.doctorPhone ?? null,
         primaryDoctorAddress: doctor.doctorAddress ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserAllergies(id: string, allergies: string[]): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        drugAllergies: allergies,
         updatedAt: new Date(),
       })
       .where(eq(users.id, id))

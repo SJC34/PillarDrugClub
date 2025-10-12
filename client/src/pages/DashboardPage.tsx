@@ -33,6 +33,8 @@ export default function DashboardPage() {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("loading");
   const [showDoctorSearch, setShowDoctorSearch] = useState(false);
+  const [showAllergiesEdit, setShowAllergiesEdit] = useState(false);
+  const [allergiesInput, setAllergiesInput] = useState("");
 
   useEffect(() => {
     // Check if user is logged in
@@ -153,6 +155,46 @@ export default function DashboardPage() {
       });
     },
   });
+
+  // Update drug allergies mutation
+  const updateAllergiesMutation = useMutation({
+    mutationFn: async (allergies: string[]) => {
+      return apiRequest('PUT', `/api/users/${user?.id}/allergies`, { drugAllergies: allergies });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/auth/user'] 
+      });
+      setShowAllergiesEdit(false);
+      toast({
+        title: "Allergies Updated",
+        description: "Your drug allergies have been updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Update Allergies",
+        description: error.message || "Could not update your drug allergies",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Open allergies edit dialog
+  const openAllergiesEdit = () => {
+    const currentAllergies = user?.drugAllergies?.join(', ') || '';
+    setAllergiesInput(currentAllergies);
+    setShowAllergiesEdit(true);
+  };
+
+  // Save allergies
+  const saveAllergies = () => {
+    const allergiesArray = allergiesInput
+      .split(',')
+      .map(a => a.trim())
+      .filter(a => a.length > 0);
+    updateAllergiesMutation.mutate(allergiesArray);
+  };
 
   if (!user || subscriptionStatus === "loading") {
     return (
@@ -578,6 +620,132 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Drug Allergies */}
+        <Card className="mt-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Drug Allergies</CardTitle>
+                <CardDescription>
+                  Important medication allergies and adverse reactions
+                </CardDescription>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={openAllergiesEdit}
+                data-testid="button-edit-allergies"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!user?.drugAllergies || user.drugAllergies.length === 0 ? (
+              <div className="text-center py-8">
+                <Pill className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">No drug allergies on file</p>
+                <Button 
+                  variant="outline"
+                  onClick={openAllergiesEdit}
+                  data-testid="button-add-allergies"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Allergies
+                </Button>
+              </div>
+            ) : (
+              <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                    <Pill className="h-6 w-6 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">
+                      Known Allergies
+                    </h4>
+                    <div className="flex flex-wrap gap-2" data-testid="allergies-list">
+                      {user.drugAllergies.map((allergy: string, idx: number) => (
+                        <Badge 
+                          key={idx} 
+                          variant="destructive"
+                          data-testid={`allergy-${idx}`}
+                        >
+                          {allergy}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Allergies Edit Modal */}
+        {showAllergiesEdit && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Edit Drug Allergies</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowAllergiesEdit(false)}
+                    data-testid="button-close-allergies-edit"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CardDescription>
+                  List any medications you're allergic to, separated by commas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="allergies" className="block text-sm font-medium mb-2">
+                      Drug Allergies
+                    </label>
+                    <textarea
+                      id="allergies"
+                      value={allergiesInput}
+                      onChange={(e) => setAllergiesInput(e.target.value)}
+                      placeholder="e.g., Penicillin, Aspirin, Sulfa drugs"
+                      className="w-full min-h-[120px] p-3 border rounded-md focus:ring-2 focus:ring-primary"
+                      data-testid="input-allergies"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Separate multiple allergies with commas
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setShowAllergiesEdit(false)}
+                      data-testid="button-cancel-allergies"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={saveAllergies}
+                      disabled={updateAllergiesMutation.isPending}
+                      data-testid="button-save-allergies"
+                    >
+                      {updateAllergiesMutation.isPending ? "Saving..." : "Save"}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Doctor Search Modal */}
         {showDoctorSearch && (

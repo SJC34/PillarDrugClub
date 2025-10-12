@@ -1662,8 +1662,16 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Update user's primary doctor
-  app.put("/api/users/:userId/primary-doctor", async (req, res) => {
+  app.put("/api/users/:userId/primary-doctor", async (req: any, res) => {
     try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      if (req.user.id !== req.params.userId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
       const { doctorId, doctorName, doctorNpi, doctorPhone, doctorAddress } = req.body;
       
       if (!doctorName) {
@@ -1686,6 +1694,44 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       console.error("Error updating primary doctor:", error);
       res.status(500).json({ 
         error: "Failed to update primary doctor", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Update user's drug allergies
+  app.put("/api/users/:userId/allergies", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      if (req.user.id !== req.params.userId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      const { drugAllergies } = req.body;
+      
+      if (!Array.isArray(drugAllergies)) {
+        return res.status(400).json({ error: "drugAllergies must be an array" });
+      }
+
+      // Validate each allergy is a string
+      const allergyValidation = z.array(z.string()).safeParse(drugAllergies);
+      if (!allergyValidation.success) {
+        return res.status(400).json({ error: "All allergies must be strings" });
+      }
+
+      await storage.updateUserAllergies(req.params.userId, drugAllergies);
+
+      res.json({ 
+        success: true, 
+        message: "Drug allergies updated successfully" 
+      });
+    } catch (error: any) {
+      console.error("Error updating drug allergies:", error);
+      res.status(500).json({ 
+        error: "Failed to update drug allergies", 
         message: error.message 
       });
     }
