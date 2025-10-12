@@ -18,6 +18,7 @@ import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
 import OrdersPage from "@/pages/OrdersPage";
+import ShipmentTrackingPage from "@/pages/ShipmentTrackingPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/checkout" component={CheckoutPage} />
       <Route path="/orders" component={OrdersPage} />
       <Route path="/orders/:id" component={OrderDetailsPage} />
+      <Route path="/tracking/:trackingNumber" component={ShipmentTrackingPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

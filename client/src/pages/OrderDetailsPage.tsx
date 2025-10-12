@@ -50,12 +50,28 @@ const statusConfig = {
   returned: { icon: Package, label: "Returned", color: "bg-gray-500" },
 };
 
+type Shipment = {
+  id: string;
+  orderId: string;
+  trackingNumber: string;
+  carrier: string;
+  status: string;
+  shippedDate: string | null;
+  estimatedDeliveryDate: string | null;
+  actualDeliveryDate: string | null;
+};
+
 export default function OrderDetailsPage() {
   const [, params] = useRoute("/orders/:id");
   const orderId = params?.id;
 
   const { data: order, isLoading } = useQuery<Order>({
     queryKey: [`/api/orders/${orderId}`],
+    enabled: !!orderId,
+  });
+
+  const { data: shipment } = useQuery<Shipment>({
+    queryKey: [`/api/shipments/order/${orderId}`],
     enabled: !!orderId,
   });
 
@@ -179,6 +195,49 @@ export default function OrderDetailsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {shipment && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5" />
+                Shipping Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Tracking Number</p>
+                    <p className="font-medium" data-testid="text-tracking-number">
+                      {shipment.trackingNumber}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Carrier</p>
+                    <p className="font-medium" data-testid="text-carrier">
+                      {shipment.carrier}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Status</p>
+                    <p className="font-medium capitalize" data-testid="text-shipment-status">
+                      {shipment.status.replace(/_/g, ' ')}
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-3 border-t">
+                  <Link href={`/tracking/${shipment.trackingNumber}`}>
+                    <Button variant="outline" size="sm" data-testid="button-track-shipment">
+                      <Truck className="h-4 w-4 mr-2" />
+                      Track Shipment
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="flex gap-4">
           <Button asChild data-testid="button-continue-shopping">

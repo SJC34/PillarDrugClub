@@ -1501,6 +1501,18 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  app.get("/api/shipments/tracking/:trackingNumber", async (req, res) => {
+    try {
+      const shipment = await storage.getShipmentByTrackingNumber(req.params.trackingNumber);
+      if (!shipment) {
+        return res.status(404).json({ error: "Shipment not found" });
+      }
+      res.json(shipment);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.get("/api/shipments/order/:orderId", async (req, res) => {
     try {
       const shipment = await storage.getShipmentByOrderId(req.params.orderId);
