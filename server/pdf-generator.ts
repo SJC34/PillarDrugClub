@@ -128,59 +128,56 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
 
     // Savings Information Section (highlighted box)
     const savingsBoxY = doc.y;
-    doc.roundedRect(60, savingsBoxY, 492, 120, 4)
-       .lineWidth(1.5)
+    doc.roundedRect(60, savingsBoxY, 492, 125, 4)
+       .lineWidth(2)
        .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
     
-    doc.fontSize(11)
+    doc.fontSize(12)
        .font('Helvetica-Bold')
        .fillColor(BRAND_SECONDARY)
-       .text('MAXIMIZE YOUR SAVINGS WITH YEAR SUPPLY PRESCRIPTIONS', 75, savingsBoxY + 15, { width: 462 });
+       .text("MAXIMIZE YOUR PATIENT'S SAVINGS WITH YEAR SUPPLY PRESCRIPTIONS", 75, savingsBoxY + 15, { width: 462 });
     
-    doc.moveDown(1);
-    doc.fontSize(9)
-       .font('Helvetica')
+    doc.moveDown(1.2);
+    doc.fontSize(10)
+       .font('Helvetica-Bold')
        .fillColor(BRAND_FOREGROUND)
        .text('Example: Levothyroxine 25mcg', 75, doc.y, { width: 462 });
     
+    doc.moveDown(0.7);
+    
+    // Traditional Insurance Model - larger, clearer
+    doc.fontSize(10)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_MUTED)
+       .text('Traditional Insurance Model: ', 75, doc.y, { continued: true })
+       .font('Helvetica')
+       .text('30 tablets + 11 refills = $10/month copays = ', { continued: true })
+       .font('Helvetica-Bold')
+       .text('$120/year');
+    
     doc.moveDown(0.5);
     
-    // Traditional Insurance Model
-    doc.fontSize(8)
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_MUTED)
-       .text('Traditional Insurance Model:', 75, doc.y)
-       .font('Helvetica')
-       .text('30 tablets + 11 refills = $10/month copays = $120/year', 75, doc.y);
-    
-    doc.moveDown(0.3);
-    
-    // Pillar Wholesale Price
-    doc.fontSize(8)
+    // Pillar Wholesale Price - larger, clearer
+    doc.fontSize(10)
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text('Pillar Wholesale Price:', 75, doc.y)
+       .text('Pillar Wholesale Price: ', 75, doc.y, { continued: true })
        .font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
-       .text('#365 tablets, no refills = $7.30/year', 75, doc.y);
+       .text('#365 tablets, no refills = ', { continued: true })
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('$7.30/year');
     
-    doc.moveDown(0.3);
+    doc.moveDown(0.6);
     
-    // Savings
-    doc.fontSize(9)
+    // Savings - larger
+    doc.fontSize(11)
        .font('Helvetica-Bold')
        .fillColor(BRAND_SECONDARY)
-       .text('Save $112.70 per year', 75, doc.y);
+       .text('Patient Saves $112.70 per year', 75, doc.y);
     
-    doc.moveDown(0.8);
-    
-    // Prescription Writing Tip
-    doc.fontSize(8)
-       .font('Helvetica-Oblique')
-       .fillColor(BRAND_MUTED)
-       .text('Tip: Request your doctor write the prescription as "#365 tablets, no refills" for maximum savings on chronic medications.', 75, doc.y, { width: 462 });
-    
-    doc.moveDown(2);
+    doc.moveDown(1.8);
 
     // Step 3 - Doctor Information (clean section)
     doc.fontSize(11)
