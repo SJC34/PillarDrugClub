@@ -14,6 +14,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
 import SettingsPage from "@/pages/SettingsPage";
 import AdminPortalPage from "@/pages/AdminPortalPage";
+import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
@@ -36,8 +37,9 @@ function Router() {
       <Route path="/subscription" component={SubscriptionPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/settings" component={SettingsPage} />
-      <Route path="/admin" component={AdminPortalPage} />
+      <Route path="/admin" component={AdminDashboardPage} />
       <Route path="/admin-portal" component={AdminPortalPage} />
+      <Route path="/admin/dashboard" component={AdminDashboardPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />

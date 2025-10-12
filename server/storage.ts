@@ -94,6 +94,39 @@ export interface IStorage {
   createRefillRequest(request: any): Promise<any>;
   updateRefillRequest(id: string, request: any): Promise<any | undefined>;
   getPrescriptionsNeedingRefill(userId: string): Promise<any[]>; // Get prescriptions that need refilling soon
+
+  // Dashboard Metrics
+  getDashboardMetrics(): Promise<{
+    userMetrics: {
+      totalUsers: number;
+      newUsersThisWeek: number;
+      activeUsers: number;
+      usersByTier: { basic: number; plus: number };
+    };
+    prescriptionMetrics: {
+      totalActivePrescriptions: number;
+      prescriptionsNeedingRefill: number;
+      pendingPrescriptionRequests: number;
+      prescriptionsByStatus: { [key: string]: number };
+    };
+    orderMetrics: {
+      totalOrders: number;
+      ordersThisMonth: number;
+      ordersByStatus: { [key: string]: number };
+      revenueEstimate: string;
+    };
+    refillMetrics: {
+      totalRefillRequests: number;
+      pendingRefills: number;
+      urgentRefills: number;
+      refillsApprovedToday: number;
+    };
+    recentActivity: {
+      recentPrescriptionRequests: Array<{ id: string; patientName: string; medicationName: string; urgency: string; requestDate: string }>;
+      recentRefillRequests: Array<{ id: string; patientName: string; medicationName: string; priority: string; requestedDate: string }>;
+      recentOrders: Array<{ id: string; orderNumber: string; status: string; total: string; createdAt: string }>;
+    };
+  }>;
 }
 
 export class MemStorage implements IStorage {
@@ -1534,6 +1567,147 @@ export class MemStorage implements IStorage {
 
     return prescriptionsNeedingRefill.sort((a, b) => a.daysUntilRefill - b.daysUntilRefill);
   }
+
+  async getDashboardMetrics() {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // User Metrics
+    const allUsers = Array.from(this.users.values());
+    const totalUsers = allUsers.length;
+    const newUsersThisWeek = allUsers.filter(u => u.createdAt && new Date(u.createdAt) >= oneWeekAgo).length;
+    
+    // Active users: users with active prescriptions or recent orders
+    const activeUserIds = new Set<string>();
+    Array.from(this.prescriptions.values())
+      .filter(p => p.status === 'active')
+      .forEach(p => activeUserIds.add(p.customerId));
+    Array.from(this.orders.values())
+      .filter(o => new Date(o.createdAt) >= oneMonthAgo)
+      .forEach(o => activeUserIds.add(o.customerId));
+    const activeUsers = activeUserIds.size;
+
+    // Users by tier (Basic = incomplete/canceled/past_due, Plus = active subscription)
+    const usersByTier = {
+      basic: allUsers.filter(u => u.subscriptionStatus !== 'active').length,
+      plus: allUsers.filter(u => u.subscriptionStatus === 'active').length
+    };
+
+    // Prescription Metrics
+    const allPrescriptions = Array.from(this.prescriptions.values());
+    const totalActivePrescriptions = allPrescriptions.filter(p => p.status === 'active').length;
+    
+    // Prescriptions needing refill (due within 7 days)
+    let prescriptionsNeedingRefill = 0;
+    for (const prescription of allPrescriptions) {
+      if (prescription.status === 'active' && prescription.lastFillDate && prescription.daysSupply) {
+        const lastFillDate = new Date(prescription.lastFillDate);
+        const refillDueDate = new Date(lastFillDate);
+        refillDueDate.setDate(lastFillDate.getDate() + prescription.daysSupply);
+        const daysUntilRefill = Math.floor((refillDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysUntilRefill <= 7 && daysUntilRefill >= 0) {
+          prescriptionsNeedingRefill++;
+        }
+      }
+    }
+
+    const allPrescriptionRequests = Array.from(this.prescriptionRequests.values());
+    const pendingPrescriptionRequests = allPrescriptionRequests.filter(r => r.status === 'pending').length;
+    
+    const prescriptionsByStatus: { [key: string]: number } = {};
+    allPrescriptions.forEach(p => {
+      prescriptionsByStatus[p.status] = (prescriptionsByStatus[p.status] || 0) + 1;
+    });
+
+    // Order Metrics
+    const allOrders = Array.from(this.orders.values());
+    const totalOrders = allOrders.length;
+    const ordersThisMonth = allOrders.filter(o => new Date(o.createdAt) >= oneMonthAgo).length;
+    
+    const ordersByStatus: { [key: string]: number } = {};
+    allOrders.forEach(o => {
+      ordersByStatus[o.status] = (ordersByStatus[o.status] || 0) + 1;
+    });
+
+    const revenueEstimate = allOrders.reduce((sum, o) => sum + parseFloat(o.total.toString()), 0).toFixed(2);
+
+    // Refill Metrics
+    const allRefillRequests = Array.from(this.refillRequests.values());
+    const totalRefillRequests = allRefillRequests.length;
+    const pendingRefills = allRefillRequests.filter(r => r.status === 'pending').length;
+    const urgentRefills = allRefillRequests.filter(r => r.priority === 'urgent' || r.priority === 'emergency').length;
+    const refillsApprovedToday = allRefillRequests.filter(r => 
+      r.status === 'approved' && new Date(r.approvedAt || '') >= startOfToday
+    ).length;
+
+    // Recent Activity
+    const recentPrescriptionRequests = allPrescriptionRequests
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10)
+      .map(r => ({
+        id: r.id,
+        patientName: r.patientName,
+        medicationName: r.medicationName,
+        urgency: r.urgency,
+        requestDate: r.requestDate
+      }));
+
+    const recentRefillRequests = allRefillRequests
+      .sort((a, b) => new Date(b.requestedDate || b.createdAt).getTime() - new Date(a.requestedDate || a.createdAt).getTime())
+      .slice(0, 10)
+      .map(r => ({
+        id: r.id,
+        patientName: r.patientName || 'Unknown',
+        medicationName: r.medicationName || 'Unknown',
+        priority: r.priority || 'routine',
+        requestedDate: r.requestedDate || r.createdAt
+      }));
+
+    const recentOrders = allOrders
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10)
+      .map(o => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        status: o.status,
+        total: o.total.toString(),
+        createdAt: o.createdAt
+      }));
+
+    return {
+      userMetrics: {
+        totalUsers,
+        newUsersThisWeek,
+        activeUsers,
+        usersByTier
+      },
+      prescriptionMetrics: {
+        totalActivePrescriptions,
+        prescriptionsNeedingRefill,
+        pendingPrescriptionRequests,
+        prescriptionsByStatus
+      },
+      orderMetrics: {
+        totalOrders,
+        ordersThisMonth,
+        ordersByStatus,
+        revenueEstimate
+      },
+      refillMetrics: {
+        totalRefillRequests,
+        pendingRefills,
+        urgentRefills,
+        refillsApprovedToday
+      },
+      recentActivity: {
+        recentPrescriptionRequests,
+        recentRefillRequests,
+        recentOrders
+      }
+    };
+  }
 }
 
 export class DbStorage extends MemStorage {
@@ -1842,6 +2016,147 @@ export class DbStorage extends MemStorage {
       interactions: dbMed.interactions ?? [],
       createdAt: dbMed.createdAt.toISOString(),
       updatedAt: dbMed.updatedAt.toISOString(),
+    };
+  }
+
+  async getDashboardMetrics() {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // User Metrics - fetch from database instead of in-memory Map
+    const allUsers = await db.select().from(users);
+    const totalUsers = allUsers.length;
+    const newUsersThisWeek = allUsers.filter(u => u.createdAt && new Date(u.createdAt) >= oneWeekAgo).length;
+    
+    // Active users: users with active prescriptions or recent orders
+    const activeUserIds = new Set<string>();
+    Array.from(this.prescriptions.values())
+      .filter(p => p.status === 'active')
+      .forEach(p => activeUserIds.add(p.customerId));
+    Array.from(this.orders.values())
+      .filter(o => new Date(o.createdAt) >= oneMonthAgo)
+      .forEach(o => activeUserIds.add(o.customerId));
+    const activeUsers = activeUserIds.size;
+
+    // Users by tier (Basic = incomplete/canceled/past_due, Plus = active subscription)
+    const usersByTier = {
+      basic: allUsers.filter(u => u.subscriptionStatus !== 'active').length,
+      plus: allUsers.filter(u => u.subscriptionStatus === 'active').length
+    };
+
+    // Prescription Metrics - use in-memory Maps
+    const allPrescriptions = Array.from(this.prescriptions.values());
+    const totalActivePrescriptions = allPrescriptions.filter(p => p.status === 'active').length;
+    
+    // Prescriptions needing refill (due within 7 days)
+    let prescriptionsNeedingRefill = 0;
+    for (const prescription of allPrescriptions) {
+      if (prescription.status === 'active' && prescription.lastFillDate && prescription.daysSupply) {
+        const lastFillDate = new Date(prescription.lastFillDate);
+        const refillDueDate = new Date(lastFillDate);
+        refillDueDate.setDate(lastFillDate.getDate() + prescription.daysSupply);
+        const daysUntilRefill = Math.floor((refillDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysUntilRefill <= 7 && daysUntilRefill >= 0) {
+          prescriptionsNeedingRefill++;
+        }
+      }
+    }
+
+    const allPrescriptionRequests = Array.from(this.prescriptionRequests.values());
+    const pendingPrescriptionRequests = allPrescriptionRequests.filter(r => r.status === 'pending').length;
+    
+    const prescriptionsByStatus: { [key: string]: number } = {};
+    allPrescriptions.forEach(p => {
+      prescriptionsByStatus[p.status] = (prescriptionsByStatus[p.status] || 0) + 1;
+    });
+
+    // Order Metrics
+    const allOrders = Array.from(this.orders.values());
+    const totalOrders = allOrders.length;
+    const ordersThisMonth = allOrders.filter(o => new Date(o.createdAt) >= oneMonthAgo).length;
+    
+    const ordersByStatus: { [key: string]: number } = {};
+    allOrders.forEach(o => {
+      ordersByStatus[o.status] = (ordersByStatus[o.status] || 0) + 1;
+    });
+
+    const revenueEstimate = allOrders.reduce((sum, o) => sum + parseFloat(o.total.toString()), 0).toFixed(2);
+
+    // Refill Metrics
+    const allRefillRequests = Array.from(this.refillRequests.values());
+    const totalRefillRequests = allRefillRequests.length;
+    const pendingRefills = allRefillRequests.filter(r => r.status === 'pending').length;
+    const urgentRefills = allRefillRequests.filter(r => r.priority === 'urgent' || r.priority === 'emergency').length;
+    const refillsApprovedToday = allRefillRequests.filter(r => 
+      r.status === 'approved' && new Date(r.approvedAt || '') >= startOfToday
+    ).length;
+
+    // Recent Activity
+    const recentPrescriptionRequests = allPrescriptionRequests
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10)
+      .map(r => ({
+        id: r.id,
+        patientName: r.patientName,
+        medicationName: r.medicationName,
+        urgency: r.urgency,
+        requestDate: r.requestDate
+      }));
+
+    const recentRefillRequests = allRefillRequests
+      .sort((a, b) => new Date(b.requestedDate || b.createdAt).getTime() - new Date(a.requestedDate || a.createdAt).getTime())
+      .slice(0, 10)
+      .map(r => ({
+        id: r.id,
+        patientName: r.patientName || 'Unknown',
+        medicationName: r.medicationName || 'Unknown',
+        priority: r.priority || 'routine',
+        requestedDate: r.requestedDate || r.createdAt
+      }));
+
+    const recentOrders = allOrders
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10)
+      .map(o => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        status: o.status,
+        total: o.total.toString(),
+        createdAt: o.createdAt
+      }));
+
+    return {
+      userMetrics: {
+        totalUsers,
+        newUsersThisWeek,
+        activeUsers,
+        usersByTier
+      },
+      prescriptionMetrics: {
+        totalActivePrescriptions,
+        prescriptionsNeedingRefill,
+        pendingPrescriptionRequests,
+        prescriptionsByStatus
+      },
+      orderMetrics: {
+        totalOrders,
+        ordersThisMonth,
+        ordersByStatus,
+        revenueEstimate
+      },
+      refillMetrics: {
+        totalRefillRequests,
+        pendingRefills,
+        urgentRefills,
+        refillsApprovedToday
+      },
+      recentActivity: {
+        recentPrescriptionRequests,
+        recentRefillRequests,
+        recentOrders
+      }
     };
   }
 }

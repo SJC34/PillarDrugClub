@@ -1248,6 +1248,32 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Admin dashboard metrics endpoint
+  app.get("/api/admin/dashboard-metrics", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    
+    // Fetch full user from storage to get role
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const metrics = await storage.getDashboardMetrics();
+      res.json(metrics);
+    } catch (error: any) {
+      console.error("Error fetching dashboard metrics:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch dashboard metrics", 
+        message: error.message 
+      });
+    }
+  });
+
   // Get user's current medications (active prescriptions)
   app.get("/api/users/:userId/medications", async (req, res) => {
     try {

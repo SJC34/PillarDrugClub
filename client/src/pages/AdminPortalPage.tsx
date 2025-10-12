@@ -92,18 +92,20 @@ export default function AdminPortalPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-teal-100 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 mb-6 md:mb-8">
-          <Link href="/">
-            <Button variant="outline" size="sm" data-testid="button-logout">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Pill className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Admin Dashboard</h1>
-              <p className="text-sm md:text-base text-muted-foreground">Manage prescription requests</p>
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <div className="flex items-center gap-4">
+            <Link href="/admin">
+              <Button variant="outline" size="sm" data-testid="button-back-dashboard">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+            <div className="flex items-center gap-2">
+              <Pill className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">Admin Management</h1>
+                <p className="text-sm md:text-base text-muted-foreground">Manage prescription requests, orders & refills</p>
+              </div>
             </div>
           </div>
         </div>
