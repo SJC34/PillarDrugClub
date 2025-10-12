@@ -151,7 +151,7 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
 
     // Step 4 - Provider Instructions (Critical Section with teal branding)
     const step4BoxY = doc.y;
-    doc.roundedRect(60, step4BoxY, 492, 155, 4)
+    doc.roundedRect(60, step4BoxY, 492, 200, 4)
        .lineWidth(2)
        .fillAndStroke(BRAND_LIGHT_BG, BRAND_SECONDARY);
     
@@ -170,11 +170,43 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     doc.fontSize(11)
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text('Pillar Drug Club', 75, doc.y)
-       .fontSize(10)
+       .text('HealthWarehouse', 75, doc.y);
+    
+    doc.moveDown(0.6);
+    doc.fontSize(9)
        .font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
-       .text('Search pharmacy directory for "Pillar Drug Club"', 75, doc.y);
+       .text('Pharmacy Lookup Information:', 75, doc.y);
+    
+    doc.moveDown(0.5);
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('NCPDP: ', 75, doc.y, { continued: true })
+       .font('Helvetica')
+       .text('1832674    ', { continued: true })
+       .font('Helvetica-Bold')
+       .text('NPI: ', { continued: true })
+       .font('Helvetica')
+       .text('1619252160    ', { continued: true })
+       .font('Helvetica-Bold')
+       .text('DEA: ', { continued: true })
+       .font('Helvetica')
+       .text('FH1427536');
+    
+    doc.moveDown(0.5);
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Location: ', 75, doc.y, { continued: true })
+       .font('Helvetica')
+       .text('Florence, KY 41042');
+    
+    doc.moveDown(0.5);
+    doc.fontSize(8)
+       .font('Helvetica-Oblique')
+       .fillColor(BRAND_MUTED)
+       .text('Note: Filter by "Retail" or "Mail Order" in your pharmacy directory', 75, doc.y, { width: 462 });
     
     doc.moveDown(1);
     doc.fontSize(9)
@@ -236,6 +268,7 @@ I am a member of Pillar Drug Club, a wholesale prescription pharmacy service. I 
 Patient Information:
 - Name: ${data.patientName}
 - Date of Birth: ${data.dateOfBirth}
+- Email: ${data.patientEmail || 'REQUIRED'}
 
 Prescription Requested:
 - Medication: ${data.medicationName}
@@ -243,9 +276,17 @@ Prescription Requested:
 - Quantity: ${data.quantity}
 ${data.specialInstructions ? `- Special Instructions: ${data.specialInstructions}` : ''}
 
-Please send this prescription to:
-Pillar Drug Club (my wholesale pharmacy)
-Via: Surescripts eRx Network or fax
+Please send this prescription via Surescripts eRx Network to:
+
+HealthWarehouse
+NCPDP: 1832674
+NPI: 1619252160
+DEA: FH1427536
+Location: Florence, KY 41042
+
+Note: You may find us under "Retail" or "Mail Order" filter in your pharmacy directory.
+
+IMPORTANT: Please include my email address (${data.patientEmail || 'REQUIRED'}) in the prescription so the pharmacy can match it to my account.
 
 I have attached a detailed prescription request form for your review.
 
