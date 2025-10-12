@@ -24,9 +24,11 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>; // For Replit OAuth
+  updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
   updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string | null): Promise<User | undefined>;
   updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
   updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined>;
+  getAllUsers(filters?: { search?: string; role?: string; status?: string; page?: number; limit?: number }): Promise<{ users: User[]; total: number }>;
 
   // Cart
   getCartItems(userId: string): Promise<any[]>;
@@ -525,6 +527,42 @@ export class MemStorage implements IStorage {
     };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+
+  async getAllUsers(filters?: { search?: string; role?: string; status?: string; page?: number; limit?: number }): Promise<{ users: User[]; total: number }> {
+    let users = Array.from(this.users.values());
+    
+    // Apply search filter (search in name and email)
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      users = users.filter(user => 
+        (user.firstName?.toLowerCase().includes(searchLower)) ||
+        (user.lastName?.toLowerCase().includes(searchLower)) ||
+        (user.email?.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    // Apply role filter
+    if (filters?.role) {
+      users = users.filter(user => user.role === filters.role);
+    }
+    
+    // Apply status filter (subscription status)
+    if (filters?.status) {
+      users = users.filter(user => user.subscriptionStatus === filters.status);
+    }
+    
+    const total = users.length;
+    
+    // Apply pagination
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    
+    users = users.slice(startIndex, endIndex);
+    
+    return { users, total };
   }
 
   // Cart methods
@@ -1886,6 +1924,58 @@ export class DbStorage extends MemStorage {
       .where(eq(users.id, id))
       .returning();
     return result[0];
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User> {
+    const result = await db.update(users)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!result[0]) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    return result[0];
+  }
+
+  async getAllUsers(filters?: { search?: string; role?: string; status?: string; page?: number; limit?: number }): Promise<{ users: User[]; total: number }> {
+    // Get all users from database
+    let allUsers = await db.select().from(users);
+    
+    // Apply search filter (search in name and email)
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      allUsers = allUsers.filter(user => 
+        (user.firstName?.toLowerCase().includes(searchLower)) ||
+        (user.lastName?.toLowerCase().includes(searchLower)) ||
+        (user.email?.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    // Apply role filter
+    if (filters?.role) {
+      allUsers = allUsers.filter(user => user.role === filters.role);
+    }
+    
+    // Apply status filter (subscription status)
+    if (filters?.status) {
+      allUsers = allUsers.filter(user => user.subscriptionStatus === filters.status);
+    }
+    
+    const total = allUsers.length;
+    
+    // Apply pagination
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    
+    const paginatedUsers = allUsers.slice(startIndex, endIndex);
+    
+    return { users: paginatedUsers, total };
   }
   
   // Helper method to verify password

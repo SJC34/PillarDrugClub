@@ -95,24 +95,26 @@ export default function AdminDashboardPage() {
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Total Users */}
-          <Card className="hover-elevate">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Total Users</p>
-                  <p className="text-2xl font-bold" data-testid="metric-total-users">
-                    {metrics?.userMetrics.totalUsers || 0}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    +{metrics?.userMetrics.newUsersThisWeek || 0} this week
-                  </p>
+          <Link href="/admin/users">
+            <Card className="hover-elevate cursor-pointer transition-all">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                    <p className="text-2xl font-bold" data-testid="metric-total-users">
+                      {metrics?.userMetrics.totalUsers || 0}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      +{metrics?.userMetrics.newUsersThisWeek || 0} this week
+                    </p>
+                  </div>
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <Users className="h-6 w-6 text-blue-600" />
+                  </div>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
           {/* Active Prescriptions */}
           <Card className="hover-elevate">

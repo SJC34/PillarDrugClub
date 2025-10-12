@@ -15,6 +15,7 @@ import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
 import SettingsPage from "@/pages/SettingsPage";
 import AdminPortalPage from "@/pages/AdminPortalPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
+import AdminUsersPage from "@/pages/AdminUsersPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboardPage} />
       <Route path="/admin-portal" component={AdminPortalPage} />
       <Route path="/admin/dashboard" component={AdminDashboardPage} />
+      <Route path="/admin/users" component={AdminUsersPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />

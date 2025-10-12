@@ -1274,6 +1274,224 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Admin user management endpoints
+
+  // GET /api/admin/users - List all users with filtering
+  app.get("/api/admin/users", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const { search, role, status, page, limit } = req.query;
+      
+      const filters = {
+        search: search as string | undefined,
+        role: role as string | undefined,
+        status: status as string | undefined,
+        page: page ? parseInt(page as string) : 1,
+        limit: limit ? parseInt(limit as string) : 10
+      };
+
+      const { users, total } = await storage.getAllUsers(filters);
+      
+      // Remove password from response
+      const sanitizedUsers = users.map(({ password, ...user }) => user);
+      
+      res.json({ 
+        users: sanitizedUsers,
+        total,
+        page: filters.page,
+        limit: filters.limit,
+        totalPages: Math.ceil(total / filters.limit)
+      });
+    } catch (error: any) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch users", 
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/admin/users/:userId - Get detailed user information
+  app.get("/api/admin/users/:userId", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Get additional user details
+      const prescriptions = await storage.getUserPrescriptions(req.params.userId);
+      const orders = await storage.getUserOrders(req.params.userId);
+      
+      // Calculate totals
+      const activePrescriptionsCount = prescriptions.filter((p: any) => p.status === 'active').length;
+      const ordersCount = orders.length;
+      const totalSpent = orders.reduce((sum: number, order: any) => {
+        const total = typeof order.total === 'string' ? parseFloat(order.total) : order.total;
+        return sum + (isNaN(total) ? 0 : total);
+      }, 0);
+
+      // Get recent orders (last 5)
+      const recentOrders = orders
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
+
+      // Remove password from response
+      const { password, ...userResponse } = targetUser;
+
+      res.json({
+        ...userResponse,
+        stats: {
+          activePrescriptionsCount,
+          ordersCount,
+          totalSpent: totalSpent.toFixed(2),
+          lastActive: targetUser.updatedAt
+        },
+        recentOrders: recentOrders.map((order: any) => ({
+          id: order.id,
+          orderNumber: order.orderNumber,
+          status: order.status,
+          total: order.total,
+          createdAt: order.createdAt
+        }))
+      });
+    } catch (error: any) {
+      console.error("Error fetching user details:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch user details", 
+        message: error.message 
+      });
+    }
+  });
+
+  // PATCH /api/admin/users/:userId - Update user information
+  app.patch("/api/admin/users/:userId", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      // Validate input with Zod
+      const updateSchema = z.object({
+        email: z.string().email().optional(),
+        phoneNumber: z.string().optional(),
+        role: z.enum(["admin", "client", "broker", "company"]).optional(),
+        subscriptionStatus: z.enum(["active", "canceled", "past_due", "incomplete"]).optional(),
+        isActive: z.string().optional()
+      });
+
+      const validatedData = updateSchema.parse(req.body);
+      
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const updatedUser = await storage.updateUser(req.params.userId, validatedData);
+      
+      // Remove password from response
+      const { password, ...userResponse } = updatedUser;
+      
+      res.json({ user: userResponse });
+    } catch (error: any) {
+      console.error("Error updating user:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Validation failed", 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ 
+        error: "Failed to update user", 
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/admin/users/:userId/suspend - Suspend/unsuspend user account
+  app.post("/api/admin/users/:userId/suspend", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      // Validate input
+      const suspendSchema = z.object({
+        is_active: z.boolean(),
+        reason: z.string().optional()
+      });
+
+      const { is_active, reason } = suspendSchema.parse(req.body);
+      
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Prevent self-suspension
+      if (req.params.userId === user.id) {
+        return res.status(400).json({ error: "Cannot suspend your own account" });
+      }
+
+      const updatedUser = await storage.updateUser(req.params.userId, {
+        isActive: is_active ? "true" : "false"
+      });
+      
+      console.log(`Admin ${user.email} ${is_active ? 'activated' : 'suspended'} user ${targetUser.email}${reason ? `: ${reason}` : ''}`);
+      
+      // Remove password from response
+      const { password, ...userResponse } = updatedUser;
+      
+      res.json({ 
+        user: userResponse,
+        message: is_active ? "User account activated" : "User account suspended"
+      });
+    } catch (error: any) {
+      console.error("Error suspending/activating user:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Validation failed", 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ 
+        error: "Failed to update user status", 
+        message: error.message 
+      });
+    }
+  });
+
   // Get user's current medications (active prescriptions)
   app.get("/api/users/:userId/medications", async (req, res) => {
     try {
