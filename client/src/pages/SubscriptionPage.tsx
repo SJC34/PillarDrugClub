@@ -14,12 +14,15 @@ import { useAuth } from "@/hooks/useAuth";
 const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 const stripePromise = STRIPE_PUBLIC_KEY ? loadStripe(STRIPE_PUBLIC_KEY) : null;
 
-const SubscribeForm = () => {
+const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  const planPrice = selectedPlan === 'basic' ? 15 : 25;
+  const planName = selectedPlan === 'basic' ? 'Basic Plan (1-3 meds)' : 'Plus Plan (4+ meds)';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +68,7 @@ const SubscribeForm = () => {
         disabled={!stripe || isLoading}
         data-testid="button-subscribe"
       >
-        {isLoading ? "Processing..." : "Subscribe for $10/month"}
+        {isLoading ? "Processing..." : `Subscribe ${planName} for $${planPrice}/month`}
       </Button>
     </form>
   );
@@ -74,6 +77,7 @@ const SubscribeForm = () => {
 export default function SubscriptionPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'plus'>('plus');
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
@@ -108,10 +112,27 @@ export default function SubscriptionPage() {
       return;
     }
 
-    // Create subscription as soon as the page loads
-    apiRequest("POST", "/api/create-subscription", { userId: user.id })
+    // Reset loading state and clear previous client secret when plan changes
+    setIsLoading(true);
+    setClientSecret("");
+
+    // Track the current plan to prevent race conditions
+    const currentPlan = selectedPlan;
+    let cancelled = false;
+
+    // Create subscription with selected plan
+    apiRequest("POST", "/api/create-subscription", { 
+      userId: user.id,
+      plan: selectedPlan 
+    })
       .then((res) => res.json())
       .then((data) => {
+        // Ignore response if plan changed or effect was cancelled
+        if (cancelled || currentPlan !== selectedPlan) {
+          console.log(`Ignoring stale response for ${currentPlan} plan`);
+          return;
+        }
+        
         if (data.clientSecret) {
           setClientSecret(data.clientSecret);
         } else {
@@ -119,17 +140,28 @@ export default function SubscriptionPage() {
         }
       })
       .catch((error) => {
-        console.error("Subscription creation error:", error);
-        toast({
-          title: "Error",
-          description: "Failed to initialize subscription. Please try again.",
-          variant: "destructive",
-        });
+        // Only show error if this is still the active request
+        if (!cancelled && currentPlan === selectedPlan) {
+          console.error("Subscription creation error:", error);
+          toast({
+            title: "Error",
+            description: "Failed to initialize subscription. Please try again.",
+            variant: "destructive",
+          });
+        }
       })
       .finally(() => {
-        setIsLoading(false);
+        // Only update loading state if this is still the active request
+        if (!cancelled && currentPlan === selectedPlan) {
+          setIsLoading(false);
+        }
       });
-  }, [authLoading, isAuthenticated, user]);
+
+    // Cleanup function to cancel stale requests
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, isAuthenticated, user, selectedPlan]);
 
   if (isLoading) {
     return (
@@ -189,7 +221,7 @@ export default function SubscriptionPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-5xl mx-auto p-6">
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/">
@@ -199,7 +231,46 @@ export default function SubscriptionPage() {
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Membership</h1>
-          <p className="text-gray-600">Subscribe for $10/month to access wholesale prescription pricing</p>
+          <p className="text-gray-600">Choose your plan and access wholesale prescription pricing</p>
+        </div>
+
+        {/* Plan Selection */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Select Your Plan</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+            <Card 
+              className={`cursor-pointer transition-all hover-elevate ${selectedPlan === 'basic' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
+              onClick={() => setSelectedPlan('basic')}
+              data-testid="card-plan-basic"
+            >
+              <CardHeader>
+                <CardTitle className="text-lg">Basic Plan</CardTitle>
+                <div className="text-2xl font-bold text-primary">
+                  $15<span className="text-base text-muted-foreground">/month</span>
+                </div>
+                <CardDescription>1-3 medications</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card 
+              className={`cursor-pointer transition-all hover-elevate relative ${selectedPlan === 'plus' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
+              onClick={() => setSelectedPlan('plus')}
+              data-testid="card-plan-plus"
+            >
+              {selectedPlan === 'plus' && (
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
+                  SELECTED
+                </div>
+              )}
+              <CardHeader>
+                <CardTitle className="text-lg">Plus Plan</CardTitle>
+                <div className="text-2xl font-bold text-primary">
+                  $25<span className="text-base text-muted-foreground">/month</span>
+                </div>
+                <CardDescription>4+ medications</CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -211,7 +282,7 @@ export default function SubscriptionPage() {
                 Your Membership Benefits
               </CardTitle>
               <CardDescription>
-                Everything included in your $10/month subscription
+                Everything included in your subscription
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -244,15 +315,19 @@ export default function SubscriptionPage() {
             <CardContent>
               <div className="mb-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-3xl font-bold text-blue-600">$10</div>
+                  <div className="text-3xl font-bold text-blue-600">
+                    ${selectedPlan === 'basic' ? '15' : '25'}
+                  </div>
                   <div className="text-gray-600">per month</div>
-                  <div className="text-sm text-gray-500 mt-1">Cancel anytime</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {selectedPlan === 'basic' ? '1-3 medications' : '4+ medications'} • Cancel anytime
+                  </div>
                 </div>
               </div>
 
               {/* Make SURE to wrap the form in <Elements> which provides the stripe context. */}
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <SubscribeForm />
+              <Elements key={clientSecret} stripe={stripePromise} options={{ clientSecret }}>
+                <SubscribeForm selectedPlan={selectedPlan} />
               </Elements>
 
               <div className="mt-4 text-center text-xs text-gray-500">

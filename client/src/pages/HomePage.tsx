@@ -132,7 +132,7 @@ export default function HomePage() {
             Join the drug membership saving people thousands of dollars per year!
             <br />
             Annual medication supplies at true wholesale prices—zero markups, pure savings. 
-            Home delivery nationwide for just $10/month.
+            Home delivery nationwide starting at just $15/month.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
@@ -152,33 +152,65 @@ export default function HomePage() {
 
       {/* Pricing Section */}
       <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Simple, Transparent Pricing</h2>
-          <Card className="max-w-md mx-auto border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl md:text-2xl font-bold">Membership</CardTitle>
-              <div className="text-3xl md:text-4xl font-bold text-primary">
-                $10
-                <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <Card className="border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl md:text-2xl font-bold">Basic Plan</CardTitle>
+                <div className="text-3xl md:text-4xl font-bold text-primary">
+                  $15
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                </div>
+                <CardDescription className="font-bold">1-3 medications</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 mb-6">
+                  {benefits.map((benefit, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-left">
+                      <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                      <span className="text-sm md:text-base font-bold text-foreground">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/register">
+                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-basic">
+                    Start Basic Plan
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10 relative">
+              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
+                BEST VALUE
               </div>
-              <CardDescription className="font-bold">Cancel anytime</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 mb-6">
-                {benefits.map((benefit, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-left">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold text-foreground">{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register">
-                <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-pricing">
-                  Start Membership
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl md:text-2xl font-bold">Plus Plan</CardTitle>
+                <div className="text-3xl md:text-4xl font-bold text-primary">
+                  $25
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                </div>
+                <CardDescription className="font-bold">4+ medications</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 mb-6">
+                  {benefits.map((benefit, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-left">
+                      <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                      <span className="text-sm md:text-base font-bold text-foreground">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/register">
+                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-plus">
+                    Start Plus Plan
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+          <p className="text-sm text-muted-foreground mt-6 font-bold">Cancel anytime • No hidden fees • Save thousands per year</p>
         </div>
       </section>
 

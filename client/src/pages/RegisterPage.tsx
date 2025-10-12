@@ -119,7 +119,7 @@ const PaymentForm = ({ clientSecret, onSuccess }: { clientSecret: string; onSucc
         disabled={!stripe || isLoading}
         data-testid="button-complete-subscription"
       >
-        {isLoading ? "Processing Payment..." : "Complete Registration - $10/month"}
+        {isLoading ? "Processing Payment..." : "Complete Registration"}
       </Button>
     </form>
   );
@@ -387,9 +387,10 @@ export default function RegisterPage() {
         return;
       }
 
-      // Move to payment step
+      // Move to payment step (default to plus plan)
       const subscriptionResponse = await apiRequest("POST", "/api/create-subscription", { 
-        userId: registeredUser.id 
+        userId: registeredUser.id,
+        plan: 'plus'
       });
       const subscriptionData = await subscriptionResponse.json();
 
@@ -421,7 +422,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing for $10/month</p>
+            <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $15/month</p>
           </div>
 
           <Card className="border-secondary/20">
@@ -1082,7 +1083,7 @@ export default function RegisterPage() {
               </div>
             </Link>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Complete Your Registration</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Step 4 of 4 - Subscribe for $10/month to access wholesale pricing</p>
+            <p className="text-sm md:text-base text-muted-foreground">Step 4 of 4 - Subscribe to access wholesale pricing</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
@@ -1094,7 +1095,7 @@ export default function RegisterPage() {
                   Your Membership Benefits
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
-                  Everything included in your $10/month subscription
+                  Everything included in your subscription
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1123,9 +1124,9 @@ export default function RegisterPage() {
               <CardContent>
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl md:text-3xl font-bold text-teal-600">$10</div>
+                    <div className="text-2xl md:text-3xl font-bold text-teal-600">$25</div>
                     <div className="text-sm md:text-base text-muted-foreground">per month</div>
-                    <div className="text-xs md:text-sm text-muted-foreground mt-1">Cancel anytime</div>
+                    <div className="text-xs md:text-sm text-muted-foreground mt-1">Plus Plan (4+ meds) • Cancel anytime</div>
                   </div>
                 </div>
 

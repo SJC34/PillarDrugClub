@@ -335,13 +335,18 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  // Stripe subscription route for $10/month membership
+  // Stripe subscription route with two-tier pricing
   app.post("/api/create-subscription", async (req, res) => {
     try {
-      const { userId } = req.body;
+      const { userId, plan = 'plus' } = req.body;
       
       if (!userId) {
         return res.status(400).json({ error: "User ID is required" });
+      }
+
+      // Validate plan
+      if (plan !== 'basic' && plan !== 'plus') {
+        return res.status(400).json({ error: "Invalid plan. Must be 'basic' or 'plus'" });
       }
       
       const user = await storage.getUser(userId);
@@ -372,21 +377,37 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         await storage.updateUserStripeInfo(userId, customerId, null);
       }
       
+      // Determine price based on plan
+      const planConfig: Record<'basic' | 'plus', { amount: number; name: string; description: string }> = {
+        basic: {
+          amount: 1500, // $15.00 in cents
+          name: 'Pillar Drug Club Basic Plan',
+          description: 'Monthly membership for 1-3 medications at wholesale pricing'
+        },
+        plus: {
+          amount: 2500, // $25.00 in cents
+          name: 'Pillar Drug Club Plus Plan',
+          description: 'Monthly membership for 4+ medications at wholesale pricing'
+        }
+      };
+
+      const selectedPlan = planConfig[plan as 'basic' | 'plus'];
+      
       // Create or retrieve the product and price
       // In production, you'd create these once via Stripe Dashboard or a setup script
-      // For now, we'll use a hardcoded price ID or create it dynamically
-      let priceId = process.env.STRIPE_PRICE_ID;
+      // For now, we'll use environment variables or create them dynamically
+      let priceId = plan === 'basic' ? process.env.STRIPE_BASIC_PRICE_ID : process.env.STRIPE_PLUS_PRICE_ID;
       
       if (!priceId) {
         // Create product and price if not configured
         const product = await stripe.products.create({
-          name: 'Pillar Drug Club Membership',
-          description: 'Monthly membership for wholesale prescription pricing',
+          name: selectedPlan.name,
+          description: selectedPlan.description,
         });
         
         const price = await stripe.prices.create({
           product: product.id,
-          unit_amount: 1000, // $10.00 in cents
+          unit_amount: selectedPlan.amount,
           currency: 'usd',
           recurring: {
             interval: 'month',
@@ -394,7 +415,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         });
         
         priceId = price.id;
-        console.log(`✅ Created Stripe product and price: ${priceId}`);
+        console.log(`✅ Created Stripe product and price for ${plan} plan: ${priceId}`);
       }
       
       // Create the subscription
@@ -407,7 +428,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         },
         expand: ['latest_invoice.payment_intent'],
         metadata: {
-          userId: userId
+          userId: userId,
+          plan: plan
         }
       });
       

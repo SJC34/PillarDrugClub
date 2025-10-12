@@ -25,6 +25,7 @@ function Router() {
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/subscribe" component={SubscriptionPage} />
+      <Route path="/subscription" component={SubscriptionPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/admin" component={AdminPortalPage} />
