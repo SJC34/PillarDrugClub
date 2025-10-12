@@ -17,6 +17,7 @@ import AdminPortalPage from "@/pages/AdminPortalPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
+import OrdersPage from "@/pages/OrdersPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/prescription-transfer" component={PrescriptionTransferPage} />
       <Route path="/cart" component={CartPage} />
       <Route path="/checkout" component={CheckoutPage} />
+      <Route path="/orders" component={OrdersPage} />
       <Route path="/orders/:id" component={OrderDetailsPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />

@@ -1422,6 +1422,27 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  app.get("/api/users/:userId/orders", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Ensure user can only access their own orders
+      const requestedUserId = req.params.userId;
+      const authenticatedUserId = req.user.id;
+
+      if (requestedUserId !== authenticatedUserId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      const orders = await storage.getUserOrders(requestedUserId);
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.get("/api/orders/search", async (req, res) => {
     try {
       const params = orderSearchSchema.parse(req.query);

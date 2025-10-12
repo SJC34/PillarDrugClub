@@ -11,6 +11,7 @@ export default function Header() {
     { name: "MEDICATIONS", href: "/medications" },
     { name: "COST CALCULATOR", href: "/cost-calculator" },
     { name: "DASHBOARD", href: "/dashboard" },
+    { name: "ORDERS", href: "/orders" },
   ];
 
   return (
