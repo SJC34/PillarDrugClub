@@ -32,6 +32,10 @@ Preferred communication style: Simple, everyday language.
   - **Admin Oversight**: Dedicated admin portal tab for managing all refill requests
   - **Patient Portal**: Dedicated refill pages for requesting refills (/refills) and viewing refill history (/refills/history)
   - **API Security**: All endpoints enforce user authentication and authorization, ensuring users can only access their own refill data
+- **Admin Dashboard System**: Comprehensive administrative tools for platform oversight and management:
+  - **Executive Dashboard** (/admin/dashboard): Real-time metrics display with user counts, prescription statistics, order volume, and refill queue; recent activity feeds showing latest users, prescriptions, and orders
+  - **User Management** (/admin/users): Complete user directory with search (by name/email), role-based filtering (admin/client/broker/company), and status filtering (active/suspended); detailed user profiles showing account statistics (active prescriptions, order count, total spend) and recent order history; account management actions including suspend/activate functionality with self-suspension prevention
+  - **Security**: All admin endpoints require authentication (401) and admin role verification (403); users cannot suspend their own accounts
 
 **System Design Choices**: The architecture emphasizes modularity, scalability, and security, particularly for sensitive healthcare data. The use of serverless PostgreSQL and a flexible storage layer contributes to scalability. Asynchronous communication for notifications ensures a responsive user experience.
 
