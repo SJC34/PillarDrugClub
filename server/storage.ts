@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication } from "@shared/schema";
+import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication, orders as ordersTable, prescriptions as prescriptionsTable } from "@shared/schema";
 import { 
   type Customer, type InsertCustomer,
   type Medication, type InsertMedication, type MedicationSearch,
@@ -60,6 +60,7 @@ export interface IStorage {
   getOrder(id: string): Promise<Order | undefined>;
   getOrderByNumber(orderNumber: string): Promise<Order | undefined>;
   getUserOrders(userId: string): Promise<Order[]>;
+  getAllOrders(): Promise<Order[]>;
   searchOrders(params: OrderSearch): Promise<{ orders: Order[]; total: number }>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrder(id: string, order: Partial<InsertOrder>): Promise<Order | undefined>;
@@ -769,6 +770,11 @@ export class MemStorage implements IStorage {
   async getUserOrders(userId: string): Promise<Order[]> {
     return Array.from(this.orders.values())
       .filter((order) => order.userId === userId)
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    return Array.from(this.orders.values())
       .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
   }
 
@@ -1976,6 +1982,35 @@ export class DbStorage extends MemStorage {
     const paginatedUsers = allUsers.slice(startIndex, endIndex);
     
     return { users: paginatedUsers, total };
+  }
+  
+  // Order database methods
+  async getUserOrders(userId: string): Promise<Order[]> {
+    const result = await db.select().from(ordersTable).where(eq(ordersTable.userId, userId));
+    return result.map(order => ({
+      ...order,
+      userId: order.userId as string,
+      subtotal: order.subtotal.toString(),
+      shippingCost: order.shippingCost.toString(),
+      tax: order.tax.toString(),
+      total: order.total.toString(),
+      createdAt: order.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: order.updatedAt?.toISOString() || new Date().toISOString()
+    })) as any[];
+  }
+
+  async getAllOrders(): Promise<Order[]> {
+    const result = await db.select().from(ordersTable);
+    return result.map(order => ({
+      ...order,
+      userId: order.userId as string,
+      subtotal: order.subtotal.toString(),
+      shippingCost: order.shippingCost.toString(),
+      tax: order.tax.toString(),
+      total: order.total.toString(),
+      createdAt: order.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: order.updatedAt?.toISOString() || new Date().toISOString()
+    })) as any[];
   }
   
   // Helper method to verify password

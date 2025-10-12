@@ -157,22 +157,24 @@ export default function AdminDashboardPage() {
           </Card>
 
           {/* Revenue */}
-          <Card className="hover-elevate">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Revenue (Est.)</p>
-                  <p className="text-2xl font-bold" data-testid="metric-revenue">
-                    ${parseFloat(metrics?.orderMetrics.revenueEstimate || "0").toLocaleString()}
-                  </p>
-                  <p className="text-xs text-muted-foreground">From orders</p>
+          <Link href="/admin/financial">
+            <Card className="hover-elevate cursor-pointer transition-all">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Revenue (Est.)</p>
+                    <p className="text-2xl font-bold" data-testid="metric-revenue">
+                      ${parseFloat(metrics?.orderMetrics.revenueEstimate || "0").toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">From orders</p>
+                  </div>
+                  <div className="p-3 bg-teal-100 rounded-lg">
+                    <DollarSign className="h-6 w-6 text-teal-600" />
+                  </div>
                 </div>
-                <div className="p-3 bg-teal-100 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-teal-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Alerts & Action Items */}

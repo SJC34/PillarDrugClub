@@ -1492,6 +1492,130 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Admin financial tracking endpoints
+
+  // GET /api/admin/financial-metrics - Get financial overview and metrics
+  app.get("/api/admin/financial-metrics", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      // Get all users for subscription metrics
+      const allUsers = await storage.getAllUsers({ page: 1, limit: 10000 });
+      const users = allUsers.users as any[];
+      
+      // Get all orders for revenue metrics
+      const allOrders = (await storage.getAllOrders()) as any[];
+      
+      // Calculate subscription metrics
+      const activeSubscriptions = users.filter((u) => u.subscriptionStatus === 'active').length;
+      const canceledSubscriptions = users.filter((u) => u.subscriptionStatus === 'canceled').length;
+      const pastDueSubscriptions = users.filter((u) => u.subscriptionStatus === 'past_due').length;
+      
+      // Assuming Basic plan = $15, Plus plan = $25 (simplified - in production would check actual plan)
+      // For now, estimate MRR based on active subscriptions
+      const estimatedMRR = activeSubscriptions * 20; // Average of $15 and $25
+      
+      // Calculate revenue metrics
+      const totalRevenue = allOrders.reduce((sum: number, order: any) => {
+        const total = typeof order.total === 'string' ? parseFloat(order.total) : order.total;
+        return sum + (isNaN(total) ? 0 : total);
+      }, 0);
+      
+      // Calculate this month's revenue
+      const now = new Date();
+      const thisMonth = now.getMonth();
+      const thisYear = now.getFullYear();
+      
+      const thisMonthRevenue = allOrders
+        .filter((order: any) => {
+          const orderDate = new Date(order.createdAt);
+          return orderDate.getMonth() === thisMonth && orderDate.getFullYear() === thisYear;
+        })
+        .reduce((sum: number, order: any) => {
+          const total = typeof order.total === 'string' ? parseFloat(order.total) : order.total;
+          return sum + (isNaN(total) ? 0 : total);
+        }, 0);
+      
+      // Get recent transactions (last 10 orders)
+      const recentTransactions = allOrders
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 10)
+        .map((order: any) => {
+          // Get user info for the order
+          const orderUser = users.find((u: any) => u.id === order.userId);
+          return {
+            id: order.id,
+            orderNumber: order.orderNumber,
+            userName: orderUser ? `${orderUser.firstName || ''} ${orderUser.lastName || ''}`.trim() : 'Unknown',
+            userEmail: orderUser?.email || 'Unknown',
+            amount: order.total,
+            status: order.status,
+            createdAt: order.createdAt
+          };
+        });
+      
+      // Calculate daily revenue for the last 30 days
+      const last30Days = Array.from({ length: 30 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (29 - i));
+        date.setHours(0, 0, 0, 0);
+        return date;
+      });
+      
+      const dailyRevenue = last30Days.map(date => {
+        const nextDate = new Date(date);
+        nextDate.setDate(nextDate.getDate() + 1);
+        
+        const dayRevenue = allOrders
+          .filter((order: any) => {
+            const orderDate = new Date(order.createdAt);
+            return orderDate >= date && orderDate < nextDate;
+          })
+          .reduce((sum: number, order: any) => {
+            const total = typeof order.total === 'string' ? parseFloat(order.total) : order.total;
+            return sum + (isNaN(total) ? 0 : total);
+          }, 0);
+        
+        return {
+          date: date.toISOString().split('T')[0],
+          revenue: parseFloat(dayRevenue.toFixed(2))
+        };
+      });
+
+      res.json({
+        revenueMetrics: {
+          totalRevenue: totalRevenue.toFixed(2),
+          monthlyRevenue: thisMonthRevenue.toFixed(2),
+          monthlyRecurringRevenue: estimatedMRR.toFixed(2),
+          averageOrderValue: allOrders.length > 0 ? (totalRevenue / allOrders.length).toFixed(2) : "0.00"
+        },
+        subscriptionMetrics: {
+          activeSubscriptions,
+          canceledSubscriptions,
+          pastDueSubscriptions,
+          totalSubscriptions: activeSubscriptions + canceledSubscriptions + pastDueSubscriptions,
+          churnRate: (canceledSubscriptions / (activeSubscriptions + canceledSubscriptions) * 100).toFixed(1)
+        },
+        recentTransactions,
+        dailyRevenue
+      });
+    } catch (error: any) {
+      console.error("Error fetching financial metrics:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch financial metrics", 
+        message: error.message 
+      });
+    }
+  });
+
   // Get user's current medications (active prescriptions)
   app.get("/api/users/:userId/medications", async (req, res) => {
     try {
