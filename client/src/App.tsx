@@ -20,6 +20,8 @@ import OrderDetailsPage from "@/pages/OrderDetailsPage";
 import OrdersPage from "@/pages/OrdersPage";
 import ShipmentTrackingPage from "@/pages/ShipmentTrackingPage";
 import PrescriptionsPage from "@/pages/PrescriptionsPage";
+import RefillsPage from "@/pages/RefillsPage";
+import RefillHistoryPage from "@/pages/RefillHistoryPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
@@ -41,6 +43,8 @@ function Router() {
       <Route path="/cost-calculator" component={CostCalculatorPage} />
       <Route path="/prescription-transfer" component={PrescriptionTransferPage} />
       <Route path="/prescriptions" component={PrescriptionsPage} />
+      <Route path="/refills" component={RefillsPage} />
+      <Route path="/refills/history" component={RefillHistoryPage} />
       <Route path="/cart" component={CartPage} />
       <Route path="/checkout" component={CheckoutPage} />
       <Route path="/orders" component={OrdersPage} />

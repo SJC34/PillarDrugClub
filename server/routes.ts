@@ -1079,6 +1079,175 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // ===== REFILL REQUEST ROUTES =====
+
+  // Get prescriptions needing refill for a user
+  app.get("/api/users/:userId/prescriptions-needing-refill", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    if (req.user.id !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      const prescriptions = await storage.getPrescriptionsNeedingRefill(req.params.userId);
+      res.json({ prescriptions });
+    } catch (error: any) {
+      console.error("Error fetching prescriptions needing refill:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch prescriptions", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Create a refill request
+  app.post("/api/refill-requests", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+      const { prescriptionId, priority, patientNotes } = req.body;
+      
+      // Get the prescription details
+      const prescription = await storage.getPrescription(prescriptionId);
+      if (!prescription) {
+        return res.status(404).json({ error: "Prescription not found" });
+      }
+
+      // Verify the prescription belongs to the authenticated user
+      if (prescription.userId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      // Calculate due date based on last fill and days supply
+      let dueDate = null;
+      if (prescription.lastFillDate && prescription.daysSupply) {
+        const lastFillDate = new Date(prescription.lastFillDate);
+        const dueDateObj = new Date(lastFillDate);
+        dueDateObj.setDate(lastFillDate.getDate() + prescription.daysSupply);
+        dueDate = dueDateObj.toISOString().split('T')[0];
+      }
+
+      const refillRequest = await storage.createRefillRequest({
+        userId: req.user.id,
+        prescriptionId,
+        medicationName: prescription.medicationName,
+        dosage: prescription.dosage,
+        quantity: prescription.quantity,
+        status: "pending",
+        priority: priority || "routine",
+        dueDate,
+        requestedDate: new Date().toISOString().split('T')[0],
+        doctorName: prescription.prescriberName,
+        doctorPhone: prescription.prescriberPhone,
+        patientNotes: patientNotes || null,
+        autoRequested: false,
+        reminderSent: false
+      });
+
+      res.json({ refillRequest });
+    } catch (error: any) {
+      console.error("Error creating refill request:", error);
+      res.status(500).json({ 
+        error: "Failed to create refill request", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Get user's refill requests
+  app.get("/api/users/:userId/refill-requests", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    if (req.user.id !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      const refillRequests = await storage.getUserRefillRequests(req.params.userId);
+      res.json({ refillRequests });
+    } catch (error: any) {
+      console.error("Error fetching refill requests:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch refill requests", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Get all refill requests (admin only)
+  app.get("/api/admin/refill-requests", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const refillRequests = await storage.getAllRefillRequests();
+      res.json({ refillRequests });
+    } catch (error: any) {
+      console.error("Error fetching all refill requests:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch refill requests", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Update refill request status (admin only)
+  app.patch("/api/refill-requests/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const { status, pharmacyNotes, orderId } = req.body;
+      
+      const updateData: any = { status };
+      
+      if (pharmacyNotes !== undefined) {
+        updateData.pharmacyNotes = pharmacyNotes;
+      }
+      
+      if (orderId !== undefined) {
+        updateData.orderId = orderId;
+      }
+
+      if (status === "approved") {
+        updateData.approvedDate = new Date().toISOString().split('T')[0];
+      } else if (status === "filled") {
+        updateData.filledDate = new Date().toISOString().split('T')[0];
+      }
+
+      const refillRequest = await storage.updateRefillRequest(req.params.id, updateData);
+      
+      if (!refillRequest) {
+        return res.status(404).json({ error: "Refill request not found" });
+      }
+
+      res.json({ refillRequest });
+    } catch (error: any) {
+      console.error("Error updating refill request:", error);
+      res.status(500).json({ 
+        error: "Failed to update refill request", 
+        message: error.message 
+      });
+    }
+  });
+
   // Get user's current medications (active prescriptions)
   app.get("/api/users/:userId/medications", async (req, res) => {
     try {

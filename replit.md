@@ -24,6 +24,14 @@ Preferred communication style: Simple, everyday language.
 - **File Upload & Storage**: Designed for secure handling of prescription uploads and medical documents, likely utilizing cloud storage.
 - **Medication Search**: CSV-based medication catalog using the SJC Pharmacy pricing file, providing search and pricing information.
 - **Annual Pricing System**: Integrates with the openFDA Drug Label API to calculate annual pricing for chronic medications, identifying and excluding short-course drugs.
+- **Medication Refill System**: Automated refill request workflow with intelligent due-date calculation based on prescription supply days. Features include:
+  - **Smart Refill Detection**: Automatically identifies prescriptions due within 7 days by calculating from lastFillDate + daysSupply
+  - **Priority-Based Requests**: Supports routine, urgent, and emergency priority levels for refill requests
+  - **Patient & Pharmacy Notes**: Bidirectional communication between patients and pharmacy staff
+  - **Status Workflow**: Complete lifecycle tracking (pending → approved → filled/rejected)
+  - **Admin Oversight**: Dedicated admin portal tab for managing all refill requests
+  - **Patient Portal**: Dedicated refill pages for requesting refills (/refills) and viewing refill history (/refills/history)
+  - **API Security**: All endpoints enforce user authentication and authorization, ensuring users can only access their own refill data
 
 **System Design Choices**: The architecture emphasizes modularity, scalability, and security, particularly for sensitive healthcare data. The use of serverless PostgreSQL and a flexible storage layer contributes to scalability. Asynchronous communication for notifications ensures a responsive user experience.
 

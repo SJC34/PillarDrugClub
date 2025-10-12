@@ -57,8 +57,13 @@ export default function AdminPortalPage() {
     queryKey: ["/api/orders/search"],
   });
 
+  const { data: refillsData, isLoading: refillsLoading } = useQuery<{ refillRequests: any[] }>({
+    queryKey: ["/api/admin/refill-requests"],
+  });
+
   const requests = data?.requests || [];
   const orders = ordersData?.orders || [];
+  const refillRequests = refillsData?.refillRequests || [];
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
@@ -165,7 +170,7 @@ export default function AdminPortalPage() {
         </div>
 
         <Tabs defaultValue="prescriptions" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="prescriptions" data-testid="tab-prescriptions">
               <FileText className="h-4 w-4 mr-2" />
               Prescription Requests
@@ -173,6 +178,10 @@ export default function AdminPortalPage() {
             <TabsTrigger value="orders" data-testid="tab-orders">
               <Package className="h-4 w-4 mr-2" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="refills" data-testid="tab-refills">
+              <Pill className="h-4 w-4 mr-2" />
+              Refill Requests
             </TabsTrigger>
           </TabsList>
 
@@ -314,6 +323,122 @@ export default function AdminPortalPage() {
                               </Link>
                             </div>
                           </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="refills">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Pill className="h-5 w-5" />
+                  Refill Requests
+                </CardTitle>
+                <CardDescription>
+                  All medication refill requests from patients
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {refillsLoading ? (
+                  <div className="p-8 text-center text-muted-foreground">Loading refill requests...</div>
+                ) : refillRequests.length === 0 ? (
+                  <div className="p-8 text-center text-muted-foreground">No refill requests yet</div>
+                ) : (
+                  <div className="space-y-4">
+                    {refillRequests.map((refill: any) => (
+                      <Card key={refill.id} className="hover-elevate" data-testid={`card-refill-${refill.id}`}>
+                        <CardContent className="p-4 md:p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Pill className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Medication</span>
+                              </div>
+                              <p className="font-semibold text-foreground">{refill.medicationName}</p>
+                              <p className="text-sm text-muted-foreground">{refill.dosage} - Qty: {refill.quantity}</p>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Requested</span>
+                              </div>
+                              <p className="font-semibold text-foreground">
+                                {new Date(refill.requestedDate).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </p>
+                              {refill.dueDate && (
+                                <p className="text-sm text-muted-foreground">
+                                  Due: {new Date(refill.dueDate).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Shield className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Status & Priority</span>
+                              </div>
+                              <div className="flex gap-2">
+                                <Badge className={
+                                  refill.status === 'filled' ? 'bg-green-100 text-green-800' :
+                                  refill.status === 'approved' ? 'bg-blue-100 text-blue-800' :
+                                  refill.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                  'bg-yellow-100 text-yellow-800'
+                                }>
+                                  {refill.status}
+                                </Badge>
+                                <Badge className={getUrgencyColor(refill.priority)}>
+                                  {refill.priority}
+                                </Badge>
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-muted-foreground">Doctor</span>
+                              </div>
+                              {refill.doctorName ? (
+                                <>
+                                  <p className="font-semibold text-foreground">{refill.doctorName}</p>
+                                  {refill.doctorPhone && (
+                                    <p className="text-sm text-muted-foreground">{refill.doctorPhone}</p>
+                                  )}
+                                </>
+                              ) : (
+                                <p className="text-sm text-muted-foreground">Not specified</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {(refill.patientNotes || refill.pharmacyNotes) && (
+                            <div className="mt-4 pt-4 border-t space-y-2">
+                              {refill.patientNotes && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground mb-1">Patient Notes</p>
+                                  <p className="text-sm">{refill.patientNotes}</p>
+                                </div>
+                              )}
+                              {refill.pharmacyNotes && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground mb-1">Pharmacy Notes</p>
+                                  <p className="text-sm">{refill.pharmacyNotes}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))}
