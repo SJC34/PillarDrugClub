@@ -50,6 +50,7 @@ export interface IStorage {
 
   // Prescriptions
   getPrescription(id: string): Promise<Prescription | undefined>;
+  getUserPrescriptions(userId: string): Promise<any[]>;
   getCustomerPrescriptions(customerId: string): Promise<Prescription[]>;
   // createPrescription and updatePrescription removed - use PrescriptionRequest instead
 
@@ -654,6 +655,14 @@ export class MemStorage implements IStorage {
   // Prescription methods
   async getPrescription(id: string): Promise<Prescription | undefined> {
     return this.prescriptions.get(id);
+  }
+
+  async getUserPrescriptions(userId: string): Promise<any[]> {
+    // Filter prescriptions from pharmacy-schema by matching customerId
+    // Note: In DB implementation, this would query the prescriptions table from shared/schema.ts by userId
+    return Array.from(this.prescriptions.values()).filter(
+      (prescription) => prescription.customerId === userId
+    );
   }
 
   async getCustomerPrescriptions(customerId: string): Promise<Prescription[]> {
