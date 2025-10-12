@@ -1389,13 +1389,26 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         }
         
         // Use wholesale price for calculation
-        const itemPrice = medication.wholesalePrice;
+        const itemPrice = parseFloat(medication.wholesalePrice as any);
+        
+        // Validate price is greater than zero
+        if (!itemPrice || itemPrice <= 0) {
+          return res.status(400).json({ 
+            error: `Medication ${item.medicationId} has invalid price: ${medication.wholesalePrice}` 
+          });
+        }
+        
         const itemTotal = itemPrice * item.quantity;
         calculatedSubtotal += itemTotal;
         
         // Update item prices
-        item.price = itemPrice;
-        item.totalPrice = itemTotal;
+        item.price = itemPrice as any;
+        item.totalPrice = itemTotal as any;
+      }
+
+      // Final validation: ensure total is greater than zero
+      if (calculatedSubtotal <= 0) {
+        return res.status(400).json({ error: "Order subtotal must be greater than $0" });
       }
 
       // Update order totals

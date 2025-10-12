@@ -15,6 +15,8 @@ import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
 import SettingsPage from "@/pages/SettingsPage";
 import AdminPortalPage from "@/pages/AdminPortalPage";
 import CartPage from "@/pages/CartPage";
+import CheckoutPage from "@/pages/CheckoutPage";
+import OrderDetailsPage from "@/pages/OrderDetailsPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
@@ -35,6 +37,8 @@ function Router() {
       <Route path="/cost-calculator" component={CostCalculatorPage} />
       <Route path="/prescription-transfer" component={PrescriptionTransferPage} />
       <Route path="/cart" component={CartPage} />
+      <Route path="/checkout" component={CheckoutPage} />
+      <Route path="/orders/:id" component={OrderDetailsPage} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
