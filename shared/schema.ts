@@ -104,3 +104,122 @@ export const insertMedicationSchema = createInsertSchema(medications).omit({
 
 export type InsertMedication = z.infer<typeof insertMedicationSchema>;
 export type Medication = typeof medications.$inferSelect;
+
+// Cart items table
+export const cartItems = pgTable("cart_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  medicationId: varchar("medication_id").notNull().references(() => medications.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCartItemSchema = createInsertSchema(cartItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
+export type CartItem = typeof cartItems.$inferSelect;
+
+// Prescriptions table
+export const prescriptions = pgTable("prescriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  medicationId: varchar("medication_id").references(() => medications.id),
+  medicationName: text("medication_name").notNull(),
+  dosage: text("dosage").notNull(),
+  quantity: integer("quantity").notNull(),
+  prescriberId: text("prescriber_id"),
+  prescriberName: text("prescriber_name"),
+  prescriberNpi: text("prescriber_npi"),
+  prescriberPhone: text("prescriber_phone"),
+  prescriberFax: text("prescriber_fax"),
+  prescriberAddress: text("prescriber_address"),
+  daysSupply: integer("days_supply"),
+  refillsRemaining: integer("refills_remaining").default(0),
+  originalRefills: integer("original_refills").default(0),
+  directions: text("directions"),
+  writtenDate: text("written_date"),
+  expirationDate: text("expiration_date"),
+  status: text("status", { enum: ["pending", "approved", "rejected", "active", "expired", "transferred", "cancelled"] }).default("pending"),
+  isTransfer: boolean("is_transfer").default(false),
+  transferFromPharmacy: text("transfer_from_pharmacy"),
+  transferFromPharmacyPhone: text("transfer_from_pharmacy_phone"),
+  transferFromPharmacyAddress: text("transfer_from_pharmacy_address"),
+  prescriptionNumber: text("prescription_number"),
+  lastFillDate: text("last_fill_date"),
+  transferReason: text("transfer_reason"),
+  notes: text("notes"),
+  urgency: text("urgency", { enum: ["routine", "urgent", "emergency"] }).default("routine"),
+  specialInstructions: text("special_instructions"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPrescriptionSchema = createInsertSchema(prescriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPrescription = z.infer<typeof insertPrescriptionSchema>;
+export type Prescription = typeof prescriptions.$inferSelect;
+
+// Orders table
+export const orders = pgTable("orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  orderNumber: text("order_number").notNull().unique(),
+  status: text("status", { 
+    enum: ["pending", "processing", "awaiting_verification", "ready_to_ship", "shipped", "delivered", "cancelled", "returned"] 
+  }).default("pending"),
+  items: jsonb("items").notNull(), // Array of order items
+  subtotal: numeric("subtotal").notNull(),
+  shippingCost: numeric("shipping_cost").notNull().default("0"),
+  tax: numeric("tax").notNull().default("0"),
+  total: numeric("total").notNull(),
+  shippingAddress: jsonb("shipping_address").notNull(),
+  paymentMethod: jsonb("payment_method"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertOrderSchema = createInsertSchema(orders).omit({
+  id: true,
+  orderNumber: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type Order = typeof orders.$inferSelect;
+
+// Shipments table
+export const shipments = pgTable("shipments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: varchar("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  trackingNumber: text("tracking_number").notNull(),
+  carrier: text("carrier").notNull(), // "UPS", "FedEx", "USPS"
+  status: text("status", { 
+    enum: ["preparing", "shipped", "in_transit", "out_for_delivery", "delivered", "exception", "returned"] 
+  }).default("preparing"),
+  shippedDate: text("shipped_date"),
+  estimatedDeliveryDate: text("estimated_delivery_date"),
+  actualDeliveryDate: text("actual_delivery_date"),
+  trackingEvents: jsonb("tracking_events").default(sql`'[]'::jsonb`),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertShipmentSchema = createInsertSchema(shipments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertShipment = z.infer<typeof insertShipmentSchema>;
+export type Shipment = typeof shipments.$inferSelect;

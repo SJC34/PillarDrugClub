@@ -1256,6 +1256,60 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Cart routes
+  app.get("/api/users/:userId/cart", async (req, res) => {
+    try {
+      const cartItems = await storage.getCartItems(req.params.userId);
+      res.json(cartItems);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/cart", async (req, res) => {
+    try {
+      const { userId, medicationId, quantity } = req.body;
+      const cartItem = await storage.addToCart(userId, medicationId, quantity || 1);
+      res.status(201).json(cartItem);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid cart data" });
+    }
+  });
+
+  app.put("/api/cart/item/:id", async (req, res) => {
+    try {
+      const { quantity } = req.body;
+      const cartItem = await storage.updateCartItem(req.params.id, quantity);
+      if (!cartItem) {
+        return res.status(404).json({ error: "Cart item not found" });
+      }
+      res.json(cartItem);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid cart data" });
+    }
+  });
+
+  app.delete("/api/cart/item/:id", async (req, res) => {
+    try {
+      const success = await storage.removeFromCart(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Cart item not found" });
+      }
+      res.json({ message: "Item removed from cart" });
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/cart/user/:userId", async (req, res) => {
+    try {
+      await storage.clearCart(req.params.userId);
+      res.json({ message: "Cart cleared" });
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Customer routes
   app.post("/api/customers", async (req, res) => {
     try {

@@ -28,6 +28,13 @@ export interface IStorage {
   updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
   updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined>;
 
+  // Cart
+  getCartItems(userId: string): Promise<any[]>;
+  addToCart(userId: string, medicationId: string, quantity: number): Promise<any>;
+  updateCartItem(id: string, quantity: number): Promise<any | undefined>;
+  removeFromCart(id: string): Promise<boolean>;
+  clearCart(userId: string): Promise<void>;
+
   // Customers
   getCustomer(id: string): Promise<Customer | undefined>;
   getCustomerByEmail(email: string): Promise<Customer | undefined>;
@@ -89,6 +96,7 @@ export class MemStorage implements IStorage {
   protected prescribers: Map<string, Prescriber>;
   protected pharmacies: Map<string, Pharmacy>;
   protected prescriptionRequests: Map<string, PrescriptionRequest>;
+  protected cartItems: Map<string, any>;
   protected orderCounter: number;
 
   constructor() {
@@ -101,6 +109,7 @@ export class MemStorage implements IStorage {
     this.prescribers = new Map();
     this.pharmacies = new Map();
     this.prescriptionRequests = new Map();
+    this.cartItems = new Map();
     this.orderCounter = 1000;
     // Removed auto-import to prevent blocking server startup for health checks
     // Data will be seeded and imported after server is listening
@@ -471,6 +480,59 @@ export class MemStorage implements IStorage {
     };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+
+  // Cart methods
+  async getCartItems(userId: string): Promise<any[]> {
+    return Array.from(this.cartItems.values()).filter(
+      (item) => item.userId === userId
+    );
+  }
+
+  async addToCart(userId: string, medicationId: string, quantity: number): Promise<any> {
+    // Check if item already exists in cart
+    const existing = Array.from(this.cartItems.values()).find(
+      (item) => item.userId === userId && item.medicationId === medicationId
+    );
+
+    if (existing) {
+      // Update quantity
+      const updated = { ...existing, quantity: existing.quantity + quantity, updatedAt: new Date() };
+      this.cartItems.set(existing.id, updated);
+      return updated;
+    }
+
+    // Create new cart item
+    const id = randomUUID();
+    const now = new Date();
+    const cartItem = {
+      id,
+      userId,
+      medicationId,
+      quantity,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.cartItems.set(id, cartItem);
+    return cartItem;
+  }
+
+  async updateCartItem(id: string, quantity: number): Promise<any | undefined> {
+    const item = this.cartItems.get(id);
+    if (!item) return undefined;
+
+    const updated = { ...item, quantity, updatedAt: new Date() };
+    this.cartItems.set(id, updated);
+    return updated;
+  }
+
+  async removeFromCart(id: string): Promise<boolean> {
+    return this.cartItems.delete(id);
+  }
+
+  async clearCart(userId: string): Promise<void> {
+    const items = await this.getCartItems(userId);
+    items.forEach(item => this.cartItems.delete(item.id));
   }
 
   // Customer methods
