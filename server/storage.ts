@@ -86,6 +86,14 @@ export interface IStorage {
   getUserPrescriptionRequests(userId: string): Promise<PrescriptionRequest[]>;
   createPrescriptionRequest(request: InsertPrescriptionRequest): Promise<PrescriptionRequest>;
   updatePrescriptionRequest(id: string, request: Partial<InsertPrescriptionRequest>): Promise<PrescriptionRequest | undefined>;
+
+  // Refill Requests
+  getRefillRequest(id: string): Promise<any | undefined>;
+  getUserRefillRequests(userId: string): Promise<any[]>;
+  getAllRefillRequests(): Promise<any[]>;
+  createRefillRequest(request: any): Promise<any>;
+  updateRefillRequest(id: string, request: any): Promise<any | undefined>;
+  getPrescriptionsNeedingRefill(userId: string): Promise<any[]>; // Get prescriptions that need refilling soon
 }
 
 export class MemStorage implements IStorage {
@@ -98,6 +106,7 @@ export class MemStorage implements IStorage {
   protected prescribers: Map<string, Prescriber>;
   protected pharmacies: Map<string, Pharmacy>;
   protected prescriptionRequests: Map<string, PrescriptionRequest>;
+  protected refillRequests: Map<string, any>;
   protected cartItems: Map<string, any>;
   protected orderCounter: number;
 
@@ -111,6 +120,7 @@ export class MemStorage implements IStorage {
     this.prescribers = new Map();
     this.pharmacies = new Map();
     this.prescriptionRequests = new Map();
+    this.refillRequests = new Map();
     this.cartItems = new Map();
     this.orderCounter = 1000;
     // Removed auto-import to prevent blocking server startup for health checks
@@ -1451,6 +1461,78 @@ export class MemStorage implements IStorage {
     };
     this.prescriptionRequests.set(id, updated);
     return updated;
+  }
+
+  // Refill Requests
+  async getRefillRequest(id: string): Promise<any | undefined> {
+    return this.refillRequests.get(id);
+  }
+
+  async getUserRefillRequests(userId: string): Promise<any[]> {
+    return Array.from(this.refillRequests.values())
+      .filter(req => req.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getAllRefillRequests(): Promise<any[]> {
+    return Array.from(this.refillRequests.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async createRefillRequest(insertRequest: any): Promise<any> {
+    const id = randomUUID();
+    const now = new Date().toISOString();
+    const request = {
+      ...insertRequest,
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    this.refillRequests.set(id, request);
+    return request;
+  }
+
+  async updateRefillRequest(id: string, updateData: any): Promise<any | undefined> {
+    const request = this.refillRequests.get(id);
+    if (!request) return undefined;
+
+    const updated = {
+      ...request,
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    this.refillRequests.set(id, updated);
+    return updated;
+  }
+
+  async getPrescriptionsNeedingRefill(userId: string): Promise<any[]> {
+    const userPrescriptions = Array.from(this.prescriptions.values())
+      .filter(p => p.userId === userId && p.status === 'active' && p.refillsRemaining > 0);
+
+    const today = new Date();
+    const prescriptionsNeedingRefill: any[] = [];
+
+    for (const prescription of userPrescriptions) {
+      if (prescription.lastFillDate && prescription.daysSupply) {
+        const lastFillDate = new Date(prescription.lastFillDate);
+        const refillDueDate = new Date(lastFillDate);
+        refillDueDate.setDate(lastFillDate.getDate() + prescription.daysSupply);
+
+        // Check if refill is due within 7 days
+        const daysUntilRefill = Math.floor((refillDueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilRefill <= 7 && daysUntilRefill >= 0) {
+          prescriptionsNeedingRefill.push({
+            ...prescription,
+            dueDate: refillDueDate.toISOString().split('T')[0],
+            daysUntilRefill
+          });
+        }
+      }
+    }
+
+    return prescriptionsNeedingRefill.sort((a, b) => a.daysUntilRefill - b.daysUntilRefill);
   }
 }
 
