@@ -35,6 +35,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/admin" component={AdminPortalPage} />
+      <Route path="/admin-portal" component={AdminPortalPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />
