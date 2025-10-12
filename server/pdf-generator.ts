@@ -89,95 +89,96 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     
     doc.moveDown(4);
 
-    // Step 1 & 2 - Medication Information (clean section)
+    // Two-column layout: Medication (left) and Savings (right)
+    const twoColumnY = doc.y;
+    const leftColX = 60;
+    const rightColX = 310;
+    const colWidth = 240;
+
+    // Left Column: Step 1 & 2 - Medication Information
     doc.fontSize(11)
        .font('Helvetica-Bold')
        .fillColor(BRAND_SECONDARY)
-       .text('STEP 1 & 2: REQUESTED MEDICATION');
+       .text('STEP 1 & 2: REQUESTED MEDICATION', leftColX, twoColumnY, { width: colWidth });
     
-    doc.moveDown(0.8);
+    doc.moveDown(0.5);
     doc.fontSize(10)
        .font('Helvetica')
-       .fillColor(BRAND_FOREGROUND)
-       .text(`Medication: `, { continued: true })
+       .fillColor(BRAND_FOREGROUND);
+    
+    const medY = doc.y;
+    doc.text(`Medication: `, leftColX, medY, { width: colWidth, continued: true })
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text(data.medicationName);
+       .text(data.medicationName, { width: colWidth });
     
+    doc.moveDown(0.3);
+    const dosageY = doc.y;
     doc.font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
-       .text(`Dosage: `, { continued: true })
+       .text(`Dosage: `, leftColX, dosageY, { width: colWidth, continued: true })
        .font('Helvetica-Bold')
-       .text(data.dosage);
+       .text(data.dosage, { width: colWidth });
     
+    doc.moveDown(0.3);
+    const qtyY = doc.y;
     doc.font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
-       .text(`Quantity: `, { continued: true })
+       .text(`Quantity: `, leftColX, qtyY, { width: colWidth, continued: true })
        .font('Helvetica-Bold')
-       .text(data.quantity);
+       .text(data.quantity, { width: colWidth });
     
     if (data.specialInstructions) {
       doc.moveDown(0.5);
+      const instrY = doc.y;
       doc.fontSize(9)
          .font('Helvetica')
          .fillColor(BRAND_MUTED)
-         .text(`Special Instructions: ${data.specialInstructions}`, { width: 492 });
+         .text(`Special Instructions: ${data.specialInstructions}`, leftColX, instrY, { width: colWidth });
     }
     
-    doc.moveDown(1.8);
+    const leftColEndY = doc.y;
 
-    // Savings Information Section (highlighted box)
-    const savingsBoxY = doc.y;
-    doc.roundedRect(60, savingsBoxY, 492, 125, 4)
+    // Right Column: Savings Information Section (highlighted box)
+    const savingsBoxHeight = 125;
+    doc.roundedRect(rightColX, twoColumnY, colWidth, savingsBoxHeight, 4)
        .lineWidth(2)
        .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
     
-    doc.fontSize(12)
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_SECONDARY)
-       .text("MAXIMIZE YOUR PATIENT'S SAVINGS WITH YEAR SUPPLY PRESCRIPTIONS", 75, savingsBoxY + 15, { width: 462 });
-    
-    doc.moveDown(1.2);
-    doc.fontSize(10)
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_FOREGROUND)
-       .text('Example: Levothyroxine 25mcg', 75, doc.y, { width: 462 });
-    
-    doc.moveDown(0.7);
-    
-    // Traditional Insurance Model - larger, clearer
-    doc.fontSize(10)
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_MUTED)
-       .text('Traditional Insurance Model: ', 75, doc.y, { continued: true })
-       .font('Helvetica')
-       .text('30 tablets + 11 refills = $10/month copays = ', { continued: true })
-       .font('Helvetica-Bold')
-       .text('$120/year');
-    
-    doc.moveDown(0.5);
-    
-    // Pillar Wholesale Price - larger, clearer
-    doc.fontSize(10)
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_PRIMARY)
-       .text('Pillar Wholesale Price: ', 75, doc.y, { continued: true })
-       .font('Helvetica')
-       .fillColor(BRAND_FOREGROUND)
-       .text('#365 tablets, no refills = ', { continued: true })
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_PRIMARY)
-       .text('$7.30/year');
-    
-    doc.moveDown(0.6);
-    
-    // Savings - larger
     doc.fontSize(11)
        .font('Helvetica-Bold')
        .fillColor(BRAND_SECONDARY)
-       .text('Patient Saves $112.70 per year', 75, doc.y);
+       .text("MAXIMIZE YOUR PATIENT'S SAVINGS", rightColX + 10, twoColumnY + 10, { width: colWidth - 20 });
     
-    doc.moveDown(1.8);
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Example: Levothyroxine 25mcg', rightColX + 10, twoColumnY + 32, { width: colWidth - 20 });
+    
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_MUTED)
+       .text('Traditional Insurance: ', rightColX + 10, twoColumnY + 47, { continued: true })
+       .font('Helvetica')
+       .text('$120/year', { width: colWidth - 20 });
+    
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('Pillar Wholesale: ', rightColX + 10, twoColumnY + 60, { continued: true })
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('$7.30/year', { width: colWidth - 20 });
+    
+    doc.fontSize(10)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('Patient Saves $112.70/year', rightColX + 10, twoColumnY + 75, { width: colWidth - 20 });
+    
+    const rightColEndY = twoColumnY + savingsBoxHeight;
+    
+    // Move down past the two-column section (use the taller column)
+    doc.y = Math.max(leftColEndY, rightColEndY) + 20;
 
     // Step 3 - Doctor Information (clean section)
     doc.fontSize(11)
