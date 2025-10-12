@@ -42,7 +42,8 @@ import {
   Clock,
   Download,
   Copy,
-  MessageSquare
+  MessageSquare,
+  DollarSign
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -537,6 +538,46 @@ export default function PrescriptionTransferPage() {
 
           {/* Doctor Fax Tab */}
           <TabsContent value="doctor-fax">
+            {/* Savings Explanation Section */}
+            <Card className="mb-6 bg-primary/5 border-primary/20">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex items-start gap-4">
+                  <div className="hidden sm:block bg-primary/10 rounded-full p-3">
+                    <DollarSign className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base md:text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                      <DollarSign className="h-5 w-5 sm:hidden text-primary" />
+                      Maximize Your Savings with Year Supply Prescriptions
+                    </h3>
+                    <p className="text-sm md:text-base text-muted-foreground mb-3">
+                      Request your chronic medications as a year supply instead of monthly refills to unlock the lowest possible prices.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-background/80 rounded-lg p-4">
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Traditional Insurance Model</p>
+                        <p className="text-lg font-bold text-destructive">$120/year</p>
+                        <p className="text-xs text-muted-foreground">30 tablets + 11 refills<br/>$10/month copays × 12 months</p>
+                        <p className="text-sm font-medium text-foreground mt-2">Example: Levothyroxine 25mcg</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-primary uppercase tracking-wide">Pillar Wholesale Price</p>
+                        <p className="text-lg font-bold text-primary">$7.30/year</p>
+                        <p className="text-xs text-muted-foreground">#365 tablets, no refills<br/>One-time payment</p>
+                        <div className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold mt-2">
+                          <CheckCircle className="h-3 w-3" />
+                          Save $112.70 per year
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-3 italic">
+                      💡 Tip: Ask your doctor to write the prescription as "#365 tablets, no refills" for maximum savings on chronic medications.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
@@ -549,66 +590,94 @@ export default function PrescriptionTransferPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleDoctorSubmit} className="space-y-6">
-                  {/* Patient Information */}
-                  <div>
-                    <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      Patient Information
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="patientName" className="text-sm md:text-base">Full Name</Label>
-                        <Input
-                          id="patientName"
-                          placeholder="John Smith"
-                          {...doctorForm.register("patientName")}
-                          data-testid="input-patient-name"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
-                        {doctorForm.formState.errors.patientName && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.patientName.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="dateOfBirth" className="text-sm md:text-base">Date of Birth</Label>
-                        <Input
-                          id="dateOfBirth"
-                          placeholder="MM/DD/YYYY"
-                          maxLength={10}
-                          {...doctorForm.register("dateOfBirth")}
-                          onChange={(e) => handleDateInputChange(e, (value) => doctorForm.setValue("dateOfBirth", value))}
-                          data-testid="input-date-of-birth"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
-                        {doctorForm.formState.errors.dateOfBirth && (
-                          <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.dateOfBirth.message}</p>
-                        )}
+                  {/* Step 1 & 2: Patient and Medication Information */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+                    {/* Left: Step Indicators */}
+                    <div className="lg:col-span-3 space-y-4">
+                      <div className="flex lg:flex-col gap-3">
+                        {/* Step 1 */}
+                        <div className="flex items-start gap-3 flex-1 lg:flex-none">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                            1
+                          </div>
+                          <div className="hidden lg:block">
+                            <p className="font-semibold text-sm text-foreground">Patient Info</p>
+                            <p className="text-xs text-muted-foreground mt-1">Your details</p>
+                          </div>
+                        </div>
+                        {/* Step 2 */}
+                        <div className="flex items-start gap-3 flex-1 lg:flex-none lg:mt-2">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                            2
+                          </div>
+                          <div className="hidden lg:block">
+                            <p className="font-semibold text-sm text-foreground">Medication</p>
+                            <p className="text-xs text-muted-foreground mt-1">What you need</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="mt-4">
-                      <Label htmlFor="drugAllergies" className="text-sm md:text-base">Drug Allergies (Optional)</Label>
-                      <Textarea
-                        id="drugAllergies"
-                        placeholder="Enter any drug allergies, separated by commas (e.g., Penicillin, Sulfa drugs)"
-                        {...doctorForm.register("drugAllergies")}
-                        data-testid="input-drug-allergies"
-                        className="min-h-[60px] resize-none text-sm md:text-base"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        List any medications you are allergic to for safety.
-                      </p>
-                    </div>
-                  </div>
 
-                  <Separator />
+                    {/* Right: Form Fields for Steps 1 & 2 */}
+                    <div className="lg:col-span-9 space-y-6">
+                      {/* Patient Information */}
+                      <div>
+                        <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2 lg:hidden">
+                          <User className="h-5 w-5" />
+                          Patient Information
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="patientName" className="text-sm md:text-base">Full Name</Label>
+                            <Input
+                              id="patientName"
+                              placeholder="John Smith"
+                              {...doctorForm.register("patientName")}
+                              data-testid="input-patient-name"
+                              className="h-10 md:h-11 text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.patientName && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.patientName.message}</p>
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="dateOfBirth" className="text-sm md:text-base">Date of Birth</Label>
+                            <Input
+                              id="dateOfBirth"
+                              placeholder="MM/DD/YYYY"
+                              maxLength={10}
+                              {...doctorForm.register("dateOfBirth")}
+                              onChange={(e) => handleDateInputChange(e, (value) => doctorForm.setValue("dateOfBirth", value))}
+                              data-testid="input-date-of-birth"
+                              className="h-10 md:h-11 text-sm md:text-base"
+                            />
+                            {doctorForm.formState.errors.dateOfBirth && (
+                              <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.dateOfBirth.message}</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <Label htmlFor="drugAllergies" className="text-sm md:text-base">Drug Allergies (Optional)</Label>
+                          <Textarea
+                            id="drugAllergies"
+                            placeholder="Enter any drug allergies, separated by commas (e.g., Penicillin, Sulfa drugs)"
+                            {...doctorForm.register("drugAllergies")}
+                            data-testid="input-drug-allergies"
+                            className="min-h-[60px] resize-none text-sm md:text-base"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            List any medications you are allergic to for safety.
+                          </p>
+                        </div>
+                      </div>
 
-                  {/* Medication Information */}
-                  <div>
-                    <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
-                      <Pill className="h-5 w-5" />
-                      Medication Information
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {/* Medication Information */}
+                      <div>
+                        <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2 lg:hidden">
+                          <Pill className="h-5 w-5" />
+                          Medication Information
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="medicationName" className="text-sm md:text-base">Medication Name</Label>
                         <MedicationSearch
