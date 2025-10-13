@@ -156,7 +156,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Card className="border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardHeader className="text-center">
-                <CardTitle className="text-xl md:text-2xl font-bold">Basic Plan</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Foundation Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
                   $15
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
@@ -174,7 +174,7 @@ export default function HomePage() {
                 </ul>
                 <Link href="/register">
                   <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-basic">
-                    Start Basic Plan
+                    Start Foundation Plan
                   </Button>
                 </Link>
               </CardContent>
@@ -185,7 +185,7 @@ export default function HomePage() {
                 BEST VALUE
               </div>
               <CardHeader className="text-center">
-                <CardTitle className="text-xl md:text-2xl font-bold">Plus Plan</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Keystone Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
                   $25
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
@@ -203,7 +203,7 @@ export default function HomePage() {
                 </ul>
                 <Link href="/register">
                   <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-plus">
-                    Start Plus Plan
+                    Start Keystone Plan
                   </Button>
                 </Link>
               </CardContent>

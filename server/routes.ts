@@ -381,12 +381,12 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const planConfig: Record<'basic' | 'plus', { amount: number; name: string; description: string }> = {
         basic: {
           amount: 1500, // $15.00 in cents
-          name: 'Pillar Drug Club Basic Plan',
+          name: 'Pillar Drug Club Foundation Plan',
           description: 'Monthly membership for 1-3 medications at wholesale pricing'
         },
         plus: {
           amount: 2500, // $25.00 in cents
-          name: 'Pillar Drug Club Plus Plan',
+          name: 'Pillar Drug Club Keystone Plan',
           description: 'Monthly membership for 4+ medications at wholesale pricing'
         }
       };

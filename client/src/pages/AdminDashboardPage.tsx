@@ -246,7 +246,7 @@ export default function AdminDashboardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
                   <div>
-                    <p className="font-semibold text-foreground">Basic Plan ($15/mo)</p>
+                    <p className="font-semibold text-foreground">Foundation Plan ($15/mo)</p>
                     <p className="text-sm text-muted-foreground">1-3 medications</p>
                   </div>
                   <p className="text-2xl font-bold text-blue-600" data-testid="metric-basic-users">
@@ -255,7 +255,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                   <div>
-                    <p className="font-semibold text-foreground">Plus Plan ($25/mo)</p>
+                    <p className="font-semibold text-foreground">Keystone Plan ($25/mo)</p>
                     <p className="text-sm text-muted-foreground">4+ medications</p>
                   </div>
                   <p className="text-2xl font-bold text-purple-600" data-testid="metric-plus-users">
