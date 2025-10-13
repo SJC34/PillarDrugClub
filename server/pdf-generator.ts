@@ -201,7 +201,7 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     // Right Column: Prescription Writing Example (below savings box)
     const boxGap = 15;
     const rxExampleY = twoColumnY + savingsBoxHeight + boxGap;
-    const rxExampleBoxHeight = 65;
+    const rxExampleBoxHeight = 90;
     doc.roundedRect(rightColX, rxExampleY, colWidth, rxExampleBoxHeight, 4)
        .lineWidth(2)
        .fillAndStroke(BRAND_LIGHT_BG, BRAND_SECONDARY);
@@ -209,20 +209,30 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     doc.fontSize(10)
        .font('Helvetica-Bold')
        .fillColor(BRAND_SECONDARY)
-       .text('HOW TO WRITE THE RX:', rightColX + 10, rxExampleY + 10, { width: colWidth - 20 });
+       .text('HOW TO WRITE THE RX:', rightColX + 10, rxExampleY + 8, { width: colWidth - 20 });
     
-    doc.fontSize(11)
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Jane Smith 1/24/1986', rightColX + 10, rxExampleY + 23, { width: colWidth - 20 });
+    
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Levothyroxine 100mcg', rightColX + 10, rxExampleY + 36, { width: colWidth - 20 });
+    
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('TK 1 TAB PO QD', rightColX + 10, rxExampleY + 49, { width: colWidth - 20 });
+    
+    doc.fontSize(10)
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text('#365', rightColX + 10, rxExampleY + 30, { width: colWidth - 20 });
-    
-    doc.fontSize(11)
-       .font('Helvetica-Bold')
-       .fillColor(BRAND_PRIMARY)
-       .text('REFILLS: 0', rightColX + 10, rxExampleY + 48, { width: colWidth - 20 });
+       .text('#180 RF:1 or #360 RF:0', rightColX + 10, rxExampleY + 67, { width: colWidth - 20 });
     
     // Right column ends at bottom of second box
-    // savingsBoxHeight (90) + gap (15) + rxExampleBoxHeight (65) = 170
+    // savingsBoxHeight (90) + gap (15) + rxExampleBoxHeight (90) = 195
     const rightColEndY = twoColumnY + savingsBoxHeight + boxGap + rxExampleBoxHeight;
     
     // Move down past the two-column section (use the taller column)
