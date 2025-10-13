@@ -173,7 +173,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link href="/register">
-                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-basic">
+                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-foundation">
                     Start Foundation Plan
                   </Button>
                 </Link>
@@ -202,7 +202,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link href="/register">
-                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-subscribe-plus">
+                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-keystone">
                     Start Keystone Plan
                   </Button>
                 </Link>
