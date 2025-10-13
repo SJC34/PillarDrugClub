@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pill, Eye, EyeOff } from "lucide-react";
-import { FaGoogle, FaApple, FaGithub, FaXTwitter } from "react-icons/fa6";
+import { FaGoogle } from "react-icons/fa6";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -182,7 +182,7 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 className="w-full bg-white hover:bg-gray-50 text-gray-700"
-                onClick={() => window.location.href = '/api/auth/google'}
+                onClick={() => window.location.href = '/api/login'}
                 data-testid="button-google-login"
               >
                 <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -192,26 +192,6 @@ export default function LoginPage() {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 Continue with Google
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full bg-white hover:bg-gray-50 text-black"
-                onClick={() => window.location.href = '/api/auth/apple'}
-                data-testid="button-apple-login"
-              >
-                <FaApple className="mr-2 h-5 w-5" />
-                Continue with Apple
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full bg-black hover:bg-gray-900 text-white"
-                onClick={() => window.location.href = '/api/auth/twitter'}
-                data-testid="button-x-login"
-              >
-                <FaXTwitter className="mr-2 h-5 w-5" />
-                Continue with X
               </Button>
             </div>
 
