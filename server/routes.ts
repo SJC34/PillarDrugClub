@@ -768,7 +768,26 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
           const annualPrice = annualPriceIndex !== -1 ? row[annualPriceIndex] : undefined;
 
           if (!ndc || !price || !wholesalePrice) {
-            errors.push(`Row ${i + 1}: Missing required fields`);
+            errors.push(`Row ${i + 1}: Missing required fields (ndc, price, or wholesalePrice)`);
+            continue;
+          }
+
+          // Parse and validate numeric values
+          const parsedPrice = parseFloat(price);
+          const parsedWholesalePrice = parseFloat(wholesalePrice);
+          const parsedAnnualPrice = annualPrice ? parseFloat(annualPrice) : undefined;
+
+          // Validate that all parsed values are valid numbers
+          if (isNaN(parsedPrice)) {
+            errors.push(`Row ${i + 1}: Invalid price value "${price}"`);
+            continue;
+          }
+          if (isNaN(parsedWholesalePrice)) {
+            errors.push(`Row ${i + 1}: Invalid wholesalePrice value "${wholesalePrice}"`);
+            continue;
+          }
+          if (annualPrice && isNaN(parsedAnnualPrice!)) {
+            errors.push(`Row ${i + 1}: Invalid annualPrice value "${annualPrice}"`);
             continue;
           }
 
@@ -780,18 +799,20 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
             continue;
           }
 
-          // Update medication prices
+          // Update medication prices with validated numbers
           const updates: any = {
-            price: price,
-            wholesalePrice: wholesalePrice,
+            price: parsedPrice,
+            wholesalePrice: parsedWholesalePrice,
           };
 
-          if (annualPrice) {
-            updates.annualPrice = annualPrice;
+          if (parsedAnnualPrice !== undefined) {
+            updates.annualPrice = parsedAnnualPrice;
           }
 
           await storage.updateMedication(medication.id, updates);
           updatedCount++;
+          
+          console.log(`✅ Updated medication ${medication.name} (NDC: ${ndc}): price=${updates.price}, wholesale=${updates.wholesalePrice}`);
         } catch (error: any) {
           errors.push(`Row ${i + 1}: ${error.message}`);
         }

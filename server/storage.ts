@@ -2089,6 +2089,69 @@ export class DbStorage extends MemStorage {
     return this.convertDBMedicationToAppMedication(result[0]);
   }
 
+  async updateMedication(id: string, updateData: Partial<InsertMedication>): Promise<Medication | undefined> {
+    // Build update object with proper type conversions for database
+    const dbUpdateData: any = {};
+    
+    if (updateData.price !== undefined) {
+      dbUpdateData.price = String(updateData.price);
+    }
+    if (updateData.wholesalePrice !== undefined) {
+      dbUpdateData.wholesalePrice = String(updateData.wholesalePrice);
+    }
+    if (updateData.annualPrice !== undefined) {
+      dbUpdateData.annualPrice = String(updateData.annualPrice);
+    }
+    if (updateData.name !== undefined) {
+      dbUpdateData.name = updateData.name;
+    }
+    if (updateData.genericName !== undefined) {
+      dbUpdateData.genericName = updateData.genericName;
+    }
+    if (updateData.brandName !== undefined) {
+      dbUpdateData.brandName = updateData.brandName;
+    }
+    if (updateData.strength !== undefined) {
+      dbUpdateData.strength = updateData.strength;
+    }
+    if (updateData.dosageForm !== undefined) {
+      dbUpdateData.dosageForm = updateData.dosageForm;
+    }
+    if (updateData.manufacturer !== undefined) {
+      dbUpdateData.manufacturer = updateData.manufacturer;
+    }
+    if (updateData.category !== undefined) {
+      dbUpdateData.category = updateData.category;
+    }
+    if (updateData.description !== undefined) {
+      dbUpdateData.description = updateData.description;
+    }
+    if (updateData.inStock !== undefined) {
+      dbUpdateData.inStock = updateData.inStock;
+    }
+    if (updateData.quantity !== undefined) {
+      dbUpdateData.quantity = updateData.quantity;
+    }
+    if (updateData.dosesPerDay !== undefined) {
+      dbUpdateData.dosesPerDay = String(updateData.dosesPerDay);
+    }
+    if (updateData.isShortCourse !== undefined) {
+      dbUpdateData.isShortCourse = updateData.isShortCourse;
+    }
+    
+    // Always update the updatedAt timestamp
+    dbUpdateData.updatedAt = new Date();
+    
+    const result = await db.update(medicationsTable)
+      .set(dbUpdateData)
+      .where(eq(medicationsTable.id, id))
+      .returning();
+    
+    if (!result[0]) return undefined;
+    
+    return this.convertDBMedicationToAppMedication(result[0]);
+  }
+
   async searchMedications(params: MedicationSearch): Promise<{ medications: Medication[]; total: number }> {
     // Build query with filters
     let query = db.select().from(medicationsTable);
