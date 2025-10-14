@@ -41,9 +41,14 @@ Preferred communication style: Simple, everyday language.
   - **Financial Dashboard** (/admin/financial): Revenue tracking with total revenue, monthly revenue, MRR, and average order value metrics; subscription analytics showing active, cancelled, and past due subscriptions with churn rate; 30-day revenue trend chart using Recharts; recent transactions table with customer details; queries actual order data from PostgreSQL database
   - **Communication Center** (/admin/communications): Email and SMS management interface with message statistics; send messages tab for composing emails and SMS to user segments; message history table tracking sent communications with delivery status; message templates for common notifications (prescription ready, refill reminders, order shipped, welcome emails); prepared for Twilio and Resend integration
   - **Reports & Analytics** (/admin/reports): Comprehensive reporting with user growth trend chart, revenue overview bar chart, subscription distribution pie chart, and prescription status breakdown; time range selector (7 days to 1 year); export options for user data, financial data, and prescription data (CSV format); visual analytics using Recharts library
+  - **Medication Pricing Management** (/admin/pricing): Bulk medication price update system via CSV upload; accepts files with columns (ndc, price, wholesalePrice, annualPrice); uses NDC codes as unique identifiers for matching medications; implements robust validation (isNaN checks after parseFloat) to prevent data corruption; provides comprehensive error reporting for invalid/malformed rows; multer-based file upload with 5MB limit and CSV-only filtering; updates persisted via DbStorage.updateMedication() to PostgreSQL with proper numeric-to-string type conversions
   - **Security**: All admin endpoints require authentication (401) and admin role verification (403); users cannot suspend their own accounts; orders and users queried from database with proper type conversions
 
 **System Design Choices**: The architecture emphasizes modularity, scalability, and security, particularly for sensitive healthcare data. The use of serverless PostgreSQL and a flexible storage layer contributes to scalability. Asynchronous communication for notifications ensures a responsive user experience.
+
+## Known Issues & Limitations
+
+**NDC Data Integrity**: The medication import pipeline (`scripts/import-pharmacy-csv.ts`) currently sets NDC codes to empty strings (`ndc: ''`) because the source SJC Pharmacy CSV file doesn't contain NDC codes. This affects the medication pricing CSV upload feature, which relies on NDC codes as unique identifiers for medication matching. Workarounds: (1) manually insert test medications with proper NDC codes for testing, (2) update the import pipeline to generate predictable pseudo-NDC codes, or (3) source medication data that includes actual NDC codes and backfill the database.
 
 ## External Dependencies
 
