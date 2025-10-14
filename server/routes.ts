@@ -19,6 +19,7 @@ import {
 import { generatePrescriptionRequestPDF, generateMessageTemplate } from "./pdf-generator";
 import { sendSMS } from "./twilio";
 import { sendEmail, sendEmailWithAttachment } from "./resend";
+import multer from "multer";
 
 // Initialize Stripe with graceful fallback
 let stripe: Stripe | null = null;
@@ -681,6 +682,133 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       res.status(500).json({ 
         error: "Failed to seed users", 
         message: error.message 
+      });
+    }
+  });
+
+  // Configure multer for CSV file upload (memory storage)
+  const csvUpload = multer({ 
+    storage: multer.memoryStorage(),
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only CSV files are allowed'));
+      }
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit
+    }
+  });
+
+  // CSV upload endpoint for updating medication prices
+  app.post("/api/admin/medications/upload-prices", csvUpload.single('file'), async (req: any, res) => {
+    try {
+      // Check authentication and admin role
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ 
+          success: false,
+          message: "Authentication required" 
+        });
+      }
+
+      const userId = req.user.claims?.sub || req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.role !== 'admin') {
+        return res.status(403).json({ 
+          success: false,
+          message: "Admin access required" 
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ 
+          success: false,
+          message: "No file uploaded" 
+        });
+      }
+
+      // Parse CSV content
+      const csvContent = req.file.buffer.toString('utf-8');
+      const lines = csvContent.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        return res.status(400).json({ 
+          success: false,
+          message: "CSV file is empty or invalid" 
+        });
+      }
+
+      // Parse header
+      const header = lines[0].split(',').map(h => h.trim());
+      const ndcIndex = header.indexOf('ndc');
+      const priceIndex = header.indexOf('price');
+      const wholesalePriceIndex = header.indexOf('wholesalePrice');
+      const annualPriceIndex = header.indexOf('annualPrice');
+
+      if (ndcIndex === -1 || priceIndex === -1 || wholesalePriceIndex === -1) {
+        return res.status(400).json({ 
+          success: false,
+          message: "CSV must contain 'ndc', 'price', and 'wholesalePrice' columns" 
+        });
+      }
+
+      // Process each row
+      const errors: string[] = [];
+      let updatedCount = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(',').map(cell => cell.trim());
+        
+        try {
+          const ndc = row[ndcIndex];
+          const price = row[priceIndex];
+          const wholesalePrice = row[wholesalePriceIndex];
+          const annualPrice = annualPriceIndex !== -1 ? row[annualPriceIndex] : undefined;
+
+          if (!ndc || !price || !wholesalePrice) {
+            errors.push(`Row ${i + 1}: Missing required fields`);
+            continue;
+          }
+
+          // Find medication by NDC
+          const medication = await storage.getMedicationByNdc(ndc);
+          
+          if (!medication) {
+            errors.push(`Row ${i + 1}: Medication with NDC ${ndc} not found`);
+            continue;
+          }
+
+          // Update medication prices
+          const updates: any = {
+            price: price,
+            wholesalePrice: wholesalePrice,
+          };
+
+          if (annualPrice) {
+            updates.annualPrice = annualPrice;
+          }
+
+          await storage.updateMedication(medication.id, updates);
+          updatedCount++;
+        } catch (error: any) {
+          errors.push(`Row ${i + 1}: ${error.message}`);
+        }
+      }
+
+      res.json({
+        success: true,
+        message: `Successfully updated ${updatedCount} medication prices`,
+        updatedCount,
+        errors: errors.length > 0 ? errors : undefined
+      });
+
+    } catch (error: any) {
+      console.error("CSV upload error:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Failed to process CSV file" 
       });
     }
   });
