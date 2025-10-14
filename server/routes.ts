@@ -731,7 +731,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
       // Parse CSV content
       const csvContent = req.file.buffer.toString('utf-8');
-      const lines = csvContent.split('\n').filter(line => line.trim());
+      const lines = csvContent.split('\n').filter((line: string) => line.trim());
       
       if (lines.length < 2) {
         return res.status(400).json({ 
@@ -741,7 +741,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       }
 
       // Parse header
-      const header = lines[0].split(',').map(h => h.trim());
+      const header = lines[0].split(',').map((h: string) => h.trim());
       const ndcIndex = header.indexOf('ndc');
       const priceIndex = header.indexOf('price');
       const wholesalePriceIndex = header.indexOf('wholesalePrice');
@@ -759,7 +759,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       let updatedCount = 0;
 
       for (let i = 1; i < lines.length; i++) {
-        const row = lines[i].split(',').map(cell => cell.trim());
+        const row = lines[i].split(',').map((cell: string) => cell.trim());
         
         try {
           const ndc = row[ndcIndex];

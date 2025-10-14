@@ -19,6 +19,7 @@ import AdminUsersPage from "@/pages/AdminUsersPage";
 import AdminFinancialPage from "@/pages/AdminFinancialPage";
 import AdminCommunicationsPage from "@/pages/AdminCommunicationsPage";
 import AdminReportsPage from "@/pages/AdminReportsPage";
+import AdminMedicationPricingPage from "@/pages/AdminMedicationPricingPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/admin/financial" component={AdminFinancialPage} />
       <Route path="/admin/communications" component={AdminCommunicationsPage} />
       <Route path="/admin/reports" component={AdminReportsPage} />
+      <Route path="/admin/pricing" component={AdminMedicationPricingPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />
