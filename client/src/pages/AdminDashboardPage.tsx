@@ -11,7 +11,11 @@ import {
   AlertCircle,
   Clock,
   CheckCircle,
-  Activity
+  Activity,
+  Settings,
+  BarChart3,
+  Mail,
+  Upload
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -230,6 +234,92 @@ export default function AdminDashboardPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Quick Actions - Admin Tools */}
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-4">Admin Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Link href="/admin/users">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-user-management">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <Settings className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">User Management</p>
+                      <p className="text-sm text-muted-foreground">Manage accounts & roles</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/financial">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-financial-dashboard">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <DollarSign className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Financial Dashboard</p>
+                      <p className="text-sm text-muted-foreground">Revenue & transactions</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/communications">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-communications">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-purple-100 rounded-lg">
+                      <Mail className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Communication Center</p>
+                      <p className="text-sm text-muted-foreground">Email & SMS messages</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/reports">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-reports">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-orange-100 rounded-lg">
+                      <BarChart3 className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Reports & Analytics</p>
+                      <p className="text-sm text-muted-foreground">Data insights & exports</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/pricing">
+              <Card className="hover-elevate cursor-pointer transition-all border-2 border-primary/20" data-testid="card-pricing-management">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-teal-100 rounded-lg">
+                      <Upload className="h-6 w-6 text-teal-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Medication Pricing</p>
+                      <p className="text-sm text-muted-foreground">Bulk CSV price updates</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
         </div>
 
         {/* Membership Distribution */}
