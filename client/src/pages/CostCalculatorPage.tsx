@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Calculator, Search, DollarSign, TrendingDown, Calendar, Pill, Plus, X } from "lucide-react";
 import { Link } from "wouter";
-import { MedicationSearch } from "@/components/MedicationSearch";
 
 interface Medication {
   id: string;
@@ -146,11 +145,14 @@ export default function CostCalculatorPage() {
           </CardHeader>
           <CardContent>
             <div className="relative mb-4">
-              <MedicationSearch
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Input
+                type="text"
                 placeholder="Search for medications..."
                 value={searchQuery}
-                onChange={setSearchQuery}
-                className="h-11 md:h-12"
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-11 md:h-12 pl-10"
+                data-testid="input-medication-search"
               />
             </div>
             
