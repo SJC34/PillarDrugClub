@@ -247,10 +247,10 @@ export default function DashboardPage() {
       color: "bg-blue-50 text-blue-600"
     },
     {
-      title: "Prescription Transfer",
-      description: "Transfer prescriptions or request new ones",
+      title: "Prescription Request",
+      description: "Request new prescriptions from your doctor",
       icon: FileText,
-      href: "/prescription-transfer",
+      href: "/prescription-request",
       color: "bg-orange-50 text-orange-600"
     },
     {
@@ -513,7 +513,7 @@ export default function DashboardPage() {
               <div className="text-center py-8">
                 <Pill className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 mb-4">No active medications on file</p>
-                <Link href="/prescription-transfer">
+                <Link href="/prescription-request">
                   <Button variant="outline" data-testid="button-add-medication">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Medication
@@ -824,7 +824,7 @@ export default function DashboardPage() {
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 mb-4">No prescription requests yet</p>
-                <Link href="/prescription-transfer">
+                <Link href="/prescription-request">
                   <Button variant="outline" data-testid="button-create-request">
                     Create Request
                   </Button>

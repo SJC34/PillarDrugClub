@@ -307,7 +307,7 @@ export default function MedicationsPage() {
                           
                           {medication.requiresPrescription ? (
                             <Link 
-                              href={`/prescription-transfer?medicationName=${encodeURIComponent(medication.name)}&dosage=${encodeURIComponent(medication.strength)}&quantity=30`}
+                              href={`/prescription-request?medicationName=${encodeURIComponent(medication.name)}&dosage=${encodeURIComponent(medication.strength)}&quantity=30`}
                               className="flex-1"
                             >
                               <Button 

@@ -11,7 +11,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import DashboardPage from "@/pages/DashboardPage";
-import PrescriptionTransferPage from "@/pages/PrescriptionTransferPage";
+import PrescriptionRequestPage from "@/pages/PrescriptionRequestPage";
 import SettingsPage from "@/pages/SettingsPage";
 import AdminPortalPage from "@/pages/AdminPortalPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
@@ -53,7 +53,7 @@ function Router() {
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />
-      <Route path="/prescription-transfer" component={PrescriptionTransferPage} />
+      <Route path="/prescription-request" component={PrescriptionRequestPage} />
       <Route path="/prescriptions" component={PrescriptionsPage} />
       <Route path="/refills" component={RefillsPage} />
       <Route path="/refills/history" component={RefillHistoryPage} />
