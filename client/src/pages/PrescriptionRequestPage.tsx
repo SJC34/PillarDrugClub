@@ -63,7 +63,6 @@ const doctorFaxSchema = z.object({
   quantity: z.string().min(1, "Quantity is required"),
   doctorName: z.string().min(2, "Doctor name is required"),
   doctorPhone: z.string().min(10, "Doctor phone is required"),
-  doctorFax: z.string().min(10, "Doctor fax is required"),
   doctorAddress: z.string().min(5, "Doctor address is required"),
   urgency: z.enum(["routine", "urgent", "emergency"]),
   specialInstructions: z.string().optional(),
@@ -129,13 +128,11 @@ export default function PrescriptionRequestPage() {
       const fullAddress = `${doctor.address}, ${doctor.city}, ${doctor.state} ${doctor.zipCode}`;
       doctorForm.setValue("doctorName", doctor.name);
       doctorForm.setValue("doctorPhone", doctor.phone || "");
-      doctorForm.setValue("doctorFax", doctor.fax || "");
       doctorForm.setValue("doctorAddress", fullAddress);
     } else {
       // Clear form fields if doctor is deselected
       doctorForm.setValue("doctorName", "");
       doctorForm.setValue("doctorPhone", "");
-      doctorForm.setValue("doctorFax", "");
       doctorForm.setValue("doctorAddress", "");
     }
   };
@@ -606,19 +603,6 @@ export default function PrescriptionRequestPage() {
                           />
                           {doctorForm.formState.errors.doctorPhone && (
                             <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorPhone.message}</p>
-                          )}
-                        </div>
-                        <div>
-                          <Label htmlFor="doctorFax" className="text-sm md:text-base">Doctor's Fax</Label>
-                          <Input
-                            id="doctorFax"
-                            placeholder="(555) 123-4568"
-                            {...doctorForm.register("doctorFax")}
-                            data-testid="input-doctor-fax"
-                            className="h-10 md:h-11 text-sm md:text-base"
-                          />
-                          {doctorForm.formState.errors.doctorFax && (
-                            <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.doctorFax.message}</p>
                           )}
                         </div>
                       </div>
