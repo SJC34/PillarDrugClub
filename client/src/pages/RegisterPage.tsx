@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Pill, Eye, EyeOff, CreditCard, Check, ArrowRight, ArrowLeft, Building, Send, User, Calendar } from "lucide-react";
+import { Pill, Eye, EyeOff, CreditCard, Check, ArrowRight, ArrowLeft, Send, User, Calendar } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,7 +18,6 @@ import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-
 import { loadStripe } from '@stripe/stripe-js';
 import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
-import { PharmacySearch } from "@/components/PharmacySearch";
 import { MedicationSearch } from "@/components/MedicationSearch";
 import { handleDateInputChange } from "@/lib/dateFormatter";
 
@@ -40,7 +39,7 @@ const step2DetailsSchema = z.object({
 });
 
 const step3RxPreferenceSchema = z.object({
-  rxType: z.enum(["new", "transfer", "skip"]),
+  rxType: z.enum(["new", "skip"]),
   // New RX fields
   medicationName: z.string().optional(),
   dosage: z.string().optional(),
@@ -50,14 +49,7 @@ const step3RxPreferenceSchema = z.object({
   doctorPhone: z.string().optional(),
   doctorFax: z.string().optional(),
   doctorAddress: z.string().optional(),
-  urgency: z.enum(["routine", "urgent", "emergency"]).optional(),
-  // Transfer RX fields
-  prescriptionNumber: z.string().optional(),
-  currentPharmacyName: z.string().optional(),
-  currentPharmacyPhone: z.string().optional(),
-  currentPharmacyAddress: z.string().optional(),
-  lastFillDate: z.string().optional(),
-  refillsRemaining: z.string().optional()
+  urgency: z.enum(["routine", "urgent", "emergency"]).optional()
 });
 
 type Step2DetailsForm = z.infer<typeof step2DetailsSchema>;
@@ -133,8 +125,6 @@ export default function RegisterPage() {
   const [clientSecret, setClientSecret] = useState('');
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
-  const [selectedPharmacy, setSelectedPharmacy] = useState<any>(null);
-  const [selectedMedication, setSelectedMedication] = useState<any>(null);
   const { toast } = useToast();
 
   // Forms for each step
@@ -217,25 +207,6 @@ export default function RegisterPage() {
     }
   };
 
-  // Handle pharmacy selection
-  const handlePharmacySelect = (pharmacy: any) => {
-    setSelectedPharmacy(pharmacy);
-    if (pharmacy) {
-      const fullAddress = `${pharmacy.address}, ${pharmacy.city}, ${pharmacy.state} ${pharmacy.zipCode}`;
-      step3Form.setValue("currentPharmacyName", pharmacy.name);
-      step3Form.setValue("currentPharmacyPhone", pharmacy.phone || "");
-      step3Form.setValue("currentPharmacyAddress", fullAddress);
-    }
-  };
-
-  // Handle medication selection
-  const handleMedicationSelect = (medication: any) => {
-    setSelectedMedication(medication);
-    if (medication) {
-      step3Form.setValue("medicationName", medication.name);
-      step3Form.setValue("dosage", medication.strength || "");
-    }
-  };
 
   // Step 2: Submit user details
   const onStep2Submit = async (data: Step2DetailsForm) => {
@@ -340,36 +311,6 @@ export default function RegisterPage() {
 
           if (!response.ok) {
             throw new Error('Failed to save prescription request');
-          }
-        } else if (data.rxType === "transfer") {
-          // Validate required fields for transfer
-          if (!data.medicationName || !data.prescriptionNumber || !data.currentPharmacyName) {
-            toast({
-              title: "Missing Information",
-              description: "Please fill in all required fields for your prescription transfer.",
-              variant: "destructive"
-            });
-            return;
-          }
-
-          // Submit transfer request
-          const response = await apiRequest("POST", "/api/prescriptions/transfer", {
-            patientName: `${registeredUser.firstName} ${registeredUser.lastName}`,
-            dateOfBirth: registeredUser.dateOfBirth || "",
-            medicationName: data.medicationName,
-            dosage: data.dosage || "",
-            quantity: data.quantity || "",
-            prescriptionNumber: data.prescriptionNumber,
-            currentPharmacyName: data.currentPharmacyName,
-            currentPharmacyPhone: data.currentPharmacyPhone || "",
-            currentPharmacyAddress: data.currentPharmacyAddress || "",
-            lastFillDate: data.lastFillDate || "",
-            refillsRemaining: data.refillsRemaining || "",
-            userId: registeredUser.id
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to save prescription transfer');
           }
         }
       }
@@ -750,7 +691,7 @@ export default function RegisterPage() {
                 {/* RX Type Selection */}
                 <div className="space-y-3">
                   <Label className="text-base font-semibold">Select an option:</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <Card 
                       className={`cursor-pointer hover-elevate ${rxType === "new" ? "border-primary" : ""}`}
                       onClick={() => step3Form.setValue("rxType", "new")}
@@ -760,18 +701,6 @@ export default function RegisterPage() {
                         <Send className="h-8 w-8 mx-auto mb-2 text-primary" />
                         <p className="font-semibold text-sm">Request New RX</p>
                         <p className="text-xs text-muted-foreground mt-1">From your doctor</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card 
-                      className={`cursor-pointer hover-elevate ${rxType === "transfer" ? "border-primary" : ""}`}
-                      onClick={() => step3Form.setValue("rxType", "transfer")}
-                      data-testid="card-rx-transfer"
-                    >
-                      <CardContent className="p-4 text-center">
-                        <Building className="h-8 w-8 mx-auto mb-2 text-primary" />
-                        <p className="font-semibold text-sm">Transfer RX</p>
-                        <p className="text-xs text-muted-foreground mt-1">From current pharmacy</p>
                       </CardContent>
                     </Card>
 
@@ -798,14 +727,6 @@ export default function RegisterPage() {
                     </h3>
 
                     <div className="space-y-4">
-                      <div>
-                        <Label className="mb-2 block">Search for Medication</Label>
-                        <MedicationSearch 
-                          onSelect={handleMedicationSelect} 
-                          selectedMedication={selectedMedication}
-                        />
-                      </div>
-
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="medicationName">Medication Name *</Label>
@@ -918,106 +839,6 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                {/* Transfer RX Form */}
-                {rxType === "transfer" && (
-                  <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
-                    <h3 className="font-semibold text-base flex items-center gap-2">
-                      <Building className="h-5 w-5 text-primary" />
-                      Transfer from Current Pharmacy
-                    </h3>
-
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="mb-2 block">Search for Medication</Label>
-                        <MedicationSearch 
-                          onSelect={handleMedicationSelect} 
-                          selectedMedication={selectedMedication}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="transferMedicationName">Medication Name *</Label>
-                          <Input
-                            id="transferMedicationName"
-                            placeholder="e.g., Atorvastatin"
-                            {...step3Form.register("medicationName")}
-                            data-testid="input-transfer-medication-name"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="prescriptionNumber">Prescription Number *</Label>
-                          <Input
-                            id="prescriptionNumber"
-                            placeholder="RX123456"
-                            {...step3Form.register("prescriptionNumber")}
-                            data-testid="input-prescription-number"
-                          />
-                        </div>
-                      </div>
-
-                      <Separator />
-
-                      <div>
-                        <Label className="mb-2 block">Find Your Current Pharmacy</Label>
-                        <PharmacySearch onPharmacySelect={handlePharmacySelect} />
-                      </div>
-
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="currentPharmacyName">Current Pharmacy Name *</Label>
-                          <Input
-                            id="currentPharmacyName"
-                            placeholder="CVS Pharmacy"
-                            {...step3Form.register("currentPharmacyName")}
-                            data-testid="input-current-pharmacy-name"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="currentPharmacyPhone">Pharmacy Phone</Label>
-                          <Input
-                            id="currentPharmacyPhone"
-                            placeholder="(555) 123-4567"
-                            {...step3Form.register("currentPharmacyPhone")}
-                            data-testid="input-current-pharmacy-phone"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="currentPharmacyAddress">Pharmacy Address</Label>
-                          <Input
-                            id="currentPharmacyAddress"
-                            placeholder="123 Main St, City, ST 12345"
-                            {...step3Form.register("currentPharmacyAddress")}
-                            data-testid="input-current-pharmacy-address"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="lastFillDate">Last Fill Date</Label>
-                            <Input
-                              id="lastFillDate"
-                              type="date"
-                              {...step3Form.register("lastFillDate")}
-                              data-testid="input-last-fill-date"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="refillsRemaining">Refills Remaining</Label>
-                            <Input
-                              id="refillsRemaining"
-                              placeholder="3"
-                              {...step3Form.register("refillsRemaining")}
-                              data-testid="input-refills-remaining"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 <div className="flex gap-3 pt-4">
                   <Button
