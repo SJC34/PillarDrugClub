@@ -10,7 +10,6 @@ interface PrescriptionRequestData {
   quantity: string;
   doctorName: string;
   doctorPhone: string;
-  doctorFax?: string;
   doctorAddress: string;
   urgency: string;
   specialInstructions?: string;
@@ -151,10 +150,6 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
        .fillColor(BRAND_FOREGROUND)
        .text(`Doctor: ${data.doctorName}`, leftColX, doc.y, { width: colWidth });
     doc.text(`Phone: ${data.doctorPhone}`, leftColX, doc.y, { width: colWidth });
-    
-    if (data.doctorFax) {
-      doc.text(`Fax: ${data.doctorFax}`, leftColX, doc.y, { width: colWidth });
-    }
     
     if (data.doctorAddress) {
       doc.text(`Address: ${data.doctorAddress}`, leftColX, doc.y, { width: colWidth });
