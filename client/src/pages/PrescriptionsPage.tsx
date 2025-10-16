@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Pill, AlertCircle, CheckCircle2, Clock, XCircle, Ban, ArrowRightLeft } from "lucide-react";
+import { Pill, AlertCircle, CheckCircle2, Clock, XCircle, Ban, ArrowRightLeft, Send } from "lucide-react";
 
 type Prescription = {
   id: string;
@@ -104,10 +104,10 @@ export default function PrescriptionsPage() {
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">My Prescriptions</h1>
-        <Link href="/prescription-transfer">
-          <Button data-testid="button-transfer-prescription">
-            <ArrowRightLeft className="h-4 w-4 mr-2" />
-            Transfer Prescription
+        <Link href="/prescription-request">
+          <Button data-testid="button-request-prescription">
+            <Send className="h-4 w-4 mr-2" />
+            Request Prescription
           </Button>
         </Link>
       </div>
@@ -118,11 +118,11 @@ export default function PrescriptionsPage() {
             <Pill className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-lg font-medium mb-2">No prescriptions yet</p>
             <p className="text-sm text-muted-foreground mb-6">
-              Transfer your prescriptions from another pharmacy to get started
+              Request new prescriptions from your doctor to get started
             </p>
-            <Link href="/prescription-transfer">
-              <Button data-testid="button-start-transfer">
-                Transfer Prescription
+            <Link href="/prescription-request">
+              <Button data-testid="button-start-request">
+                Request Prescription
               </Button>
             </Link>
           </CardContent>

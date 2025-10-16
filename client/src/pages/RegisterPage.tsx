@@ -676,7 +676,7 @@ export default function RegisterPage() {
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Prescription Setup</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Do you need to request or transfer a prescription?</p>
+            <p className="text-sm md:text-base text-muted-foreground">Do you need to request a new prescription from your doctor?</p>
           </div>
 
           <Card className="border-secondary/20">

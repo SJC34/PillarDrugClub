@@ -26,7 +26,7 @@ export default function Benefits() {
     {
       icon: Clock,
       title: "Easy management",
-      description: "Transfer prescriptions easily and get automatic refill reminders through your member portal."
+      description: "Request prescriptions easily and get automatic refill reminders through your member portal."
     }
   ];
 
