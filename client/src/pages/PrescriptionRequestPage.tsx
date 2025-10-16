@@ -54,7 +54,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { handleDateInputChange } from "@/lib/dateFormatter";
 import { useMutation } from "@tanstack/react-query";
 
-const doctorFaxSchema = z.object({
+const prescriptionRequestSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   drugAllergies: z.string().optional(),
@@ -71,7 +71,7 @@ const doctorFaxSchema = z.object({
   downloadForm: z.boolean().default(false)
 });
 
-type DoctorFaxForm = z.infer<typeof doctorFaxSchema>;
+type PrescriptionRequestForm = z.infer<typeof prescriptionRequestSchema>;
 
 export default function PrescriptionRequestPage() {
   const [, setLocation] = useLocation();
@@ -85,8 +85,8 @@ export default function PrescriptionRequestPage() {
   const [prescriptionRequestId, setPrescriptionRequestId] = useState<string>("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const doctorForm = useForm<DoctorFaxForm>({
-    resolver: zodResolver(doctorFaxSchema),
+  const doctorForm = useForm<PrescriptionRequestForm>({
+    resolver: zodResolver(prescriptionRequestSchema),
     defaultValues: {
       urgency: "routine",
       sendEmail: true,
@@ -208,7 +208,7 @@ export default function PrescriptionRequestPage() {
     onDoctorSubmit(data);
   };
 
-  const onDoctorSubmit = async (data: DoctorFaxForm) => {
+  const onDoctorSubmit = async (data: PrescriptionRequestForm) => {
     console.log("Form submitted with data:", data);
     setSubmissionStatus("submitting");
     try {

@@ -47,7 +47,6 @@ const step3RxPreferenceSchema = z.object({
   doctorName: z.string().optional(),
   doctorEmail: z.string().optional(),
   doctorPhone: z.string().optional(),
-  doctorFax: z.string().optional(),
   doctorAddress: z.string().optional(),
   urgency: z.enum(["routine", "urgent", "emergency"]).optional()
 });
@@ -202,7 +201,6 @@ export default function RegisterPage() {
       const fullAddress = `${doctor.address}, ${doctor.city}, ${doctor.state} ${doctor.zipCode}`;
       step3Form.setValue("doctorName", doctor.name);
       step3Form.setValue("doctorPhone", doctor.phone || "");
-      step3Form.setValue("doctorFax", doctor.fax || "");
       step3Form.setValue("doctorAddress", fullAddress);
     }
   };
@@ -302,7 +300,6 @@ export default function RegisterPage() {
               doctorName: data.doctorName,
               doctorEmail: data.doctorEmail || "",
               doctorPhone: data.doctorPhone || "",
-              doctorFax: data.doctorFax || "",
               doctorAddress: data.doctorAddress || "",
               urgency: data.urgency || "routine",
               userId: registeredUser.id
@@ -787,25 +784,14 @@ export default function RegisterPage() {
                           />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="doctorPhone">Doctor Phone</Label>
-                            <Input
-                              id="doctorPhone"
-                              placeholder="(555) 123-4567"
-                              {...step3Form.register("doctorPhone")}
-                              data-testid="input-doctor-phone"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="doctorFax">Doctor Fax</Label>
-                            <Input
-                              id="doctorFax"
-                              placeholder="(555) 123-4568"
-                              {...step3Form.register("doctorFax")}
-                              data-testid="input-doctor-fax"
-                            />
-                          </div>
+                        <div>
+                          <Label htmlFor="doctorPhone">Doctor Phone</Label>
+                          <Input
+                            id="doctorPhone"
+                            placeholder="(555) 123-4567"
+                            {...step3Form.register("doctorPhone")}
+                            data-testid="input-doctor-phone"
+                          />
                         </div>
 
                         <div>
