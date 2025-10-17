@@ -19,7 +19,8 @@ import {
   MessageSquare,
   Plus,
   X,
-  Edit
+  Edit,
+  Trash2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -210,7 +211,9 @@ export default function DashboardPage() {
   // Mock data - in real app this would come from API
   const memberData = {
     name: `${user.firstName} ${user.lastName}`,
-    memberSince: new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+    memberSince: user.createdAt 
+      ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+      : "Recently",
     subscriptionStatus: subscriptionStatus === "active" ? "Active" : "Pending",
     totalSavings: 247.50,
     activePrescriptions: 3,
@@ -505,10 +508,24 @@ export default function DashboardPage() {
         {/* Current Medications */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Current Medications</CardTitle>
-            <CardDescription>
-              Your active prescriptions
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Current Medications</CardTitle>
+                <CardDescription>
+                  Your active medications with pharmacist insights
+                </CardDescription>
+              </div>
+              <Link href="/medications/my-list">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  data-testid="button-manage-medications"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Manage All
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
             {loadingMedications ? (
@@ -520,8 +537,8 @@ export default function DashboardPage() {
               <div className="text-center py-8">
                 <Pill className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 mb-4">No active medications on file</p>
-                <Link href="/prescription-request">
-                  <Button variant="outline" data-testid="button-add-medication">
+                <Link href="/medications/my-list">
+                  <Button variant="outline" data-testid="button-add-first-medication">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Medication
                   </Button>
@@ -529,22 +546,75 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {medications.map((med: any, idx: number) => (
+                {medications.map((med: any) => (
                   <div 
-                    key={idx} 
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                    data-testid={`medication-${idx}`}
+                    key={med.id} 
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/20 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-colors"
+                    data-testid={`medication-${med.id}`}
                   >
-                    <div className="flex items-center gap-3">
-                      <Pill className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium text-gray-900">{med.name}</p>
-                        <p className="text-sm text-gray-600">{med.dosage} - {med.refills} refills remaining</p>
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                        <Pill className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 dark:text-gray-100" data-testid={`medication-name-${med.id}`}>
+                          {med.medicationName} {med.strength && <span className="text-blue-600 dark:text-blue-400">{med.strength}</span>}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {med.dosage} • {med.frequency}
+                        </p>
+                        {med.prescribedBy && (
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                            Prescribed by {med.prescribedBy}
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <Badge variant="secondary">{med.status}</Badge>
+                    <div className="flex items-center gap-2">
+                      {med.isActive && (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                          Active
+                        </Badge>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to remove ${med.medicationName}?`)) {
+                            apiRequest('DELETE', `/api/users/${user?.id}/medications/${med.id}`)
+                              .then(() => {
+                                queryClient.invalidateQueries({ 
+                                  queryKey: [`/api/users/${user?.id}/medications`] 
+                                });
+                                toast({
+                                  title: "Medication Removed",
+                                  description: `${med.medicationName} has been removed from your list`,
+                                });
+                              })
+                              .catch((error: any) => {
+                                toast({
+                                  title: "Failed to Remove Medication",
+                                  description: error.message || "Could not remove medication",
+                                  variant: "destructive",
+                                });
+                              });
+                          }
+                        }}
+                        data-testid={`button-delete-medication-${med.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-gray-400 hover:text-red-600" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
+                <div className="pt-2">
+                  <Link href="/medications/my-list">
+                    <Button variant="outline" className="w-full" data-testid="button-view-all-medications">
+                      View All Medications & Insights
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
           </CardContent>
