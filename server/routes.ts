@@ -1188,6 +1188,111 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // User Medications Routes
+  app.get("/api/users/:userId/medications", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    if (req.user.id !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      const medications = await storage.getUserActiveMedications(req.params.userId);
+      
+      // Fetch OpenFDA data for each medication if needed
+      const { getDrugLabel, checkDrugInteractions } = await import("./openfda-service");
+      
+      // Enrich medications with FDA data
+      const enrichedMeds = await Promise.all(medications.map(async (med) => {
+        if (!med.fdaData || (med.lastFdaCheck && Date.now() - new Date(med.lastFdaCheck).getTime() > 24 * 60 * 60 * 1000)) {
+          // Fetch fresh FDA data if not cached or older than 24 hours
+          const fdaData = await getDrugLabel(med.genericName || med.medicationName);
+          if (fdaData) {
+            // Update cache
+            await storage.updateUserMedication(med.id, {
+              fdaData,
+              lastFdaCheck: new Date()
+            });
+            return { ...med, fdaData };
+          }
+        }
+        return med;
+      }));
+      
+      // Check for drug interactions
+      const interactionCheck = await checkDrugInteractions(
+        enrichedMeds.map(m => ({ genericName: m.genericName || m.medicationName }))
+      );
+      
+      res.json({ 
+        medications: enrichedMeds,
+        interactions: interactionCheck 
+      });
+    } catch (error: any) {
+      console.error("Error fetching medications:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch medications", 
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/users/:userId/medications", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    if (req.user.id !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      const { getDrugLabel } = await import("./openfda-service");
+      
+      // Fetch FDA data for the new medication
+      const fdaData = await getDrugLabel(req.body.genericName || req.body.medicationName);
+      
+      const medication = await storage.addUserMedication({
+        userId: req.params.userId,
+        ...req.body,
+        fdaData,
+        lastFdaCheck: new Date(),
+        fromPrescription: req.body.fromPrescription || false,
+      });
+      
+      res.json(medication);
+    } catch (error: any) {
+      console.error("Error adding medication:", error);
+      res.status(500).json({ 
+        error: "Failed to add medication", 
+        message: error.message 
+      });
+    }
+  });
+
+  app.delete("/api/users/:userId/medications/:medicationId", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    if (req.user.id !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      await storage.removeUserMedication(req.params.medicationId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error removing medication:", error);
+      res.status(500).json({ 
+        error: "Failed to remove medication", 
+        message: error.message 
+      });
+    }
+  });
+
   // Get all refill requests (admin only)
   app.get("/api/admin/refill-requests", async (req, res) => {
     if (!req.isAuthenticated()) {

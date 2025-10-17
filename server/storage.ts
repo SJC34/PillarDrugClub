@@ -99,6 +99,13 @@ export interface IStorage {
   updateRefillRequest(id: string, request: any): Promise<any | undefined>;
   getPrescriptionsNeedingRefill(userId: string): Promise<any[]>; // Get prescriptions that need refilling soon
 
+  // User Medications
+  getUserMedications(userId: string): Promise<any[]>;
+  getUserActiveMedications(userId: string): Promise<any[]>;
+  addUserMedication(medication: any): Promise<any>;
+  updateUserMedication(id: string, medication: any): Promise<any | undefined>;
+  removeUserMedication(id: string): Promise<boolean>;
+
   // Dashboard Metrics
   getDashboardMetrics(): Promise<{
     userMetrics: {
@@ -2371,6 +2378,41 @@ export class DbStorage extends MemStorage {
         recentOrders
       }
     };
+  }
+
+  async getUserMedications(userId: string): Promise<any[]> {
+    const { userMedications } = await import("@shared/schema");
+    const result = await db.select().from(userMedications).where(eq(userMedications.userId, userId));
+    return result;
+  }
+
+  async getUserActiveMedications(userId: string): Promise<any[]> {
+    const { userMedications } = await import("@shared/schema");
+    const result = await db.select().from(userMedications)
+      .where(eq(userMedications.userId, userId))
+      .where(eq(userMedications.isActive, true));
+    return result;
+  }
+
+  async addUserMedication(medication: any): Promise<any> {
+    const { userMedications } = await import("@shared/schema");
+    const [result] = await db.insert(userMedications).values(medication).returning();
+    return result;
+  }
+
+  async updateUserMedication(id: string, medication: any): Promise<any | undefined> {
+    const { userMedications } = await import("@shared/schema");
+    const [result] = await db.update(userMedications)
+      .set({ ...medication, updatedAt: new Date() })
+      .where(eq(userMedications.id, id))
+      .returning();
+    return result;
+  }
+
+  async removeUserMedication(id: string): Promise<boolean> {
+    const { userMedications } = await import("@shared/schema");
+    const result = await db.delete(userMedications).where(eq(userMedications.id, id));
+    return true;
   }
 }
 
