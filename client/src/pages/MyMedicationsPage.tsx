@@ -34,6 +34,8 @@ type AddMedicationForm = z.infer<typeof addMedicationSchema>;
 export default function MyMedicationsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [medicationSearchValue, setMedicationSearchValue] = useState("");
 
   const form = useForm<AddMedicationForm>({
     resolver: zodResolver(addMedicationSchema),
@@ -51,7 +53,10 @@ export default function MyMedicationsPage() {
   });
 
   // Fetch user's medications
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<{
+    medications: any[];
+    interactions: { hasInteractions: boolean; interactions: any[] };
+  }>({
     queryKey: ["/api/users", user?.id, "medications"],
     enabled: !!user?.id,
   });
@@ -69,7 +74,7 @@ export default function MyMedicationsPage() {
       toast({ title: "Medication added successfully" });
       setAddDialogOpen(false);
       form.reset();
-      setSelectedMedication(null);
+      setMedicationSearchValue("");
     },
     onError: (error: any) => {
       toast({
@@ -98,11 +103,9 @@ export default function MyMedicationsPage() {
     },
   });
 
-  const handleMedicationSelect = (medication: any) => {
-    setSelectedMedication(medication);
-    form.setValue("medicationName", medication.name);
-    form.setValue("genericName", medication.genericName);
-    form.setValue("strength", medication.strength);
+  const handleMedicationSearchChange = (value: string) => {
+    setMedicationSearchValue(value);
+    form.setValue("medicationName", value);
   };
 
   const onSubmit = (values: AddMedicationForm) => {
@@ -141,7 +144,8 @@ export default function MyMedicationsPage() {
             
             <div className="space-y-4">
               <MedicationSearch
-                onSelect={handleMedicationSelect}
+                value={medicationSearchValue}
+                onChange={handleMedicationSearchChange}
                 placeholder="Search for a medication..."
               />
               

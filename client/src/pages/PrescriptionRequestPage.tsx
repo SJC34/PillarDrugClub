@@ -174,7 +174,7 @@ export default function PrescriptionRequestPage() {
   }, []);
 
   // Handle form submission with authentication check
-  const handleDoctorSubmit = (e: React.FormEvent) => {
+  const handleDoctorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     console.log("handleDoctorSubmit called");
@@ -192,7 +192,7 @@ export default function PrescriptionRequestPage() {
     }
     
     // Validate form first
-    const isValid = doctorForm.trigger();
+    const isValid = await doctorForm.trigger();
     if (!isValid) {
       return;
     }
