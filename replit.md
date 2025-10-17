@@ -35,6 +35,15 @@ Preferred communication style: Simple, everyday language.
   - **Admin Oversight**: Dedicated admin portal tab for managing all refill requests
   - **Patient Portal**: Dedicated refill pages for requesting refills (/refills) and viewing refill history (/refills/history)
   - **API Security**: All endpoints enforce user authentication and authorization, ensuring users can only access their own refill data
+- **Personal Medication List** (/medications/my-list): User-managed medication list with pharmacist-level insights powered by OpenFDA integration:
+  - **Manual Medication Entry**: Add medications with details (name, strength, dosage, frequency, route, prescriber, notes)
+  - **MedicationSearch Integration**: Search and select medications with auto-populated generic names
+  - **OpenFDA Data Enrichment**: Automatic fetching of FDA drug label data (warnings, interactions, administration instructions, side effects)
+  - **Drug Interaction Checking**: Cross-references all user medications to detect potential drug-drug interactions
+  - **Pharmacist Insights Panel**: Displays comprehensive medication information including important warnings, administration guidelines, and safety alerts
+  - **Real-time Updates**: FDA data cached for 24 hours, automatically refreshed when outdated
+  - **User Authorization**: Secure access with user ID verification ensuring users can only manage their own medications
+  - **API Endpoints**: GET/POST/DELETE /api/users/:userId/medications with proper authentication and authorization
 - **Admin Dashboard System**: Comprehensive administrative tools for platform oversight and management:
   - **Executive Dashboard** (/admin/dashboard): Real-time metrics display with user counts, prescription statistics, order volume, and refill queue; recent activity feeds showing latest users, prescriptions, and orders; clickable metric cards linking to detailed pages; dedicated "Admin Tools" section provides quick access to all administrative features via responsive grid of cards (User Management, Financial Dashboard, Communication Center, Reports & Analytics, Medication Pricing) with hover interactions and visual hierarchy highlighting
   - **User Management** (/admin/users): Complete user directory with search (by name/email), role-based filtering (admin/client/broker/company), and status filtering (active/suspended); detailed user profiles showing account statistics (active prescriptions, order count, total spend) and recent order history; account management actions including suspend/activate functionality with self-suspension prevention
