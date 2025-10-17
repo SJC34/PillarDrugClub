@@ -409,20 +409,64 @@ export default function MyMedicationsPage() {
                       )}
                       
                       {med.fdaData.warnings?.boxedWarning?.length > 0 && (
-                        <div className="p-2 rounded-md bg-destructive/10">
+                        <div className="p-2 rounded-md bg-red-100 dark:bg-red-950">
                           <div className="flex items-start gap-2">
-                            <AlertTriangle className="h-4 w-4 mt-0.5 text-destructive" />
+                            <AlertTriangle className="h-4 w-4 mt-0.5 text-red-600 dark:text-red-400" />
                             <div className="flex-1">
-                              <div className="text-sm font-medium text-destructive">
-                                Important Warning
+                              <div className="text-sm font-medium text-red-900 dark:text-red-100">
+                                ⚠️ Boxed Warning
                               </div>
-                              <div className="text-xs text-muted-foreground mt-1">
+                              <div className="text-xs text-red-700 dark:text-red-300 mt-1">
                                 {med.fdaData.warnings.boxedWarning[0].substring(0, 150)}...
                               </div>
                             </div>
                           </div>
                         </div>
                       )}
+                      
+                      {med.fdaData.warnings?.warnings?.length > 0 && (
+                        <div className="p-2 rounded-md bg-orange-50 dark:bg-orange-950">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 mt-0.5 text-orange-600 dark:text-orange-400" />
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-orange-900 dark:text-orange-100">
+                                Warnings
+                              </div>
+                              <div className="text-xs text-orange-700 dark:text-orange-300 mt-1">
+                                {med.fdaData.warnings.warnings[0].substring(0, 150)}...
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {med.fdaData.warnings?.contraindications?.length > 0 && (
+                        <div className="p-2 rounded-md bg-yellow-50 dark:bg-yellow-950">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 mt-0.5 text-yellow-600 dark:text-yellow-400" />
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-yellow-900 dark:text-yellow-100">
+                                Contraindications
+                              </div>
+                              <div className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                                {med.fdaData.warnings.contraindications[0].substring(0, 150)}...
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {!med.fdaData && (
+                    <div className="p-2 rounded-md bg-muted">
+                      <div className="flex items-start gap-2">
+                        <Info className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                        <div className="flex-1">
+                          <div className="text-sm text-muted-foreground">
+                            No FDA safety information available for this medication.
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
