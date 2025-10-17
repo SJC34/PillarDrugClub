@@ -259,3 +259,36 @@ export const insertRefillRequestSchema = createInsertSchema(refillRequests).omit
 
 export type InsertRefillRequest = z.infer<typeof insertRefillRequestSchema>;
 export type RefillRequest = typeof refillRequests.$inferSelect;
+
+// User medications table - tracks patient's current medication list
+export const userMedications = pgTable("user_medications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  medicationId: varchar("medication_id").references(() => medications.id, { onDelete: "set null" }),
+  prescriptionId: varchar("prescription_id").references(() => prescriptions.id, { onDelete: "set null" }),
+  medicationName: text("medication_name").notNull(),
+  genericName: text("generic_name"),
+  strength: text("strength").notNull(),
+  dosage: text("dosage").notNull(), // e.g., "1 tablet", "2.5 mg"
+  frequency: text("frequency").notNull(), // e.g., "twice daily", "every 8 hours"
+  route: text("route"), // e.g., "oral", "topical", "injection"
+  startDate: text("start_date"),
+  endDate: text("end_date"),
+  prescribedBy: text("prescribed_by"),
+  notes: text("notes"),
+  isActive: boolean("is_active").notNull().default(true),
+  fromPrescription: boolean("from_prescription").default(false), // Auto-added from prescription
+  fdaData: jsonb("fda_data"), // Cached OpenFDA data
+  lastFdaCheck: timestamp("last_fda_check"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserMedicationSchema = createInsertSchema(userMedications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertUserMedication = z.infer<typeof insertUserMedicationSchema>;
+export type UserMedication = typeof userMedications.$inferSelect;
