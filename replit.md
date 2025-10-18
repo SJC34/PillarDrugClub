@@ -2,7 +2,7 @@
 
 ## Overview
 
-Pillar Drug Club is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers. It's a full-stack web application (React/TypeScript frontend, Node.js/Express backend) designed to bypass insurance complexities and provide transparent, cost-effective medication access. The platform offers two membership tiers: Foundation Plan ($15/month for 1-3 medications) and Keystone Plan ($25/month for 4+ medications). The platform supports multiple user types (clients, brokers, companies, administrators) through dedicated portals, offering features like medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The business vision is to revolutionize prescription access by making essential medications affordable and easily accessible, tapping into a significant market opportunity for direct-to-consumer healthcare solutions.
+Pillar Drug Club is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers two membership tiers: Foundation Plan ($15/month for 1-3 medications) and Keystone Plan ($25/month for 4+ medications). The platform supports multiple user types (clients, brokers, companies, administrators) with features like medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The business aims to revolutionize prescription access by making essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
 
 ## User Preferences
 
@@ -10,54 +10,32 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-**UI/UX Decisions**: The frontend uses React 18 with TypeScript and Vite, employing a component-based architecture. Shadcn/ui and Tailwind CSS form the design system, inspired by modern healthcare aesthetics (e.g., Ro, Roman) with a focus on minimalism and professional typography (Plus Jakarta Sans and Inter families). The platform is mobile-first and fully responsive, ensuring optimal viewing and interaction across devices, including a touch-friendly mobile navigation overlay and adaptive layouts. The homepage features an auto-advancing Embla Carousel to engage users.
+**UI/UX Decisions**: The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Tailwind CSS. The design is mobile-first, responsive, and inspired by modern healthcare aesthetics, focusing on minimalism and professional typography (Plus Jakarta Sans, Inter).
 
 **Technical Implementations**:
-- **Frontend**: Utilizes TanStack Query for server state management and caching, React Hook Form with Zod for form handling and validation.
-- **Backend**: Express.js with TypeScript provides RESTful APIs. It features a storage abstraction layer, currently backed by a PostgreSQL database.
-- **Database**: PostgreSQL with Drizzle ORM for type-safe operations. The schema includes comprehensive models for users, customers, medications, prescriptions, orders, and shipments, supporting complex medication data like NDC codes and pricing tiers.
-- **Authentication & Authorization**: Implements dual authentication via email/password and Google OAuth (via Replit Auth OIDC integration), using Passport.js for session management with PostgreSQL storage. Single unified session middleware from setupAuth() handles both authentication methods. A robust role-based access control system manages permissions for clients, brokers, companies, and admins.
-- **Multi-Step Registration**: A 4-step onboarding process includes social authentication, user detail collection, prescription preference selection (new RX request with PDF generation/distribution), and Stripe membership payment integration.
-- **Payment Processing**: Integrated Stripe for subscription-based membership and payment processing with two-tier pricing (Foundation Plan: $15/month for 1-3 medications, Keystone Plan: $25/month for 4+ medications). The subscription page features plan selection with race-condition-safe state management and proper Stripe Elements remounting when plans change.
-- **PDF Prescription System**: Generates professional, branded PDF prescription request forms with complete SureScripts pharmacy lookup information (HealthWarehouse: NCPDP 1832674, NPI 1619252160, DEA FH1427536, Florence KY 41042) and distributes them to both patients and doctors via email and SMS, using PDFKit, Resend, and Twilio. Email templates also include full pharmacy details for easy provider reference. PDFs feature a two-column layout: left column displays requested medication details (Step 1 & 2: medication name, dosage, quantity, special instructions with automatic text wrapping for long names) and prescriber information (Step 3: doctor name, phone, address); right column contains a highlighted savings section titled "MAXIMIZE YOUR PATIENT'S SAVINGS" showing the Levothyroxine 25mcg example (Traditional Insurance: $120/year vs Pillar Wholesale: $7.30/year, patient saves $112.70/year) and a prescription writing example box titled "HOW TO WRITE THE RX:" showing a complete clinical example (Jane Smith 1/24/1986, Levothyroxine 100mcg, TK 1 TAB PO QD, #180 RF:1 or #360 RF:0) to guide doctors on writing either 6-month or 12-month supply prescriptions, all with clear 9-11pt typography for easy physician reading.
-- **Account Settings**: Users can manage personal information (date of birth), contact details (phone number, SMS preferences), and mailing address through a dedicated settings page (/settings). The DOB field is used for prescription requests and pharmacy records.
-- **Member Dashboard**: Comprehensive user dashboard featuring quick action cards for common tasks (Cost Calculator, My Medications, Prescription Request, Browse Medications, Account Settings). Displays current medications with full details (name, strength, dosage, frequency, prescriber, active status) and inline delete functionality with confirmation. Each medication card features hover effects and links to the full My Medications page via "Manage All" and "View All Medications & Insights" buttons. Includes primary care physician details (with integrated NPI database search for doctor management), and drug allergies management. Users can add/edit their drug allergies, which automatically prepopulate in prescription request forms.
-- **Medication Ordering Workflow**: Clicking "Order with Prescription" on medication details or "Order Rx" on medication listings redirects to the prescription request page with medication info as URL parameters (medicationName, dosage, quantity), automatically prepopulating the doctor form alongside user profile data (DOB, allergies).
-- **Prescription Request Page**: Features a responsive two-column layout with step indicators (1, 2, 3) positioned on the left side and form fields on the right (collapses to inline layout on mobile). Focused solely on requesting new prescriptions from doctors for year-supply wholesale medications. Includes a savings explanation section at the top demonstrating year supply benefits using Levothyroxine 25mcg as an example: traditional insurance model ($120/year for 30 tablets + 11 refills with $10/month copays) vs Pillar wholesale pricing ($7.30/year for 365 tablets with no refills), showing potential savings of $112.70 per year.
-- **File Upload & Storage**: Designed for secure handling of prescription uploads and medical documents, likely utilizing cloud storage.
-- **Medication Search**: CSV-based medication catalog using the SJC Pharmacy pricing file, providing search and pricing information.
-- **Annual Pricing System**: Integrates with the openFDA Drug Label API to calculate annual pricing for chronic medications, identifying and excluding short-course drugs.
-- **Medication Refill System**: Automated refill request workflow with intelligent due-date calculation based on prescription supply days. Features include:
-  - **Smart Refill Detection**: Automatically identifies prescriptions due within 7 days by calculating from lastFillDate + daysSupply
-  - **Priority-Based Requests**: Supports routine, urgent, and emergency priority levels for refill requests
-  - **Patient & Pharmacy Notes**: Bidirectional communication between patients and pharmacy staff
-  - **Status Workflow**: Complete lifecycle tracking (pending → approved → filled/rejected)
-  - **Admin Oversight**: Dedicated admin portal tab for managing all refill requests
-  - **Patient Portal**: Dedicated refill pages for requesting refills (/refills) and viewing refill history (/refills/history)
-  - **API Security**: All endpoints enforce user authentication and authorization, ensuring users can only access their own refill data
-- **Personal Medication List** (/medications/my-list): User-managed medication list with pharmacist-level insights powered by OpenFDA integration:
-  - **Manual Medication Entry**: Add medications with details (name, strength, dosage, frequency, route, prescriber, notes)
-  - **MedicationSearch Integration**: Search and select medications with auto-populated generic names
-  - **OpenFDA Data Enrichment**: Automatic fetching of FDA drug label data (warnings, interactions, administration instructions, side effects)
-  - **Drug Interaction Checking**: Cross-references all user medications to detect potential drug-drug interactions
-  - **Pharmacist Insights Panel**: Displays comprehensive medication information including important warnings, administration guidelines, and safety alerts
-  - **Real-time Updates**: FDA data cached for 24 hours, automatically refreshed when outdated
-  - **User Authorization**: Secure access with user ID verification ensuring users can only manage their own medications
-  - **API Endpoints**: GET/POST/DELETE /api/users/:userId/medications with proper authentication and authorization
-- **Admin Dashboard System**: Comprehensive administrative tools for platform oversight and management:
-  - **Executive Dashboard** (/admin/dashboard): Real-time metrics display with user counts, prescription statistics, order volume, and refill queue; recent activity feeds showing latest users, prescriptions, and orders; clickable metric cards linking to detailed pages; dedicated "Admin Tools" section provides quick access to all administrative features via responsive grid of cards (User Management, Financial Dashboard, Communication Center, Reports & Analytics, Medication Pricing) with hover interactions and visual hierarchy highlighting
-  - **User Management** (/admin/users): Complete user directory with search (by name/email), role-based filtering (admin/client/broker/company), and status filtering (active/suspended); detailed user profiles showing account statistics (active prescriptions, order count, total spend) and recent order history; account management actions including suspend/activate functionality with self-suspension prevention
-  - **Financial Dashboard** (/admin/financial): Revenue tracking with total revenue, monthly revenue, MRR, and average order value metrics; subscription analytics showing active, cancelled, and past due subscriptions with churn rate; 30-day revenue trend chart using Recharts; recent transactions table with customer details; queries actual order data from PostgreSQL database
-  - **Communication Center** (/admin/communications): Email and SMS management interface with message statistics; send messages tab for composing emails and SMS to user segments; message history table tracking sent communications with delivery status; message templates for common notifications (prescription ready, refill reminders, order shipped, welcome emails); prepared for Twilio and Resend integration
-  - **Reports & Analytics** (/admin/reports): Comprehensive reporting with user growth trend chart, revenue overview bar chart, subscription distribution pie chart, and prescription status breakdown; time range selector (7 days to 1 year); export options for user data, financial data, and prescription data (CSV format); visual analytics using Recharts library
-  - **Medication Pricing Management** (/admin/pricing): Bulk medication price update system via CSV upload; accepts files with columns (ndc, price, wholesalePrice, annualPrice); uses NDC codes as unique identifiers for matching medications; implements robust validation (isNaN checks after parseFloat) to prevent data corruption; provides comprehensive error reporting for invalid/malformed rows; multer-based file upload with 5MB limit and CSV-only filtering; updates persisted via DbStorage.updateMedication() to PostgreSQL with proper numeric-to-string type conversions
-  - **Security**: All admin endpoints require authentication (401) and admin role verification (403); users cannot suspend their own accounts; orders and users queried from database with proper type conversions
-
-**System Design Choices**: The architecture emphasizes modularity, scalability, and security, particularly for sensitive healthcare data. The use of serverless PostgreSQL and a flexible storage layer contributes to scalability. Asynchronous communication for notifications ensures a responsive user experience.
-
-## Known Issues & Limitations
-
-**NDC Data Integrity**: The medication import pipeline (`scripts/import-pharmacy-csv.ts`) currently sets NDC codes to empty strings (`ndc: ''`) because the source SJC Pharmacy CSV file doesn't contain NDC codes. This affects the medication pricing CSV upload feature, which relies on NDC codes as unique identifiers for medication matching. Workarounds: (1) manually insert test medications with proper NDC codes for testing, (2) update the import pipeline to generate predictable pseudo-NDC codes, or (3) source medication data that includes actual NDC codes and backfill the database.
+- **Frontend**: Utilizes TanStack Query for server state management and caching, and React Hook Form with Zod for form validation.
+- **Backend**: Express.js with TypeScript provides RESTful APIs, backed by a PostgreSQL database with Drizzle ORM.
+- **Authentication & Authorization**: Dual authentication via email/password and Google OAuth (Replit Auth OIDC), using Passport.js for session management and a robust role-based access control system.
+- **Multi-Step Registration**: A 4-step onboarding process includes social authentication, user detail collection, prescription preference selection, and Stripe membership payment.
+- **Payment Processing**: Integrated Stripe for subscription-based membership with two-tier pricing.
+- **PDF Prescription System**: Generates branded PDF prescription request forms with SureScripts pharmacy lookup information and distributes them via email and SMS using PDFKit, Resend, and Twilio. PDFs are structured to guide doctors on writing 6 or 12-month supply prescriptions.
+- **Account Settings**: Users can manage personal information, contact details, and mailing addresses.
+- **Member Dashboard**: Comprehensive user dashboard with quick action cards, current medication display, primary care physician management (with NPI search), and drug allergies management.
+- **Medication Ordering Workflow**: Streamlined process for requesting prescriptions, prepopulating forms with user and medication data.
+- **Prescription Request Page**: Features a responsive two-column layout with step indicators, focusing on requesting new year-supply wholesale medications and demonstrating savings.
+- **Medication Search**: CSV-based medication catalog providing search and pricing information.
+- **Annual Pricing System**: Integrates with the openFDA Drug Label API to calculate annual pricing for chronic medications.
+- **Medication Refill System**: Automated refill request workflow with smart refill detection, priority levels, patient/pharmacy notes, status tracking, and admin oversight.
+- **Personal Medication List**: User-managed list with OpenFDA integration for data enrichment (warnings, interactions, side effects) and real-time drug-drug interaction checking.
+- **Admin Dashboard System**: Comprehensive tools for platform oversight including:
+    - **Executive Dashboard**: Real-time metrics, recent activity feeds, and quick access to admin features.
+    - **User Management**: User directory with search, filtering, detailed profiles, and account actions.
+    - **Financial Dashboard**: Revenue tracking, subscription analytics, and transaction history.
+    - **Communication Center**: Email and SMS management with message templates.
+    - **Reports & Analytics**: Comprehensive reporting with charts and export options.
+    - **Medication Pricing Management**: Bulk medication price updates via CSV upload with robust validation.
+    - **Referral Monitoring**: Oversight for the member referral program with fraud detection and analytics.
+- **System Design Choices**: Emphasizes modularity, scalability, and security for sensitive healthcare data, utilizing serverless PostgreSQL and asynchronous communication.
 
 ## External Dependencies
 
@@ -69,9 +47,6 @@ Preferred communication style: Simple, everyday language.
 - **HTTP Client**: TanStack Query.
 - **Development Tools**: Vite, ESBuild.
 - **Deployment Platform**: Replit.
-- **Font Service**: Google Fonts (Inter family).
 - **Healthcare Provider Database**: NLM Clinical Tables NPI database API.
 - **Medication Data**: SJC Pharmacy pricing CSV file, openFDA Drug Label API.
-- **E-Prescribing Network**: Surescripts (planned integration via certified partner like DoseSpot).
-- **Healthcare Integration**: HealthWarehouse API (for medication sourcing).
 - **Communication Services**: Twilio (SMS), Resend (email).

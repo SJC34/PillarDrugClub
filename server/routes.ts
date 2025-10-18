@@ -2000,6 +2000,181 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Admin referral monitoring endpoint
+  app.get("/api/admin/referrals", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      // Get all referral codes
+      const referralCodes = await storage.getAllReferralCodes();
+      
+      // Get all referral credits
+      const referralCredits = await storage.getAllReferralCredits();
+
+      // Prepare codes with stats
+      const codesWithStats = referralCodes.map((code: any) => {
+        const uses = referralCredits.filter((c: any) => c.referralCode === code.code).length;
+        const successful = referralCredits.filter((c: any) => 
+          c.referralCode === code.code && c.status === 'redeemed'
+        ).length;
+
+        return {
+          code: code.code,
+          ownerId: code.ownerId,
+          ownerName: `${code.ownerFirstName || ''} ${code.ownerLastName || ''}`.trim(),
+          ownerEmail: code.ownerEmail || '',
+          createdAt: code.createdAt,
+          totalUses: uses,
+          successfulReferrals: successful,
+        };
+      });
+
+      // Prepare credits with names
+      const creditsWithNames = referralCredits.map((credit: any) => ({
+        id: credit.id,
+        userId: credit.userId,
+        userName: `${credit.userFirstName || ''} ${credit.userLastName || ''}`.trim(),
+        referralCode: credit.referralCode,
+        referredByName: credit.referredByName || 'Unknown',
+        createdAt: credit.createdAt,
+        redeemedAt: credit.redeemedAt,
+        status: credit.status,
+      }));
+
+      // Fraud detection
+      const fraudAlerts: Array<{
+        type: string;
+        severity: string;
+        userId: string;
+        userName: string;
+        details: string;
+        affectedCodes: string[];
+      }> = [];
+
+      // Check for multiple codes from same user
+      const codesByUser = new Map<string, string[]>();
+      referralCodes.forEach((code: any) => {
+        if (!codesByUser.has(code.ownerId)) {
+          codesByUser.set(code.ownerId, []);
+        }
+        codesByUser.get(code.ownerId)!.push(code.code);
+      });
+
+      codesByUser.forEach((codes, userId) => {
+        if (codes.length > 1) {
+          const user = referralCodes.find((c: any) => c.ownerId === userId);
+          fraudAlerts.push({
+            type: 'multiple_codes_same_user',
+            severity: codes.length > 3 ? 'high' : 'medium',
+            userId: userId,
+            userName: `${user?.ownerFirstName || ''} ${user?.ownerLastName || ''}`.trim(),
+            details: `User has ${codes.length} referral codes. This may indicate abuse.`,
+            affectedCodes: codes,
+          });
+        }
+      });
+
+      // Check for high velocity referrals
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const recentCreditsByCode = new Map<string, number>();
+      referralCredits.forEach((credit: any) => {
+        const createdDate = new Date(credit.createdAt);
+        if (createdDate >= sevenDaysAgo) {
+          recentCreditsByCode.set(
+            credit.referralCode, 
+            (recentCreditsByCode.get(credit.referralCode) || 0) + 1
+          );
+        }
+      });
+
+      recentCreditsByCode.forEach((count, code) => {
+        if (count >= 10) {
+          const codeInfo = referralCodes.find((c: any) => c.code === code);
+          if (codeInfo) {
+            fraudAlerts.push({
+              type: 'high_velocity',
+              severity: count >= 20 ? 'high' : 'medium',
+              userId: codeInfo.ownerId,
+              userName: `${codeInfo.ownerFirstName || ''} ${codeInfo.ownerLastName || ''}`.trim(),
+              details: `${count} referrals in the past 7 days. This is unusually high.`,
+              affectedCodes: [code],
+            });
+          }
+        }
+      });
+
+      // Analytics
+      const pendingCredits = referralCredits.filter((c: any) => c.status === 'pending').length;
+      const redeemedCredits = referralCredits.filter((c: any) => c.status === 'redeemed').length;
+      const totalReferrals = referralCredits.length;
+      
+      // Each credit is worth $15-25 (let's use average of $20)
+      const avgSavingsPerCredit = 20;
+      const totalSavings = redeemedCredits * avgSavingsPerCredit;
+
+      // Top referrers
+      const codeUseMap = new Map<string, { code: string; ownerName: string; uses: number }>();
+      codesWithStats.forEach((codeData: any) => {
+        codeUseMap.set(codeData.code, {
+          code: codeData.code,
+          ownerName: codeData.ownerName,
+          uses: codeData.successfulReferrals,
+        });
+      });
+      
+      const topReferrers = Array.from(codeUseMap.values())
+        .sort((a, b) => b.uses - a.uses)
+        .slice(0, 5);
+
+      // Recent activity
+      const recentActivity = referralCredits
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 10)
+        .map((credit: any) => ({
+          action: credit.status === 'redeemed' ? 'Credit redeemed' : 'New referral',
+          userName: `${credit.userFirstName || ''} ${credit.userLastName || ''}`.trim(),
+          code: credit.referralCode,
+          timestamp: credit.status === 'redeemed' && credit.redeemedAt ? credit.redeemedAt : credit.createdAt,
+        }));
+
+      const averageReferralsPerCode = referralCodes.length > 0 
+        ? totalReferrals / referralCodes.length 
+        : 0;
+
+      res.json({
+        codes: codesWithStats,
+        credits: creditsWithNames,
+        fraudAlerts: fraudAlerts,
+        analytics: {
+          totalCodes: referralCodes.length,
+          totalReferrals: totalReferrals,
+          pendingCredits: pendingCredits,
+          redeemedCredits: redeemedCredits,
+          totalSavings: totalSavings,
+          averageReferralsPerCode: averageReferralsPerCode,
+          topReferrers: topReferrers,
+          recentActivity: recentActivity,
+        },
+      });
+    } catch (error: any) {
+      console.error("Error fetching referral data:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch referral data", 
+        message: error.message 
+      });
+    }
+  });
+
   // Admin user management endpoints
 
   // GET /api/admin/users - List all users with filtering

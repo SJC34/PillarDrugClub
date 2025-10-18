@@ -11,7 +11,7 @@ import {
 } from "@shared/pharmacy-schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq, and, or, asc } from "drizzle-orm";
+import { eq, and, or, asc, desc } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 // modify the interface with any CRUD methods
@@ -117,6 +117,8 @@ export interface IStorage {
   updateReferralCredit(id: string, updates: any): Promise<any | undefined>;
   getReferralStats(userId: string): Promise<{ totalReferrals: number; creditsEarned: number; creditsRedeemed: number }>;
   getAvailableReferralCredits(userId: string): Promise<any[]>;
+  getAllReferralCodes(): Promise<any[]>;
+  getAllReferralCredits(): Promise<any[]>;
 
   // Dashboard Metrics
   getDashboardMetrics(): Promise<{
@@ -2527,6 +2529,43 @@ export class DbStorage extends MemStorage {
       )
       .orderBy(asc(referralCredits.createdAt));
     return result;
+  }
+
+  async getAllReferralCodes(): Promise<any[]> {
+    const result = await db.select()
+      .from(referralCodes)
+      .leftJoin(users, eq(referralCodes.userId, users.id))
+      .orderBy(desc(referralCodes.createdAt));
+    
+    // Transform the result to flatten the joined data
+    return result.map((row: any) => ({
+      code: row.referralCodes?.code || '',
+      ownerId: row.referralCodes?.userId || '',
+      createdAt: row.referralCodes?.createdAt || '',
+      ownerFirstName: row.users?.firstName || '',
+      ownerLastName: row.users?.lastName || '',
+      ownerEmail: row.users?.email || ''
+    }));
+  }
+
+  async getAllReferralCredits(): Promise<any[]> {
+    const result = await db.select()
+      .from(referralCredits)
+      .leftJoin(users, eq(referralCredits.userId, users.id))
+      .orderBy(desc(referralCredits.createdAt));
+    
+    // Transform the result to flatten the joined data
+    return result.map((row: any) => ({
+      id: row.referralCredits?.id || '',
+      userId: row.referralCredits?.userId || '',
+      referralCode: row.referralCredits?.referralCode || '',
+      createdAt: row.referralCredits?.createdAt || '',
+      redeemedAt: row.referralCredits?.redeemedAt || null,
+      status: row.referralCredits?.status || '',
+      referredByName: row.referralCredits?.referredByName || '',
+      userFirstName: row.users?.firstName || '',
+      userLastName: row.users?.lastName || ''
+    }));
   }
 }
 

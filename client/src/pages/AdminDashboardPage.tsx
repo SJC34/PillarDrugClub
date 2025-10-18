@@ -15,7 +15,8 @@ import {
   Settings,
   BarChart3,
   Mail,
-  Upload
+  Upload,
+  Gift
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -314,6 +315,22 @@ export default function AdminDashboardPage() {
                     <div>
                       <p className="font-semibold text-foreground">Medication Pricing</p>
                       <p className="text-sm text-muted-foreground">Bulk CSV price updates</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/referrals">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-referral-monitoring">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-pink-100 rounded-lg">
+                      <Gift className="h-6 w-6 text-pink-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Referral Monitoring</p>
+                      <p className="text-sm text-muted-foreground">Track codes & fraud detection</p>
                     </div>
                   </div>
                 </CardContent>
