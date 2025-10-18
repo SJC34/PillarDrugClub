@@ -11,7 +11,7 @@ import {
 } from "@shared/pharmacy-schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, or, asc } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 // modify the interface with any CRUD methods
@@ -116,6 +116,7 @@ export interface IStorage {
   createReferralCredit(credit: any): Promise<any>;
   updateReferralCredit(id: string, updates: any): Promise<any | undefined>;
   getReferralStats(userId: string): Promise<{ totalReferrals: number; creditsEarned: number; creditsRedeemed: number }>;
+  getAvailableReferralCredits(userId: string): Promise<any[]>;
 
   // Dashboard Metrics
   getDashboardMetrics(): Promise<{
@@ -2511,6 +2512,21 @@ export class DbStorage extends MemStorage {
       creditsEarned: credits.length,
       creditsRedeemed: credits.filter(c => c.status === "redeemed").length
     };
+  }
+
+  async getAvailableReferralCredits(userId: string): Promise<any[]> {
+    const result = await db.select().from(referralCredits)
+      .where(
+        and(
+          eq(referralCredits.userId, userId),
+          or(
+            eq(referralCredits.status, 'pending'),
+            eq(referralCredits.status, 'applied')
+          )
+        )
+      )
+      .orderBy(asc(referralCredits.createdAt));
+    return result;
   }
 }
 

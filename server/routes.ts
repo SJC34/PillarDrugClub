@@ -287,8 +287,54 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         console.log(`✅ Created Stripe product and price for ${plan} plan: ${priceId}`);
       }
       
+      // Check for available referral credits
+      const availableCredits = await storage.getAvailableReferralCredits(userId);
+      let couponId = null;
+      let appliedCreditId = null;
+      
+      if (availableCredits.length > 0) {
+        // Use the first available credit
+        const credit = availableCredits[0];
+        
+        // Create or retrieve a Stripe coupon for 1 month free (100% off for 1 month)
+        try {
+          // Try to get existing coupon or create a new one
+          const coupons = await stripe.coupons.list({ limit: 100 });
+          let existingCoupon = coupons.data.find(c => 
+            c.percent_off === 100 && 
+            c.duration === 'repeating' && 
+            c.duration_in_months === 1
+          );
+          
+          if (!existingCoupon) {
+            existingCoupon = await stripe.coupons.create({
+              percent_off: 100,
+              duration: 'repeating',
+              duration_in_months: 1,
+              name: 'Pillar Referral Credit - 1 Month Free',
+            });
+            console.log(`✅ Created Stripe coupon: ${existingCoupon.id}`);
+          }
+          
+          couponId = existingCoupon.id;
+          appliedCreditId = credit.id;
+          
+          // Update credit status to 'applied'
+          await storage.updateReferralCredit(credit.id, {
+            status: 'applied',
+            stripeCouponId: couponId,
+            appliedAt: new Date()
+          });
+          
+          console.log(`✅ Applied referral credit ${credit.id} (coupon ${couponId}) for user ${userId}`);
+        } catch (couponError) {
+          console.error('Error creating/applying coupon:', couponError);
+          // Continue with subscription creation even if coupon fails
+        }
+      }
+      
       // Create the subscription
-      const subscription = await stripe.subscriptions.create({
+      const subscriptionParams: any = {
         customer: customerId,
         items: [{ price: priceId }],
         payment_behavior: 'default_incomplete',
@@ -300,7 +346,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
           userId: userId,
           plan: plan
         }
-      });
+      };
+      
+      // Add coupon if available
+      if (couponId) {
+        subscriptionParams.coupon = couponId;
+      }
+      
+      const subscription = await stripe.subscriptions.create(subscriptionParams);
       
       // Get the client secret from the payment intent
       const invoice = subscription.latest_invoice as Stripe.Invoice;
