@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication, orders as ordersTable, prescriptions as prescriptionsTable } from "@shared/schema";
+import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication, orders as ordersTable, prescriptions as prescriptionsTable, referralCodes, referralHistory, referralCredits, type ReferralCode, type ReferralHistory, type ReferralCredit } from "@shared/schema";
 import { 
   type Customer, type InsertCustomer,
   type Medication, type InsertMedication, type MedicationSearch,
@@ -105,6 +105,17 @@ export interface IStorage {
   addUserMedication(medication: any): Promise<any>;
   updateUserMedication(id: string, medication: any): Promise<any | undefined>;
   removeUserMedication(id: string): Promise<boolean>;
+
+  // Referral System
+  getReferralCode(userId: string): Promise<any | undefined>;
+  createReferralCode(userId: string, code: string): Promise<any>;
+  validateReferralCode(code: string): Promise<any | undefined>;
+  applyReferralCode(refereeId: string, referralCode: string): Promise<any>;
+  getUserReferralHistory(userId: string): Promise<any[]>;
+  getUserReferralCredits(userId: string): Promise<any[]>;
+  createReferralCredit(credit: any): Promise<any>;
+  updateReferralCredit(id: string, updates: any): Promise<any | undefined>;
+  getReferralStats(userId: string): Promise<{ totalReferrals: number; creditsEarned: number; creditsRedeemed: number }>;
 
   // Dashboard Metrics
   getDashboardMetrics(): Promise<{
@@ -2413,6 +2424,93 @@ export class DbStorage extends MemStorage {
     const { userMedications } = await import("@shared/schema");
     const result = await db.delete(userMedications).where(eq(userMedications.id, id));
     return true;
+  }
+
+  async getReferralCode(userId: string): Promise<any | undefined> {
+    const [result] = await db.select().from(referralCodes).where(eq(referralCodes.userId, userId));
+    return result;
+  }
+
+  async createReferralCode(userId: string, code: string): Promise<any> {
+    const [result] = await db.insert(referralCodes).values({
+      userId,
+      code,
+      isActive: true
+    }).returning();
+    return result;
+  }
+
+  async validateReferralCode(code: string): Promise<any | undefined> {
+    const [result] = await db.select().from(referralCodes).where(eq(referralCodes.code, code));
+    return result;
+  }
+
+  async applyReferralCode(refereeId: string, referralCode: string): Promise<any> {
+    const code = await this.validateReferralCode(referralCode);
+    if (!code || !code.isActive) {
+      throw new Error("Invalid or inactive referral code");
+    }
+
+    // Prevent self-referrals
+    if (code.userId === refereeId) {
+      throw new Error("You cannot use your own referral code");
+    }
+
+    // Check for existing referral relationship to prevent duplicates
+    const existingReferral = await db.select().from(referralHistory)
+      .where(eq(referralHistory.referrerId, code.userId))
+      .where(eq(referralHistory.refereeId, refereeId));
+    
+    if (existingReferral.length > 0) {
+      throw new Error("This referral relationship already exists");
+    }
+
+    const [result] = await db.insert(referralHistory).values({
+      referrerId: code.userId,
+      refereeId,
+      referralCode: referralCode,
+      status: "pending",
+      referrerCreditApplied: false,
+      refereeCreditApplied: false
+    }).returning();
+
+    return result;
+  }
+
+  async getUserReferralHistory(userId: string): Promise<any[]> {
+    const result = await db.select().from(referralHistory)
+      .where(eq(referralHistory.referrerId, userId));
+    return result;
+  }
+
+  async getUserReferralCredits(userId: string): Promise<any[]> {
+    const result = await db.select().from(referralCredits)
+      .where(eq(referralCredits.userId, userId));
+    return result;
+  }
+
+  async createReferralCredit(credit: any): Promise<any> {
+    const [result] = await db.insert(referralCredits).values(credit).returning();
+    return result;
+  }
+
+  async updateReferralCredit(id: string, updates: any): Promise<any | undefined> {
+    const [result] = await db.update(referralCredits)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(referralCredits.id, id))
+      .returning();
+    return result;
+  }
+
+  async getReferralStats(userId: string): Promise<{ totalReferrals: number; creditsEarned: number; creditsRedeemed: number }> {
+    const history = await this.getUserReferralHistory(userId);
+    const credits = await this.getUserReferralCredits(userId);
+    
+    return {
+      totalReferrals: history.filter(h => h.status === "credited").length,
+      creditsEarned: credits.length,
+      creditsRedeemed: credits.filter(c => c.status === "redeemed").length
+    };
   }
 }
 

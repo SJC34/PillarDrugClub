@@ -31,6 +31,10 @@ export const users = pgTable("users", {
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionStatus: text("subscription_status", { enum: ["active", "canceled", "past_due", "incomplete"] }).default("incomplete"),
   isActive: text("is_active").default("true"),
+  commitmentStartDate: timestamp("commitment_start_date"),
+  commitmentEndDate: timestamp("commitment_end_date"),
+  monthsPaid: integer("months_paid").default(0),
+  monthlyRate: numeric("monthly_rate"),
   primaryDoctorId: text("primary_doctor_id"),
   primaryDoctorName: text("primary_doctor_name"),
   primaryDoctorNpi: text("primary_doctor_npi"),
@@ -292,3 +296,69 @@ export const insertUserMedicationSchema = createInsertSchema(userMedications).om
 
 export type InsertUserMedication = z.infer<typeof insertUserMedicationSchema>;
 export type UserMedication = typeof userMedications.$inferSelect;
+
+// Referral codes table - each user gets a unique referral code
+export const referralCodes = pgTable("referral_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  code: text("code").notNull().unique(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertReferralCodeSchema = createInsertSchema(referralCodes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertReferralCode = z.infer<typeof insertReferralCodeSchema>;
+export type ReferralCode = typeof referralCodes.$inferSelect;
+
+// Referral history table - tracks who referred whom
+export const referralHistory = pgTable("referral_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  referrerId: varchar("referrer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  refereeId: varchar("referee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  referralCode: text("referral_code").notNull().references(() => referralCodes.code, { onDelete: "cascade" }),
+  status: text("status", { enum: ["pending", "completed", "credited"] }).default("pending"),
+  referrerCreditApplied: boolean("referrer_credit_applied").default(false),
+  refereeCreditApplied: boolean("referee_credit_applied").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertReferralHistorySchema = createInsertSchema(referralHistory).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertReferralHistory = z.infer<typeof insertReferralHistorySchema>;
+export type ReferralHistory = typeof referralHistory.$inferSelect;
+
+// Referral credits table - tracks credits earned and redeemed
+export const referralCredits = pgTable("referral_credits", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  referralHistoryId: varchar("referral_history_id").references(() => referralHistory.id, { onDelete: "set null" }),
+  creditType: text("credit_type", { enum: ["referrer_bonus", "referee_bonus"] }).notNull(),
+  monthsFree: integer("months_free").notNull().default(1),
+  status: text("status", { enum: ["pending", "applied", "redeemed", "expired"] }).default("pending"),
+  stripeCouponId: text("stripe_coupon_id"),
+  appliedAt: timestamp("applied_at"),
+  redeemedAt: timestamp("redeemed_at"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertReferralCreditSchema = createInsertSchema(referralCredits).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertReferralCredit = z.infer<typeof insertReferralCreditSchema>;
+export type ReferralCredit = typeof referralCredits.$inferSelect;
