@@ -4,7 +4,8 @@ import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-
 import { loadStripe } from '@stripe/stripe-js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pill, Check, CreditCard } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Pill, Check, CreditCard, AlertCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -248,6 +249,9 @@ export default function SubscriptionPage() {
                   $15<span className="text-base text-muted-foreground">/month</span>
                 </div>
                 <CardDescription>1-3 medications</CardDescription>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  12-month commitment required
+                </div>
               </CardHeader>
             </Card>
 
@@ -267,10 +271,23 @@ export default function SubscriptionPage() {
                   $25<span className="text-base text-muted-foreground">/month</span>
                 </div>
                 <CardDescription>4+ medications</CardDescription>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  12-month commitment required
+                </div>
               </CardHeader>
             </Card>
           </div>
         </div>
+
+        {/* Annual Commitment Notice */}
+        <Alert className="mb-8 max-w-3xl mx-auto" data-testid="alert-commitment">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="ml-2">
+            <strong>12-Month Commitment:</strong> All memberships require a 12-month annual commitment. 
+            If you cancel before completing 12 monthly payments, a termination fee equal to the 
+            remaining months will apply. After fulfilling your commitment, you can cancel anytime with no fee.
+          </AlertDescription>
+        </Alert>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Subscription Benefits */}
@@ -294,11 +311,21 @@ export default function SubscriptionPage() {
                 ))}
               </ul>
               
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Money-Back Guarantee</h4>
-                <p className="text-sm text-gray-600">
-                  Not satisfied? Get a full refund within your first 30 days.
-                </p>
+              <div className="mt-6 space-y-4">
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-2">Money-Back Guarantee</h4>
+                  <p className="text-sm text-gray-600">
+                    Not satisfied? Get a full refund within your first 30 days.
+                  </p>
+                </div>
+                
+                <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <h4 className="font-semibold text-gray-900 mb-2">Annual Commitment Terms</h4>
+                  <p className="text-sm text-gray-600">
+                    All memberships include a 12-month commitment. Early cancellation requires 
+                    payment of remaining months. You can cancel anytime after 12 payments with no fee.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -329,9 +356,14 @@ export default function SubscriptionPage() {
                 <SubscribeForm selectedPlan={selectedPlan} />
               </Elements>
 
-              <div className="mt-4 text-center text-xs text-gray-500">
-                Your payment information is secure and encrypted. 
-                We use Stripe for payment processing.
+              <div className="mt-4 space-y-2">
+                <div className="text-center text-xs text-gray-500">
+                  Your payment information is secure and encrypted. 
+                  We use Stripe for payment processing.
+                </div>
+                <div className="text-center text-xs text-gray-500">
+                  By subscribing, you agree to our 12-month commitment terms.
+                </div>
               </div>
             </CardContent>
           </Card>
