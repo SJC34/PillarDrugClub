@@ -41,6 +41,16 @@ if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('s
   }
 }
 
+// Helper function to generate unique referral codes
+function generateReferralCode(firstName?: string, lastName?: string): string {
+  const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+  if (firstName && lastName) {
+    const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    return `${initials}${randomPart}`;
+  }
+  return `PILLAR${randomPart}`;
+}
+
 export async function registerRoutes(app: Express, server: Server): Promise<void> {
   // Setup Replit Auth (handles Google login via OIDC)
   // This also sets up the session middleware that email/password auth will use
@@ -1292,6 +1302,205 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       });
     }
   });
+
+  // ============= REFERRAL SYSTEM ROUTES =============
+
+  // Get or generate user's referral code
+  app.get("/api/users/:userId/referral-code", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const userId = req.user.claims?.sub || req.user.id;
+    if (userId !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      // Check if user already has a referral code
+      let referralCode = await storage.getReferralCode(req.params.userId);
+
+      // If not, generate one with collision handling
+      if (!referralCode) {
+        const user = await storage.getUser(req.params.userId);
+        let attempts = 0;
+        const maxAttempts = 5;
+        
+        while (attempts < maxAttempts) {
+          try {
+            const code = generateReferralCode(user?.firstName, user?.lastName);
+            referralCode = await storage.createReferralCode(req.params.userId, code);
+            break;
+          } catch (error: any) {
+            attempts++;
+            if (attempts >= maxAttempts) {
+              throw new Error("Failed to generate unique referral code");
+            }
+          }
+        }
+      }
+
+      res.json(referralCode);
+    } catch (error: any) {
+      console.error("Error getting referral code:", error);
+      res.status(500).json({
+        error: "Failed to get referral code",
+        message: error.message
+      });
+    }
+  });
+
+  // Validate a referral code (public endpoint)
+  app.post("/api/referrals/validate", async (req, res) => {
+    try {
+      const { code } = req.body;
+      
+      if (!code) {
+        return res.status(400).json({ error: "Referral code is required" });
+      }
+
+      const referralCode = await storage.validateReferralCode(code);
+      
+      if (!referralCode || !referralCode.isActive) {
+        return res.status(404).json({ 
+          valid: false, 
+          message: "Invalid or inactive referral code" 
+        });
+      }
+
+      // Get referrer information
+      const referrer = await storage.getUser(referralCode.userId);
+      
+      res.json({
+        valid: true,
+        referrer: {
+          firstName: referrer?.firstName,
+          lastName: referrer?.lastName
+        }
+      });
+    } catch (error: any) {
+      console.error("Error validating referral code:", error);
+      res.status(500).json({
+        error: "Failed to validate referral code",
+        message: error.message
+      });
+    }
+  });
+
+  // Apply a referral code (called during signup)
+  app.post("/api/referrals/apply", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const userId = req.user.claims?.sub || req.user.id;
+
+    try {
+      const { referralCode } = req.body;
+      
+      if (!referralCode) {
+        return res.status(400).json({ error: "Referral code is required" });
+      }
+
+      const result = await storage.applyReferralCode(userId, referralCode);
+      
+      res.json({
+        success: true,
+        message: "Referral code applied successfully! Both you and your referrer will receive 1 free month.",
+        referralHistory: result
+      });
+    } catch (error: any) {
+      console.error("Error applying referral code:", error);
+      res.status(400).json({
+        error: "Failed to apply referral code",
+        message: error.message
+      });
+    }
+  });
+
+  // Get user's referral stats
+  app.get("/api/users/:userId/referral-stats", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const userId = req.user.claims?.sub || req.user.id;
+    if (userId !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      const stats = await storage.getReferralStats(req.params.userId);
+      res.json(stats);
+    } catch (error: any) {
+      console.error("Error getting referral stats:", error);
+      res.status(500).json({
+        error: "Failed to get referral stats",
+        message: error.message
+      });
+    }
+  });
+
+  // Get user's referral history
+  app.get("/api/users/:userId/referral-history", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const userId = req.user.claims?.sub || req.user.id;
+    if (userId !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      const history = await storage.getUserReferralHistory(req.params.userId);
+      
+      // Enrich with referee information
+      const enrichedHistory = await Promise.all(
+        history.map(async (item: any) => {
+          const referee = await storage.getUser(item.refereeId);
+          return {
+            ...item,
+            refereeName: referee ? `${referee.firstName} ${referee.lastName}` : "Unknown",
+            refereeEmail: referee?.email
+          };
+        })
+      );
+
+      res.json(enrichedHistory);
+    } catch (error: any) {
+      console.error("Error getting referral history:", error);
+      res.status(500).json({
+        error: "Failed to get referral history",
+        message: error.message
+      });
+    }
+  });
+
+  // Get user's referral credits
+  app.get("/api/users/:userId/referral-credits", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const userId = req.user.claims?.sub || req.user.id;
+    if (userId !== req.params.userId) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    try {
+      const credits = await storage.getUserReferralCredits(req.params.userId);
+      res.json(credits);
+    } catch (error: any) {
+      console.error("Error getting referral credits:", error);
+      res.status(500).json({
+        error: "Failed to get referral credits",
+        message: error.message
+      });
+    }
+  });
+
+  // ============= END REFERRAL SYSTEM ROUTES =============
 
   // Get all refill requests (admin only)
   app.get("/api/admin/refill-requests", async (req, res) => {
