@@ -42,6 +42,8 @@ export const users = pgTable("users", {
   primaryDoctorAddress: jsonb("primary_doctor_address"),
   userAddress: jsonb("user_address"),
   drugAllergies: text("drug_allergies").array(),
+  hwCustomerId: integer("hw_customer_id"), // HealthWarehouse customer ID
+  hwPatientId: integer("hw_patient_id"), // HealthWarehouse patient ID
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -178,7 +180,7 @@ export const orders = pgTable("orders", {
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   orderNumber: text("order_number").notNull().unique(),
   status: text("status", { 
-    enum: ["pending", "processing", "awaiting_verification", "ready_to_ship", "shipped", "delivered", "cancelled", "returned"] 
+    enum: ["pending", "processing", "transfer_success", "transfer_failure", "dispensed", "complete", "canceled", "awaiting_verification", "ready_to_ship", "shipped", "delivered", "returned"] 
   }).default("pending"),
   items: jsonb("items").notNull(), // Array of order items
   subtotal: numeric("subtotal").notNull(),
@@ -188,6 +190,8 @@ export const orders = pgTable("orders", {
   shippingAddress: jsonb("shipping_address").notNull(),
   paymentMethod: jsonb("payment_method"),
   notes: text("notes"),
+  hwOrderId: integer("hw_order_id"), // HealthWarehouse order ID
+  hwOrderData: jsonb("hw_order_data"), // Full HealthWarehouse order response
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -206,8 +210,8 @@ export type Order = typeof orders.$inferSelect;
 export const shipments = pgTable("shipments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   orderId: varchar("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
-  trackingNumber: text("tracking_number").notNull(),
-  carrier: text("carrier").notNull(), // "UPS", "FedEx", "USPS"
+  trackingNumber: text("tracking_number"),
+  carrier: text("carrier"), // "UPS", "FedEx", "USPS"
   status: text("status", { 
     enum: ["preparing", "shipped", "in_transit", "out_for_delivery", "delivered", "exception", "returned"] 
   }).default("preparing"),
@@ -215,6 +219,8 @@ export const shipments = pgTable("shipments", {
   estimatedDeliveryDate: text("estimated_delivery_date"),
   actualDeliveryDate: text("actual_delivery_date"),
   trackingEvents: jsonb("tracking_events").default(sql`'[]'::jsonb`),
+  hwShipmentId: integer("hw_shipment_id"), // HealthWarehouse shipment ID
+  hwShipmentData: jsonb("hw_shipment_data"), // Full HealthWarehouse shipment response
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
