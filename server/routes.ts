@@ -402,6 +402,254 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Calculate termination fee for early cancellation
+  app.get("/api/subscription/termination-fee/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Check if user has an active subscription
+      if (!user.stripeSubscriptionId || user.subscriptionStatus === 'canceled') {
+        return res.status(400).json({ error: "No active subscription found" });
+      }
+      
+      // Check if user has commitment tracking data
+      if (!user.commitmentStartDate || !user.monthlyRate) {
+        return res.status(400).json({ 
+          error: "Commitment data not found",
+          message: "This subscription was created before the annual commitment system was implemented"
+        });
+      }
+      
+      // Calculate termination fee
+      const monthsPaid = user.monthsPaid ?? 0;
+      const remainingMonths = Math.max(0, 12 - monthsPaid);
+      const monthlyRateCents = parseInt(user.monthlyRate, 10);
+      const terminationFeeCents = remainingMonths * monthlyRateCents;
+      
+      // Check if commitment is already fulfilled
+      if (remainingMonths === 0) {
+        return res.json({
+          needsTerminationFee: false,
+          monthsPaid,
+          remainingMonths: 0,
+          terminationFee: 0,
+          message: "12-month commitment fulfilled - no termination fee required"
+        });
+      }
+      
+      res.json({
+        needsTerminationFee: true,
+        monthsPaid,
+        remainingMonths,
+        monthlyRate: monthlyRateCents,
+        terminationFee: terminationFeeCents,
+        terminationFeeFormatted: `$${(terminationFeeCents / 100).toFixed(2)}`,
+        commitmentStartDate: user.commitmentStartDate,
+        commitmentEndDate: user.commitmentEndDate
+      });
+    } catch (error: any) {
+      console.error("Error calculating termination fee:", error);
+      res.status(500).json({ 
+        error: "Error calculating termination fee", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Create Payment Intent for termination fee
+  app.post("/api/subscription/termination-fee/create-payment-intent", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+      
+      if (!stripe) {
+        return res.status(503).json({ 
+          error: "Payment processing unavailable", 
+          message: "Payment system is not configured" 
+        });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Check if user has an active subscription
+      if (!user.stripeSubscriptionId || user.subscriptionStatus === 'canceled') {
+        return res.status(400).json({ error: "No active subscription found" });
+      }
+      
+      // Calculate termination fee
+      const monthsPaid = user.monthsPaid ?? 0;
+      const remainingMonths = Math.max(0, 12 - monthsPaid);
+      const monthlyRateCents = parseInt(user.monthlyRate || '0', 10);
+      const terminationFeeCents = remainingMonths * monthlyRateCents;
+      
+      if (remainingMonths === 0 || terminationFeeCents === 0) {
+        return res.status(400).json({ 
+          error: "No termination fee required",
+          message: "12-month commitment already fulfilled"
+        });
+      }
+      
+      // Get or create Stripe customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          name: `${user.firstName} ${user.lastName}`,
+          metadata: { userId: userId }
+        });
+        customerId = customer.id;
+        await storage.updateUserStripeInfo(userId, customerId, user.stripeSubscriptionId);
+      }
+      
+      // Create Payment Intent for termination fee
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: terminationFeeCents,
+        currency: 'usd',
+        customer: customerId,
+        description: `Early termination fee for Pillar Drug Club subscription (${remainingMonths} months remaining)`,
+        metadata: {
+          userId: userId,
+          type: 'termination_fee',
+          monthsPaid: monthsPaid.toString(),
+          remainingMonths: remainingMonths.toString(),
+          subscriptionId: user.stripeSubscriptionId
+        }
+      });
+      
+      console.log(`✅ Created termination fee payment intent ${paymentIntent.id} for user ${userId}: $${(terminationFeeCents / 100).toFixed(2)}`);
+      
+      res.json({
+        clientSecret: paymentIntent.client_secret,
+        amount: terminationFeeCents,
+        amountFormatted: `$${(terminationFeeCents / 100).toFixed(2)}`,
+        remainingMonths
+      });
+    } catch (error: any) {
+      console.error("Error creating termination fee payment intent:", error);
+      res.status(500).json({ 
+        error: "Error creating payment intent", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Cancel subscription after termination fee payment
+  app.post("/api/subscription/cancel-with-fee", async (req, res) => {
+    try {
+      const { userId, paymentIntentId } = req.body;
+      
+      if (!userId || !paymentIntentId) {
+        return res.status(400).json({ error: "User ID and payment intent ID are required" });
+      }
+      
+      if (!stripe) {
+        return res.status(503).json({ 
+          error: "Payment processing unavailable", 
+          message: "Payment system is not configured" 
+        });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Verify subscription is currently active
+      if (!user.stripeSubscriptionId || user.subscriptionStatus !== 'active') {
+        return res.status(400).json({ 
+          error: "No active subscription",
+          message: "Subscription is not active or already canceled"
+        });
+      }
+      
+      // Calculate termination fee and verify commitment not already fulfilled
+      const monthsPaid = user.monthsPaid ?? 0;
+      const remainingMonths = Math.max(0, 12 - monthsPaid);
+      
+      if (remainingMonths === 0) {
+        return res.status(400).json({ 
+          error: "No termination fee required",
+          message: "12-month commitment already fulfilled - you can cancel without fee"
+        });
+      }
+      
+      // Verify payment intent was successful
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status !== 'succeeded') {
+        return res.status(400).json({ 
+          error: "Payment not completed",
+          message: "Termination fee payment must be completed before cancellation"
+        });
+      }
+      
+      // Verify payment intent belongs to this user
+      if (paymentIntent.metadata.userId !== userId) {
+        return res.status(403).json({ error: "Unauthorized - payment belongs to different user" });
+      }
+      
+      // Verify payment intent is for termination fee (not a reused old payment)
+      if (paymentIntent.metadata.type !== 'termination_fee') {
+        return res.status(400).json({ 
+          error: "Invalid payment type",
+          message: "Payment intent is not for a termination fee"
+        });
+      }
+      
+      // Verify payment intent matches current subscription
+      if (paymentIntent.metadata.subscriptionId !== user.stripeSubscriptionId) {
+        return res.status(400).json({ 
+          error: "Payment intent mismatch",
+          message: "Payment intent is for a different subscription"
+        });
+      }
+      
+      // Calculate expected termination fee and verify payment amount matches
+      const monthlyRateCents = parseInt(user.monthlyRate || '0', 10);
+      const expectedFeeCents = remainingMonths * monthlyRateCents;
+      
+      if (paymentIntent.amount !== expectedFeeCents) {
+        return res.status(400).json({ 
+          error: "Payment amount mismatch",
+          message: `Payment intent amount ($${(paymentIntent.amount / 100).toFixed(2)}) does not match current termination fee ($${(expectedFeeCents / 100).toFixed(2)})`
+        });
+      }
+      
+      // Cancel the subscription
+      if (user.stripeSubscriptionId) {
+        await stripe.subscriptions.cancel(user.stripeSubscriptionId);
+        await storage.updateSubscriptionStatus(userId, 'canceled');
+        console.log(`✅ Canceled subscription ${user.stripeSubscriptionId} for user ${userId} after termination fee payment of $${(expectedFeeCents / 100).toFixed(2)}`);
+      }
+      
+      res.json({ 
+        success: true,
+        message: "Subscription canceled successfully after termination fee payment"
+      });
+    } catch (error: any) {
+      console.error("Error canceling subscription:", error);
+      res.status(500).json({ 
+        error: "Error canceling subscription", 
+        message: error.message 
+      });
+    }
+  });
+
   // Stripe webhook endpoint for subscription events
   app.post("/api/webhooks/stripe", async (req, res) => {
     if (!stripe) {
