@@ -366,7 +366,28 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       // Update user with subscription info
       await storage.updateUserStripeInfo(userId, customerId, subscription.id);
       
-      console.log(`✅ Created subscription ${subscription.id} for user ${userId}`);
+      // Set annual commitment tracking fields only if user doesn't have an active commitment
+      if (!user.commitmentStartDate) {
+        const now = new Date();
+        const commitmentEnd = new Date(now);
+        commitmentEnd.setFullYear(commitmentEnd.getFullYear() + 1); // 12 months from now
+        
+        await storage.updateUser(userId, {
+          commitmentStartDate: now,
+          commitmentEndDate: commitmentEnd,
+          monthsPaid: 0, // Will be incremented by webhook on first payment
+          monthlyRate: selectedPlan.amount.toString(), // Store as string for numeric type
+        });
+        
+        console.log(`✅ Created subscription ${subscription.id} for user ${userId} with new 12-month commitment ending ${commitmentEnd.toISOString()}`);
+      } else {
+        // User has existing commitment, just update the monthly rate if plan changed
+        await storage.updateUser(userId, {
+          monthlyRate: selectedPlan.amount.toString(),
+        });
+        
+        console.log(`✅ Updated subscription ${subscription.id} for user ${userId}, preserving existing commitment (${user.monthsPaid} months paid)`);
+      }
       
       res.json({ 
         clientSecret: paymentIntent.client_secret,
