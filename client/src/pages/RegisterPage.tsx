@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Pill, Eye, EyeOff, CreditCard, Check, ArrowRight, ArrowLeft, Send, User, Calendar } from "lucide-react";
+import { Pill, Eye, EyeOff, CreditCard, Check, ArrowRight, ArrowLeft, Send, User, Calendar, Gift, AlertCircle, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,6 +35,7 @@ const step2DetailsSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters").optional(),
   confirmPassword: z.string().optional(),
   drugAllergies: z.string().optional(),
+  referralCode: z.string().optional(),
   smsConsent: z.boolean()
 });
 
@@ -124,6 +125,9 @@ export default function RegisterPage() {
   const [clientSecret, setClientSecret] = useState('');
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+  const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
+  const [referralReferrerName, setReferralReferrerName] = useState<string>("");
+  const [isValidatingReferral, setIsValidatingReferral] = useState(false);
   const { toast } = useToast();
 
   // Forms for each step
@@ -205,10 +209,41 @@ export default function RegisterPage() {
     }
   };
 
+  // Validate referral code
+  const validateReferralCode = async (code: string) => {
+    if (!code || code.trim() === "") {
+      setReferralCodeValid(null);
+      setReferralReferrerName("");
+      return;
+    }
+
+    setIsValidatingReferral(true);
+    try {
+      const response = await apiRequest("POST", "/api/referral/validate", { code: code.trim() });
+      const data = await response.json();
+      
+      if (data.valid) {
+        setReferralCodeValid(true);
+        setReferralReferrerName(data.referrerName || "");
+      } else {
+        setReferralCodeValid(false);
+        setReferralReferrerName("");
+      }
+    } catch (error) {
+      setReferralCodeValid(false);
+      setReferralReferrerName("");
+    } finally {
+      setIsValidatingReferral(false);
+    }
+  };
+
 
   // Step 2: Submit user details
   const onStep2Submit = async (data: Step2DetailsForm) => {
     try {
+      // Prepare referral code if valid
+      const referralCodeToSubmit = data.referralCode && referralCodeValid ? data.referralCode.trim() : undefined;
+
       // If social auth, user is already created, just update phone and SMS consent
       if (registeredUser?.id) {
         // Update user with additional details
@@ -218,7 +253,8 @@ export default function RegisterPage() {
           smsConsent: data.smsConsent ? "true" : "false",
           firstName: data.firstName,
           lastName: data.lastName,
-          drugAllergies: data.drugAllergies ? data.drugAllergies.split(',').map(a => a.trim()).filter(Boolean) : []
+          drugAllergies: data.drugAllergies ? data.drugAllergies.split(',').map(a => a.trim()).filter(Boolean) : [],
+          referralCode: referralCodeToSubmit
         });
 
         if (!response.ok) {
@@ -245,7 +281,8 @@ export default function RegisterPage() {
             phoneNumber: data.phoneNumber,
             password: data.password,
             smsConsent: data.smsConsent ? "true" : "false",
-            drugAllergies: data.drugAllergies ? data.drugAllergies.split(',').map(a => a.trim()).filter(Boolean) : []
+            drugAllergies: data.drugAllergies ? data.drugAllergies.split(',').map(a => a.trim()).filter(Boolean) : [],
+            referralCode: referralCodeToSubmit
           }),
         });
 
@@ -623,6 +660,60 @@ export default function RegisterPage() {
                   <p className="text-xs text-muted-foreground">
                     List any medications you are allergic to. This helps us ensure your safety.
                   </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="referralCode" className="text-sm md:text-base flex items-center gap-2">
+                    <Gift className="h-4 w-4 text-primary" />
+                    Referral Code (Optional)
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="referralCode"
+                      placeholder="Enter referral code"
+                      {...step2Form.register("referralCode")}
+                      onChange={(e) => {
+                        step2Form.setValue("referralCode", e.target.value);
+                        validateReferralCode(e.target.value);
+                      }}
+                      data-testid="input-referral-code"
+                      className="h-10 md:h-11 pr-10"
+                    />
+                    {isValidatingReferral && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                    {!isValidatingReferral && referralCodeValid === true && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Check className="h-4 w-4 text-green-600" />
+                      </div>
+                    )}
+                    {!isValidatingReferral && referralCodeValid === false && step2Form.watch("referralCode") && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <AlertCircle className="h-4 w-4 text-destructive" />
+                      </div>
+                    )}
+                  </div>
+                  {referralCodeValid === true && referralReferrerName && (
+                    <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <p className="text-sm font-semibold text-green-900 dark:text-green-100 flex items-center gap-2">
+                        <Gift className="h-4 w-4" />
+                        Valid Code! 1 Month Free
+                      </p>
+                      <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                        Referred by {referralReferrerName}. You'll both get 1 month free!
+                      </p>
+                    </div>
+                  )}
+                  {referralCodeValid === false && step2Form.watch("referralCode") && (
+                    <p className="text-xs text-destructive">Invalid referral code</p>
+                  )}
+                  {!step2Form.watch("referralCode") && (
+                    <p className="text-xs text-muted-foreground">
+                      Have a referral code? Get 1 month free when you use it!
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-start space-x-3">
