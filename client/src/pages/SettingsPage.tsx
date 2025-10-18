@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pill, Phone, MapPin, User, Save, ArrowLeft, Calendar } from "lucide-react";
+import { Pill, Phone, MapPin, User, Save, ArrowLeft, Calendar, CreditCard, AlertTriangle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -258,6 +258,49 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Subscription Management */}
+          {user?.subscriptionStatus === "active" && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                  <CreditCard className="h-5 w-5 text-primary" />
+                  Subscription Management
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">
+                  Manage your Pillar Drug Club membership
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 border rounded-md">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-foreground">
+                      Pillar Drug Club Membership
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Wholesale prescription pricing
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Status: <span className="text-green-600 font-medium">Active</span>
+                    </p>
+                  </div>
+                  <Link href="/cancel-subscription">
+                    <Button
+                      variant="outline"
+                      className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      data-testid="button-cancel-subscription"
+                    >
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Cancel Subscription
+                    </Button>
+                  </Link>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Note: Canceling before completing your 12-month commitment will require a one-time early termination fee.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           <Separator className="my-6" />
 

@@ -650,6 +650,64 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Cancel subscription without termination fee (for fulfilled commitments)
+  app.post("/api/subscription/cancel", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+      
+      if (!stripe) {
+        return res.status(503).json({ 
+          error: "Payment processing unavailable", 
+          message: "Payment system is not configured" 
+        });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Verify subscription is currently active
+      if (!user.stripeSubscriptionId || user.subscriptionStatus !== 'active') {
+        return res.status(400).json({ 
+          error: "No active subscription",
+          message: "Subscription is not active or already canceled"
+        });
+      }
+      
+      // Verify 12-month commitment has been fulfilled
+      const monthsPaid = user.monthsPaid ?? 0;
+      const remainingMonths = Math.max(0, 12 - monthsPaid);
+      
+      if (remainingMonths > 0) {
+        return res.status(400).json({ 
+          error: "Commitment not fulfilled",
+          message: `You have ${remainingMonths} months remaining in your annual commitment. Please pay the termination fee to cancel early.`
+        });
+      }
+      
+      // Cancel the subscription
+      await stripe.subscriptions.cancel(user.stripeSubscriptionId);
+      await storage.updateSubscriptionStatus(userId, 'canceled');
+      console.log(`✅ Canceled subscription ${user.stripeSubscriptionId} for user ${userId} (commitment fulfilled)`);
+      
+      res.json({ 
+        success: true,
+        message: "Subscription canceled successfully"
+      });
+    } catch (error: any) {
+      console.error("Error canceling subscription:", error);
+      res.status(500).json({ 
+        error: "Error canceling subscription", 
+        message: error.message 
+      });
+    }
+  });
+
   // Stripe webhook endpoint for subscription events
   app.post("/api/webhooks/stripe", async (req, res) => {
     if (!stripe) {
