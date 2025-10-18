@@ -264,6 +264,13 @@ export default function DashboardPage() {
       color: "bg-orange-50 text-orange-600"
     },
     {
+      title: "Referrals",
+      description: "Refer friends and earn free months",
+      icon: User,
+      href: "/referrals",
+      color: "bg-pink-50 text-pink-600"
+    },
+    {
       title: "Browse Medications",
       description: "Search our medication database",
       icon: Package,
