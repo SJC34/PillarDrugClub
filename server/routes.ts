@@ -478,7 +478,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
           const invoice = event.data.object as Stripe.Invoice;
           const subscriptionId = (invoice as any).subscription as string;
           
-          if (subscriptionId && invoice.customer_email) {
+          if (subscriptionId) {
             // Find user by Stripe subscription ID and mark as active
             console.log(`✅ Payment succeeded for subscription ${subscriptionId}`);
             
@@ -489,6 +489,31 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
             if (userId) {
               await storage.updateSubscriptionStatus(userId, 'active');
               console.log(`✅ Activated subscription for user ${userId}`);
+              
+              // Increment monthsPaid counter for annual commitment tracking
+              const user = await storage.getUser(userId);
+              if (user) {
+                // Use nullish coalescing to default to 0 if monthsPaid is null/undefined
+                const newMonthsPaid = (user.monthsPaid ?? 0) + 1;
+                await storage.updateUser(userId, {
+                  monthsPaid: newMonthsPaid
+                });
+                console.log(`✅ Incremented monthsPaid to ${newMonthsPaid} for user ${userId}`);
+                
+                // If this is the first payment and user has applied referral credits, mark them as redeemed
+                if (newMonthsPaid === 1) {
+                  const appliedCredits = await storage.getAvailableReferralCredits(userId);
+                  const creditsToRedeem = appliedCredits.filter(c => c.status === 'applied');
+                  
+                  for (const credit of creditsToRedeem) {
+                    await storage.updateReferralCredit(credit.id, {
+                      status: 'redeemed',
+                      redeemedAt: new Date()
+                    });
+                    console.log(`✅ Marked referral credit ${credit.id} as redeemed for user ${userId}`);
+                  }
+                }
+              }
             }
           }
           break;
