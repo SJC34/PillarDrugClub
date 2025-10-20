@@ -27,6 +27,13 @@ Preferred communication style: Simple, everyday language.
 - **Annual Pricing System**: Integrates with the openFDA Drug Label API to calculate annual pricing for chronic medications.
 - **Medication Refill System**: Automated refill request workflow with smart refill detection, priority levels, patient/pharmacy notes, status tracking, and admin oversight.
 - **Personal Medication List**: User-managed list with OpenFDA integration for data enrichment (warnings, interactions, side effects) and real-time drug-drug interaction checking.
+- **Refund Policy System**: Comprehensive refund and cancellation policy documentation featuring:
+    - **Two-tier refund structure**: Pre-prescription grace period (7 days full refund) and post-prescription non-refundable policy
+    - **Annual commitment terms**: 12-month membership requirement with early termination fees ($120 Foundation, $200 Keystone)
+    - **PDF generation**: Professional branded refund policy PDFs with complete legal disclosure
+    - **Web accessibility**: Dedicated /refund-policy page with HTML version and downloadable PDF
+    - **Checkout integration**: Policy links integrated in subscription flow and footer for transparency
+    - **Regulatory compliance**: Aligned with pharmacy regulations, FTC ROSCA, California Automatic Renewal Law
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including:
     - **Executive Dashboard**: Real-time metrics, recent activity feeds, and quick access to admin features.
     - **User Management**: User directory with search, filtering, detailed profiles, and account actions.

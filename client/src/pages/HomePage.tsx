@@ -281,6 +281,7 @@ export default function HomePage() {
             Transparent wholesale prescription pricing for everyone.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm font-bold text-muted-foreground">
+            <a href="/refund-policy" className="hover:text-foreground transition-colors" data-testid="link-footer-refund-policy">Refund Policy</a>
             <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-foreground transition-colors">Contact</a>
