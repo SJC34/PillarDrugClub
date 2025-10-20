@@ -59,6 +59,7 @@ export default function Footer() {
             <h3 className="font-medium mb-6 text-foreground">Support</h3>
             <ul className="space-y-3 text-muted-foreground">
               <li><a href="#help" className="hover:text-secondary transition-colors">Help center</a></li>
+              <li><a href="/refund-policy" className="hover:text-secondary transition-colors" data-testid="link-footer-refund-policy">Refund policy</a></li>
               <li><a href="#privacy" className="hover:text-secondary transition-colors">Privacy policy</a></li>
               <li><a href="#terms" className="hover:text-secondary transition-colors">Terms of service</a></li>
               <li><a href="#pharmacy" className="hover:text-secondary transition-colors">Pharmacy information</a></li>

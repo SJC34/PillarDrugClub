@@ -62,6 +62,14 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
       <div className="bg-gray-50 p-4 rounded-lg">
         <PaymentElement />
       </div>
+      
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription className="text-sm">
+          By subscribing, you agree to our <a href="/refund-policy" target="_blank" className="underline font-medium hover:text-primary" data-testid="link-checkout-refund-policy">refund policy</a>. Membership requires a 12-month commitment with monthly billing.
+        </AlertDescription>
+      </Alert>
+
       <Button 
         type="submit" 
         className="w-full" 
