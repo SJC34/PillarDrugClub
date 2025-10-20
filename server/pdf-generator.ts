@@ -379,3 +379,286 @@ Thank you for your assistance.
 Best regards,
 ${data.patientName}`;
 }
+
+export async function generateRefundPolicyPDF(): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ 
+      size: 'LETTER',
+      margins: { top: 50, bottom: 50, left: 60, right: 60 }
+    });
+    
+    const chunks: Buffer[] = [];
+    
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+
+    // Brand Colors
+    const BRAND_PRIMARY = '#2BABA2';
+    const BRAND_SECONDARY = '#0A736D';
+    const BRAND_FOREGROUND = '#1C2F2E';
+    const BRAND_LIGHT_BG = '#E5F5F4';
+    const BRAND_MUTED = '#5A7A78';
+    const BRAND_ACCENT = '#F59E0B';
+
+    // Header
+    doc.fontSize(28)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('PILLAR DRUG CLUB', { align: 'center' });
+    
+    doc.moveDown(0.3);
+    doc.fontSize(16)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Refund & Cancellation Policy', { align: 'center' });
+    
+    doc.moveDown(0.3);
+    doc.fontSize(9)
+       .fillColor(BRAND_MUTED)
+       .text(`Effective Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`, { align: 'center' });
+    
+    doc.moveDown(2);
+
+    // Introduction
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Pillar Drug Club is a wholesale prescription pharmacy service operating under strict federal and state pharmacy regulations. This policy outlines our refund and cancellation terms, which are designed to comply with pharmaceutical industry requirements while maintaining transparency with our members.', {
+         align: 'left',
+         lineGap: 4
+       });
+
+    doc.moveDown(1.5);
+
+    // Section 1: Annual Commitment Requirement
+    const section1Y = doc.y;
+    doc.roundedRect(60, section1Y - 10, 492, 50, 4)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
+    
+    doc.fontSize(13)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('1. ANNUAL MEMBERSHIP COMMITMENT', 75, section1Y);
+    
+    doc.moveDown(0.5);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('All memberships require a 12-month annual commitment from the date of subscription activation.', 75, doc.y, { width: 462, lineGap: 3 });
+
+    doc.moveDown(2);
+
+    // Section 2: No Refund Policy
+    doc.fontSize(13)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('2. NO REFUND POLICY');
+    
+    doc.moveDown(0.7);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND);
+
+    const noRefundText = [
+      { bold: true, text: '2.1 Medications: ' },
+      { bold: false, text: 'Due to federal and state pharmacy regulations governing the dispensing of prescription medications, all medication sales are final. Once a prescription is received and processed by our partner pharmacy (HealthWarehouse), no refunds, returns, or exchanges are permitted under any circumstances.' }
+    ];
+
+    let xPos = 60;
+    noRefundText.forEach(segment => {
+      doc.font(segment.bold ? 'Helvetica-Bold' : 'Helvetica')
+         .text(segment.text, xPos, doc.y, { 
+           width: 492, 
+           continued: segment !== noRefundText[noRefundText.length - 1],
+           lineGap: 4
+         });
+    });
+
+    doc.moveDown(0.8);
+    doc.font('Helvetica-Bold')
+       .text('2.2 Membership Fees: ', 60, doc.y, { continued: true })
+       .font('Helvetica')
+       .text('Monthly membership fees are non-refundable once a prescription has been received by our partner pharmacy on your behalf. This policy ensures compliance with pharmacy regulations and protects the integrity of our wholesale pricing model.', { width: 492, lineGap: 4 });
+
+    doc.moveDown(0.8);
+    doc.font('Helvetica-Bold')
+       .text('2.3 Pre-Prescription Grace Period: ', 60, doc.y, { continued: true })
+       .font('Helvetica')
+       .text('Members may request a full refund of membership fees within 7 days of initial subscription if no prescriptions have been transmitted to our partner pharmacy. After this period or once any prescription is received, all fees become non-refundable.', { width: 492, lineGap: 4 });
+
+    doc.moveDown(2);
+
+    // Section 3: Early Termination Fee
+    const earlyTermY = doc.y;
+    doc.roundedRect(60, earlyTermY - 10, 492, 95, 4)
+       .fillAndStroke('#FEF3C7', BRAND_ACCENT);
+    
+    doc.fontSize(13)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_ACCENT)
+       .text('3. EARLY TERMINATION FEE', 75, earlyTermY);
+    
+    doc.moveDown(0.5);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('If you choose to cancel your membership before completing your 12-month commitment, an early termination fee will apply:', 75, doc.y, { width: 462, lineGap: 4 });
+
+    doc.moveDown(0.5);
+    doc.font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('• Foundation Plan ($15/month):', 85, doc.y, { continued: true })
+       .font('Helvetica')
+       .text(' $120 termination fee (equivalent to 8 months)', { width: 452 });
+
+    doc.moveDown(0.3);
+    doc.font('Helvetica-Bold')
+       .text('• Keystone Plan ($25/month):', 85, doc.y, { continued: true })
+       .font('Helvetica')
+       .text(' $200 termination fee (equivalent to 8 months)', { width: 452 });
+
+    doc.moveDown(0.5);
+    doc.fontSize(9)
+       .fillColor(BRAND_MUTED)
+       .text('This fee compensates for administrative costs, pharmacy network setup, and wholesale pricing arrangements made on your behalf.', 75, doc.y, { width: 462, lineGap: 3 });
+
+    doc.moveDown(2);
+
+    // Check if we need a new page
+    if (doc.y > 600) {
+      doc.addPage();
+    }
+
+    // Section 4: Cancellation Process
+    doc.fontSize(13)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('4. CANCELLATION PROCESS', 60, doc.y);
+    
+    doc.moveDown(0.7);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND);
+
+    doc.text('To cancel your membership:', 60, doc.y, { lineGap: 4 });
+    doc.moveDown(0.5);
+    doc.text('1. Log into your account at pillardrugclub.com', 75, doc.y, { width: 477 });
+    doc.text('2. Navigate to Account Settings > Cancel Membership', 75, doc.y, { width: 477 });
+    doc.text('3. Review your commitment status and applicable termination fees', 75, doc.y, { width: 477 });
+    doc.text('4. Confirm cancellation request', 75, doc.y, { width: 477 });
+    doc.text('5. Receive email confirmation with final billing details', 75, doc.y, { width: 477 });
+
+    doc.moveDown(0.8);
+    doc.text('Cancellation is as easy as signing up - we comply with all consumer protection laws regarding subscription cancellation procedures.', 60, doc.y, { width: 492, lineGap: 4 });
+
+    doc.moveDown(2);
+
+    // Section 5: Regulatory Compliance
+    doc.fontSize(13)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('5. REGULATORY COMPLIANCE', 60, doc.y);
+    
+    doc.moveDown(0.7);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('This policy is designed to comply with:', 60, doc.y, { lineGap: 4 });
+
+    doc.moveDown(0.5);
+    doc.text('• Federal pharmacy regulations governing prescription medication dispensing', 75, doc.y, { width: 477 });
+    doc.text('• State pharmacy board requirements in all 50 states', 75, doc.y, { width: 477 });
+    doc.text('• FTC regulations regarding subscription services (ROSCA)', 75, doc.y, { width: 477 });
+    doc.text('• California Automatic Renewal Law (effective July 1, 2025)', 75, doc.y, { width: 477 });
+    doc.text('• Consumer protection laws in all jurisdictions we serve', 75, doc.y, { width: 477 });
+
+    doc.moveDown(2);
+
+    // Section 6: Member Rights
+    doc.fontSize(13)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('6. YOUR RIGHTS AS A MEMBER', 60, doc.y);
+    
+    doc.moveDown(0.7);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND);
+
+    doc.text('You have the right to:', 60, doc.y, { lineGap: 4 });
+    doc.moveDown(0.5);
+    doc.text('• Receive clear disclosure of all fees, commitment terms, and cancellation policies', 75, doc.y, { width: 477 });
+    doc.text('• Cancel your membership at any time (subject to termination fees if within commitment period)', 75, doc.y, { width: 477 });
+    doc.text('• Access this policy at any time on our website', 75, doc.y, { width: 477 });
+    doc.text('• Contact customer support with questions about fees or cancellation', 75, doc.y, { width: 477 });
+    doc.text('• File complaints with state pharmacy boards or consumer protection agencies if you believe this policy violates applicable regulations', 75, doc.y, { width: 477 });
+
+    doc.moveDown(2);
+
+    // Section 7: Contact Information
+    const contactY = doc.y;
+    doc.roundedRect(60, contactY - 10, 492, 65, 4)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
+    
+    doc.fontSize(13)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('7. CONTACT US', 75, contactY);
+    
+    doc.moveDown(0.5);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('For questions about this refund policy or to request cancellation:', 75, doc.y, { width: 462, lineGap: 4 });
+
+    doc.moveDown(0.5);
+    doc.text('Email: support@pillardrugclub.com', 75, doc.y, { width: 462 });
+    doc.text('Website: www.pillardrugclub.com/refund-policy', 75, doc.y, { width: 462 });
+    doc.text('Response Time: Within 2 business days', 75, doc.y, { width: 462 });
+
+    // Check if we need a new page for disclaimer
+    if (doc.y > 650) {
+      doc.addPage();
+    }
+
+    doc.moveDown(2);
+
+    // Important Notice Box
+    const noticeY = doc.y;
+    doc.roundedRect(60, noticeY - 10, 492, 85, 4)
+       .fillAndStroke('#FEE2E2', '#DC2626');
+    
+    doc.fontSize(12)
+       .font('Helvetica-Bold')
+       .fillColor('#DC2626')
+       .text('IMPORTANT NOTICE', 75, noticeY);
+    
+    doc.moveDown(0.5);
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('By subscribing to Pillar Drug Club, you acknowledge that you have read, understood, and agree to this Refund & Cancellation Policy. You understand that:', 75, doc.y, { width: 462, lineGap: 3 });
+
+    doc.moveDown(0.3);
+    doc.text('• All prescription medication sales are final under pharmacy regulations', 80, doc.y, { width: 457 });
+    doc.text('• Membership requires a 12-month commitment', 80, doc.y, { width: 457 });
+    doc.text('• Early cancellation incurs an 8-month termination fee', 80, doc.y, { width: 457 });
+    doc.text('• Membership fees are non-refundable after prescriptions are received', 80, doc.y, { width: 457 });
+
+    // Footer
+    doc.fontSize(8)
+       .font('Helvetica')
+       .fillColor(BRAND_MUTED)
+       .text(`Document Generated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`, 60, 730, { align: 'left' });
+    
+    doc.fontSize(9)
+       .fillColor(BRAND_PRIMARY)
+       .text('PILLAR DRUG CLUB', 60, 745, { align: 'center' })
+       .fontSize(7)
+       .fillColor(BRAND_MUTED)
+       .text('Wholesale Prescription Pharmacy • Licensed in All 50 States', 60, 756, { align: 'center' });
+
+    doc.end();
+  });
+}

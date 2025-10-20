@@ -16,7 +16,7 @@ import {
   orderSearchSchema,
   insertPrescriptionRequestSchema
 } from "@shared/pharmacy-schema";
-import { generatePrescriptionRequestPDF, generateMessageTemplate } from "./pdf-generator";
+import { generatePrescriptionRequestPDF, generateMessageTemplate, generateRefundPolicyPDF } from "./pdf-generator";
 import { sendSMS } from "./twilio";
 import { sendEmail, sendEmailWithAttachment } from "./resend";
 import multer from "multer";
@@ -1496,6 +1496,28 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       console.error("Error fetching prescription requests:", error);
       res.status(500).json({ 
         error: "Failed to fetch prescription requests", 
+        message: error.message 
+      });
+    }
+  });
+
+  // ===== REFUND POLICY PDF ROUTE =====
+
+  // Generate and download refund policy PDF
+  app.get("/api/refund-policy-pdf", async (req, res) => {
+    try {
+      console.log("📄 Generating refund policy PDF...");
+      const pdfBuffer = await generateRefundPolicyPDF();
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="Pillar-Drug-Club-Refund-Policy.pdf"');
+      res.send(pdfBuffer);
+      
+      console.log("✅ Refund policy PDF generated and sent successfully");
+    } catch (error: any) {
+      console.error("Error generating refund policy PDF:", error);
+      res.status(500).json({ 
+        error: "Failed to generate PDF", 
         message: error.message 
       });
     }
