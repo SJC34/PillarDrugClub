@@ -598,7 +598,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
 
     // Section 7: Contact Information
     const contactY = doc.y;
-    doc.roundedRect(60, contactY - 10, 492, 65, 4)
+    doc.roundedRect(60, contactY - 10, 492, 90, 4)
        .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
     
     doc.fontSize(13)
@@ -626,7 +626,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
 
     // Important Notice Box
     const noticeY = doc.y;
-    doc.roundedRect(60, noticeY - 10, 492, 85, 4)
+    doc.roundedRect(60, noticeY - 10, 492, 120, 4)
        .fillAndStroke('#FEE2E2', '#DC2626');
     
     doc.fontSize(12)
