@@ -4,7 +4,6 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { storage } from "./storage";
 import { insertUserSchema } from "@shared/schema";
-import { setupAuth, isAuthenticated as replitAuthCheck } from "./replitAuth";
 import { setupSocialAuth, isAuthenticated as socialAuthCheck } from "./socialAuth";
 import { 
   insertCustomerSchema, 
@@ -52,20 +51,19 @@ function generateReferralCode(firstName?: string, lastName?: string): string {
 }
 
 export async function registerRoutes(app: Express, server: Server): Promise<void> {
-  // Setup Replit Auth (handles Google login via OIDC)
-  // This also sets up the session middleware that email/password auth will use
-  await setupAuth(app);
+  // Setup Google OAuth authentication
+  // This also sets up the session middleware
+  await setupSocialAuth(app);
 
-  // Get authenticated user (handles both Replit Auth and legacy auth)
+  // Get authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ message: "Not authenticated" });
       }
       
-      // Determine user ID based on auth method
-      // Replit Auth uses req.user.claims.sub, legacy auth uses req.user.id
-      const userId = req.user.claims?.sub || req.user.id;
+      // Get user ID from session
+      const userId = req.user.id;
       
       if (!userId) {
         return res.status(401).json({ message: "User ID not found" });
