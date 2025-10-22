@@ -974,7 +974,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         });
       }
 
-      const userId = req.user.claims?.sub || req.user.id;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       if (!user || user.role !== 'admin') {
@@ -1736,7 +1736,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = req.user.claims?.sub || req.user.id;
+    const userId = req.user.id;
     if (userId !== req.params.userId) {
       return res.status(403).json({ error: "Forbidden" });
     }
@@ -1818,7 +1818,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = req.user.claims?.sub || req.user.id;
+    const userId = req.user.id;
 
     try {
       const { referralCode } = req.body;
@@ -1849,7 +1849,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = req.user.claims?.sub || req.user.id;
+    const userId = req.user.id;
     if (userId !== req.params.userId) {
       return res.status(403).json({ error: "Forbidden" });
     }
@@ -1872,7 +1872,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = req.user.claims?.sub || req.user.id;
+    const userId = req.user.id;
     if (userId !== req.params.userId) {
       return res.status(403).json({ error: "Forbidden" });
     }
@@ -1908,7 +1908,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = req.user.claims?.sub || req.user.id;
+    const userId = req.user.id;
     if (userId !== req.params.userId) {
       return res.status(403).json({ error: "Forbidden" });
     }
@@ -1928,12 +1928,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // ============= END REFERRAL SYSTEM ROUTES =============
 
   // Get all refill requests (admin only)
-  app.get("/api/admin/refill-requests", async (req, res) => {
+  app.get("/api/admin/refill-requests", async (req: any, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    if (req.user.role !== "admin") {
+    const userId = req.user.id;
+    const user = await storage.getUser(userId);
+    
+    if (!user || user.role !== "admin") {
       return res.status(403).json({ error: "Admin access required" });
     }
 
@@ -1950,12 +1953,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Update refill request status (admin only)
-  app.patch("/api/refill-requests/:id", async (req, res) => {
+  app.patch("/api/refill-requests/:id", async (req: any, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    if (req.user.role !== "admin") {
+    const userId = req.user.id;
+    const user = await storage.getUser(userId);
+    
+    if (!user || user.role !== "admin") {
       return res.status(403).json({ error: "Admin access required" });
     }
 
