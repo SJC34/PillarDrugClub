@@ -30,6 +30,10 @@ export interface IStorage {
   updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined>;
   updateUserAllergies(id: string, allergies: string[]): Promise<User | undefined>;
   getAllUsers(filters?: { search?: string; role?: string; status?: string; page?: number; limit?: number }): Promise<{ users: User[]; total: number }>;
+  deactivateUser(id: string, reason?: string): Promise<User | undefined>;
+  reactivateUser(id: string): Promise<User | undefined>;
+  softDeleteUser(id: string, reason?: string): Promise<User | undefined>;
+  recoverDeletedUser(id: string): Promise<User | undefined>;
 
   // Cart
   getCartItems(userId: string): Promise<any[]>;
@@ -1990,6 +1994,61 @@ export class DbStorage extends MemStorage {
     if (!result[0]) {
       throw new Error(`User with id ${id} not found`);
     }
+    return result[0];
+  }
+
+  async deactivateUser(id: string, reason?: string): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        isActive: "false",
+        deletionReason: reason || "Account deactivated by admin",
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return result[0];
+  }
+
+  async reactivateUser(id: string): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        isActive: "true",
+        deletionReason: null,
+        deletedAt: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return result[0];
+  }
+
+  async softDeleteUser(id: string, reason?: string): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        deletedAt: new Date(),
+        deletionReason: reason || "Account deleted by admin",
+        isActive: "false",
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return result[0];
+  }
+
+  async recoverDeletedUser(id: string): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        deletedAt: null,
+        deletionReason: null,
+        isActive: "true",
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
     return result[0];
   }
 

@@ -44,6 +44,8 @@ export const users = pgTable("users", {
   drugAllergies: text("drug_allergies").array(),
   hwCustomerId: integer("hw_customer_id"), // HealthWarehouse customer ID
   hwPatientId: integer("hw_patient_id"), // HealthWarehouse patient ID
+  deletedAt: timestamp("deleted_at"), // Soft delete timestamp
+  deletionReason: text("deletion_reason"), // Reason for deletion/deactivation
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
