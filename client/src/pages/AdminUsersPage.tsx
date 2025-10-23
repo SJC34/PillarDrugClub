@@ -37,7 +37,11 @@ import {
   Package,
   Ban,
   CheckCircle,
-  Edit
+  Edit,
+  Trash2,
+  RefreshCw,
+  UserX,
+  AlertTriangle
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -56,6 +60,8 @@ interface User {
 
 interface UserDetail extends User {
   phoneNumber: string | null;
+  deletedAt?: string | null;
+  deletionReason?: string | null;
   stats?: {
     activePrescriptionsCount: number;
     ordersCount: number;
@@ -125,6 +131,80 @@ export default function AdminUsersPage() {
     },
     onError: () => {
       toast({ title: "Failed to update user status", variant: "destructive" });
+    },
+  });
+
+  // Deactivate user mutation
+  const deactivateMutation = useMutation({
+    mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
+      return apiRequest(`/api/admin/users/${userId}/deactivate`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "User account deactivated successfully" });
+      setSelectedUser(null);
+    },
+    onError: () => {
+      toast({ title: "Failed to deactivate user", variant: "destructive" });
+    },
+  });
+
+  // Reactivate user mutation
+  const reactivateMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return apiRequest(`/api/admin/users/${userId}/reactivate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "User account reactivated successfully" });
+      setSelectedUser(null);
+    },
+    onError: () => {
+      toast({ title: "Failed to reactivate user", variant: "destructive" });
+    },
+  });
+
+  // Delete user mutation
+  const deleteMutation = useMutation({
+    mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
+      return apiRequest(`/api/admin/users/${userId}/delete`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "User account deleted successfully. Can be recovered within 30 days." });
+      setSelectedUser(null);
+    },
+    onError: () => {
+      toast({ title: "Failed to delete user", variant: "destructive" });
+    },
+  });
+
+  // Recover user mutation
+  const recoverMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return apiRequest(`/api/admin/users/${userId}/recover`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "User account recovered successfully" });
+      setSelectedUser(null);
+    },
+    onError: () => {
+      toast({ title: "Failed to recover user", variant: "destructive" });
     },
   });
 
@@ -443,29 +523,127 @@ export default function AdminUsersPage() {
                   </div>
                 )}
 
+                {/* Status Alert */}
+                {userDetail.deletedAt && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-red-900">Account Deleted</h4>
+                      <p className="text-sm text-red-700 mt-1">
+                        Deleted on {new Date(userDetail.deletedAt).toLocaleDateString()}
+                      </p>
+                      {userDetail.deletionReason && (
+                        <p className="text-sm text-red-700 mt-1">
+                          Reason: {userDetail.deletionReason}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {!userDetail.deletedAt && userDetail.isActive === "false" && userDetail.deletionReason && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-yellow-900">Account Deactivated</h4>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        Reason: {userDetail.deletionReason}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t">
-                  {userDetail.isActive === "true" ? (
-                    <Button
-                      variant="destructive"
-                      onClick={() => suspendMutation.mutate({ userId: userDetail.id, isActive: false })}
-                      disabled={suspendMutation.isPending}
-                      data-testid="button-suspend-user"
-                    >
-                      <Ban className="h-4 w-4 mr-2" />
-                      Suspend Account
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="default"
-                      onClick={() => suspendMutation.mutate({ userId: userDetail.id, isActive: true })}
-                      disabled={suspendMutation.isPending}
-                      data-testid="button-activate-user"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Activate Account
-                    </Button>
-                  )}
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-semibold text-sm text-muted-foreground">Account Actions</h3>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Deactivate/Reactivate */}
+                    {userDetail.isActive === "true" && !userDetail.deletedAt ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          const reason = prompt("Reason for deactivation (optional):");
+                          if (reason !== null) {
+                            deactivateMutation.mutate({ userId: userDetail.id, reason: reason || undefined });
+                          }
+                        }}
+                        disabled={deactivateMutation.isPending}
+                        data-testid="button-deactivate-user"
+                      >
+                        <UserX className="h-4 w-4 mr-2" />
+                        Deactivate
+                      </Button>
+                    ) : !userDetail.deletedAt ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => reactivateMutation.mutate(userDetail.id)}
+                        disabled={reactivateMutation.isPending}
+                        data-testid="button-reactivate-user"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Reactivate
+                      </Button>
+                    ) : null}
+
+                    {/* Suspend/Activate */}
+                    {!userDetail.deletedAt && userDetail.isActive === "true" ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => suspendMutation.mutate({ userId: userDetail.id, isActive: false })}
+                        disabled={suspendMutation.isPending}
+                        data-testid="button-suspend-user"
+                      >
+                        <Ban className="h-4 w-4 mr-2" />
+                        Suspend
+                      </Button>
+                    ) : !userDetail.deletedAt ? (
+                      <Button
+                        variant="default"
+                        onClick={() => suspendMutation.mutate({ userId: userDetail.id, isActive: true })}
+                        disabled={suspendMutation.isPending}
+                        data-testid="button-activate-user"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Activate
+                      </Button>
+                    ) : null}
+
+                    {/* Delete/Recover */}
+                    {userDetail.deletedAt ? (
+                      <Button
+                        variant="default"
+                        className="col-span-2"
+                        onClick={() => recoverMutation.mutate(userDetail.id)}
+                        disabled={recoverMutation.isPending}
+                        data-testid="button-recover-user"
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Recover Account
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="destructive"
+                        className="col-span-2"
+                        onClick={() => {
+                          const confirmed = confirm(
+                            "Are you sure you want to delete this account? It can be recovered within 30 days."
+                          );
+                          if (confirmed) {
+                            const reason = prompt("Reason for deletion (optional):");
+                            if (reason !== null) {
+                              deleteMutation.mutate({ userId: userDetail.id, reason: reason || undefined });
+                            }
+                          }
+                        }}
+                        disabled={deleteMutation.isPending}
+                        data-testid="button-delete-user"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Account
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : null}

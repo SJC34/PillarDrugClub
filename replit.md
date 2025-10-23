@@ -36,7 +36,11 @@ Preferred communication style: Simple, everyday language.
     - **Regulatory compliance**: Aligned with pharmacy regulations, FTC ROSCA, California Automatic Renewal Law
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including:
     - **Executive Dashboard**: Real-time metrics, recent activity feeds, and quick access to admin features.
-    - **User Management**: User directory with search, filtering, detailed profiles, and account actions.
+    - **User Management**: User directory with search, filtering, detailed profiles, and comprehensive account management actions:
+        - **Deactivate/Reactivate**: Temporarily disable or re-enable user accounts with optional reason tracking
+        - **Soft Delete/Recovery**: Delete user accounts with 30-day recovery window and reason documentation
+        - **Suspend/Activate**: Legacy account suspension functionality
+        - All actions include audit logging and prevent admin self-modification
     - **Financial Dashboard**: Revenue tracking, subscription analytics, and transaction history.
     - **Communication Center**: Email and SMS management with message templates.
     - **Reports & Analytics**: Comprehensive reporting with charts and export options.

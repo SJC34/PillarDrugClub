@@ -2431,17 +2431,17 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       return res.status(403).json({ error: "Admin access required" });
     }
 
+    // Prevent self-modification
+    if (req.params.userId === user.id) {
+      return res.status(400).json({ error: "Cannot deactivate your own account" });
+    }
+
     try {
       const { reason } = req.body;
       
       const targetUser = await storage.getUser(req.params.userId);
       if (!targetUser) {
         return res.status(404).json({ error: "User not found" });
-      }
-
-      // Prevent self-deactivation
-      if (req.params.userId === user.id) {
-        return res.status(400).json({ error: "Cannot deactivate your own account" });
       }
 
       const updatedUser = await storage.deactivateUser(req.params.userId, reason);
@@ -2473,6 +2473,11 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     const fullUser = await storage.getUser(user.id);
     if (!fullUser || fullUser.role !== "admin") {
       return res.status(403).json({ error: "Admin access required" });
+    }
+
+    // Prevent self-modification (though reactivation is safe, keep consistency)
+    if (req.params.userId === user.id) {
+      return res.status(400).json({ error: "Cannot modify your own account status" });
     }
 
     try {
@@ -2512,17 +2517,17 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       return res.status(403).json({ error: "Admin access required" });
     }
 
+    // Prevent self-deletion
+    if (req.params.userId === user.id) {
+      return res.status(400).json({ error: "Cannot delete your own account" });
+    }
+
     try {
       const { reason } = req.body;
       
       const targetUser = await storage.getUser(req.params.userId);
       if (!targetUser) {
         return res.status(404).json({ error: "User not found" });
-      }
-
-      // Prevent self-deletion
-      if (req.params.userId === user.id) {
-        return res.status(400).json({ error: "Cannot delete your own account" });
       }
 
       const updatedUser = await storage.softDeleteUser(req.params.userId, reason);
@@ -2554,6 +2559,11 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     const fullUser = await storage.getUser(user.id);
     if (!fullUser || fullUser.role !== "admin") {
       return res.status(403).json({ error: "Admin access required" });
+    }
+
+    // Prevent self-modification (though recovery is safe, keep consistency)
+    if (req.params.userId === user.id) {
+      return res.status(400).json({ error: "Cannot modify your own account status" });
     }
 
     try {
