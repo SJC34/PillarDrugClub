@@ -38,17 +38,20 @@ async function upsertUserFromProfile(profile: any, provider: string) {
   const lastName = profile.name?.familyName || profile.family_name || profile.lastName || "";
   const profileImageUrl = profile.photos?.[0]?.value || profile.picture || profile.profileImageUrl || "";
 
+  // Check if user already exists
+  let existingUser;
+  let isNewUser = false;
+  try {
+    existingUser = await storage.getUser(userId);
+  } catch (error) {
+    // User doesn't exist
+    isNewUser = true;
+  }
+
   // If provider doesn't send email, try to get it from existing user
   let finalEmail = email;
-  if (!finalEmail) {
-    try {
-      const existingUser = await storage.getUser(userId);
-      if (existingUser && existingUser.email) {
-        finalEmail = existingUser.email;
-      }
-    } catch (error) {
-      // User doesn't exist yet, and no email from provider
-    }
+  if (!finalEmail && existingUser?.email) {
+    finalEmail = existingUser.email;
   }
 
   // If we still don't have an email, we can't proceed
@@ -72,6 +75,7 @@ async function upsertUserFromProfile(profile: any, provider: string) {
     firstName: firstName,
     lastName: lastName,
     provider: provider,
+    isNewUser: isNewUser,
   };
 }
 
@@ -113,8 +117,16 @@ export async function setupSocialAuth(app: Express) {
     app.get(
       "/api/auth/google/callback",
       passport.authenticate("google", { failureRedirect: "/login" }),
-      (req, res) => {
-        res.redirect("/dashboard");
+      (req: any, res) => {
+        // Check if this is a new user who needs to complete registration
+        const user = req.user;
+        if (user && user.isNewUser) {
+          // New user - redirect to registration to complete onboarding
+          res.redirect("/register");
+        } else {
+          // Existing user - go to dashboard
+          res.redirect("/dashboard");
+        }
       }
     );
   }

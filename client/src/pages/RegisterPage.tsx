@@ -162,12 +162,13 @@ export default function RegisterPage() {
     }
   }, [toast]);
 
-  // Check for OAuth success
+  // Check for OAuth success - check both localStorage and session
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
+    // First check localStorage (for backward compatibility)
+    const userFromStorage = localStorage.getItem("user");
+    if (userFromStorage) {
       try {
-        const userData = JSON.parse(user);
+        const userData = JSON.parse(userFromStorage);
         if (userData.id) {
           // User authenticated via OAuth, move to step 2
           setRegisteredUser(userData);
@@ -183,11 +184,49 @@ export default function RegisterPage() {
           if (userData.lastName) {
             step2Form.setValue("lastName", userData.lastName);
           }
+          return;
         }
       } catch (e) {
         console.error("Error parsing user data:", e);
       }
     }
+
+    // Check if user is authenticated via session (Google OAuth)
+    const checkAuthenticatedUser = async () => {
+      try {
+        const response = await fetch("/api/auth/user", {
+          credentials: "include"
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          if (userData.id) {
+            // User is authenticated (likely from Google OAuth)
+            setRegisteredUser(userData);
+            setCurrentStep(2);
+            
+            // Pre-fill email and name if available
+            if (userData.email) {
+              step2Form.setValue("email", userData.email);
+            }
+            if (userData.firstName) {
+              step2Form.setValue("firstName", userData.firstName);
+            }
+            if (userData.lastName) {
+              step2Form.setValue("lastName", userData.lastName);
+            }
+            
+            // Store in localStorage for consistency
+            localStorage.setItem("user", JSON.stringify(userData));
+          }
+        }
+      } catch (error) {
+        // User not authenticated, stay on step 1
+        console.log("No authenticated user found");
+      }
+    };
+
+    checkAuthenticatedUser();
   }, []);
 
   const benefits = [
