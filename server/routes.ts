@@ -2419,6 +2419,168 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // POST /api/admin/users/:userId/deactivate - Deactivate user account
+  app.post("/api/admin/users/:userId/deactivate", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const { reason } = req.body;
+      
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Prevent self-deactivation
+      if (req.params.userId === user.id) {
+        return res.status(400).json({ error: "Cannot deactivate your own account" });
+      }
+
+      const updatedUser = await storage.deactivateUser(req.params.userId, reason);
+      
+      console.log(`Admin ${user.email} deactivated user ${targetUser.email}${reason ? `: ${reason}` : ''}`);
+      
+      const { password, ...userResponse } = updatedUser!;
+      
+      res.json({ 
+        user: userResponse,
+        message: "User account deactivated successfully"
+      });
+    } catch (error: any) {
+      console.error("Error deactivating user:", error);
+      res.status(500).json({ 
+        error: "Failed to deactivate user", 
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/admin/users/:userId/reactivate - Reactivate user account
+  app.post("/api/admin/users/:userId/reactivate", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const updatedUser = await storage.reactivateUser(req.params.userId);
+      
+      console.log(`Admin ${user.email} reactivated user ${targetUser.email}`);
+      
+      const { password, ...userResponse } = updatedUser!;
+      
+      res.json({ 
+        user: userResponse,
+        message: "User account reactivated successfully"
+      });
+    } catch (error: any) {
+      console.error("Error reactivating user:", error);
+      res.status(500).json({ 
+        error: "Failed to reactivate user", 
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/admin/users/:userId/delete - Soft delete user account
+  app.post("/api/admin/users/:userId/delete", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const { reason } = req.body;
+      
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Prevent self-deletion
+      if (req.params.userId === user.id) {
+        return res.status(400).json({ error: "Cannot delete your own account" });
+      }
+
+      const updatedUser = await storage.softDeleteUser(req.params.userId, reason);
+      
+      console.log(`Admin ${user.email} soft deleted user ${targetUser.email}${reason ? `: ${reason}` : ''}`);
+      
+      const { password, ...userResponse } = updatedUser!;
+      
+      res.json({ 
+        user: userResponse,
+        message: "User account deleted successfully. Can be recovered within 30 days."
+      });
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ 
+        error: "Failed to delete user", 
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/admin/users/:userId/recover - Recover deleted user account
+  app.post("/api/admin/users/:userId/recover", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const updatedUser = await storage.recoverDeletedUser(req.params.userId);
+      
+      console.log(`Admin ${user.email} recovered deleted user ${targetUser.email}`);
+      
+      const { password, ...userResponse } = updatedUser!;
+      
+      res.json({ 
+        user: userResponse,
+        message: "User account recovered successfully"
+      });
+    } catch (error: any) {
+      console.error("Error recovering user:", error);
+      res.status(500).json({ 
+        error: "Failed to recover user", 
+        message: error.message 
+      });
+    }
+  });
+
   // Admin financial tracking endpoints
 
   // GET /api/admin/financial-metrics - Get financial overview and metrics
