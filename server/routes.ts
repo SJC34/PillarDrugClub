@@ -167,11 +167,21 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Update user information (for multi-step registration after social auth)
-  app.patch("/api/users/:userId", async (req, res) => {
+  app.patch("/api/users/:userId", async (req: any, res) => {
     try {
       const { userId } = req.params;
       const { email, phoneNumber, smsConsent, firstName, lastName, dateOfBirth, drugAllergies, userAddress } = req.body;
       
+      // Authentication check
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Authorization check - users can only update their own profile
+      if (req.user.id !== userId) {
+        return res.status(403).json({ error: "Forbidden - You can only update your own profile" });
+      }
+
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
