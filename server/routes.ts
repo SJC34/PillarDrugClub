@@ -170,15 +170,31 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   app.patch("/api/users/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
-      const { phoneNumber, smsConsent, firstName, lastName, dateOfBirth, drugAllergies, userAddress } = req.body;
+      const { email, phoneNumber, smsConsent, firstName, lastName, dateOfBirth, drugAllergies, userAddress } = req.body;
       
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
+      // Validate email uniqueness if email is being changed
+      if (email !== undefined && email !== user.email) {
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({ error: "Invalid email format" });
+        }
+
+        // Check if email is already in use by another user
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ error: "Email address is already in use" });
+        }
+      }
+
       // Update user with provided fields, normalizing types
       const updates: any = {};
+      if (email !== undefined) updates.email = email;
       if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
       if (smsConsent !== undefined) {
         // Normalize smsConsent to string "true" or "false" (database expects text type)
