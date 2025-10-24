@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pill, Phone, MapPin, User, Save, ArrowLeft, Calendar, CreditCard, AlertTriangle } from "lucide-react";
+import { Pill, Phone, MapPin, User, Save, ArrowLeft, Calendar, CreditCard, AlertTriangle, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 const settingsSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
   dateOfBirth: z.string().optional(),
   phoneNumber: z.string()
     .min(10, "Please enter a valid phone number")
@@ -37,6 +38,7 @@ export default function SettingsPage() {
   const form = useForm<SettingsForm>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
+      email: user?.email || "",
       dateOfBirth: user?.dateOfBirth || "",
       phoneNumber: user?.phoneNumber || "",
       smsConsent: user?.smsConsent === "true",
@@ -59,6 +61,7 @@ export default function SettingsPage() {
       };
 
       return apiRequest("PATCH", `/api/users/${user.id}`, {
+        email: data.email,
         dateOfBirth: data.dateOfBirth,
         phoneNumber: data.phoneNumber,
         smsConsent: data.smsConsent,
@@ -122,6 +125,29 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-sm md:text-base flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  {...form.register("email")}
+                  data-testid="input-email"
+                  className="h-10 md:h-11"
+                />
+                {form.formState.errors.email && (
+                  <p className="text-xs md:text-sm text-destructive mt-1">
+                    {form.formState.errors.email.message}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Used for account login and important notifications
+                </p>
+              </div>
+
               <div>
                 <Label htmlFor="dateOfBirth" className="text-sm md:text-base">
                   Date of Birth
