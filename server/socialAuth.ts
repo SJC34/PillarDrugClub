@@ -134,8 +134,8 @@ export async function setupSocialAuth(app: Express) {
         // Check if this is a new user who needs to complete registration
         const user = req.user;
         if (user && user.isNewUser) {
-          // New user - redirect to registration to complete onboarding
-          res.redirect("/register");
+          // New user - skip step 1 (social auth already done), go to step 2 (user details)
+          res.redirect("/register?step=2");
         } else {
           // Existing user - go to dashboard
           res.redirect("/dashboard");
