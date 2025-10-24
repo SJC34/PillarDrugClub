@@ -33,48 +33,60 @@ export function getSession() {
 }
 
 async function upsertUserFromProfile(profile: any, provider: string) {
-  const userId = `${provider}_${profile.id}`;
   const email = profile.emails?.[0]?.value || profile.email;
   const firstName = profile.name?.givenName || profile.given_name || profile.firstName || "";
   const lastName = profile.name?.familyName || profile.family_name || profile.lastName || "";
   const profileImageUrl = profile.photos?.[0]?.value || profile.picture || profile.profileImageUrl || "";
 
-  // Check if user already exists
-  let existingUser;
-  let isNewUser = false;
-  try {
-    existingUser = await storage.getUser(userId);
-  } catch (error) {
-    // User doesn't exist
-    isNewUser = true;
-  }
-
-  // If provider doesn't send email, try to get it from existing user
-  let finalEmail = email;
-  if (!finalEmail && existingUser?.email) {
-    finalEmail = existingUser.email;
-  }
-
-  // If we still don't have an email, we can't proceed
-  if (!finalEmail) {
+  // Validate email exists
+  if (!email) {
     throw new Error(
       `${provider} authentication failed: Email address is required but was not provided. Please ensure email permissions are granted.`
     );
   }
 
-  await storage.upsertUser({
-    id: userId,
-    email: finalEmail,
-    firstName: firstName,
-    lastName: lastName,
-    profileImageUrl: profileImageUrl,
-  });
+  // First, try to find existing user by email
+  let existingUser;
+  let isNewUser = false;
+  try {
+    existingUser = await storage.getUserByEmail(email);
+  } catch (error) {
+    // User doesn't exist by email, this is a new user
+    isNewUser = true;
+  }
+
+  let userId: string;
+  
+  if (existingUser) {
+    // User already exists - use their existing ID
+    userId = existingUser.id;
+    
+    // Update their profile with OAuth data (name, photo)
+    await storage.upsertUser({
+      id: userId,
+      email: email,
+      firstName: firstName || existingUser.firstName,
+      lastName: lastName || existingUser.lastName,
+      profileImageUrl: profileImageUrl || existingUser.profileImageUrl,
+    });
+  } else {
+    // New user - create with Google-prefixed ID
+    userId = `${provider}_${profile.id}`;
+    
+    await storage.upsertUser({
+      id: userId,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      profileImageUrl: profileImageUrl,
+    });
+  }
 
   return {
     id: userId,
-    email: finalEmail,
-    firstName: firstName,
-    lastName: lastName,
+    email: email,
+    firstName: firstName || existingUser?.firstName || "",
+    lastName: lastName || existingUser?.lastName || "",
     provider: provider,
     isNewUser: isNewUser,
   };
