@@ -55,35 +55,6 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // This also sets up the session middleware
   await setupSocialAuth(app);
 
-  // DIAGNOSTIC ENDPOINT - Shows exact OAuth configuration
-  app.get('/api/auth/google/debug', (req, res) => {
-    const callbackURL = process.env.REPLIT_DOMAINS 
-      ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}`
-      : "http://localhost:5000";
-    
-    const fullCallbackURL = `${callbackURL}/api/auth/google/callback`;
-    
-    res.json({
-      configured: {
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        hasSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-        redirectUri: fullCallbackURL,
-        domain: process.env.REPLIT_DOMAINS,
-      },
-      instructions: {
-        message: "Add this EXACT redirect URI to Google Cloud Console",
-        redirectUriToCopy: fullCallbackURL,
-        steps: [
-          "1. Go to https://console.cloud.google.com/apis/credentials",
-          `2. Find OAuth Client: ${process.env.GOOGLE_CLIENT_ID}`,
-          `3. Add to Authorized redirect URIs: ${fullCallbackURL}`,
-          "4. Save and wait 2 minutes",
-          "5. Try signing in again"
-        ]
-      }
-    });
-  });
-
   // Get authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
     try {
