@@ -55,6 +55,36 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // This also sets up the session middleware
   await setupSocialAuth(app);
 
+  // DIAGNOSTIC ENDPOINT - Shows exact OAuth configuration needed
+  app.get('/api/auth/config', (req, res) => {
+    const domain = process.env.REPLIT_DOMAINS 
+      ? process.env.REPLIT_DOMAINS.split(",")[0]
+      : "localhost:5000";
+    
+    const protocol = domain.includes('localhost') ? 'http' : 'https';
+    const callbackURL = `${protocol}://${domain}/api/auth/google/callback`;
+    
+    res.json({
+      currentDomain: domain,
+      requiredRedirectURI: callbackURL,
+      appURL: `${protocol}://${domain}`,
+      googleClientId: process.env.GOOGLE_CLIENT_ID,
+      instructions: {
+        step1: "Go to https://console.cloud.google.com/apis/credentials",
+        step2: `Find OAuth Client: ${process.env.GOOGLE_CLIENT_ID}`,
+        step3: `Add this EXACT URI to 'Authorized redirect URIs': ${callbackURL}`,
+        step4: "Click Save and wait 2-3 minutes",
+        step5: `Open this URL in Safari/Chrome (NOT embedded browser): ${protocol}://${domain}`,
+        step6: "Click 'Sign in with Google'"
+      },
+      important: [
+        "You CANNOT use pillardrugclub.com until you publish the app",
+        "For development, use the Replit dev URL shown above",
+        "MUST open in Safari/Chrome - Google blocks embedded browsers"
+      ]
+    });
+  });
+
   // Get authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
     try {
