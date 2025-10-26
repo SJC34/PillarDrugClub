@@ -381,8 +381,12 @@ export default function DashboardPage() {
                   <CreditCard className="h-5 w-5 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">$10</p>
-                  <p className="text-sm text-gray-600">Monthly Membership</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "15" : "25"}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {user?.subscriptionTier === "free" ? "Free Tier" : "Monthly Membership"}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -481,34 +485,129 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Membership Info */}
-        <Card className="mt-8">
+        {/* Subscription Tier Information */}
+        <Card className="mt-8 border-2 border-primary/20">
           <CardHeader>
-            <CardTitle>Membership Information</CardTitle>
-            <CardDescription>
-              Manage your subscription and billing
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">Current Plan</h4>
-                <p className="text-lg font-semibold text-blue-600">
-                  Pillar Club Membership
-                </p>
-                <p className="text-sm text-gray-600">$10/month</p>
+                <CardTitle className="flex items-center gap-2">
+                  Your Subscription
+                  <Badge variant={user?.subscriptionTier === "free" ? "outline" : "default"}>
+                    {user?.subscriptionTier === "free" ? "Free Tier" : 
+                     user?.subscriptionTier === "gold" ? "Gold Plan" : "Platinum Plan"}
+                  </Badge>
+                </CardTitle>
+                <CardDescription>
+                  {user?.subscriptionTier === "free" 
+                    ? "Get access to year-supply pricing with Gold or Platinum" 
+                    : "Access to 6-month and 1-year supply wholesale pricing"}
+                </CardDescription>
               </div>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">Next Billing Date</h4>
-                <p className="text-gray-900">March 15, 2024</p>
-                <p className="text-sm text-gray-600">Auto-renewal enabled</p>
-              </div>
-              <div className="flex items-end">
-                <Button variant="outline">
-                  Manage Subscription
-                </Button>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-primary">
+                  ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "15" : "25"}
+                  <span className="text-sm text-muted-foreground">/mo</span>
+                </div>
+                {user?.subscriptionTier === "free" && (
+                  <p className="text-xs text-muted-foreground mt-1">$30 per order fee</p>
+                )}
               </div>
             </div>
+          </CardHeader>
+          <CardContent>
+            {user?.subscriptionTier === "free" ? (
+              <>
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-3">Free Tier Benefits:</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>Up to 90-day medication supplies</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>Wholesale pricing on all medications</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>Free home delivery</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>No monthly commitment</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border border-primary/20">
+                  <h4 className="font-semibold mb-2">Upgrade to unlock:</h4>
+                  <ul className="space-y-1.5 mb-4">
+                    <li className="flex items-start gap-2 text-sm">
+                      <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
+                      <span>6-month and 1-year supply options</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
+                      <span>Maximum wholesale savings</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
+                      <span>No per-order dispensing fees</span>
+                    </li>
+                  </ul>
+                  <div className="flex gap-3">
+                    <Link href="/settings?tab=subscription" className="flex-1">
+                      <Button className="w-full" data-testid="button-upgrade-gold">
+                        Upgrade to Gold ($15/mo)
+                      </Button>
+                    </Link>
+                    <Link href="/settings?tab=subscription" className="flex-1">
+                      <Button variant="outline" className="w-full" data-testid="button-upgrade-platinum">
+                        Upgrade to Platinum ($25/mo)
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-4">
+                  <h4 className="font-semibold mb-3">Your Plan Benefits:</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>6-month and 1-year supply access</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>Wholesale year-supply pricing</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>Free home delivery</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
+                      <span>{user?.subscriptionTier === "gold" ? "1-3 medications" : "4+ medications"}</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="flex gap-3">
+                  <Link href="/settings?tab=subscription" className="flex-1">
+                    <Button variant="outline" className="w-full" data-testid="button-manage-subscription">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Manage Subscription
+                    </Button>
+                  </Link>
+                  {user?.subscriptionTier === "gold" && (
+                    <Link href="/settings?tab=subscription" className="flex-1">
+                      <Button className="w-full" data-testid="button-upgrade-to-platinum">
+                        Upgrade to Platinum
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
