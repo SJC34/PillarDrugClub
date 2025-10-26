@@ -525,14 +525,30 @@ export default function PrescriptionRequestPage() {
                         )}
                       </div>
                       <div className="sm:col-span-2 lg:col-span-1">
-                        <Label htmlFor="quantity" className="text-sm md:text-base">Quantity</Label>
-                        <Input
-                          id="quantity"
-                          placeholder="30 or #365"
-                          {...doctorForm.register("quantity")}
-                          data-testid="input-quantity"
-                          className="h-10 md:h-11 text-sm md:text-base"
-                        />
+                        <Label htmlFor="quantity" className="text-sm md:text-base">Supply Length</Label>
+                        <Select
+                          value={doctorForm.watch("quantity") || ""}
+                          onValueChange={(value) => doctorForm.setValue("quantity", value)}
+                        >
+                          <SelectTrigger className="h-10 md:h-11 text-sm md:text-base" data-testid="select-supply-length">
+                            <SelectValue placeholder="Select supply length" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="30">30-day supply (#30)</SelectItem>
+                            <SelectItem value="90">90-day supply (#90)</SelectItem>
+                            {user?.subscriptionTier !== "free" && (
+                              <>
+                                <SelectItem value="180">6-month supply (#180)</SelectItem>
+                                <SelectItem value="365">1-year supply (#365)</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        {user?.subscriptionTier === "free" && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Upgrade to Gold or Platinum for 6-month & 1-year supply access
+                          </p>
+                        )}
                         {doctorForm.formState.errors.quantity && (
                           <p className="text-xs md:text-sm text-destructive mt-1">{doctorForm.formState.errors.quantity.message}</p>
                         )}
