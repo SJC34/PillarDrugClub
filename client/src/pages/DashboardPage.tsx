@@ -572,13 +572,13 @@ export default function DashboardPage() {
                       <span>No per-order dispensing fees</span>
                     </li>
                   </ul>
-                  <div className="flex gap-3">
-                    <Link href="/settings?tab=subscription" className="flex-1">
+                  <div className="flex flex-col gap-3">
+                    <Link href="/settings?tab=subscription">
                       <Button className="w-full" data-testid="button-upgrade-gold">
                         Upgrade to Gold ($15/mo)
                       </Button>
                     </Link>
-                    <Link href="/settings?tab=subscription" className="flex-1">
+                    <Link href="/settings?tab=subscription">
                       <Button variant="outline" className="w-full" data-testid="button-upgrade-platinum">
                         Upgrade to Platinum ($25/mo)
                       </Button>
