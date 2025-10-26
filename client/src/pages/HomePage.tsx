@@ -151,12 +151,56 @@ export default function HomePage() {
 
       {/* Pricing Section */}
       <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Simple, Transparent Pricing</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Choose Your Savings Plan</h2>
+          <p className="text-base md:text-lg text-muted-foreground mb-8 font-bold max-w-3xl mx-auto">
+            Start with our Free Tier, or unlock year-supply wholesale pricing with Gold or Platinum
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Free Tier */}
+            <Card className="border-secondary/30">
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl md:text-2xl font-bold">Free Tier</CardTitle>
+                <div className="text-3xl md:text-4xl font-bold text-foreground">
+                  $0
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                </div>
+                <CardDescription className="font-bold">Pay per order</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 p-3 bg-secondary/10 rounded-lg">
+                  <p className="text-sm font-bold text-secondary">$30 dispensing & shipping per order</p>
+                </div>
+                <ul className="space-y-3 mb-6 text-left">
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Up to 90-day supplies</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Wholesale pricing</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">No monthly commitment</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Home delivery</span>
+                  </li>
+                </ul>
+                <Link href="/register">
+                  <Button variant="outline" className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-free">
+                    Start Free
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Gold Plan */}
             <Card className="border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardHeader className="text-center">
-                <CardTitle className="text-xl md:text-2xl font-bold">Foundation Plan</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Gold Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
                   $15
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
@@ -164,28 +208,42 @@ export default function HomePage() {
                 <CardDescription className="font-bold">1-3 medications</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-3 mb-6">
-                  {benefits.map((benefit, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-left">
-                      <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm md:text-base font-bold text-foreground">{benefit}</span>
-                    </li>
-                  ))}
+                <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                  <p className="text-sm font-bold text-primary">6-month & 1-year supply access</p>
+                </div>
+                <ul className="space-y-3 mb-6 text-left">
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Wholesale year-supply pricing</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">No insurance required</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Free home delivery</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Transparent pricing</span>
+                  </li>
                 </ul>
-                <Link href="/register">
-                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-foundation">
-                    Start Foundation Plan
+                <Link href="/register?tier=gold">
+                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-gold">
+                    Start Gold Plan
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
+            {/* Platinum Plan */}
             <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10 relative">
               <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
                 BEST VALUE
               </div>
               <CardHeader className="text-center">
-                <CardTitle className="text-xl md:text-2xl font-bold">Keystone Plan</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Platinum Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
                   $25
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
@@ -193,23 +251,36 @@ export default function HomePage() {
                 <CardDescription className="font-bold">4+ medications</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-3 mb-6">
-                  {benefits.map((benefit, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-left">
-                      <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm md:text-base font-bold text-foreground">{benefit}</span>
-                    </li>
-                  ))}
+                <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                  <p className="text-sm font-bold text-primary">6-month & 1-year supply access</p>
+                </div>
+                <ul className="space-y-3 mb-6 text-left">
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Wholesale year-supply pricing</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">No insurance required</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Free home delivery</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Maximum savings</span>
+                  </li>
                 </ul>
-                <Link href="/register">
-                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-keystone">
-                    Start Keystone Plan
+                <Link href="/register?tier=platinum">
+                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-platinum">
+                    Start Platinum Plan
                   </Button>
                 </Link>
               </CardContent>
             </Card>
           </div>
-          <p className="text-sm text-muted-foreground mt-6 font-bold">No hidden fees • Save thousands per year</p>
+          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual commitment • Gold & Platinum plans billed monthly</p>
         </div>
       </section>
 

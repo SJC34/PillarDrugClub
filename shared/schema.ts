@@ -27,6 +27,7 @@ export const users = pgTable("users", {
   phoneNumber: text("phone_number"),
   smsConsent: text("sms_consent").default("false"),
   role: text("role", { enum: ["admin", "client", "broker", "company"] }).default("client"),
+  subscriptionTier: text("subscription_tier", { enum: ["free", "gold", "platinum"] }).default("free"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionStatus: text("subscription_status", { enum: ["active", "canceled", "past_due", "incomplete"] }).default("incomplete"),

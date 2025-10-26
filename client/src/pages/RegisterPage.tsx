@@ -128,7 +128,17 @@ export default function RegisterPage() {
   const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
   const [referralReferrerName, setReferralReferrerName] = useState<string>("");
   const [isValidatingReferral, setIsValidatingReferral] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<"free" | "gold" | "platinum">("free");
   const { toast } = useToast();
+
+  // Parse tier from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tier = params.get('tier');
+    if (tier === 'gold' || tier === 'platinum' || tier === 'free') {
+      setSelectedTier(tier);
+    }
+  }, []);
 
   // Forms for each step
   const step2Form = useForm<Step2DetailsForm>({
@@ -388,21 +398,41 @@ export default function RegisterPage() {
         }
       }
 
-      // Check if Stripe is configured
-      if (!STRIPE_PUBLIC_KEY) {
-        // Skip payment step if Stripe is not configured
+      // If free tier, skip payment and complete registration
+      if (selectedTier === "free") {
+        // Update user tier in database
+        await apiRequest("PUT", `/api/users/${registeredUser.id}`, {
+          subscriptionTier: "free",
+          subscriptionStatus: "active"
+        });
+
         toast({
           title: "Registration Complete!",
-          description: "Welcome to Pillar Drug Club! You can subscribe later to access wholesale pricing.",
+          description: "Welcome to Pillar Drug Club! You can upgrade anytime to access year-supply pricing.",
         });
         setLocation("/dashboard");
         return;
       }
 
-      // Move to payment step (default to plus plan)
+      // Check if Stripe is configured for paid tiers
+      if (!STRIPE_PUBLIC_KEY) {
+        toast({
+          title: "Payment Not Available",
+          description: "Stripe is not configured. Defaulting to Free Tier.",
+          variant: "destructive",
+        });
+        await apiRequest("PUT", `/api/users/${registeredUser.id}`, {
+          subscriptionTier: "free",
+          subscriptionStatus: "active"
+        });
+        setLocation("/dashboard");
+        return;
+      }
+
+      // Move to payment step for Gold/Platinum tiers
       const subscriptionResponse = await apiRequest("POST", "/api/create-subscription", { 
         userId: registeredUser.id,
-        plan: 'plus'
+        plan: selectedTier  // 'gold' or 'platinum'
       });
       const subscriptionData = await subscriptionResponse.json();
 
@@ -516,11 +546,71 @@ export default function RegisterPage() {
   if (currentStep === 2) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-2xl">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Your Information</h1>
             <p className="text-sm md:text-base text-muted-foreground">Complete your profile to continue</p>
           </div>
+
+          {/* Tier Selection */}
+          <Card className="border-secondary/20 mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg md:text-xl font-display">Choose Your Plan</CardTitle>
+              <CardDescription className="text-sm md:text-base">
+                Select the membership tier that fits your needs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setSelectedTier("free")}
+                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                    selectedTier === "free"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover-elevate"
+                  }`}
+                  data-testid="button-select-free"
+                >
+                  <div className="font-bold text-lg mb-1">Free</div>
+                  <div className="text-2xl font-bold mb-2">$0<span className="text-sm text-muted-foreground">/mo</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">$30 per order fee</div>
+                  <div className="text-xs">Up to 90-day supplies</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedTier("gold")}
+                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                    selectedTier === "gold"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover-elevate"
+                  }`}
+                  data-testid="button-select-gold"
+                >
+                  <div className="font-bold text-lg mb-1">Gold</div>
+                  <div className="text-2xl font-bold text-primary mb-2">$15<span className="text-sm text-muted-foreground">/mo</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">1-3 medications</div>
+                  <div className="text-xs">6-mo & 1-yr supplies</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedTier("platinum")}
+                  className={`p-4 rounded-lg border-2 transition-all text-left relative ${
+                    selectedTier === "platinum"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover-elevate"
+                  }`}
+                  data-testid="button-select-platinum"
+                >
+                  <Badge className="absolute top-2 right-2 text-xs">Best Value</Badge>
+                  <div className="font-bold text-lg mb-1">Platinum</div>
+                  <div className="text-2xl font-bold text-primary mb-2">$25<span className="text-sm text-muted-foreground">/mo</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">4+ medications</div>
+                  <div className="text-xs">6-mo & 1-yr supplies</div>
+                </button>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card className="border-secondary/20">
             <CardHeader>
@@ -1039,9 +1129,16 @@ export default function RegisterPage() {
               <CardContent>
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl md:text-3xl font-bold text-teal-600">$25</div>
+                    <div className="text-2xl md:text-3xl font-bold text-teal-600">
+                      ${selectedTier === "gold" ? "15" : "25"}
+                    </div>
                     <div className="text-sm md:text-base text-muted-foreground">per month</div>
-                    <div className="text-xs md:text-sm text-muted-foreground mt-1">Keystone Plan (4+ meds)</div>
+                    <div className="text-xs md:text-sm text-muted-foreground mt-1">
+                      {selectedTier === "gold" ? "Gold Plan (1-3 meds)" : "Platinum Plan (4+ meds)"}
+                    </div>
+                    <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
+                      Access to 6-month & 1-year supply pricing
+                    </div>
                   </div>
                 </div>
 
