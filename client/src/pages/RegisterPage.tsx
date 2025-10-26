@@ -604,14 +604,16 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedTier("platinum")}
-                  className={`p-4 rounded-lg border-2 transition-all text-left relative ${
+                  className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-visible ${
                     selectedTier === "platinum"
                       ? "border-primary bg-primary/5"
                       : "border-border hover-elevate"
                   }`}
                   data-testid="button-select-platinum"
                 >
-                  <Badge className="absolute top-2 right-2 text-xs">Best Value</Badge>
+                  <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-bold z-10">
+                    BEST VALUE
+                  </div>
                   <div className="flex items-center gap-2 mb-2">
                     <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Platinum</div>
