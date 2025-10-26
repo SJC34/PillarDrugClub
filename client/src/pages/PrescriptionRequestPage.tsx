@@ -412,13 +412,27 @@ export default function PrescriptionRequestPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleDoctorSubmit} className="space-y-6">
-              {/* Patient Information */}
-              <div>
-                <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Patient Information
-                </h3>
-                <div className="space-y-6">
+              {/* Step 1: Patient Information */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+                {/* Left: Step Indicator */}
+                <div className="lg:col-span-3">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                      1
+                    </div>
+                    <div className="hidden lg:block">
+                      <p className="font-semibold text-sm text-foreground">Patient Info</p>
+                      <p className="text-xs text-muted-foreground mt-1">Your details</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Patient Information Form */}
+                <div className="lg:col-span-9 space-y-6">
+                  <h3 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2 lg:hidden">
+                    <User className="h-5 w-5" />
+                    Patient Information
+                  </h3>
                   {/* Patient Information Fields */}
                   <div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -468,30 +482,17 @@ export default function PrescriptionRequestPage() {
                 </div>
               </div>
 
-              {/* Step 1 & 2: Medication Information with Step Indicators */}
+              {/* Step 2: Medication Information */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-                {/* Left: Step Indicators */}
-                <div className="lg:col-span-3 space-y-4">
-                  <div className="flex lg:flex-col gap-3">
-                    {/* Step 1 */}
-                    <div className="flex items-start gap-3 flex-1 lg:flex-none">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                        1
-                      </div>
-                      <div className="hidden lg:block">
-                        <p className="font-semibold text-sm text-foreground">Patient Info</p>
-                        <p className="text-xs text-muted-foreground mt-1">Your details</p>
-                      </div>
+                {/* Left: Step Indicator */}
+                <div className="lg:col-span-3">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                      2
                     </div>
-                    {/* Step 2 */}
-                    <div className="flex items-start gap-3 flex-1 lg:flex-none lg:mt-2">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                        2
-                      </div>
-                      <div className="hidden lg:block">
-                        <p className="font-semibold text-sm text-foreground">Medication</p>
-                        <p className="text-xs text-muted-foreground mt-1">What you need</p>
-                      </div>
+                    <div className="hidden lg:block">
+                      <p className="font-semibold text-sm text-foreground">Medication</p>
+                      <p className="text-xs text-muted-foreground mt-1">What you need</p>
                     </div>
                   </div>
                 </div>
