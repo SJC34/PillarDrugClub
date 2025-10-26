@@ -20,7 +20,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { MedicationSearch } from "@/components/MedicationSearch";
 import { handleDateInputChange } from "@/lib/dateFormatter";
-import goldPillarBadge from "@assets/image_1761453675599.png";
+import freePillarBadge from "@assets/image_1761455037188.png";
+import goldPillarBadge from "@assets/image_1761454767191.png";
 import platinumPillarBadge from "@assets/image_1761453800697.png";
 
 // Schemas for different steps
@@ -574,7 +575,10 @@ export default function RegisterPage() {
                   }`}
                   data-testid="button-select-free"
                 >
-                  <div className="font-bold text-lg mb-1">Free</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <img src={freePillarBadge} alt="Free" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Free</div>
+                  </div>
                   <div className="text-2xl font-bold mb-2">$0<span className="text-sm text-muted-foreground">/mo</span></div>
                   <div className="text-xs text-muted-foreground mb-2">$30 per order fee</div>
                   <div className="text-xs">Up to 90-day supplies</div>
