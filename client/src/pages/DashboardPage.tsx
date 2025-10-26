@@ -380,9 +380,15 @@ export default function DashboardPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <CreditCard className="h-5 w-5 text-orange-600" />
-                </div>
+                {user?.subscriptionTier === "free" && (
+                  <img src={freePillarBadge} alt="Free Tier" className="w-10 h-10 object-contain" />
+                )}
+                {user?.subscriptionTier === "gold" && (
+                  <img src={goldPillarBadge} alt="Gold Plan" className="w-10 h-10 object-contain" />
+                )}
+                {user?.subscriptionTier === "platinum" && (
+                  <img src={platinumPillarBadge} alt="Platinum Plan" className="w-10 h-10 object-contain" />
+                )}
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
                     ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "15" : "25"}
@@ -503,7 +509,7 @@ export default function DashboardPage() {
                   {user?.subscriptionTier === "platinum" && (
                     <img src={platinumPillarBadge} alt="Platinum Plan" className="w-10 h-10 object-contain" />
                   )}
-                  Your Subscription
+                  Current Subscription
                   <Badge variant={user?.subscriptionTier === "free" ? "outline" : "default"}>
                     {user?.subscriptionTier === "free" ? "Free Tier" : 
                      user?.subscriptionTier === "gold" ? "Gold Plan" : "Platinum Plan"}
@@ -603,7 +609,7 @@ export default function DashboardPage() {
                     </li>
                   </ul>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Link href="/settings?tab=subscription" className="flex-1">
                     <Button variant="outline" className="w-full" data-testid="button-manage-subscription">
                       <Settings className="h-4 w-4 mr-2" />
