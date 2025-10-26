@@ -20,6 +20,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { MedicationSearch } from "@/components/MedicationSearch";
 import { handleDateInputChange } from "@/lib/dateFormatter";
+import goldPillarBadge from "@assets/image_1761453675599.png";
+import platinumPillarBadge from "@assets/image_1761453800697.png";
 
 // Schemas for different steps
 const step1SocialSchema = z.object({
@@ -587,7 +589,10 @@ export default function RegisterPage() {
                   }`}
                   data-testid="button-select-gold"
                 >
-                  <div className="font-bold text-lg mb-1">Gold</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <img src={goldPillarBadge} alt="Gold" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Gold</div>
+                  </div>
                   <div className="text-2xl font-bold text-primary mb-2">$15<span className="text-sm text-muted-foreground">/mo</span></div>
                   <div className="text-xs text-muted-foreground mb-2">1-3 medications</div>
                   <div className="text-xs">6-mo & 1-yr supplies</div>
@@ -603,7 +608,10 @@ export default function RegisterPage() {
                   data-testid="button-select-platinum"
                 >
                   <Badge className="absolute top-2 right-2 text-xs">Best Value</Badge>
-                  <div className="font-bold text-lg mb-1">Platinum</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Platinum</div>
+                  </div>
                   <div className="text-2xl font-bold text-primary mb-2">$25<span className="text-sm text-muted-foreground">/mo</span></div>
                   <div className="text-xs text-muted-foreground mb-2">4+ medications</div>
                   <div className="text-xs">6-mo & 1-yr supplies</div>

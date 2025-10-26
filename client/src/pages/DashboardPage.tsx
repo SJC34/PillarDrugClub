@@ -27,6 +27,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { PrescriptionRequest } from "@shared/pharmacy-schema";
 import { useAuth } from "@/hooks/useAuth";
+import goldPillarBadge from "@assets/image_1761453675599.png";
+import platinumPillarBadge from "@assets/image_1761453800697.png";
 
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
@@ -491,6 +493,12 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
+                  {user?.subscriptionTier === "gold" && (
+                    <img src={goldPillarBadge} alt="Gold Plan" className="w-10 h-10 object-contain" />
+                  )}
+                  {user?.subscriptionTier === "platinum" && (
+                    <img src={platinumPillarBadge} alt="Platinum Plan" className="w-10 h-10 object-contain" />
+                  )}
                   Your Subscription
                   <Badge variant={user?.subscriptionTier === "free" ? "outline" : "default"}>
                     {user?.subscriptionTier === "free" ? "Free Tier" : 
