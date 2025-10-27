@@ -196,6 +196,53 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     });
   });
 
+  // Email signup endpoint (public - no auth required)
+  app.post("/api/email-signup", async (req, res) => {
+    try {
+      const { email, source, utmSource, utmMedium, utmCampaign } = req.body;
+      
+      // Validate email
+      const emailSchema = z.object({
+        email: z.string().email("Please enter a valid email address"),
+        source: z.string().optional(),
+        utmSource: z.string().optional(),
+        utmMedium: z.string().optional(),
+        utmCampaign: z.string().optional(),
+      });
+      
+      const validatedData = emailSchema.parse(req.body);
+      
+      // Save to database
+      const signup = await storage.createEmailSignup({
+        email: validatedData.email,
+        source: validatedData.source || "landing_page",
+        utmSource: validatedData.utmSource,
+        utmMedium: validatedData.utmMedium,
+        utmCampaign: validatedData.utmCampaign,
+        subscribed: true,
+      });
+      
+      res.json({ 
+        success: true, 
+        message: "Thanks for signing up! We'll keep you posted.",
+        signup 
+      });
+    } catch (error: any) {
+      console.error("Email signup error:", error);
+      if (error.code === '23505') { // Postgres unique violation
+        return res.status(400).json({ 
+          error: "This email is already registered for updates" 
+        });
+      }
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: error.errors[0]?.message || "Invalid email address" 
+        });
+      }
+      res.status(500).json({ error: "Failed to save email signup" });
+    }
+  });
+
   // Update user information (for multi-step registration after social auth)
   app.patch("/api/users/:userId", async (req: any, res) => {
     try {

@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication, orders as ordersTable, prescriptions as prescriptionsTable, referralCodes, referralHistory, referralCredits, type ReferralCode, type ReferralHistory, type ReferralCredit } from "@shared/schema";
+import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication, orders as ordersTable, prescriptions as prescriptionsTable, referralCodes, referralHistory, referralCredits, type ReferralCode, type ReferralHistory, type ReferralCredit, emailSignups } from "@shared/schema";
 import { 
   type Customer, type InsertCustomer,
   type Medication, type InsertMedication, type MedicationSearch,
@@ -123,6 +123,9 @@ export interface IStorage {
   getAvailableReferralCredits(userId: string): Promise<any[]>;
   getAllReferralCodes(): Promise<any[]>;
   getAllReferralCredits(): Promise<any[]>;
+
+  // Email Signups
+  createEmailSignup(signup: any): Promise<any>;
 
   // Dashboard Metrics
   getDashboardMetrics(): Promise<{
@@ -2625,6 +2628,11 @@ export class DbStorage extends MemStorage {
       userFirstName: row.users?.firstName || '',
       userLastName: row.users?.lastName || ''
     }));
+  }
+
+  async createEmailSignup(signup: any): Promise<any> {
+    const result = await db.insert(emailSignups).values(signup).returning();
+    return result[0];
   }
 }
 
