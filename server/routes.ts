@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { z } from "zod";
 import { storage } from "./storage";
-import { insertUserSchema } from "@shared/schema";
+import { insertUserSchema, insertEmailSignupSchema } from "@shared/schema";
 import { setupSocialAuth, isAuthenticated as socialAuthCheck } from "./socialAuth";
 import { 
   insertCustomerSchema, 
@@ -199,27 +199,17 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Email signup endpoint (public - no auth required)
   app.post("/api/email-signup", async (req, res) => {
     try {
-      const { email, source, utmSource, utmMedium, utmCampaign } = req.body;
+      // Validate request body using Zod schema
+      const validatedData = insertEmailSignupSchema.parse(req.body);
       
-      // Validate email
-      const emailSchema = z.object({
-        email: z.string().email("Please enter a valid email address"),
-        source: z.string().optional(),
-        utmSource: z.string().optional(),
-        utmMedium: z.string().optional(),
-        utmCampaign: z.string().optional(),
-      });
-      
-      const validatedData = emailSchema.parse(req.body);
-      
-      // Save to database
+      // Save to database with defaults
       const signup = await storage.createEmailSignup({
         email: validatedData.email,
         source: validatedData.source || "landing_page",
         utmSource: validatedData.utmSource,
         utmMedium: validatedData.utmMedium,
         utmCampaign: validatedData.utmCampaign,
-        subscribed: true,
+        subscribed: validatedData.subscribed ?? true,
       });
       
       res.json({ 
