@@ -43,8 +43,8 @@ import PriceBanner from "@/components/PriceBanner";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={ComingSoonPage} />
-      <Route path="/home" component={HomePage} />
+      <Route path="/" component={HomePage} />
+      <Route path="/coming-soon" component={ComingSoonPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/subscribe" component={SubscriptionPage} />
@@ -86,7 +86,7 @@ function Router() {
 
 function AppContent() {
   const [location] = useLocation();
-  const isComingSoonPage = location === "/";
+  const isComingSoonPage = location === "/coming-soon";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
