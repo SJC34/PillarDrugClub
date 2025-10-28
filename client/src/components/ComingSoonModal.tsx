@@ -92,6 +92,15 @@ export function ComingSoonModal({ open, onOpenChange }: ComingSoonModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-4 top-4 rounded-full"
+          onClick={() => onOpenChange(false)}
+          data-testid="button-close-modal"
+        >
+          <X className="h-4 w-4" />
+        </Button>
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
