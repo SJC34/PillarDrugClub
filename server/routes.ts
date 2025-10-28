@@ -204,7 +204,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       
       // Save to database with defaults
       const signup = await storage.createEmailSignup({
+        name: validatedData.name,
         email: validatedData.email,
+        phone: validatedData.phone,
         source: validatedData.source || "landing_page",
         utmSource: validatedData.utmSource,
         utmMedium: validatedData.utmMedium,
