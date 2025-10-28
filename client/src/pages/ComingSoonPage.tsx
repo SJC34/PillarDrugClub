@@ -100,7 +100,7 @@ export default function ComingSoonPage() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent leading-tight">
               Prescription Medications
               <br />
-              <span className="text-primary">At Wholesale Prices</span>
+              <span className="text-primary">As Low As 1¢ Per Tablet</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Join the waitlist for Pillar Drug Club — your direct access to affordable, 
