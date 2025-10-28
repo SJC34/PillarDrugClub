@@ -12,15 +12,19 @@ import {
   Home, 
   Mail,
   Loader2,
-  Sparkles
+  Sparkles,
+  User,
+  Phone
 } from "lucide-react";
 
 export default function ComingSoonPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const { toast } = useToast();
 
   const signupMutation = useMutation({
-    mutationFn: async (data: { email: string }) => {
+    mutationFn: async (data: { name: string; email: string; phone: string }) => {
       return apiRequest("POST", "/api/email-signup", data);
     },
     onSuccess: () => {
@@ -28,7 +32,9 @@ export default function ComingSoonPage() {
         title: "You're on the list!",
         description: "We'll notify you as soon as Pillar launches.",
       });
+      setName("");
       setEmail("");
+      setPhone("");
     },
     onError: (error: any) => {
       toast({
@@ -41,15 +47,15 @@ export default function ComingSoonPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
+    if (!name || !email || !phone) {
       toast({
         variant: "destructive",
-        title: "Email required",
-        description: "Please enter your email address.",
+        title: "All fields required",
+        description: "Please fill in your name, email, and phone number.",
       });
       return;
     }
-    signupMutation.mutate({ email });
+    signupMutation.mutate({ name, email, phone });
   };
 
   const benefits = [
@@ -111,15 +117,42 @@ export default function ComingSoonPage() {
                   <h3 className="text-lg font-bold text-foreground">Get Early Access</h3>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-3">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={signupMutation.isPending}
-                    className="h-12 text-base"
-                    data-testid="input-email-signup"
-                  />
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={signupMutation.isPending}
+                      className="h-12 text-base pl-10"
+                      data-testid="input-name-signup"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder="Email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={signupMutation.isPending}
+                      className="h-12 text-base pl-10"
+                      data-testid="input-email-signup"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="tel"
+                      placeholder="Phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      disabled={signupMutation.isPending}
+                      className="h-12 text-base pl-10"
+                      data-testid="input-phone-signup"
+                    />
+                  </div>
                   <Button 
                     type="submit" 
                     className="w-full h-12 text-base font-bold"
@@ -137,7 +170,7 @@ export default function ComingSoonPage() {
                   </Button>
                 </form>
                 <p className="text-xs text-muted-foreground mt-3 text-center">
-                  No spam, ever. Unsubscribe anytime.
+                  We'll send you updates about our launch. Unsubscribe anytime.
                 </p>
               </CardContent>
             </Card>
@@ -244,15 +277,42 @@ export default function ComingSoonPage() {
             <Card className="border-2 border-primary/20 shadow-xl">
               <CardContent className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-3">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={signupMutation.isPending}
-                    className="h-12 text-base"
-                    data-testid="input-email-signup-footer"
-                  />
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={signupMutation.isPending}
+                      className="h-12 text-base pl-10"
+                      data-testid="input-name-signup-footer"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder="Email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={signupMutation.isPending}
+                      className="h-12 text-base pl-10"
+                      data-testid="input-email-signup-footer"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="tel"
+                      placeholder="Phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      disabled={signupMutation.isPending}
+                      className="h-12 text-base pl-10"
+                      data-testid="input-phone-signup-footer"
+                    />
+                  </div>
                   <Button 
                     type="submit" 
                     className="w-full h-12 text-base font-bold"
