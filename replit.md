@@ -16,12 +16,12 @@ Preferred communication style: Simple, everyday language.
 - **Frontend**: Utilizes TanStack Query for server state management and caching, and React Hook Form with Zod for form validation.
 - **Backend**: Express.js with TypeScript provides RESTful APIs, backed by a PostgreSQL database with Drizzle ORM.
 - **Authentication & Authorization**: Dual authentication via email/password and Google OAuth (Replit Auth OIDC), using Passport.js for session management and a robust role-based access control system.
-- **Coming Soon Landing Page**: Pre-launch email collection system featuring:
+- **Coming Soon Landing Page**: Pre-launch waitlist collection system featuring:
     - **Modern Landing Page**: Clean, conversion-focused design with hero section, value proposition, pricing teaser, and multiple CTAs
-    - **Email Collection**: Secure email signup with Zod validation, duplicate detection, and database persistence
-    - **Database Schema**: Dedicated email_signups table with UTM tracking support for marketing analytics
-    - **Public API Endpoint**: POST /api/email-signup with comprehensive error handling and validation
-    - **Responsive Design**: Mobile-first approach with gradient backgrounds and modern UI animations
+    - **Contact Collection**: Secure signup form collecting name, email, and phone number with Zod validation, duplicate detection, and database persistence
+    - **Database Schema**: Dedicated email_signups table with name, email, phone fields plus UTM tracking support for marketing analytics
+    - **Public API Endpoint**: POST /api/email-signup with comprehensive error handling, phone format validation, and duplicate email prevention
+    - **Responsive Design**: Mobile-first approach with gradient backgrounds, icon-enhanced inputs, and modern UI animations
     - **Standalone Layout**: Coming soon page renders without app header/navigation for clean presentation
 - **Multi-Step Registration**: A 4-step onboarding process includes social authentication, tier selection, user detail collection, prescription preference selection, and Stripe membership payment (skipped for Free Tier).
 - **Payment Processing**: Integrated Stripe for subscription-based membership with three-tier pricing (Free, Gold $15/month, Platinum $25/month). Free tier users bypass payment and can upgrade anytime.
