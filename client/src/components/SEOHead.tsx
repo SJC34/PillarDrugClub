@@ -70,6 +70,10 @@ export const pharmacySchema = {
   "priceRange": "$",
   "address": {
     "@type": "PostalAddress",
+    "streetAddress": "4701 SW Admiral Way, Unit #336",
+    "addressLocality": "Seattle",
+    "addressRegion": "WA",
+    "postalCode": "98106",
     "addressCountry": "US"
   },
   "email": "support@pillardrugclub.com",
@@ -201,6 +205,10 @@ export const organizationSchema = {
   "foundingDate": "2024",
   "address": {
     "@type": "PostalAddress",
+    "streetAddress": "4701 SW Admiral Way, Unit #336",
+    "addressLocality": "Seattle",
+    "addressRegion": "WA",
+    "postalCode": "98106",
     "addressCountry": "US"
   },
   "contactPoint": {

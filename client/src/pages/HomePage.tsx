@@ -15,7 +15,7 @@ import {
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { ComingSoonModal } from "@/components/ComingSoonModal";
-import { SEOHead, pharmacySchema, medicalWebPageSchema, faqSchema, organizationSchema } from "@/components/SEOHead";
+import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema } from "@/components/SEOHead";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 import joinVideo from "@assets/join-pillar-video.mp4";
 import freePillarBadge from "@assets/image_1761455037188.png";
@@ -38,7 +38,6 @@ export default function HomePage() {
     "@graph": [
       pharmacySchema,
       medicalWebPageSchema,
-      faqSchema,
       organizationSchema
     ]
   };
