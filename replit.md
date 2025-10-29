@@ -25,6 +25,13 @@ Preferred communication style: Simple, everyday language.
     - **Responsive Design**: Mobile-first modal with gradient backgrounds, icon-enhanced inputs, and modern UI animations
     - **Auto-close**: Modal automatically closes 1.5 seconds after successful signup
     - **Standalone Page**: Original coming soon page still available at /coming-soon for direct access
+- **SEO Optimization System**: Comprehensive search engine optimization designed to compete with Mark Cuban Cost Plus Drug Company and Scriptco featuring:
+    - **Dynamic Meta Tags**: SEOHead component with page-specific title, description, keywords, and Open Graph/Twitter Card integration
+    - **Healthcare Schema Markup**: Production-ready JSON-LD structured data including Pharmacy, MedicalWebPage, FAQPage, and Organization schemas (verified data only, no fabricated ratings/phones)
+    - **Keyword Strategy**: Target competitive keywords ("wholesale pricing", "1 cent per tablet", "no insurance needed", "bypass PBMs", "cost plus drugs alternative") while highlighting unique value propositions
+    - **Homepage Content**: Keyword-rich hero section with "As Low As 1¢ Per Tablet" messaging, benefits section emphasizing transparency, FAQ section with schema markup
+    - **Technical SEO**: robots.txt with sitemap reference, sitemap.xml with priority pages, canonical URLs, mobile-friendly meta viewport
+    - **Post-Deploy Validation**: Requires Google Rich Results Test and Search Console monitoring for indexing verification
 - **Multi-Step Registration**: A 4-step onboarding process includes social authentication, tier selection, user detail collection, prescription preference selection, and Stripe membership payment (skipped for Free Tier).
 - **Payment Processing**: Integrated Stripe for subscription-based membership with three-tier pricing (Free, Gold $15/month, Platinum $25/month). Free tier users bypass payment and can upgrade anytime.
 - **PDF Prescription System**: Generates branded PDF prescription request forms with SureScripts pharmacy lookup information and distributes them via email and SMS using PDFKit, Resend, and Twilio. PDFs are structured to guide doctors on writing 6 or 12-month supply prescriptions.
