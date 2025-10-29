@@ -14,6 +14,7 @@ import {
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { ComingSoonModal } from "@/components/ComingSoonModal";
+import { SEOHead, pharmacySchema, medicalWebPageSchema, faqSchema, organizationSchema } from "@/components/SEOHead";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 import joinVideo from "@assets/join-pillar-video.mp4";
 import freePillarBadge from "@assets/image_1761455037188.png";
@@ -30,39 +31,55 @@ export default function HomePage() {
       localStorage.setItem("hasSeenComingSoonModal", "true");
     }
   }, []);
+
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      pharmacySchema,
+      medicalWebPageSchema,
+      faqSchema,
+      organizationSchema
+    ]
+  };
   const benefits = [
-    "Access wholesale prescription pricing",
-    "No insurance required",
-    "Home delivery nationwide", 
-    "Real cost calculator",
-    "Transparent pricing"
+    "Wholesale prescription pricing - as low as 1¢ per tablet",
+    "No insurance required - bypass insurance and PBMs",
+    "Free nationwide home delivery to all 50 states", 
+    "Real cost calculator - know your savings upfront",
+    "100% transparent pricing - no hidden fees ever"
   ];
 
   const features = [
     {
       icon: Calculator,
-      title: "Cost Calculator",
-      description: "Compare real medication costs before you buy"
+      title: "Transparent Cost Calculator",
+      description: "Compare real wholesale medication costs vs retail prices before you buy - see your savings instantly"
     },
     {
       icon: Pill,
-      title: "3,000+ Medications",
-      description: "Access to thousands of prescription medications"
+      title: "3,000+ Generic & Brand Medications",
+      description: "Access thousands of prescription medications at true wholesale cost - chronic medications for diabetes, hypertension, cholesterol & more"
     },
     {
       icon: Home,
-      title: "Home Delivery",
-      description: "Convenient delivery straight to your door"
+      title: "Free Nationwide Home Delivery",
+      description: "Convenient delivery straight to your door in all 50 states - no pharmacy lines, no waiting"
     },
     {
       icon: Shield,
       title: "No Insurance Needed",
-      description: "Direct access to wholesale pricing"
+      description: "Direct wholesale pricing that often beats insurance copays - bypass PBMs and insurance completely"
     }
   ];
 
   return (
     <div className="min-h-screen">
+      <SEOHead
+        title="Pillar Drug Club - Prescription Medications As Low As 1¢ Per Tablet | Wholesale Pharmacy"
+        description="Save up to 95% on prescriptions with Pillar Drug Club. Get medications as low as 1¢ per tablet at true wholesale cost. No insurance needed. Year-supply prescriptions with transparent pricing."
+        canonical="https://pillardrugclub.com"
+        schema={combinedSchema}
+      />
 
       {/* Hero Section */}
       <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
@@ -316,7 +333,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {features.map((feature, idx) => {
               const Icon = feature.icon;
-              const isCalculator = feature.title === "Cost Calculator";
+              const isCalculator = feature.title.includes("Cost Calculator");
               
               const cardContent = (
                 <Card className={`text-center p-4 md:p-6 border-secondary/20 transition-colors ${isCalculator ? 'hover:border-primary/60 hover-elevate cursor-pointer' : 'hover:border-secondary/40'}`}>

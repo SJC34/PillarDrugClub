@@ -1,0 +1,29 @@
+# Robots.txt for Pillar Drug Club
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# High-priority pages for crawling
+Allow: /medications
+Allow: /cost-calculator
+Allow: /register
+Allow: /pricing
+Allow: /refund-policy
+
+# Disallow admin and account-specific pages
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /prescriptions
+Disallow: /refills
+
+# Disallow API endpoints
+Disallow: /api/*
+
+# Sitemap location
+Sitemap: https://pillardrugclub.com/sitemap.xml
