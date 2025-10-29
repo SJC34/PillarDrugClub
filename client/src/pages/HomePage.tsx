@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { 
   DollarSign, 
   Shield, 
@@ -42,41 +43,41 @@ export default function HomePage() {
     ]
   };
   const benefits = [
-    "Wholesale prescription pricing - as low as 1¢ per tablet",
-    "No insurance required - bypass insurance and PBMs",
-    "Free nationwide home delivery to all 50 states", 
-    "Real cost calculator - know your savings upfront",
-    "100% transparent pricing - no hidden fees ever"
+    "Save 90% on prescriptions - medications as low as 1¢ per pill",
+    "No insurance needed - our prices often beat insurance copays",
+    "Free delivery to your door - all 50 states, no extra fees", 
+    "See exact costs upfront - no surprises, no hidden charges",
+    "Same quality medications - just without the pharmacy markup"
   ];
 
   const features = [
     {
       icon: Calculator,
-      title: "Transparent Cost Calculator",
-      description: "Compare real wholesale medication costs vs retail prices before you buy - see your savings instantly"
+      title: "See Exact Costs Before You Order",
+      description: "Use our free calculator to see how much YOU'LL save on YOUR medications - no guessing, no surprises"
     },
     {
       icon: Pill,
-      title: "3,000+ Generic & Brand Medications",
-      description: "Access thousands of prescription medications at true wholesale cost - chronic medications for diabetes, hypertension, cholesterol & more"
+      title: "3,000+ Medications for Common Conditions",
+      description: "Diabetes, high blood pressure, cholesterol, thyroid, depression and more - find your medication at a price you can afford"
     },
     {
       icon: Home,
-      title: "Free Nationwide Home Delivery",
-      description: "Convenient delivery straight to your door in all 50 states - no pharmacy lines, no waiting"
+      title: "Free Delivery to Your Home",
+      description: "No more pharmacy trips or long waits - your medications shipped directly to your door at no extra cost"
     },
     {
       icon: Shield,
-      title: "No Insurance Needed",
-      description: "Direct wholesale pricing that often beats insurance copays - bypass PBMs and insurance completely"
+      title: "Works Without Insurance",
+      description: "Have insurance? Don't need it. No insurance? No problem. Our prices often beat insurance copays anyway."
     }
   ];
 
   return (
     <div className="min-h-screen">
       <SEOHead
-        title="Pillar Drug Club - Prescription Medications As Low As 1¢ Per Tablet | Wholesale Pharmacy"
-        description="Save up to 95% on prescriptions with Pillar Drug Club. Get medications as low as 1¢ per tablet at true wholesale cost. No insurance needed. Year-supply prescriptions with transparent pricing."
+        title="Save 90% on Prescriptions | Get Meds Without Insurance - Pillar Drug Club"
+        description="Can't afford your prescriptions? Get medications for as low as 1¢ per pill. No insurance needed. Free delivery. Save hundreds on diabetes, blood pressure, cholesterol & more."
         canonical="https://pillardrugclub.com"
         schema={combinedSchema}
       />
@@ -85,7 +86,7 @@ export default function HomePage() {
       <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
           {/* Question above carousel */}
-          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Stuck in lines at the pharmacy?</p>
+          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Paying too much for your prescriptions?</p>
           
           {/* Carousel with pharmacy image and video */}
           <div className="mb-8 max-w-2xl mx-auto">
@@ -155,14 +156,13 @@ export default function HomePage() {
           </div>
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Wholesale prescription prices
-            <span className="text-primary block">No insurance required</span>
+            Get Your Meds for Pennies
+            <span className="text-primary block">As Low As 1¢ Per Pill</span>
           </h1>
           <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
-            Join the drug membership saving people thousands of dollars per year!
+            Stop overpaying at traditional pharmacies. No insurance needed.
             <br />
-            Annual medication supplies at true wholesale prices—zero markups, pure savings. 
-            Home delivery nationwide starting at just $15/month.
+            Save 90% on diabetes, blood pressure, cholesterol & more—delivered free to your door.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
@@ -362,6 +362,91 @@ export default function HomePage() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-12 md:py-16 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-4">
+            Common Questions About Saving on Prescriptions
+          </h2>
+          <p className="text-center text-muted-foreground mb-8 md:mb-12 font-bold max-w-2xl mx-auto">
+            Get answers to the questions patients ask most about affording their medications.
+          </p>
+          <Accordion type="single" collapsible className="w-full" data-testid="faq-accordion">
+            <AccordionItem value="item-1" data-testid="faq-item-expensive">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-expensive">
+                Why is my prescription so expensive?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-expensive">
+                Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pillar Drug Club buys directly from wholesalers and passes the true cost to you - as low as 1¢ per pill. We cut out the middlemen so you stop overpaying.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2" data-testid="faq-item-no-insurance">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-no-insurance">
+                Can I get prescriptions without insurance?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-no-insurance">
+                Yes! No insurance needed. Pillar Drug Club offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3" data-testid="faq-item-cost">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-cost">
+                How much will my prescription cost?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cost">
+                Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as 1¢ per tablet. No hidden fees - what you see is what you pay.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4" data-testid="faq-item-save-money">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-save-money">
+                How do I save money on my medications?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
+                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month) and Platinum ($25/month) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-5" data-testid="faq-item-cant-afford">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-cant-afford">
+                What if I can't afford my prescriptions?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cant-afford">
+                Start with our Free Tier - $0/month and only $30 per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6" data-testid="faq-item-delivery">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-delivery">
+                Do you deliver to my home?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-delivery">
+                Yes, free delivery nationwide to all 50 states. Your medications are shipped directly to your door with tracking. No pharmacy trips, no waiting in line.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7" data-testid="faq-item-medications">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-medications">
+                What medications do you carry?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-medications">
+                We have 3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression, and more. Search our catalog to find your specific medication and see the exact cost before you order.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-8" data-testid="faq-item-safe">
+              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-safe">
+                Is this safe and legitimate?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-safe">
+                Yes! We're a licensed pharmacy operating in all 50 states. All medications come from FDA-approved manufacturers through licensed U.S. wholesalers. Same quality medications, just without the markup.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
 

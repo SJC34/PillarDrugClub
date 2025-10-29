@@ -65,9 +65,9 @@ export const pharmacySchema = {
   "@context": "https://schema.org",
   "@type": "Pharmacy",
   "name": "Pillar Drug Club",
-  "description": "Wholesale pharmacy offering prescription medications as low as 1¢ per tablet with transparent pricing and no insurance required",
+  "description": "Get affordable prescription medications as low as 1¢ per pill without insurance. Save 90% on diabetes, blood pressure, cholesterol & more. Free home delivery nationwide.",
   "url": "https://pillardrugclub.com",
-  "priceRange": "$$",
+  "priceRange": "$",
   "address": {
     "@type": "PostalAddress",
     "addressCountry": "US"
@@ -76,31 +76,31 @@ export const pharmacySchema = {
   "availableService": [
     {
       "@type": "MedicalProcedure",
-      "name": "Prescription Medication Dispensing",
-      "description": "Wholesale prescription medications at true cost plus minimal markup"
+      "name": "Cheap Prescriptions Without Insurance",
+      "description": "Save 90% on medications by buying directly at wholesale cost - no insurance needed"
     },
     {
       "@type": "Service",
       "name": "Year Supply Prescriptions",
-      "description": "6-month and 12-month supply prescriptions for chronic medications"
+      "description": "Order 6-month or 12-month medication supplies to save even more money"
     },
     {
       "@type": "DeliveryService",
-      "name": "Nationwide Home Delivery",
-      "description": "Free delivery of prescription medications to all 50 states"
+      "name": "Free Home Delivery",
+      "description": "Your medications shipped directly to your door at no extra cost"
     }
   ],
   "hasOfferCatalog": {
     "@type": "OfferCatalog",
-    "name": "Prescription Medications",
-    "description": "3000+ generic and brand name medications at wholesale pricing",
+    "name": "Affordable Prescription Medications",
+    "description": "3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression and more",
     "itemListElement": [
       {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Product",
-          "name": "Generic Prescription Medications",
-          "description": "Affordable generic medications as low as 1¢ per tablet"
+          "name": "Low Cost Generic Medications",
+          "description": "Common prescriptions as low as 1¢ per pill - save hundreds every month"
         }
       }
     ]
@@ -110,18 +110,18 @@ export const pharmacySchema = {
 export const medicalWebPageSchema = {
   "@context": "https://schema.org",
   "@type": "MedicalWebPage",
-  "name": "Pillar Drug Club - Wholesale Prescription Pharmacy",
-  "description": "Access affordable prescription medications at wholesale prices with transparent pricing",
+  "name": "Pillar Drug Club - Save Money on Prescriptions",
+  "description": "Stop overpaying for prescriptions. Get medications as low as 1¢ per pill without insurance. Free delivery.",
   "url": "https://pillardrugclub.com",
   "specialty": "Pharmacy",
   "about": {
     "@type": "MedicalBusiness",
     "name": "Pillar Drug Club",
-    "description": "Direct-to-consumer wholesale pharmacy"
+    "description": "Affordable prescription pharmacy helping people save money on medications"
   },
   "audience": {
     "@type": "MedicalAudience",
-    "audienceType": "Patients seeking affordable medications",
+    "audienceType": "People who can't afford their prescriptions or want to save money on medications",
     "geographicArea": {
       "@type": "AdministrativeArea",
       "name": "United States"
@@ -136,42 +136,66 @@ export const faqSchema = {
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "How much do prescriptions cost at Pillar Drug Club?",
+      "name": "Why is my prescription so expensive?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Pillar Drug Club offers prescription medications as low as 1¢ per tablet at true wholesale cost. We provide transparent pricing with no hidden fees, and you can save up to 95% compared to traditional pharmacies."
+        "text": "Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pillar Drug Club buys directly from wholesalers and passes the true cost to you - as low as 1¢ per pill. We cut out the middlemen so you stop overpaying."
       }
     },
     {
       "@type": "Question",
-      "name": "Do I need insurance to use Pillar Drug Club?",
+      "name": "Can I get prescriptions without insurance?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No insurance is required! Pillar Drug Club offers wholesale pricing directly to consumers, bypassing insurance and PBMs. Our transparent pricing often beats insurance copays."
+        "text": "Yes! No insurance needed. Pillar Drug Club offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not."
       }
     },
     {
       "@type": "Question",
-      "name": "What membership tiers are available?",
+      "name": "How much will my prescription cost?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "We offer three tiers: Free Tier ($0/month with $30 fee per order, 90-day max supply), Gold Plan ($15/month for 1-3 medications with 6-month and 1-year supplies), and Platinum Plan ($25/month for 4+ medications with 6-month and 1-year supplies)."
+        "text": "Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as 1¢ per tablet. No hidden fees - what you see is what you pay."
       }
     },
     {
       "@type": "Question",
-      "name": "How does delivery work?",
+      "name": "How do I save money on my medications?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Pillar Drug Club provides free nationwide home delivery to all 50 states. Your medications are delivered directly to your door with secure packaging and tracking."
+        "text": "Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month) and Platinum ($25/month) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail."
       }
     },
     {
       "@type": "Question",
-      "name": "What types of medications are available?",
+      "name": "What if I can't afford my prescriptions?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "We offer 3000+ generic and brand name prescription medications covering chronic conditions like diabetes, hypertension, cholesterol, and more. All medications are sourced from licensed wholesalers."
+        "text": "Start with our Free Tier - $0/month and only $30 per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you deliver to my home?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, free delivery nationwide to all 50 states. Your medications are shipped directly to your door with tracking. No pharmacy trips, no waiting in line."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What medications do you carry?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We have 3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression, and more. Search our catalog to find your specific medication and see the exact cost before you order."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this safe and legitimate?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! We're a licensed pharmacy operating in all 50 states. All medications come from FDA-approved manufacturers through licensed U.S. wholesalers. Same quality medications, just without the markup."
       }
     }
   ]
@@ -182,7 +206,7 @@ export const organizationSchema = {
   "@type": "Organization",
   "name": "Pillar Drug Club",
   "url": "https://pillardrugclub.com",
-  "description": "Wholesale pharmacy providing prescription medications at true cost with transparent pricing",
+  "description": "Helping Americans save money on prescriptions with affordable medications as low as 1¢ per pill. No insurance needed.",
   "foundingDate": "2024",
   "contactPoint": {
     "@type": "ContactPoint",
