@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, ShoppingCart, AlertTriangle, Info, Package } from "lucide-react";
+import { SEOHead, createDrugSchema, createBreadcrumbSchema } from "@/components/SEOHead";
 
 interface Medication {
   id: string;
@@ -69,8 +70,39 @@ export default function MedicationDetailsPage() {
     );
   }
 
+  const drugSchema = createDrugSchema({
+    name: medication.name,
+    genericName: medication.genericName,
+    brandName: medication.brandName,
+    description: medication.description,
+    manufacturer: medication.manufacturer,
+    dosageForm: medication.dosageForm,
+    strength: medication.strength,
+    price: medication.price,
+    wholesalePrice: medication.wholesalePrice,
+    isPrescriptionOnly: medication.requiresPrescription,
+    category: medication.category
+  });
+
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "https://pillardrugclub.com" },
+    { name: "Medications", url: "https://pillardrugclub.com/medications" },
+    { name: medication.name, url: `https://pillardrugclub.com/medications/${medication.id}` }
+  ]);
+
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [drugSchema, breadcrumbSchema]
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <SEOHead
+        title={`${medication.name} - Save Up to ${Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}% | Pillar Drug Club`}
+        description={`Get ${medication.genericName} for just $${medication.wholesalePrice.toFixed(2)} - save ${Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}% vs retail. ${medication.description}`}
+        canonical={`https://pillardrugclub.com/medications/${medication.id}`}
+        schema={combinedSchema}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Back Navigation */}
         <div className="mb-6">

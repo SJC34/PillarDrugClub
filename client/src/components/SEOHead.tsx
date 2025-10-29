@@ -215,3 +215,83 @@ export const organizationSchema = {
     "availableLanguage": ["English"]
   }
 };
+
+export interface DrugSchemaProps {
+  name: string;
+  genericName: string;
+  brandName?: string;
+  description: string;
+  manufacturer?: string;
+  dosageForm: string;
+  strength: string;
+  price: number;
+  wholesalePrice: number;
+  isPrescriptionOnly: boolean;
+  category?: string;
+}
+
+export function createDrugSchema(props: DrugSchemaProps) {
+  const savingsPercent = Math.round(((props.price - props.wholesalePrice) / props.price) * 100);
+  
+  return {
+    "@context": "https://schema.org",
+    "@type": "Drug",
+    "name": props.name,
+    "nonProprietaryName": props.genericName,
+    "proprietaryName": props.brandName || props.name,
+    "description": props.description,
+    "dosageForm": props.dosageForm,
+    "strength": props.strength,
+    "manufacturer": props.manufacturer ? {
+      "@type": "Organization",
+      "name": props.manufacturer
+    } : undefined,
+    "isPrescriptionOnly": props.isPrescriptionOnly,
+    "drugClass": props.category,
+    "availableStrength": {
+      "@type": "DrugStrength",
+      "strengthValue": props.strength,
+      "strengthUnit": ""
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": props.wholesalePrice.toFixed(2),
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "seller": {
+        "@type": "Pharmacy",
+        "name": "Pillar Drug Club"
+      },
+      "priceValidUntil": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    },
+    "potentialAction": {
+      "@type": "OrderAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://pillardrugclub.com/register",
+        "actionPlatform": [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform"
+        ]
+      }
+    }
+  };
+}
+
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+export function createBreadcrumbSchema(items: BreadcrumbItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items.map((item, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": item.name,
+      "item": item.url
+    }))
+  };
+}
