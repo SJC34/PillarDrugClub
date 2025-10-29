@@ -93,17 +93,7 @@ export const pharmacySchema = {
   "hasOfferCatalog": {
     "@type": "OfferCatalog",
     "name": "Affordable Prescription Medications",
-    "description": "3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression and more",
-    "itemListElement": [
-      {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Product",
-          "name": "Low Cost Generic Medications",
-          "description": "Common prescriptions as low as 1¢ per pill - save hundreds every month"
-        }
-      }
-    ]
+    "description": "3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression and more"
   }
 };
 
@@ -206,13 +196,19 @@ export const organizationSchema = {
   "@type": "Organization",
   "name": "Pillar Drug Club",
   "url": "https://pillardrugclub.com",
+  "logo": "https://pillardrugclub.com/logo.png",
   "description": "Helping Americans save money on prescriptions with affordable medications as low as 1¢ per pill. No insurance needed.",
   "foundingDate": "2024",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "US"
+  },
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "Customer Service",
+    "telephone": "+1-800-555-0123",
     "email": "support@pillardrugclub.com",
-    "availableLanguage": ["English"]
+    "availableLanguage": "English"
   }
 };
 
