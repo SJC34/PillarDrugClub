@@ -37,6 +37,161 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Pharmacy",
+          "name": "Pillar Drug Club",
+          "description": "Get affordable prescription medications as low as 1¢ per pill without insurance. Save 90% on diabetes, blood pressure, cholesterol & more. Free home delivery nationwide.",
+          "url": "https://pillardrugclub.com",
+          "priceRange": "$",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "US"
+          },
+          "email": "support@pillardrugclub.com",
+          "availableService": [
+            {
+              "@type": "MedicalProcedure",
+              "name": "Cheap Prescriptions Without Insurance",
+              "description": "Save 90% on medications by buying directly at wholesale cost - no insurance needed"
+            },
+            {
+              "@type": "Service",
+              "name": "Year Supply Prescriptions",
+              "description": "Order 6-month or 12-month medication supplies to save even more money"
+            },
+            {
+              "@type": "DeliveryService",
+              "name": "Free Home Delivery",
+              "description": "Your medications shipped directly to your door at no extra cost"
+            }
+          ],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Affordable Prescription Medications",
+            "description": "3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression and more",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Product",
+                  "name": "Low Cost Generic Medications",
+                  "description": "Common prescriptions as low as 1¢ per pill - save hundreds every month"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "@type": "MedicalWebPage",
+          "name": "Pillar Drug Club - Save Money on Prescriptions",
+          "description": "Stop overpaying for prescriptions. Get medications as low as 1¢ per pill without insurance. Free delivery.",
+          "url": "https://pillardrugclub.com",
+          "specialty": "Pharmacy",
+          "about": {
+            "@type": "MedicalBusiness",
+            "name": "Pillar Drug Club",
+            "description": "Affordable prescription pharmacy helping people save money on medications"
+          },
+          "audience": {
+            "@type": "MedicalAudience",
+            "audienceType": "People who can't afford their prescriptions or want to save money on medications",
+            "geographicArea": {
+              "@type": "AdministrativeArea",
+              "name": "United States"
+            }
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Why is my prescription so expensive?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pillar Drug Club buys directly from wholesalers and passes the true cost to you - as low as 1¢ per pill. We cut out the middlemen so you stop overpaying."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I get prescriptions without insurance?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! No insurance needed. Pillar Drug Club offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How much will my prescription cost?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as 1¢ per tablet. No hidden fees - what you see is what you pay."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I save money on my medications?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month) and Platinum ($25/month) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What if I can't afford my prescriptions?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Start with our Free Tier - $0/month and only $30 per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do you deliver to my home?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, free delivery nationwide to all 50 states. Your medications are shipped directly to your door with tracking. No pharmacy trips, no waiting in line."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What medications do you carry?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We have 3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression, and more. Search our catalog to find your specific medication and see the exact cost before you order."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is this safe and legitimate?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! We're a licensed pharmacy operating in all 50 states. All medications come from FDA-approved manufacturers through licensed U.S. wholesalers. Same quality medications, just without the markup."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "Organization",
+          "name": "Pillar Drug Club",
+          "url": "https://pillardrugclub.com",
+          "description": "Helping Americans save money on prescriptions with affordable medications as low as 1¢ per pill. No insurance needed.",
+          "foundingDate": "2024",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Service",
+            "email": "support@pillardrugclub.com",
+            "availableLanguage": ["English"]
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
