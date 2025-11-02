@@ -62,15 +62,23 @@ Preferred communication style: Simple, everyday language.
     - **Reports & Analytics**: Comprehensive reporting with charts and export options.
     - **Medication Pricing Management**: Bulk medication price updates via CSV upload with robust validation.
     - **Referral Monitoring**: Oversight for the member referral program with fraud detection and analytics.
-    - **AI Blog Manager**: OpenAI-powered content generation system for SEO-optimized blog posts featuring:
-        - **AI Content Generation**: GPT-4 powered blog post creation with customizable topic, category (medications/pharmacy-news/healthcare-savings/general), tone (professional/friendly/educational/conversational), keywords, and target length (short/medium/long)
-        - **SEO Optimization**: Automatically generates seoTitle (max 60 chars), seoDescription (max 160 chars), seoKeywords array, and content tags optimized for search engines
-        - **Blog Management**: Full CRUD operations for blog posts with draft/published status, view count tracking, and category filtering
-        - **Admin Interface**: Dedicated /admin/blog page with three views: post list, AI generator, and editor with real-time preview
-        - **Public Blog Pages**: /blog index page with search/filtering and /blog/:slug individual post pages with complete SEO meta tags
-        - **Structured Data**: JSON-LD schema markup for BlogPosting, Open Graph tags, Twitter Cards, and canonical URLs for maximum SEO impact
-        - **Security**: Admin-only access for generation/editing via /api/blog/posts, public read-only access via /api/blog/posts/published
-        - **Database Schema**: blog_posts table with title, slug, content, excerpt, category, tags, seoTitle, seoDescription, seoKeywords, status, publishedAt, viewCount, aiGenerated flag, and generationPrompt tracking
+    - **Hybrid Blog System**: Dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG):
+        - **Architecture**: Two-service system with Node.js backend (port 5000) for general content and Python FastAPI service (port 8001) for medical RAG
+        - **General AI Blog** (TypeScript/GPT-4):
+            - Topic, category, tone, keywords, and target length customization
+            - SEO optimization: auto-generates seoTitle (max 60 chars), seoDescription (max 160 chars), seoKeywords
+            - Instant generation for pharmacy news, healthcare savings, general wellness topics
+        - **Medical RAG Blog** (Python FastAPI):
+            - **Vector Store**: FAISS-based RAG with OpenAI text-embedding-3-small embeddings
+            - **FDA Source Ingestion**: Whitelisted US sources (FDA.gov, CDC.gov, NIH.gov), SPL section parsing, 400-900 token chunks
+            - **Retrieval**: k=20 similarity search with freshness filters, required section validation (BOXED_WARNING, CONTRAINDICATIONS, etc.)
+            - **Content Generation**: FDA-compliant prompts, numbered citations [1][2][3], safety sections, fair balance (benefits + risks)
+            - **Compliance Guardrails**: Off-label detection, US-only validation, minimum 3-5 citations, disclaimer enforcement
+            - **Review Workflow**: Async job processing → compliance policy report → manual admin checklist → approval → publishing
+        - **Admin Interface**: /admin/blog with dual blog type selector, job polling for RAG generation, compliance review UI with required checkboxes
+        - **Database Schema**: blog_posts (general), medical_blog_posts (RAG with compliance metadata), document_chunks (vector store)
+        - **Public Pages**: /blog index with search/filtering, /blog/:slug with complete SEO, schema.org MedicalWebPage markup for medical posts
+        - **Security**: Admin-only generation/editing, public read-only access, proper CORS for FastAPI service
 - **System Design Choices**: Emphasizes modularity, scalability, and security for sensitive healthcare data, utilizing serverless PostgreSQL and asynchronous communication.
 
 ## External Dependencies
@@ -86,4 +94,4 @@ Preferred communication style: Simple, everyday language.
 - **Healthcare Provider Database**: NLM Clinical Tables NPI database API.
 - **Medication Data**: SJC Pharmacy pricing CSV file, openFDA Drug Label API.
 - **Communication Services**: Twilio (SMS), Resend (email).
-- **AI Content Generation**: OpenAI GPT-4 for automated blog post creation with SEO optimization.
+- **AI Content Generation**: OpenAI GPT-4 for general blog content (TypeScript backend), Python FastAPI RAG service for FDA-compliant medical content.
