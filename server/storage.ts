@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication, orders as ordersTable, prescriptions as prescriptionsTable, referralCodes, referralHistory, referralCredits, type ReferralCode, type ReferralHistory, type ReferralCredit, emailSignups } from "@shared/schema";
+import { type User, type InsertUser, type UpsertUser, users, medications as medicationsTable, type Medication as DBMedication, type InsertMedication as DBInsertMedication, orders as ordersTable, prescriptions as prescriptionsTable, referralCodes, referralHistory, referralCredits, type ReferralCode, type ReferralHistory, type ReferralCredit, emailSignups, blogPosts } from "@shared/schema";
 import { 
   type Customer, type InsertCustomer,
   type Medication, type InsertMedication, type MedicationSearch,
@@ -126,6 +126,16 @@ export interface IStorage {
 
   // Email Signups
   createEmailSignup(signup: any): Promise<any>;
+
+  // Blog Posts
+  getBlogPost(id: string): Promise<any | undefined>;
+  getBlogPostBySlug(slug: string): Promise<any | undefined>;
+  getAllBlogPosts(filters?: { status?: string; category?: string; page?: number; limit?: number }): Promise<{ posts: any[]; total: number }>;
+  getPublishedBlogPosts(filters?: { category?: string; page?: number; limit?: number }): Promise<{ posts: any[]; total: number }>;
+  createBlogPost(post: any): Promise<any>;
+  updateBlogPost(id: string, updates: any): Promise<any | undefined>;
+  deleteBlogPost(id: string): Promise<boolean>;
+  incrementBlogPostViews(id: string): Promise<void>;
 
   // Dashboard Metrics
   getDashboardMetrics(): Promise<{
@@ -2633,6 +2643,91 @@ export class DbStorage extends MemStorage {
   async createEmailSignup(signup: any): Promise<any> {
     const result = await db.insert(emailSignups).values(signup).returning();
     return result[0];
+  }
+
+  // Blog Posts
+  async getBlogPost(id: string): Promise<any | undefined> {
+    const result = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return result[0];
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<any | undefined> {
+    const result = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return result[0];
+  }
+
+  async getAllBlogPosts(filters?: { status?: string; category?: string; page?: number; limit?: number }): Promise<{ posts: any[]; total: number }> {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 20;
+    const offset = (page - 1) * limit;
+
+    let query = db.select().from(blogPosts).$dynamic();
+    
+    if (filters?.status) {
+      query = query.where(eq(blogPosts.status, filters.status as any));
+    }
+    if (filters?.category) {
+      query = query.where(eq(blogPosts.category, filters.category as any));
+    }
+
+    const posts = await query
+      .orderBy(desc(blogPosts.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Get total count
+    const totalQuery = db.select().from(blogPosts).$dynamic();
+    if (filters?.status) {
+      totalQuery.where(eq(blogPosts.status, filters.status as any));
+    }
+    if (filters?.category) {
+      totalQuery.where(eq(blogPosts.category, filters.category as any));
+    }
+    const totalResult = await totalQuery;
+    
+    return { posts, total: totalResult.length };
+  }
+
+  async getPublishedBlogPosts(filters?: { category?: string; page?: number; limit?: number }): Promise<{ posts: any[]; total: number }> {
+    return this.getAllBlogPosts({ ...filters, status: 'published' });
+  }
+
+  async createBlogPost(post: any): Promise<any> {
+    // Generate slug from title
+    const slug = post.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    
+    const result = await db.insert(blogPosts).values({
+      ...post,
+      slug,
+      publishedAt: post.status === 'published' ? new Date() : null
+    }).returning();
+    return result[0];
+  }
+
+  async updateBlogPost(id: string, updates: any): Promise<any | undefined> {
+    const result = await db.update(blogPosts)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+        publishedAt: updates.status === 'published' && !updates.publishedAt ? new Date() : updates.publishedAt
+      })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteBlogPost(id: string): Promise<boolean> {
+    const result = await db.delete(blogPosts).where(eq(blogPosts.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async incrementBlogPostViews(id: string): Promise<void> {
+    await db.update(blogPosts)
+      .set({ viewCount: sql`${blogPosts.viewCount} + 1` })
+      .where(eq(blogPosts.id, id));
   }
 }
 

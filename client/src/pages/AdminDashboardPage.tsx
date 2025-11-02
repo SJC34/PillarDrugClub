@@ -16,7 +16,8 @@ import {
   BarChart3,
   Mail,
   Upload,
-  Gift
+  Gift,
+  PenTool
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -331,6 +332,22 @@ export default function AdminDashboardPage() {
                     <div>
                       <p className="font-semibold text-foreground">Referral Monitoring</p>
                       <p className="text-sm text-muted-foreground">Track codes & fraud detection</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/blog">
+              <Card className="hover-elevate cursor-pointer transition-all border-2 border-indigo-200" data-testid="card-blog-management">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-indigo-100 rounded-lg">
+                      <PenTool className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">AI Blog Manager</p>
+                      <p className="text-sm text-muted-foreground">Generate SEO content with AI</p>
                     </div>
                   </div>
                 </CardContent>

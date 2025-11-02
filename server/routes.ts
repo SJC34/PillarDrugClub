@@ -3382,4 +3382,168 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       res.status(500).json({ error: "Failed to send email", message: error.message });
     }
   });
+
+  // ==========================
+  // BLOG POST ROUTES (AI-POWERED)
+  // ==========================
+
+  // Get all blog posts (admin - all statuses, public - published only)
+  app.get("/api/blog/posts", async (req: any, res) => {
+    try {
+      const isAdmin = req.isAuthenticated() && req.user?.role === "admin";
+      const { status, category, page, limit } = req.query;
+      
+      let posts;
+      if (isAdmin) {
+        posts = await storage.getAllBlogPosts({
+          status,
+          category,
+          page: page ? parseInt(page) : undefined,
+          limit: limit ? parseInt(limit) : undefined
+        });
+      } else {
+        posts = await storage.getPublishedBlogPosts({
+          category,
+          page: page ? parseInt(page) : undefined,
+          limit: limit ? parseInt(limit) : undefined
+        });
+      }
+      
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  // Get single blog post by slug
+  app.get("/api/blog/posts/:slug", async (req, res) => {
+    try {
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      if (!post) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      // Increment view count
+      await storage.incrementBlogPostViews(post.id);
+      
+      res.json(post);
+    } catch (error) {
+      console.error("Error fetching blog post:", error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+
+  // Generate blog post with AI (admin only)
+  app.post("/api/blog/generate", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { topic, category, tone, keywords, targetLength } = req.body;
+      
+      if (!topic || !category) {
+        return res.status(400).json({ error: "Topic and category are required" });
+      }
+
+      // Import AI module
+      const { generateBlogPost } = await import("./blog-ai");
+      
+      const generatedContent = await generateBlogPost({
+        topic,
+        category,
+        tone,
+        keywords,
+        targetLength
+      });
+      
+      res.json(generatedContent);
+    } catch (error: any) {
+      console.error("Error generating blog post:", error);
+      res.status(500).json({ error: "Failed to generate blog post", message: error.message });
+    }
+  });
+
+  // Create blog post (admin only)
+  app.post("/api/blog/posts", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const postData = {
+        ...req.body,
+        authorId: req.user.id,
+        authorName: `${req.user.firstName} ${req.user.lastName}`
+      };
+      
+      const post = await storage.createBlogPost(postData);
+      res.json(post);
+    } catch (error: any) {
+      console.error("Error creating blog post:", error);
+      res.status(500).json({ error: "Failed to create blog post", message: error.message });
+    }
+  });
+
+  // Update blog post (admin only)
+  app.patch("/api/blog/posts/:id", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const post = await storage.updateBlogPost(req.params.id, req.body);
+      if (!post) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      res.json(post);
+    } catch (error: any) {
+      console.error("Error updating blog post:", error);
+      res.status(500).json({ error: "Failed to update blog post", message: error.message });
+    }
+  });
+
+  // Delete blog post (admin only)
+  app.delete("/api/blog/posts/:id", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const success = await storage.deleteBlogPost(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting blog post:", error);
+      res.status(500).json({ error: "Failed to delete blog post", message: error.message });
+    }
+  });
+
+  // Generate SEO metadata for existing content (admin only)
+  app.post("/api/blog/seo-metadata", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { title, content } = req.body;
+      
+      if (!title || !content) {
+        return res.status(400).json({ error: "Title and content are required" });
+      }
+
+      const { generateSEOMetadata } = await import("./blog-ai");
+      const metadata = await generateSEOMetadata(title, content);
+      
+      res.json(metadata);
+    } catch (error: any) {
+      console.error("Error generating SEO metadata:", error);
+      res.status(500).json({ error: "Failed to generate SEO metadata", message: error.message });
+    }
+  });
 }
