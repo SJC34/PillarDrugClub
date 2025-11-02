@@ -24,6 +24,8 @@ import AdminReportsPage from "@/pages/AdminReportsPage";
 import AdminMedicationPricingPage from "@/pages/AdminMedicationPricingPage";
 import AdminReferralsPage from "@/pages/AdminReferralsPage";
 import AdminBlogPage from "@/pages/AdminBlogPage";
+import BlogPage from "@/pages/BlogPage";
+import BlogPostPage from "@/pages/BlogPostPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
@@ -75,6 +77,8 @@ function Router() {
       <Route path="/refund-policy" component={RefundPolicyPage} />
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route path="/terms-of-service" component={TermsOfServicePage} />
+      <Route path="/blog" component={BlogPage} />
+      <Route path="/blog/:slug" component={BlogPostPage} />
       <Route path="/cart" component={CartPage} />
       <Route path="/checkout" component={CheckoutPage} />
       <Route path="/orders" component={OrdersPage} />
