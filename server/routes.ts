@@ -3449,11 +3449,20 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Generate blog post with AI (admin only)
   app.post("/api/blog/generate", async (req: any, res) => {
     try {
-      if (!req.isAuthenticated() || req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Admin access required" });
+      console.log("📝 Blog generation request received");
+      
+      if (!req.isAuthenticated()) {
+        console.log("❌ User not authenticated");
+        return res.status(403).json({ error: "Authentication required", message: "Please log in to continue" });
+      }
+      
+      if (req.user?.role !== "admin") {
+        console.log("❌ User not admin:", req.user?.role);
+        return res.status(403).json({ error: "Admin access required", message: "Only admins can generate blog posts" });
       }
 
       const { topic, category, tone, keywords, targetLength } = req.body;
+      console.log("📝 Generation params:", { topic, category, tone, keywords, targetLength });
       
       if (!topic || !category) {
         return res.status(400).json({ error: "Topic and category are required" });
@@ -3462,6 +3471,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       // Import AI module
       const { generateBlogPost } = await import("./blog-ai");
       
+      console.log("🤖 Calling OpenAI to generate blog post...");
       const generatedContent = await generateBlogPost({
         topic,
         category,
@@ -3470,10 +3480,19 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         targetLength
       });
       
+      console.log("✅ Blog post generated successfully");
       res.json(generatedContent);
     } catch (error: any) {
-      console.error("Error generating blog post:", error);
-      res.status(500).json({ error: "Failed to generate blog post", message: error.message });
+      console.error("❌ Error generating blog post:", error);
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.split('\n').slice(0, 3).join('\n')
+      });
+      res.status(500).json({ 
+        error: "Failed to generate blog post", 
+        message: error.message || "Unknown error occurred. Please check server logs." 
+      });
     }
   });
 
