@@ -58,16 +58,26 @@ interface GeneratedContent {
 
 export default function AdminBlogPage() {
   const { toast } = useToast();
-  const [view, setView] = useState<"list" | "generate" | "edit">("list");
+  const [view, setView] = useState<"list" | "generate" | "edit" | "medical-review">("list");
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
-  // AI Generation Form State
+  // Blog Type Selection
+  const [blogType, setBlogType] = useState<"general" | "medical">("general");
+
+  // AI Generation Form State (General)
   const [topic, setTopic] = useState("");
   const [category, setCategory] = useState("");
   const [tone, setTone] = useState("professional");
   const [keywords, setKeywords] = useState("");
   const [targetLength, setTargetLength] = useState("medium");
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
+
+  // Medical RAG State
+  const [medicalTopic, setMedicalTopic] = useState("");
+  const [minCitations, setMinCitations] = useState(5);
+  const [medicalJobId, setMedicalJobId] = useState<string | null>(null);
+  const [medicalJobStatus, setMedicalJobStatus] = useState<any>(null);
+  const [pollingInterval, setPollingInterval] = useState<any>(null);
 
   // Edit Form State
   const [editTitle, setEditTitle] = useState("");
@@ -197,23 +207,110 @@ export default function AdminBlogPage() {
     },
   });
 
-  const handleGenerate = () => {
-    if (!topic || !category) {
+  // Medical RAG: Start generation
+  const medicalGenerateMutation = useMutation({
+    mutationFn: async (data: { topic: string; min_citations: number }) => {
+      const response = await fetch("http://localhost:8001/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || "Failed to start generation");
+      }
+      return response.json();
+    },
+    onSuccess: (data: { job_id: string; status: string }) => {
+      setMedicalJobId(data.job_id);
       toast({
-        title: "Missing Information",
-        description: "Please provide a topic and category",
+        title: "Medical Content Generation Started",
+        description: "Generating FDA-compliant content. This may take 1-2 minutes...",
+      });
+      // Start polling for job status
+      startJobPolling(data.job_id);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to start medical content generation",
         variant: "destructive",
       });
-      return;
-    }
+    },
+  });
 
-    generateMutation.mutate({
-      topic,
-      category,
-      tone,
-      keywords: keywords ? keywords.split(",").map(k => k.trim()) : undefined,
-      targetLength,
-    });
+  // Poll for medical job status
+  const startJobPolling = (jobId: string) => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`http://localhost:8001/api/generate/jobs/${jobId}`);
+        if (!response.ok) {
+          clearInterval(interval);
+          return;
+        }
+        const status = await response.json();
+        setMedicalJobStatus(status);
+        
+        if (status.status === "completed" || status.status === "failed") {
+          clearInterval(interval);
+          setPollingInterval(null);
+          
+          if (status.status === "completed") {
+            toast({
+              title: "Medical Content Generated!",
+              description: "Review compliance report before publishing",
+            });
+            setView("medical-review");
+          } else {
+            toast({
+              title: "Generation Failed",
+              description: status.error_message || "Medical content generation failed",
+              variant: "destructive",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+        clearInterval(interval);
+      }
+    }, 3000); // Poll every 3 seconds
+    
+    setPollingInterval(interval);
+  };
+
+  const handleGenerate = () => {
+    if (blogType === "general") {
+      if (!topic || !category) {
+        toast({
+          title: "Missing Information",
+          description: "Please provide a topic and category",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      generateMutation.mutate({
+        topic,
+        category,
+        tone,
+        keywords: keywords ? keywords.split(",").map(k => k.trim()) : undefined,
+        targetLength,
+      });
+    } else {
+      if (!medicalTopic) {
+        toast({
+          title: "Missing Information",
+          description: "Please provide a topic for medical content",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      medicalGenerateMutation.mutate({
+        topic: medicalTopic,
+        min_citations: minCitations,
+      });
+    }
   };
 
   const handleSave = (status: "draft" | "published") => {
@@ -405,90 +502,177 @@ export default function AdminBlogPage() {
                   <Sparkles className="h-5 w-5 text-indigo-600" />
                   AI Content Generator
                 </CardTitle>
-                <CardDescription>Tell us what you want to write about and let AI do the work</CardDescription>
+                <CardDescription>Choose your content type and let AI generate SEO-optimized posts</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="topic">Topic *</Label>
-                  <Input
-                    id="topic"
-                    placeholder="e.g., Benefits of Metformin for Type 2 Diabetes"
-                    value={topic}
-                    onChange={(e) => setTopic(e.target.value)}
-                    data-testid="input-topic"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger id="category" data-testid="select-category">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="medications">Medications</SelectItem>
-                      <SelectItem value="pharmacy-news">Pharmacy News</SelectItem>
-                      <SelectItem value="healthcare-savings">Healthcare Savings</SelectItem>
-                      <SelectItem value="general">General</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="tone">Tone</Label>
-                  <Select value={tone} onValueChange={setTone}>
-                    <SelectTrigger id="tone" data-testid="select-tone">
+                  <Label htmlFor="blog-type">Blog Type *</Label>
+                  <Select value={blogType} onValueChange={(value: "general" | "medical") => setBlogType(value)}>
+                    <SelectTrigger id="blog-type" data-testid="select-blog-type">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="professional">Professional</SelectItem>
-                      <SelectItem value="friendly">Friendly</SelectItem>
-                      <SelectItem value="educational">Educational</SelectItem>
-                      <SelectItem value="conversational">Conversational</SelectItem>
+                      <SelectItem value="general">General AI (Healthcare Content)</SelectItem>
+                      <SelectItem value="medical">Medical RAG (FDA-Compliant)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {blogType === "general" 
+                      ? "General healthcare topics, news, and savings tips" 
+                      : "FDA-approved medication information with strict compliance"}
+                  </p>
                 </div>
 
-                <div>
-                  <Label htmlFor="keywords">Keywords (comma-separated)</Label>
-                  <Input
-                    id="keywords"
-                    placeholder="e.g., diabetes, metformin, blood sugar"
-                    value={keywords}
-                    onChange={(e) => setKeywords(e.target.value)}
-                    data-testid="input-keywords"
-                  />
-                </div>
+                {blogType === "general" ? (
+                  <>
+                    <div>
+                      <Label htmlFor="topic">Topic *</Label>
+                      <Input
+                        id="topic"
+                        placeholder="e.g., Top 5 Ways to Save on Prescriptions"
+                        value={topic}
+                        onChange={(e) => setTopic(e.target.value)}
+                        data-testid="input-topic"
+                      />
+                    </div>
 
-                <div>
-                  <Label htmlFor="targetLength">Target Length</Label>
-                  <Select value={targetLength} onValueChange={setTargetLength}>
-                    <SelectTrigger id="targetLength" data-testid="select-length">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="short">Short (500-800 words)</SelectItem>
-                      <SelectItem value="medium">Medium (800-1200 words)</SelectItem>
-                      <SelectItem value="long">Long (1200-1800 words)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div>
+                      <Label htmlFor="category">Category *</Label>
+                      <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger id="category" data-testid="select-category">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="medications">Medications</SelectItem>
+                          <SelectItem value="pharmacy-news">Pharmacy News</SelectItem>
+                          <SelectItem value="healthcare-savings">Healthcare Savings</SelectItem>
+                          <SelectItem value="general">General</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                <Button
-                  onClick={handleGenerate}
-                  disabled={generateMutation.isPending}
-                  className="w-full"
-                  data-testid="button-generate"
-                >
-                  {generateMutation.isPending ? (
-                    <>Generating...</>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Generate Content
-                    </>
-                  )}
-                </Button>
+                    <div>
+                      <Label htmlFor="tone">Tone</Label>
+                      <Select value={tone} onValueChange={setTone}>
+                        <SelectTrigger id="tone" data-testid="select-tone">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="professional">Professional</SelectItem>
+                          <SelectItem value="friendly">Friendly</SelectItem>
+                          <SelectItem value="educational">Educational</SelectItem>
+                          <SelectItem value="conversational">Conversational</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+                      <Input
+                        id="keywords"
+                        placeholder="e.g., diabetes, metformin, blood sugar"
+                        value={keywords}
+                        onChange={(e) => setKeywords(e.target.value)}
+                        data-testid="input-keywords"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="targetLength">Target Length</Label>
+                      <Select value={targetLength} onValueChange={setTargetLength}>
+                        <SelectTrigger id="targetLength" data-testid="select-length">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="short">Short (500-800 words)</SelectItem>
+                          <SelectItem value="medium">Medium (800-1200 words)</SelectItem>
+                          <SelectItem value="long">Long (1200-1800 words)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={generateMutation.isPending}
+                      className="w-full"
+                      data-testid="button-generate"
+                    >
+                      {generateMutation.isPending ? (
+                        <>Generating...</>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Generate Content
+                        </>
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <Label htmlFor="medical-topic">Medication Topic *</Label>
+                      <Input
+                        id="medical-topic"
+                        placeholder="e.g., Metformin for Type 2 Diabetes"
+                        value={medicalTopic}
+                        onChange={(e) => setMedicalTopic(e.target.value)}
+                        data-testid="input-medical-topic"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Must be based on FDA-approved labeling
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="min-citations">Minimum Citations</Label>
+                      <Select value={minCitations.toString()} onValueChange={(val) => setMinCitations(parseInt(val))}>
+                        <SelectTrigger id="min-citations" data-testid="select-min-citations">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="3">3 citations</SelectItem>
+                          <SelectItem value="5">5 citations (recommended)</SelectItem>
+                          <SelectItem value="7">7 citations</SelectItem>
+                          <SelectItem value="10">10 citations</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="border rounded-md p-3 bg-muted/30">
+                      <h4 className="text-sm font-semibold mb-2">FDA Compliance Requirements:</h4>
+                      <ul className="text-xs text-muted-foreground space-y-1">
+                        <li>✓ US sources only (FDA, CDC, NIH)</li>
+                        <li>✓ Citations for all claims</li>
+                        <li>✓ Safety sections required</li>
+                        <li>✓ No off-label uses</li>
+                        <li>✓ Fair balance (benefits + risks)</li>
+                      </ul>
+                    </div>
+
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={medicalGenerateMutation.isPending || !!medicalJobId}
+                      className="w-full"
+                      data-testid="button-generate-medical"
+                    >
+                      {medicalGenerateMutation.isPending || medicalJobStatus?.status === "generating" ? (
+                        <>Generating FDA-Compliant Content...</>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Generate Medical Content
+                        </>
+                      )}
+                    </Button>
+
+                    {medicalJobStatus && medicalJobStatus.status === "generating" && (
+                      <div className="text-sm text-muted-foreground text-center">
+                        <Clock className="h-4 w-4 inline mr-2 animate-spin" />
+                        Processing... This may take 1-2 minutes
+                      </div>
+                    )}
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -667,6 +851,146 @@ export default function AdminBlogPage() {
                       setView("list");
                     }}
                     data-testid="button-cancel"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Medical Compliance Review */}
+        {view === "medical-review" && medicalJobStatus && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Medical Content Review</CardTitle>
+                <CardDescription>Review FDA compliance before publishing</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Compliance Status */}
+                {medicalJobStatus.policy_report && (
+                  <div className={`border rounded-md p-4 ${medicalJobStatus.policy_report.passed ? 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'}`}>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2">
+                      {medicalJobStatus.policy_report.passed ? (
+                        <><CheckCircle className="h-5 w-5 text-green-600" /> Compliance Passed</>
+                      ) : (
+                        <><Clock className="h-5 w-5 text-red-600" /> Compliance Issues Detected</>
+                      )}
+                    </h3>
+                    
+                    <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Citations:</span>
+                        <span className="font-semibold ml-2">{medicalJobStatus.policy_report.citation_count}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Citation Density:</span>
+                        <span className="font-semibold ml-2">{medicalJobStatus.policy_report.citation_density.toFixed(2)} per 150 words</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">US Sources Only:</span>
+                        <Badge variant={medicalJobStatus.policy_report.us_sources_only ? "default" : "destructive"}>
+                          {medicalJobStatus.policy_report.us_sources_only ? "Yes" : "No"}
+                        </Badge>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Safety Sections:</span>
+                        <Badge variant={medicalJobStatus.policy_report.has_safety_sections ? "default" : "destructive"}>
+                          {medicalJobStatus.policy_report.has_safety_sections ? "Present" : "Missing"}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {medicalJobStatus.policy_report.failures?.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">Policy Violations:</h4>
+                        <ul className="text-sm space-y-1">
+                          {medicalJobStatus.policy_report.failures.map((failure: string, idx: number) => (
+                            <li key={idx} className="text-red-600 dark:text-red-400">• {failure}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {medicalJobStatus.policy_report.warnings?.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold text-yellow-600 dark:text-yellow-400 mb-2">Warnings:</h4>
+                        <ul className="text-sm space-y-1">
+                          {medicalJobStatus.policy_report.warnings.map((warning: string, idx: number) => (
+                            <li key={idx} className="text-yellow-600 dark:text-yellow-400">• {warning}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Content Preview */}
+                <div>
+                  <Label className="text-sm font-semibold">Generated Content:</Label>
+                  <div className="mt-2 p-4 border rounded-md bg-muted/20 max-h-96 overflow-y-auto">
+                    <div dangerouslySetInnerHTML={{ __html: medicalJobStatus.content_html || "" }} />
+                  </div>
+                </div>
+
+                {/* Manual Approval (if compliance passed) */}
+                {medicalJobStatus.policy_report?.passed && (
+                  <div className="space-y-4 border-t pt-4">
+                    <h4 className="font-semibold">Final Compliance Checklist</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Review the generated content manually and confirm all requirements are met:
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" id="check-boxed" className="rounded" data-testid="checkbox-boxed-warning" />
+                        <Label htmlFor="check-boxed" className="text-sm">Boxed warning included (if applicable)</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" id="check-contraindications" className="rounded" data-testid="checkbox-contraindications" />
+                        <Label htmlFor="check-contraindications" className="text-sm">Contraindications section present</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" id="check-us-sources" className="rounded" data-testid="checkbox-us-sources" />
+                        <Label htmlFor="check-us-sources" className="text-sm">All sources are US-based (FDA/CDC/NIH)</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" id="check-no-off-label" className="rounded" data-testid="checkbox-no-off-label" />
+                        <Label htmlFor="check-no-off-label" className="text-sm">No off-label uses mentioned</Label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4">
+                  {medicalJobStatus.policy_report?.passed ? (
+                    <Button
+                      onClick={() => {
+                        setEditTitle(medicalTopic);
+                        setEditContent(medicalJobStatus.content_html || "");
+                        setEditCategory("medications");
+                        setView("edit");
+                      }}
+                      data-testid="button-approve-and-edit"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Approve & Continue to Editor
+                    </Button>
+                  ) : (
+                    <p className="text-sm text-destructive">
+                      Content cannot be published due to compliance violations. Please regenerate with a different topic or parameters.
+                    </p>
+                  )}
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setMedicalJobId(null);
+                      setMedicalJobStatus(null);
+                      setView("list");
+                    }}
+                    data-testid="button-cancel-review"
                   >
                     Cancel
                   </Button>
