@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from sqlmodel import Session, select
 import httpx
 from datetime import datetime
@@ -13,8 +13,23 @@ from app.settings import settings
 router = APIRouter(prefix="/ingest", tags=["ingestion"])
 
 
+def get_session():
+    from app.main import engine
+    with Session(engine) as session:
+        yield session
+
+
+def get_vector_store():
+    from app.main import _vector_store
+    return _vector_store
+
+
 @router.post("/url", response_model=IngestURLResponse)
-async def ingest_url(request: IngestURLRequest, db: Session, vector_store: VectorStore):
+async def ingest_url(
+    request: IngestURLRequest,
+    db: Session = Depends(get_session),
+    vector_store: VectorStore = Depends(get_vector_store)
+):
     """Ingest document from whitelisted URL"""
     
     # Validate whitelist
@@ -112,8 +127,8 @@ async def ingest_url(request: IngestURLRequest, db: Session, vector_store: Vecto
 @router.post("/upload", response_model=IngestURLResponse)
 async def ingest_upload(
     file: UploadFile = File(...),
-    db: Session = None,
-    vector_store: VectorStore = None
+    db: Session = Depends(get_session),
+    vector_store: VectorStore = Depends(get_vector_store)
 ):
     """Upload and ingest PDF or HTML file"""
     

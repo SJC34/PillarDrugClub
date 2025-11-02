@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from sqlmodel import Session, select
 from datetime import datetime
 import uuid
@@ -16,6 +16,12 @@ from app.settings import settings
 
 router = APIRouter(prefix="/generate", tags=["generation"])
 client = OpenAI(api_key=settings.openai_api_key)
+
+
+def get_session():
+    from app.main import engine
+    with Session(engine) as session:
+        yield session
 
 
 FDA_SYSTEM_PROMPT = """You are a US medical writer constrained to FDA-approved labeling and US clinical guidelines only.
@@ -176,7 +182,7 @@ def generate_schema_markup(topic: str, html_content: str, citations: List[dict])
 async def generate_post(
     request: GenerateRequest,
     background_tasks: BackgroundTasks,
-    db: Session
+    db: Session = Depends(get_session)
 ):
     """Start medical blog post generation job"""
     
@@ -203,7 +209,7 @@ async def generate_post(
 
 
 @router.get("/jobs/{job_id}", response_model=JobStatusResponse)
-async def get_job_status(job_id: str, db: Session):
+async def get_job_status(job_id: str, db: Session = Depends(get_session)):
     """Get status and result of generation job"""
     
     post = db.exec(select(MedicalBlogPost).where(MedicalBlogPost.job_id == job_id)).first()
@@ -224,7 +230,7 @@ async def get_job_status(job_id: str, db: Session):
 
 
 @router.post("/review", status_code=200)
-async def review_post(request: ReviewChecklistRequest, db: Session):
+async def review_post(request: ReviewChecklistRequest, db: Session = Depends(get_session)):
     """Admin review checklist approval"""
     
     post = db.exec(select(MedicalBlogPost).where(MedicalBlogPost.id == request.post_id)).first()
@@ -251,7 +257,7 @@ async def review_post(request: ReviewChecklistRequest, db: Session):
 
 
 @router.post("/publish", status_code=200)
-async def publish_post(request: PublishRequest, db: Session):
+async def publish_post(request: PublishRequest, db: Session = Depends(get_session)):
     """Publish approved post to static HTML"""
     
     post = db.exec(select(MedicalBlogPost).where(MedicalBlogPost.id == request.post_id)).first()

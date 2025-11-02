@@ -77,13 +77,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers with dependency injection
-ingest.router.dependencies.append(Depends(get_session))
-ingest.router.dependencies.append(Depends(get_vector_store))
-retrieve.router.dependencies.append(Depends(get_session))
-retrieve.router.dependencies.append(Depends(get_vector_store))
-generate.router.dependencies.append(Depends(get_session))
-
+# Include routers  
+# Dependencies are now injected at route level using Depends()
 app.include_router(ingest.router, prefix="/api")
 app.include_router(retrieve.router, prefix="/api")
 app.include_router(generate.router, prefix="/api")

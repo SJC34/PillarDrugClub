@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session, select, or_
 from datetime import datetime, timedelta
 from typing import List
@@ -10,8 +10,23 @@ from app.settings import settings
 router = APIRouter(prefix="/retrieve", tags=["retrieval"])
 
 
+def get_session():
+    from app.main import engine
+    with Session(engine) as session:
+        yield session
+
+
+def get_vector_store():
+    from app.main import _vector_store
+    return _vector_store
+
+
 @router.post("", response_model=RetrieveResponse)
-async def retrieve_chunks(request: RetrieveRequest, db: Session, vector_store: VectorStore):
+async def retrieve_chunks(
+    request: RetrieveRequest,
+    db: Session = Depends(get_session),
+    vector_store: VectorStore = Depends(get_vector_store)
+):
     """
     Retrieve relevant document chunks using vector similarity search.
     Filters by freshness and required sections.
