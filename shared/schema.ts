@@ -397,3 +397,47 @@ export const insertEmailSignupSchema = createInsertSchema(emailSignups).omit({
 
 export type InsertEmailSignup = z.infer<typeof insertEmailSignupSchema>;
 export type EmailSignup = typeof emailSignups.$inferSelect;
+
+// Blog posts table - for SEO content generation
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  content: text("content").notNull(), // Full markdown/HTML content
+  excerpt: text("excerpt"), // Short summary for previews
+  authorId: varchar("author_id").references(() => users.id, { onDelete: "set null" }),
+  authorName: text("author_name"), // Cached author name
+  category: text("category", { 
+    enum: ["medications", "pharmacy-news", "healthcare-savings", "insurance", "general"] 
+  }).notNull().default("general"),
+  tags: text("tags").array().default(sql`'{}'::text[]`),
+  featuredImage: text("featured_image"),
+  seoTitle: text("seo_title"), // Custom SEO title (max 60 chars)
+  seoDescription: text("seo_description"), // Meta description (max 160 chars)
+  seoKeywords: text("seo_keywords").array().default(sql`'{}'::text[]`),
+  status: text("status", { enum: ["draft", "published", "archived"] }).default("draft"),
+  publishedAt: timestamp("published_at"),
+  viewCount: integer("view_count").default(0),
+  aiGenerated: boolean("ai_generated").default(false), // Track AI-generated content
+  generationPrompt: text("generation_prompt"), // Store the prompt used
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  slug: true, // Auto-generated from title
+  authorName: true, // Auto-populated
+  viewCount: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  title: z.string().min(10, "Title must be at least 10 characters").max(200, "Title too long"),
+  content: z.string().min(100, "Content must be at least 100 characters"),
+  excerpt: z.string().max(300, "Excerpt too long").optional(),
+  seoTitle: z.string().max(60, "SEO title must be 60 characters or less").optional(),
+  seoDescription: z.string().max(160, "SEO description must be 160 characters or less").optional(),
+});
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
