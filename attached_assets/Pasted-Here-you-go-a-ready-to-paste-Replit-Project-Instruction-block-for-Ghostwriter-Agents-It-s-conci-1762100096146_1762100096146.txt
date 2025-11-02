@@ -1,0 +1,126 @@
+Here you go — a ready-to-paste Replit “Project Instruction” block for Ghostwriter/Agents. It’s concise, comprehensive, and production-oriented.
+
+⸻
+
+Project Instructions — FDA/US-Guideline Blog Generator (RAG)
+
+Goal
+Build a medical blog generator that creates SEO-optimized, patient-friendly posts only from FDA labels and US clinical guidelines. Output must be source-grounded with citations and pass safety/compliance checks.
+
+Tech Stack
+	•	Backend: FastAPI (Python)
+	•	Vector DB: FAISS or Chroma
+	•	DB: SQLite (SQLModel)
+	•	LLM: OpenAI (configurable), fallback Ollama
+	•	Embeddings: text-embedding-3-small (or local bge-small-en)
+	•	Frontend: Admin UI (React/Vite + Tailwind) or Jinja templates
+	•	Storage: local /data for sources/chunks/posts
+
+Repository Structure
+
+/app
+  /api {ingest.py, retrieve.py, generate.py, seo.py, guardrails.py, models.py, settings.py, main.py}
+  /services {chunker.py, vectors.py, cleaners.py, citations.py, compliance.py}
+  /ui/admin {React app}
+  /tests {test_ingest.py, test_guardrails.py, test_generate.py, test_seo.py}
+.env.example
+README.md
+
+Source Policy (US-only, whitelist REQUIRED)
+dailymed.nlm.nih.gov, fda.gov, cdc.gov, nih.gov, uspreventiveservicestaskforce.org, ahrq.gov, idsociety.org, acog.org, diabetes.org
+
+Reject non-whitelisted domains at ingest and retrieval.
+
+Ingestion (API)
+	•	POST /api/ingest/url {url} (must be whitelisted)
+	•	POST /api/ingest/upload (PDF/HTML)
+	•	Parse FDA SPL sections: Indications/Usage, Dosage & Administration, Boxed Warning, Contraindications, Warnings/Precautions, Adverse Reactions, Drug Interactions, Use in Specific Populations.
+	•	Chunk size 400–900 tokens (with overlap).
+	•	Store chunk metadata: {title, url, domain, section, published_date, text, tokens, sha256}.
+	•	Nightly job: refresh DailyMed “most recent” (optional).
+
+Retrieval (API)
+	•	POST /api/retrieve {query, k=10, min_chunks=3, max_age_years=5, required_sections?}
+	•	Require ≥3 chunks from whitelisted domains; filter by freshness; return chunks + metadata.
+
+Generation (RAG)
+	•	POST /api/generate {topic, min_citations=5} → returns job_id
+	•	GET /api/jobs/{id} → status/result
+	•	System Prompt (use verbatim):
+
+You are a US medical writer constrained to FDA-approved labeling and US clinical guidelines only.
+Cite every factual claim with numbered markers like [1], [2] and list full sources (title, org, date, URL).
+No off-label claims. No dosing beyond label/guideline. US spelling/terms only.
+Sections (in order):
+- H1 Title
+- Summary (3–4 sentences)
+- Indications (label-based)
+- Safety (Boxed Warning, Contraindications, Warnings/Precautions)
+- Side Effects (common per label)
+- Interactions (major classes/notable)
+- Who Should Not Use (contraindications)
+- FAQs (3–5; each answer must cite)
+- Sources (numbered with titles + URLs)
+Add footer: “Last reviewed: YYYY-MM-DD. Reviewer: PharmD.” and “Educational only; not medical advice.”
+
+
+	•	Compose prompt with a Context block of top 10 retrieved chunks (title/org/date/URL/section/excerpt).
+	•	Fail with 422 “insufficient evidence” if <3 valid chunks.
+
+Guardrails (must pass or 422)
+	•	Off-label detector: if indications not in retrieved label → reject.
+	•	Fair balance: if Indications present, require Safety + Side Effects + Interactions sections populated.
+	•	US-only validation: all citations must be whitelisted domains.
+	•	Citation density: ≥1 citation per ~150 words; FAQs must cite.
+	•	Disclaimer: ensure “Educational only; not medical advice.” present.
+	•	Return a policy report (pass/fail reasons, triggered rules).
+
+SEO & E-E-A-T
+	•	Generate schema.org MedicalWebPage (or Article) + FAQPage JSON-LD: author, reviewedBy, datePublished, dateModified, citation (URLs).
+	•	HTML with semantic H1/H2, internal link placeholders (e.g., /drugs/{slug}, /pricing).
+	•	Footer: “Reviewed by PharmD” + last reviewed date.
+
+Admin Dashboard
+	•	Generate by topic; filters: source selection, freshness (≤5y), min citations.
+	•	Show draft HTML + citations + policy report.
+	•	Required reviewer checkbox: “Boxed Warning included”, “Contraindications included”, “US sources only”, “No off-label”.
+	•	Approve & publish static HTML.
+	•	Routes:
+
+GET /api/posts/{id}
+POST /api/seo/preview {post_id}
+POST /api/publish {post_id, path}
+
+
+
+Environment (.env.example)
+
+OPENAI_API_KEY=
+LLM_PROVIDER=openai|ollama
+EMBEDDINGS_PROVIDER=openai|local
+WHITELIST_DOMAINS=dailymed.nlm.nih.gov,fda.gov,cdc.gov,nih.gov,uspreventiveservicestaskforce.org,ahrq.gov,idsociety.org,acog.org,diabetes.org
+CHUNK_MIN_TOKENS=400
+CHUNK_MAX_TOKENS=900
+MIN_RETRIEVED_CHUNKS=3
+FRESHNESS_YEARS=5
+
+Tests (must pass)
+	•	test_ingest.py: reject non-whitelist; extract SPL sections; chunk bounds.
+	•	test_guardrails.py: block off-label; require safety sections; citation density.
+	•	test_generate.py: fail on insufficient evidence; pass with citations.
+	•	test_seo.py: valid schema JSON; FAQPage included.
+
+Acceptance Criteria
+	•	Generates posts only from whitelisted US sources with proper citations.
+	•	Includes FDA safety sections (Boxed Warning, Contraindications, AEs, Interactions).
+	•	Adds schema.org + FAQ schema; includes “Educational only; not medical advice.”
+	•	Admin can review and publish; outputs valid HTML with reviewer + date.
+
+Deliverables
+	•	Running FastAPI app with /docs
+	•	Admin dashboard
+	•	Seed fixtures (e.g., metformin, semaglutide labels; one CDC guideline)
+
+Command
+
+Build this project end-to-end per the spec above.

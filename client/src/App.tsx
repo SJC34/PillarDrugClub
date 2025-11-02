@@ -23,6 +23,7 @@ import AdminCommunicationsPage from "@/pages/AdminCommunicationsPage";
 import AdminReportsPage from "@/pages/AdminReportsPage";
 import AdminMedicationPricingPage from "@/pages/AdminMedicationPricingPage";
 import AdminReferralsPage from "@/pages/AdminReferralsPage";
+import AdminBlogPage from "@/pages/AdminBlogPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import OrderDetailsPage from "@/pages/OrderDetailsPage";
@@ -60,6 +61,7 @@ function Router() {
       <Route path="/admin/reports" component={AdminReportsPage} />
       <Route path="/admin/pricing" component={AdminMedicationPricingPage} />
       <Route path="/admin/referrals" component={AdminReferralsPage} />
+      <Route path="/admin/blog" component={AdminBlogPage} />
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/my-list" component={MyMedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
