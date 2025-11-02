@@ -62,6 +62,15 @@ Preferred communication style: Simple, everyday language.
     - **Reports & Analytics**: Comprehensive reporting with charts and export options.
     - **Medication Pricing Management**: Bulk medication price updates via CSV upload with robust validation.
     - **Referral Monitoring**: Oversight for the member referral program with fraud detection and analytics.
+    - **AI Blog Manager**: OpenAI-powered content generation system for SEO-optimized blog posts featuring:
+        - **AI Content Generation**: GPT-4 powered blog post creation with customizable topic, category (medications/pharmacy-news/healthcare-savings/general), tone (professional/friendly/educational/conversational), keywords, and target length (short/medium/long)
+        - **SEO Optimization**: Automatically generates seoTitle (max 60 chars), seoDescription (max 160 chars), seoKeywords array, and content tags optimized for search engines
+        - **Blog Management**: Full CRUD operations for blog posts with draft/published status, view count tracking, and category filtering
+        - **Admin Interface**: Dedicated /admin/blog page with three views: post list, AI generator, and editor with real-time preview
+        - **Public Blog Pages**: /blog index page with search/filtering and /blog/:slug individual post pages with complete SEO meta tags
+        - **Structured Data**: JSON-LD schema markup for BlogPosting, Open Graph tags, Twitter Cards, and canonical URLs for maximum SEO impact
+        - **Security**: Admin-only access for generation/editing via /api/blog/posts, public read-only access via /api/blog/posts/published
+        - **Database Schema**: blog_posts table with title, slug, content, excerpt, category, tags, seoTitle, seoDescription, seoKeywords, status, publishedAt, viewCount, aiGenerated flag, and generationPrompt tracking
 - **System Design Choices**: Emphasizes modularity, scalability, and security for sensitive healthcare data, utilizing serverless PostgreSQL and asynchronous communication.
 
 ## External Dependencies
@@ -77,3 +86,4 @@ Preferred communication style: Simple, everyday language.
 - **Healthcare Provider Database**: NLM Clinical Tables NPI database API.
 - **Medication Data**: SJC Pharmacy pricing CSV file, openFDA Drug Label API.
 - **Communication Services**: Twilio (SMS), Resend (email).
+- **AI Content Generation**: OpenAI GPT-4 for automated blog post creation with SEO optimization.

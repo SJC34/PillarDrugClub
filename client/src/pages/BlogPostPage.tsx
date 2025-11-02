@@ -17,8 +17,9 @@ interface BlogPost {
   category: string;
   tags: string[];
   authorName: string;
-  metaDescription: string | null;
-  metaKeywords: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoKeywords: string[];
   publishedAt: string | null;
   createdAt: string;
   viewCount: number;
@@ -78,27 +79,68 @@ export default function BlogPostPage() {
     );
   }
 
+  const canonicalUrl = `https://pillardrugclub.com/blog/${post.slug}`;
+  const seoTitle = post.seoTitle || post.title;
+  const seoDescription = post.seoDescription || post.excerpt || "";
+
+  // Structured Data for SEO (JSON-LD)
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "alternativeHeadline": seoTitle,
+    "description": seoDescription,
+    "author": {
+      "@type": "Person",
+      "name": post.authorName
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Pillar Drug Club",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://pillardrugclub.com/logo.png"
+      }
+    },
+    "datePublished": post.publishedAt || post.createdAt,
+    "dateModified": post.createdAt,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": canonicalUrl
+    },
+    "keywords": post.seoKeywords.join(", ")
+  };
+
   return (
     <>
       <Helmet>
-        <title>{post.title} | Pillar Drug Club</title>
-        <meta name="description" content={post.metaDescription || post.excerpt || ""} />
-        {post.metaKeywords && <meta name="keywords" content={post.metaKeywords} />}
+        <title>{seoTitle} | Pillar Drug Club</title>
+        <meta name="description" content={seoDescription} />
+        {post.seoKeywords.length > 0 && <meta name="keywords" content={post.seoKeywords.join(", ")} />}
+        <link rel="canonical" href={canonicalUrl} />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="article" />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.metaDescription || post.excerpt || ""} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:site_name" content="Pillar Drug Club" />
         <meta property="article:published_time" content={post.publishedAt || post.createdAt} />
         <meta property="article:author" content={post.authorName} />
+        <meta property="article:section" content={categoryLabels[post.category] || post.category} />
         {post.tags.map((tag) => (
           <meta key={tag} property="article:tag" content={tag} />
         ))}
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.metaDescription || post.excerpt || ""} />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDescription} />
+        
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-background">

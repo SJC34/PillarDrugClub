@@ -50,9 +50,10 @@ interface GeneratedContent {
   title: string;
   content: string;
   excerpt: string;
-  metaDescription: string;
-  metaKeywords: string[];
-  suggestedTags: string[];
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string[];
+  tags: string[];
 }
 
 export default function AdminBlogPage() {
@@ -106,12 +107,12 @@ export default function AdminBlogPage() {
     },
     onSuccess: (data: GeneratedContent) => {
       setGeneratedContent(data);
-      setEditTitle(data.title);
+      setEditTitle(data.seoTitle || data.title);
       setEditContent(data.content);
       setEditExcerpt(data.excerpt);
-      setEditMetaDescription(data.metaDescription);
-      setEditMetaKeywords(data.metaKeywords.join(", "));
-      setEditTags(data.suggestedTags.join(", "));
+      setEditMetaDescription(data.seoDescription || data.excerpt);
+      setEditMetaKeywords(data.seoKeywords.join(", "));
+      setEditTags(data.tags.join(", "));
       setEditCategory(category);
       toast({
         title: "Content Generated!",
@@ -499,8 +500,16 @@ export default function AdminBlogPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Title</Label>
-                    <p className="font-semibold">{generatedContent.title}</p>
+                    <Label className="text-xs text-muted-foreground">SEO Title</Label>
+                    <p className="font-semibold text-sm">{generatedContent.seoTitle}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Display Title</Label>
+                    <p className="text-sm">{generatedContent.title}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">SEO Description</Label>
+                    <p className="text-sm">{generatedContent.seoDescription}</p>
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">Excerpt</Label>
@@ -508,14 +517,22 @@ export default function AdminBlogPage() {
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">Content Preview</Label>
-                    <div className="text-sm text-muted-foreground max-h-48 overflow-y-auto border rounded-md p-3">
-                      {generatedContent.content.substring(0, 500)}...
+                    <div className="text-sm text-muted-foreground max-h-32 overflow-y-auto border rounded-md p-3">
+                      {generatedContent.content.substring(0, 400)}...
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">SEO Keywords</Label>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {generatedContent.seoKeywords.map((keyword, idx) => (
+                        <Badge key={idx} variant="outline">{keyword}</Badge>
+                      ))}
                     </div>
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">Suggested Tags</Label>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {generatedContent.suggestedTags.map((tag, idx) => (
+                      {generatedContent.tags.map((tag, idx) => (
                         <Badge key={idx} variant="secondary">{tag}</Badge>
                       ))}
                     </div>

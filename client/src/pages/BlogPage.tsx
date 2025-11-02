@@ -26,8 +26,9 @@ export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const { data: posts, isLoading } = useQuery<BlogPost[]>({
-    queryKey: ["/api/blog/posts"],
+  const { data: posts, isLoading, error } = useQuery<BlogPost[]>({
+    queryKey: ["/api/blog/posts/published"],
+    retry: 1,
   });
 
   const filteredPosts = posts?.filter((post) => {
@@ -91,6 +92,17 @@ export default function BlogPage() {
         {isLoading ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Loading articles...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground mb-4">Unable to load articles. Please try again later.</p>
+            <Button
+              variant="outline"
+              onClick={() => window.location.reload()}
+              data-testid="button-reload"
+            >
+              Reload Page
+            </Button>
           </div>
         ) : !filteredPosts || filteredPosts.length === 0 ? (
           <div className="text-center py-12">

@@ -3387,31 +3387,43 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // BLOG POST ROUTES (AI-POWERED)
   // ==========================
 
-  // Get all blog posts (admin - all statuses, public - published only)
+  // Get all blog posts (admin only - all statuses)
   app.get("/api/blog/posts", async (req: any, res) => {
     try {
-      const isAdmin = req.isAuthenticated() && req.user?.role === "admin";
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
       const { status, category, page, limit } = req.query;
       
-      let posts;
-      if (isAdmin) {
-        posts = await storage.getAllBlogPosts({
-          status,
-          category,
-          page: page ? parseInt(page) : undefined,
-          limit: limit ? parseInt(limit) : undefined
-        });
-      } else {
-        posts = await storage.getPublishedBlogPosts({
-          category,
-          page: page ? parseInt(page) : undefined,
-          limit: limit ? parseInt(limit) : undefined
-        });
-      }
+      const posts = await storage.getAllBlogPosts({
+        status,
+        category,
+        page: page ? parseInt(page) : undefined,
+        limit: limit ? parseInt(limit) : undefined
+      });
       
       res.json(posts);
     } catch (error) {
       console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  // Get published blog posts (public)
+  app.get("/api/blog/posts/published", async (req, res) => {
+    try {
+      const { category, page, limit } = req.query;
+      
+      const posts = await storage.getPublishedBlogPosts({
+        category,
+        page: page ? parseInt(page) : undefined,
+        limit: limit ? parseInt(limit) : undefined
+      });
+      
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching published blog posts:", error);
       res.status(500).json({ error: "Failed to fetch blog posts" });
     }
   });
