@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pill, Phone, MapPin, User, Save, ArrowLeft, Calendar, CreditCard, AlertTriangle, Mail } from "lucide-react";
+import { Pill, Phone, MapPin, User, Save, ArrowLeft, Calendar, CreditCard, AlertTriangle, Mail, LogOut } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,6 +34,10 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSignOut = () => {
+    window.location.href = "/api/logout";
+  };
 
   const form = useForm<SettingsForm>({
     resolver: zodResolver(settingsSchema),
@@ -327,6 +331,39 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Account Actions */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <User className="h-5 w-5 text-primary" />
+                Account Actions
+              </CardTitle>
+              <CardDescription className="text-sm md:text-base">
+                Manage your account security
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 border rounded-md">
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">
+                    Sign Out
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Sign out of your account on this device
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={handleSignOut}
+                  data-testid="button-sign-out-settings"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           <Separator className="my-6" />
 

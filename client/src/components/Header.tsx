@@ -1,11 +1,31 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon, Pill } from "lucide-react";
+import { Menu, X, Sun, Moon, Pill, User, LogOut, Settings } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { user, isAuthenticated } = useAuth();
+
+  const handleSignOut = () => {
+    window.location.href = "/api/logout";
+  };
+
+  const getUserInitials = () => {
+    if (!user?.firstName || !user?.lastName) return "U";
+    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  };
 
   const navigation = [
     { name: "MEDICATIONS", href: "/medications" },
@@ -57,7 +77,7 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Right side - Dark mode toggle and auth buttons */}
+          {/* Right side - Dark mode toggle and auth buttons/user menu */}
           <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
@@ -72,18 +92,71 @@ export default function Header() {
               )}
             </Button>
             
-            <div className="hidden md:flex items-center space-x-3">
-              <a href="/login">
-                <Button variant="ghost" size="sm" className="font-bold" data-testid="button-login">
-                  SIGN IN
-                </Button>
-              </a>
-              <a href="/register">
-                <Button size="sm" className="font-bold px-4" data-testid="button-signup">
-                  GET STARTED
-                </Button>
-              </a>
-            </div>
+            {isAuthenticated ? (
+              <div className="hidden md:flex items-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="gap-2 hover-elevate" data-testid="button-user-menu">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {getUserInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-bold text-sm">
+                        {user?.firstName} {user?.lastName}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <a href="/settings" className="cursor-pointer" data-testid="menu-item-settings">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Account Settings
+                      </a>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <a href="/dashboard" className="cursor-pointer" data-testid="menu-item-dashboard">
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </a>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleSignOut}
+                      className="cursor-pointer text-destructive focus:text-destructive"
+                      data-testid="menu-item-sign-out"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center space-x-3">
+                <a href="/login">
+                  <Button variant="ghost" size="sm" className="font-bold" data-testid="button-login">
+                    SIGN IN
+                  </Button>
+                </a>
+                <a href="/register">
+                  <Button size="sm" className="font-bold px-4" data-testid="button-signup">
+                    GET STARTED
+                  </Button>
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
@@ -116,16 +189,53 @@ export default function Header() {
                   ))}
                 </div>
                 <div className="px-6 py-6 border-t border-teal-700 space-y-3">
-                  <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" data-testid="mobile-button-login">
-                      SIGN IN
-                    </Button>
-                  </a>
-                  <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full font-bold !bg-white !text-teal-600 hover:!bg-teal-50" data-testid="mobile-button-signup">
-                      GET STARTED
-                    </Button>
-                  </a>
+                  {isAuthenticated ? (
+                    <>
+                      <div className="flex items-center gap-3 mb-4 px-4">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className="bg-white text-teal-600 font-bold">
+                            {getUserInitials()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-bold !text-white text-sm">
+                            {user?.firstName} {user?.lastName}
+                          </p>
+                          <p className="text-xs !text-teal-100">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+                      <a href="/settings" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" data-testid="mobile-button-settings">
+                          <Settings className="mr-2 h-4 w-4" />
+                          ACCOUNT SETTINGS
+                        </Button>
+                      </a>
+                      <Button 
+                        onClick={handleSignOut}
+                        variant="outline" 
+                        className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" 
+                        data-testid="mobile-button-sign-out"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        SIGN OUT
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <a href="/login" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" data-testid="mobile-button-login">
+                          SIGN IN
+                        </Button>
+                      </a>
+                      <a href="/register" onClick={() => setIsMenuOpen(false)}>
+                        <Button className="w-full font-bold !bg-white !text-teal-600 hover:!bg-teal-50" data-testid="mobile-button-signup">
+                          GET STARTED
+                        </Button>
+                      </a>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
