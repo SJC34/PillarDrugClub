@@ -26,12 +26,14 @@ export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const { data: posts, isLoading, error } = useQuery<BlogPost[]>({
+  const { data, isLoading, error } = useQuery<{ posts: BlogPost[] }>({
     queryKey: ["/api/blog/posts/published"],
     retry: 1,
   });
 
-  const filteredPosts = posts?.filter((post) => {
+  const posts = data?.posts || [];
+
+  const filteredPosts = posts.filter((post) => {
     const matchesSearch = 
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());

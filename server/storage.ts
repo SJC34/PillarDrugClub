@@ -11,7 +11,7 @@ import {
 } from "@shared/pharmacy-schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq, and, or, asc, desc } from "drizzle-orm";
+import { eq, and, or, asc, desc, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 // modify the interface with any CRUD methods
