@@ -8,7 +8,7 @@ import Autoplay from "embla-carousel-autoplay";
 import type { BlogPost } from "@shared/schema";
 
 export function BlogCarousel() {
-  const { data: posts, isLoading } = useQuery<BlogPost[]>({
+  const { data, isLoading, isError, error, refetch } = useQuery<{ posts: BlogPost[] }>({
     queryKey: ["/api/blog/posts/published"],
     queryFn: async () => {
       const response = await fetch("/api/blog/posts/published?limit=6");
@@ -17,6 +17,8 @@ export function BlogCarousel() {
     },
   });
 
+  const posts = data?.posts || [];
+
   if (isLoading) {
     return (
       <section className="py-12 md:py-16 px-4 sm:px-6">
@@ -24,6 +26,24 @@ export function BlogCarousel() {
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold mb-2">Latest Healthcare Insights</h2>
             <p className="text-muted-foreground font-bold">Loading articles...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (isError) {
+    return (
+      <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">Latest Healthcare Insights</h2>
+            <p className="text-muted-foreground font-bold mb-4">
+              Unable to load articles at this time.
+            </p>
+            <Button onClick={() => refetch()} variant="outline" data-testid="button-retry-blog-posts">
+              Try Again
+            </Button>
           </div>
         </div>
       </section>
@@ -72,7 +92,7 @@ export function BlogCarousel() {
           <CarouselContent className="-ml-2 md:-ml-4">
             {posts.map((post) => (
               <CarouselItem key={post.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                <Link href={`/blog/${post.slug}`}>
+                <Link href={`/blog/${post.slug}`} data-testid={`link-blog-post-${post.id}`}>
                   <Card className="h-full hover-elevate cursor-pointer" data-testid={`card-blog-post-${post.id}`}>
                     {post.featuredImage && (
                       <div className="aspect-video w-full overflow-hidden rounded-t-lg">
