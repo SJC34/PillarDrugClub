@@ -177,11 +177,11 @@ export default function Header() {
             <div className="fixed inset-0 z-[100] bg-black/50" onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
             <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-[101] bg-primary" data-testid="mobile-menu-panel">
               <div className="flex flex-col h-full">
-                <div className="px-6 py-4 border-b border-primary-foreground/20">
+                <div className="px-6 py-4 border-b border-teal-700/30">
                   <div className="flex items-center gap-2">
-                    <a href="/" className="text-xl font-black flex items-center gap-2 text-white hover:text-white/90 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                    <a href="/" className="text-xl font-black flex items-center gap-2 text-teal-800 hover:text-teal-900 transition-colors" onClick={() => setIsMenuOpen(false)}>
                       pillar drug club
-                      <Pill className="h-5 w-5 text-white" />
+                      <Pill className="h-5 w-5 text-teal-800" />
                     </a>
                   </div>
                 </div>
@@ -193,39 +193,39 @@ export default function Header() {
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
-                      <Button className="w-full justify-center text-lg font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6">
+                      <Button className="w-full justify-center text-lg font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3">
                         {item.name}
                       </Button>
                     </a>
                   ))}
                 </div>
-                <div className="px-6 py-6 border-t border-primary-foreground/20 space-y-4">
+                <div className="px-6 py-6 border-t border-teal-700/30 space-y-4">
                   {isAuthenticated ? (
                     <>
                       <div className="flex items-center gap-3 mb-4 px-4">
                         <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-white text-primary font-bold">
+                          <AvatarFallback className="bg-teal-700 text-white font-bold">
                             {getUserInitials()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-bold text-white text-sm">
+                          <p className="font-bold text-teal-800 text-sm">
                             {user?.firstName} {user?.lastName}
                           </p>
-                          <p className="text-xs text-teal-100">
+                          <p className="text-xs text-teal-700">
                             {user?.email}
                           </p>
                         </div>
                       </div>
                       <a href="/settings" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full justify-center font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6" data-testid="mobile-button-settings">
+                        <Button className="w-full justify-center font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3" data-testid="mobile-button-settings">
                           <Settings className="mr-2 h-4 w-4" />
                           ACCOUNT SETTINGS
                         </Button>
                       </a>
                       <Button 
                         onClick={handleSignOut}
-                        className="w-full justify-center font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6" 
+                        className="w-full justify-center font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3" 
                         data-testid="mobile-button-sign-out"
                       >
                         <LogOut className="mr-2 h-4 w-4" />
@@ -235,12 +235,12 @@ export default function Header() {
                   ) : (
                     <>
                       <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full justify-center font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6" data-testid="mobile-button-login">
+                        <Button className="w-full justify-center font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3" data-testid="mobile-button-login">
                           SIGN IN
                         </Button>
                       </a>
                       <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full justify-center font-bold bg-white text-primary hover:bg-teal-50 border-0 py-6" data-testid="mobile-button-signup">
+                        <Button className="w-full justify-center font-bold bg-white/90 text-primary hover:bg-white/80 border-0 py-3" data-testid="mobile-button-signup">
                           GET STARTED
                         </Button>
                       </a>
