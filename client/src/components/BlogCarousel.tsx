@@ -24,7 +24,7 @@ export function BlogCarousel() {
       <section className="py-12 md:py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">The Pillar Post</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">The Pillar Post 🗞️</h2>
             <p className="text-muted-foreground font-bold">Loading articles...</p>
           </div>
         </div>
@@ -37,7 +37,7 @@ export function BlogCarousel() {
       <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">The Pillar Post</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">The Pillar Post 🗞️</h2>
             <p className="text-muted-foreground font-bold mb-4">
               Unable to load articles at this time.
             </p>
@@ -71,7 +71,7 @@ export function BlogCarousel() {
     <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2" data-testid="heading-blog-carousel">The Pillar Post</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2" data-testid="heading-blog-carousel">The Pillar Post 🗞️</h2>
           <p className="text-muted-foreground font-bold">Expert advice on medications, savings, and wellness</p>
         </div>
 
