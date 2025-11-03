@@ -90,9 +90,11 @@ export default function AdminBlogPage() {
   const [editStatus, setEditStatus] = useState<"draft" | "published">("draft");
 
   // Fetch all blog posts
-  const { data: posts, isLoading: isLoadingPosts } = useQuery<BlogPost[]>({
+  const { data: postsResponse, isLoading: isLoadingPosts } = useQuery<{ posts: BlogPost[], total: number }>({
     queryKey: ["/api/blog/posts"],
   });
+  
+  const posts = postsResponse?.posts || [];
 
   // Generate blog post with AI
   const generateMutation = useMutation({

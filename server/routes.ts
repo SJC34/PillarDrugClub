@@ -127,7 +127,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const user = await storage.createUser(userData);
       
       // Create session for the newly registered user
-      req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName }, (err: any) => {
+      req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role }, (err: any) => {
         if (err) {
           console.error("Session creation error:", err);
           return res.status(500).json({ error: "Registration successful but session creation failed" });
@@ -165,7 +165,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       }
       
       // Establish session using passport
-      req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName }, (err: any) => {
+      req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role }, (err: any) => {
         if (err) {
           console.error("Session creation error:", err);
           return res.status(500).json({ error: "Login failed - could not create session" });

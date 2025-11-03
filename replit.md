@@ -16,6 +16,7 @@ Preferred communication style: Simple, everyday language.
 - **Frontend**: Utilizes TanStack Query for server state management and caching, and React Hook Form with Zod for form validation.
 - **Backend**: Express.js with TypeScript provides RESTful APIs, backed by a PostgreSQL database with Drizzle ORM.
 - **Authentication & Authorization**: Dual authentication via email/password and Google OAuth (Replit Auth OIDC), using Passport.js for session management and a robust role-based access control system.
+    - **Session Management Fix (Nov 2025)**: Fixed critical bug where user `role` was not being stored in session during email/password login and registration. Now properly includes `{ id, email, firstName, lastName, role }` in session object, enabling role-based access control for admin features like blog generation.
 - **Coming Soon Waitlist Modal**: Pre-launch waitlist collection system integrated into HomePage featuring:
     - **Modal Popup**: Auto-displays on first visit with localStorage persistence to prevent re-showing to returning visitors
     - **Exit Control**: Explicit close button (X icon) in top-right corner for easy dismissal
@@ -79,6 +80,9 @@ Preferred communication style: Simple, everyday language.
         - **Database Schema**: blog_posts (general), medical_blog_posts (RAG with compliance metadata), document_chunks (vector store)
         - **Public Pages**: /blog index with search/filtering, /blog/:slug with complete SEO, schema.org MedicalWebPage markup for medical posts
         - **Security**: Admin-only generation/editing, public read-only access, proper CORS for FastAPI service
+        - **Bug Fixes (Nov 2025)**:
+            - **Pagination Response Handling**: Fixed AdminBlogPage to properly handle paginated API response `{posts: [], total: 0}` instead of expecting raw array, preventing "posts.map is not a function" runtime error
+            - **Admin Role Authentication**: Fixed session management to include user role, enabling proper admin access control for blog generation endpoints
 - **System Design Choices**: Emphasizes modularity, scalability, and security for sensitive healthcare data, utilizing serverless PostgreSQL and asynchronous communication.
 
 ## External Dependencies
