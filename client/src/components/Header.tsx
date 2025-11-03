@@ -174,77 +174,74 @@ export default function Header() {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-[100] md:hidden">
-            <div className="fixed inset-0 z-[100] bg-black/50" onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-[101] bg-primary" data-testid="mobile-menu-panel">
-              <div className="flex flex-col h-full">
-                <div className="px-6 py-4 border-b border-teal-700/30">
-                  <div className="flex items-center gap-2">
-                    <a href="/" className="text-xl font-black flex items-center gap-2 text-teal-800 hover:text-teal-900 transition-colors" onClick={() => setIsMenuOpen(false)}>
-                      pillar drug club
-                      <Pill className="h-5 w-5 text-teal-800" />
-                    </a>
-                  </div>
-                </div>
-                <div className="flex-1 px-6 py-6 space-y-4">
-                  {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    >
-                      <Button className="w-full justify-center text-lg font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3">
+            <div className="fixed inset-0 z-[100] bg-black/40" onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-[101] bg-white dark:bg-gray-950" data-testid="mobile-menu-panel">
+              <div className="flex flex-col h-full px-6 py-8 bg-white dark:bg-gray-950">
+                {/* Navigation Links */}
+                <nav className="flex-1 pt-16 bg-white dark:bg-gray-950">
+                  <div className="space-y-1">
+                    {navigation.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block py-4 text-2xl font-bold text-gray-900 dark:text-white hover:text-primary transition-colors border-b border-gray-200 dark:border-gray-800"
+                        data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
                         {item.name}
-                      </Button>
-                    </a>
-                  ))}
-                </div>
-                <div className="px-6 py-6 border-t border-teal-700/30 space-y-4">
+                      </a>
+                    ))}
+                  </div>
+                </nav>
+
+                {/* Bottom Section */}
+                <div className="border-t border-gray-200 dark:border-gray-800 pt-6 space-y-4 bg-white dark:bg-gray-950">
                   {isAuthenticated ? (
                     <>
-                      <div className="flex items-center gap-3 mb-4 px-4">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-teal-700 text-white font-bold">
+                      <div className="flex items-center gap-3 pb-4">
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback className="bg-primary text-primary-foreground text-lg font-bold">
                             {getUserInitials()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-bold text-teal-800 text-sm">
+                          <p className="font-bold text-gray-900 dark:text-white">
                             {user?.firstName} {user?.lastName}
                           </p>
-                          <p className="text-xs text-teal-700">
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
                             {user?.email}
                           </p>
                         </div>
                       </div>
-                      <a href="/settings" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full justify-center font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3" data-testid="mobile-button-settings">
-                          <Settings className="mr-2 h-4 w-4" />
-                          ACCOUNT SETTINGS
-                        </Button>
+                      <a 
+                        href="/settings" 
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors"
+                        data-testid="mobile-button-settings"
+                      >
+                        Account Settings
                       </a>
-                      <Button 
+                      <button 
                         onClick={handleSignOut}
-                        className="w-full justify-center font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3" 
+                        className="block w-full text-left py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors" 
                         data-testid="mobile-button-sign-out"
                       >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        SIGN OUT
-                      </Button>
+                        Sign Out
+                      </button>
                     </>
                   ) : (
-                    <>
-                      <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full justify-center font-bold bg-primary/90 text-white hover:bg-primary/80 border-0 py-3" data-testid="mobile-button-login">
+                    <div className="space-y-3 bg-white dark:bg-gray-950">
+                      <a href="/login" onClick={() => setIsMenuOpen(false)} className="block">
+                        <Button variant="outline" className="w-full justify-center text-lg font-bold py-6 bg-white dark:bg-gray-900" data-testid="mobile-button-login">
                           SIGN IN
                         </Button>
                       </a>
-                      <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full justify-center font-bold bg-white/90 text-primary hover:bg-white/80 border-0 py-3" data-testid="mobile-button-signup">
+                      <a href="/register" onClick={() => setIsMenuOpen(false)} className="block">
+                        <Button className="w-full justify-center text-lg font-bold py-6" data-testid="mobile-button-signup">
                           GET STARTED
                         </Button>
                       </a>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
