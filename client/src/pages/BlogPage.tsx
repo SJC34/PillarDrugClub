@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, User, Eye, Search, Tag } from "lucide-react";
 import { Link } from "wouter";
-import Header from "@/components/Header";
 
 interface BlogPost {
   id: string;
@@ -71,8 +70,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Hero Section - GoodRx Style */}
         <div className="text-center mb-16">

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { Calendar, User, Eye, Tag, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
-import Header from "@/components/Header";
 
 interface BlogPost {
   id: string;
@@ -58,7 +57,6 @@ export default function BlogPostPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="max-w-4xl mx-auto px-4 py-12">
           <p className="text-center text-muted-foreground">Loading article...</p>
         </div>
@@ -69,7 +67,6 @@ export default function BlogPostPage() {
   if (error || !post) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="max-w-4xl mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Article Not Found</h1>
           <p className="text-muted-foreground mb-6">The article you're looking for doesn't exist.</p>
@@ -149,8 +146,6 @@ export default function BlogPostPage() {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <Header />
-        
         <article className="max-w-4xl mx-auto px-4 py-12">
           {/* Back Button */}
           <Link href="/blog">
