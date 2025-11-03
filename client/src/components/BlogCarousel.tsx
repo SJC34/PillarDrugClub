@@ -90,50 +90,76 @@ export function BlogCarousel() {
           className="w-full"
         >
           <CarouselContent className="-ml-2 md:-ml-4">
-            {posts.map((post) => (
-              <CarouselItem key={post.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                <Link href={`/blog/${post.slug}`} data-testid={`link-blog-post-${post.id}`}>
-                  <Card className="h-full hover-elevate cursor-pointer" data-testid={`card-blog-post-${post.id}`}>
-                    {post.featuredImage && (
-                      <div className="aspect-video w-full overflow-hidden rounded-t-lg">
-                        <img 
-                          src={post.featuredImage} 
-                          alt={post.title}
-                          className="w-full h-full object-cover"
-                          data-testid={`img-blog-${post.id}`}
-                        />
-                      </div>
-                    )}
-                    <CardHeader>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                        <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-bold capitalize" data-testid={`category-${post.id}`}>
-                          {post.category?.replace("-", " ")}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span data-testid={`date-${post.id}`}>{formatDate(post.publishedAt)}</span>
+            {posts.map((post, index) => {
+              const gradients = [
+                'from-blue-500/10 to-purple-500/10',
+                'from-green-500/10 to-teal-500/10',
+                'from-orange-500/10 to-red-500/10',
+                'from-pink-500/10 to-rose-500/10',
+                'from-indigo-500/10 to-blue-500/10',
+                'from-cyan-500/10 to-sky-500/10',
+              ];
+              const gradient = gradients[index % gradients.length];
+              
+              return (
+                <CarouselItem key={post.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <Link href={`/blog/${post.slug}`} data-testid={`link-blog-post-${post.id}`}>
+                    <Card className="h-full hover-elevate cursor-pointer overflow-hidden" data-testid={`card-blog-post-${post.id}`}>
+                      {/* Featured Image or Gradient */}
+                      {post.featuredImage ? (
+                        <div className="aspect-video w-full overflow-hidden">
+                          <img 
+                            src={post.featuredImage} 
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            data-testid={`img-blog-${post.id}`}
+                          />
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span data-testid={`read-time-${post.id}`}>{estimateReadTime(post.content)}</span>
+                      ) : (
+                        <div className={`aspect-video w-full bg-gradient-to-br ${gradient} flex items-center justify-center p-6`}>
+                          <h3 className="text-xl font-bold text-foreground text-center line-clamp-3">
+                            {post.title}
+                          </h3>
                         </div>
-                      </div>
-                      <CardTitle className="text-lg line-clamp-2" data-testid={`title-${post.id}`}>
-                        {post.title}
-                      </CardTitle>
-                      <CardDescription className="line-clamp-3 font-bold" data-testid={`excerpt-${post.id}`}>
-                        {post.excerpt || post.content.substring(0, 150) + "..."}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button variant="ghost" size="sm" className="p-0 h-auto font-bold" data-testid={`button-read-more-${post.id}`}>
-                        Read More <ArrowRight className="ml-1 h-4 w-4" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </CarouselItem>
-            ))}
+                      )}
+                      
+                      <CardHeader>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 flex-wrap">
+                          <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-semibold capitalize" data-testid={`category-${post.id}`}>
+                            {post.category?.replace("-", " ")}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            <span data-testid={`date-${post.id}`}>{formatDate(post.publishedAt)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            <span data-testid={`read-time-${post.id}`}>{estimateReadTime(post.content)}</span>
+                          </div>
+                        </div>
+                        
+                        <CardTitle className="text-lg line-clamp-2" data-testid={`title-${post.id}`}>
+                          {post.title}
+                        </CardTitle>
+                        
+                        <CardDescription className="line-clamp-2" data-testid={`excerpt-${post.id}`}>
+                          {post.excerpt || post.content.substring(0, 120) + "..."}
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent>
+                        <div className="text-sm font-medium text-foreground mb-2">
+                          Written by {post.authorName || "Pillar Team"}
+                        </div>
+                        <Button variant="ghost" size="sm" className="p-0 h-auto font-semibold" data-testid={`button-read-more-${post.id}`}>
+                          Read More <ArrowRight className="ml-1 h-4 w-4" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </CarouselItem>
+              );
+            })}
           </CarouselContent>
           <CarouselPrevious className="hidden md:flex" data-testid="button-carousel-prev" />
           <CarouselNext className="hidden md:flex" data-testid="button-carousel-next" />

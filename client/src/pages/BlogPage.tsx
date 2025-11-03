@@ -50,17 +50,37 @@ export default function BlogPage() {
     "general": "General"
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 24) {
+      if (diffInHours < 1) return "Updated just now";
+      if (diffInHours === 1) return "Updated 1 hour ago";
+      return `Updated ${diffInHours} hours ago`;
+    } else if (diffInHours < 48) {
+      return "Updated 1 day ago";
+    } else if (diffInHours < 168) {
+      const days = Math.floor(diffInHours / 24);
+      return `Updated ${days} days ago`;
+    } else {
+      return `Updated on ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">The Pillar Post 🗞️</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Expert insights on medications, pharmacy news, and healthcare savings. 
-            Get trusted information to help you make informed healthcare decisions.
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        {/* Hero Section - GoodRx Style */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
+            The Answers You Need.
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium">
+            From pharmacists and healthcare experts you can trust.
           </p>
         </div>
 
@@ -127,41 +147,69 @@ export default function BlogPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts.map((post) => (
-              <Link key={post.id} href={`/blog/${post.slug}`}>
-                <Card className="h-full hover-elevate cursor-pointer transition-all" data-testid={`card-blog-${post.slug}`}>
-                  <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" data-testid={`badge-category-${post.slug}`}>
-                        <Tag className="h-3 w-3 mr-1" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPosts.map((post, index) => {
+              const gradients = [
+                'from-blue-500/10 to-purple-500/10',
+                'from-green-500/10 to-teal-500/10',
+                'from-orange-500/10 to-red-500/10',
+                'from-pink-500/10 to-rose-500/10',
+                'from-indigo-500/10 to-blue-500/10',
+                'from-cyan-500/10 to-sky-500/10',
+              ];
+              const gradient = gradients[index % gradients.length];
+              
+              return (
+                <Link key={post.id} href={`/blog/${post.slug}`}>
+                  <Card 
+                    className="h-full hover-elevate cursor-pointer overflow-hidden" 
+                    data-testid={`card-blog-${post.slug}`}
+                  >
+                    {/* Featured Image or Gradient Background */}
+                    {(post as any).featuredImage ? (
+                      <div className="aspect-video w-full overflow-hidden">
+                        <img 
+                          src={(post as any).featuredImage} 
+                          alt={post.title}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        />
+                      </div>
+                    ) : (
+                      <div className={`aspect-video w-full bg-gradient-to-br ${gradient} flex items-center justify-center p-6`}>
+                        <h3 className="text-2xl font-bold text-foreground text-center line-clamp-3">
+                          {post.title}
+                        </h3>
+                      </div>
+                    )}
+                    
+                    <CardHeader>
+                      <Badge variant="secondary" className="mb-2 w-fit" data-testid={`badge-category-${post.slug}`}>
                         {categoryLabels[post.category] || post.category}
                       </Badge>
-                    </div>
-                    <CardTitle className="text-xl line-clamp-2">{post.title}</CardTitle>
-                    <CardDescription className="line-clamp-3">
-                      {post.excerpt}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <User className="h-3 w-3" />
-                        {post.authorName}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        {post.viewCount}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                      
+                      <CardTitle className="text-xl line-clamp-2">
+                        {post.title}
+                      </CardTitle>
+                      
+                      <CardDescription className="line-clamp-2">
+                        {post.excerpt}
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent>
+                      <div className="flex flex-col gap-1 text-sm">
+                        <span className="text-foreground font-medium">
+                          Written by {post.authorName}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {formatDate(post.publishedAt || post.createdAt)}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

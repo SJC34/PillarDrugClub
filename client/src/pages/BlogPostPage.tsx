@@ -50,6 +50,11 @@ export default function BlogPostPage() {
     "general": "General"
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -155,48 +160,46 @@ export default function BlogPostPage() {
             </Button>
           </Link>
 
-          {/* Article Header */}
-          <div className="mb-8">
-            <Badge variant="secondary" className="mb-4" data-testid="badge-category">
-              <Tag className="h-3 w-3 mr-1" />
-              {categoryLabels[post.category] || post.category}
-            </Badge>
-            
-            <h1 className="text-4xl font-bold text-foreground mb-4">{post.title}</h1>
+          {/* Article Header - GoodRx Style */}
+          <div className="mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
+              {post.title}
+            </h1>
             
             {post.excerpt && (
-              <p className="text-xl text-muted-foreground mb-6">{post.excerpt}</p>
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                {post.excerpt}
+              </p>
             )}
             
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                {post.authorName}
-              </span>
-              <span className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                {new Date(post.publishedAt || post.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric"
-                })}
-              </span>
-              <span className="flex items-center gap-2">
-                <Eye className="h-4 w-4" />
-                {post.viewCount} views
-              </span>
+            <div className="flex flex-col gap-2 pb-8 border-b border-border">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-semibold text-foreground">
+                  Written by {post.authorName}
+                </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Updated on {formatDate(post.publishedAt || post.createdAt)}
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                <Badge variant="secondary" data-testid="badge-category">
+                  {categoryLabels[post.category] || post.category}
+                </Badge>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  {post.viewCount} views
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Article Content */}
-          <Card>
-            <CardContent className="p-8">
-              <div 
-                className="prose prose-lg max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
-              />
-            </CardContent>
-          </Card>
+          {/* Article Content - GoodRx Style */}
+          <div className="prose prose-lg max-w-none dark:prose-invert mb-12">
+            <div 
+              className="text-foreground leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
+            />
+          </div>
 
           {/* Tags */}
           {post.tags.length > 0 && (
