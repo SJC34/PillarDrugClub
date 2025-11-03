@@ -185,7 +185,7 @@ export default function Header() {
                     </a>
                   </div>
                 </div>
-                <div className="flex-1 px-6 py-6 space-y-3">
+                <div className="flex-1 px-6 py-6 space-y-4">
                   {navigation.map((item) => (
                     <a
                       key={item.name}
@@ -193,18 +193,18 @@ export default function Header() {
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
-                      <Button className="w-full justify-start text-lg font-bold bg-teal-700 text-white hover:bg-teal-600 border-0">
+                      <Button className="w-full justify-center text-lg font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6">
                         {item.name}
                       </Button>
                     </a>
                   ))}
                 </div>
-                <div className="px-6 py-6 border-t border-primary-foreground/20 space-y-3">
+                <div className="px-6 py-6 border-t border-primary-foreground/20 space-y-4">
                   {isAuthenticated ? (
                     <>
                       <div className="flex items-center gap-3 mb-4 px-4">
                         <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-white text-teal-600 font-bold">
+                          <AvatarFallback className="bg-white text-primary font-bold">
                             {getUserInitials()}
                           </AvatarFallback>
                         </Avatar>
@@ -218,14 +218,14 @@ export default function Header() {
                         </div>
                       </div>
                       <a href="/settings" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full font-bold bg-teal-700 text-white hover:bg-teal-600 border-0" data-testid="mobile-button-settings">
+                        <Button className="w-full justify-center font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6" data-testid="mobile-button-settings">
                           <Settings className="mr-2 h-4 w-4" />
                           ACCOUNT SETTINGS
                         </Button>
                       </a>
                       <Button 
                         onClick={handleSignOut}
-                        className="w-full font-bold bg-teal-700 text-white hover:bg-teal-600 border-0" 
+                        className="w-full justify-center font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6" 
                         data-testid="mobile-button-sign-out"
                       >
                         <LogOut className="mr-2 h-4 w-4" />
@@ -235,12 +235,12 @@ export default function Header() {
                   ) : (
                     <>
                       <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full font-bold bg-teal-700 text-white hover:bg-teal-600 border-0" data-testid="mobile-button-login">
+                        <Button className="w-full justify-center font-bold bg-primary text-white hover:bg-primary/90 border-0 py-6" data-testid="mobile-button-login">
                           SIGN IN
                         </Button>
                       </a>
                       <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full font-bold bg-white text-teal-600 hover:bg-teal-50 border-0" data-testid="mobile-button-signup">
+                        <Button className="w-full justify-center font-bold bg-white text-primary hover:bg-teal-50 border-0 py-6" data-testid="mobile-button-signup">
                           GET STARTED
                         </Button>
                       </a>
