@@ -163,7 +163,7 @@ export async function setupSocialAuth(app: Express) {
   // Logout route
   app.get("/api/auth/social-logout", (req, res) => {
     req.logout(() => {
-      res.redirect("/");
+      res.redirect("/login");
     });
   });
 }

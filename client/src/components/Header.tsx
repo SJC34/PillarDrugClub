@@ -18,8 +18,19 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated } = useAuth();
 
-  const handleSignOut = () => {
-    window.location.href = "/api/logout";
+  const handleSignOut = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        window.location.href = "/login";
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      window.location.href = "/login";
+    }
   };
 
   const getUserInitials = () => {
@@ -179,8 +190,8 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-bold !text-white transition-all py-3 px-4 rounded-lg"
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.25)' }}
+                      className="block text-lg font-bold !text-white transition-all py-3 px-4 rounded-lg hover:!bg-white/40 active:!bg-white/50"
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)', border: '2px solid rgba(255, 255, 255, 0.5)' }}
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
