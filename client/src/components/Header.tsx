@@ -177,8 +177,16 @@ export default function Header() {
             <div className="fixed inset-0 z-[100] bg-black/40" onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
             <div className="fixed inset-y-0 left-0 right-0 z-[101] bg-white dark:bg-gray-950" data-testid="mobile-menu-panel">
               <div className="flex flex-col h-full py-8 bg-white dark:bg-gray-950">
+                {/* Logo Header */}
+                <div className="px-6 pb-8">
+                  <a href="/" className="text-xl font-black flex items-center gap-2 text-gray-900 dark:text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                    pillar drug club
+                    <Pill className="h-5 w-5 text-primary" />
+                  </a>
+                </div>
+                
                 {/* Navigation Links */}
-                <nav className="flex-1 pt-16 bg-white dark:bg-gray-950">
+                <nav className="flex-1 bg-white dark:bg-gray-950">
                   <div className="space-y-1">
                     {navigation.map((item) => (
                       <a
