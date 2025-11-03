@@ -188,12 +188,12 @@ export default function Header() {
                 {/* Navigation Links */}
                 <nav className="flex-1 bg-white dark:bg-gray-950">
                   <div className="space-y-1">
-                    {navigation.map((item) => (
+                    {navigation.map((item, index) => (
                       <a
                         key={item.name}
                         href={item.href}
                         onClick={() => setIsMenuOpen(false)}
-                        className="block py-4 px-6 text-lg font-bold text-gray-900 dark:text-white hover:text-primary transition-colors border-b border-gray-200 dark:border-gray-800"
+                        className={`block py-4 px-6 text-lg font-bold text-gray-900 dark:text-white hover:text-primary transition-colors border-b border-gray-200 dark:border-gray-800 ${index === 0 ? 'border-t' : ''}`}
                         data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                       >
                         {item.name}
