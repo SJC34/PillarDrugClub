@@ -22,7 +22,10 @@ import {
   Plus,
   Edit,
   CheckCircle,
-  Clock
+  Clock,
+  Upload,
+  X,
+  Image as ImageIcon
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -88,6 +91,8 @@ export default function AdminBlogPage() {
   const [editMetaDescription, setEditMetaDescription] = useState("");
   const [editMetaKeywords, setEditMetaKeywords] = useState("");
   const [editStatus, setEditStatus] = useState<"draft" | "published">("draft");
+  const [editFeaturedImage, setEditFeaturedImage] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // Fetch all blog posts
   const { data: postsResponse, isLoading: isLoadingPosts } = useQuery<{ posts: BlogPost[], total: number }>({
@@ -325,6 +330,7 @@ export default function AdminBlogPage() {
       metaDescription: editMetaDescription,
       metaKeywords: editMetaKeywords,
       status,
+      featuredImage: editFeaturedImage || undefined,
     };
 
     saveMutation.mutate(postData);
@@ -340,6 +346,7 @@ export default function AdminBlogPage() {
     setEditMetaDescription(post.metaDescription || "");
     setEditMetaKeywords(post.metaKeywords || "");
     setEditStatus(post.status);
+    setEditFeaturedImage(post.featuredImage || null);
     setView("edit");
   };
 
@@ -359,6 +366,122 @@ export default function AdminBlogPage() {
     setEditMetaDescription("");
     setEditMetaKeywords("");
     setEditStatus("draft");
+    setEditFeaturedImage(null);
+  };
+
+  // Image upload and resize handler
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Invalid File",
+        description: "Please upload an image file (JPG, PNG, etc.)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please upload an image under 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploadingImage(true);
+
+    try {
+      // Create image element
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+
+      img.onload = () => {
+        // Create canvas for resizing
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+          toast({
+            title: "Upload Failed",
+            description: "Unable to process image",
+            variant: "destructive",
+          });
+          setIsUploadingImage(false);
+          return;
+        }
+
+        // Target dimensions: 1200x630 (optimal for blog cards)
+        const targetWidth = 1200;
+        const targetHeight = 630;
+
+        // Calculate dimensions maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        const aspectRatio = width / height;
+
+        if (width > targetWidth || height > targetHeight) {
+          if (aspectRatio > targetWidth / targetHeight) {
+            width = targetWidth;
+            height = targetWidth / aspectRatio;
+          } else {
+            height = targetHeight;
+            width = targetHeight * aspectRatio;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress image
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to base64 with quality compression
+        let quality = 0.85;
+        let base64Image = canvas.toDataURL("image/jpeg", quality);
+
+        // If still too large, reduce quality
+        while (base64Image.length > 200 * 1024 && quality > 0.5) {
+          quality -= 0.05;
+          base64Image = canvas.toDataURL("image/jpeg", quality);
+        }
+
+        setEditFeaturedImage(base64Image);
+        setIsUploadingImage(false);
+
+        toast({
+          title: "Image Uploaded",
+          description: `Image resized to ${Math.round(width)}x${Math.round(height)}px`,
+        });
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Image upload error:", error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to process image",
+        variant: "destructive",
+      });
+      setIsUploadingImage(false);
+    }
+  };
+
+  // Handle drag and drop
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
   };
 
   return (
@@ -765,6 +888,67 @@ export default function AdminBlogPage() {
                     onChange={(e) => setEditExcerpt(e.target.value)}
                     data-testid="textarea-edit-excerpt"
                   />
+                </div>
+
+                {/* Featured Image Upload */}
+                <div>
+                  <Label>Featured Image (Optional)</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Upload an image for your blog post. It will be automatically resized to 1200x630px.
+                  </p>
+                  
+                  {editFeaturedImage ? (
+                    <div className="relative border-2 border-dashed border-border rounded-md p-4" data-testid="image-preview-container">
+                      <img 
+                        src={editFeaturedImage} 
+                        alt="Featured" 
+                        className="w-full h-48 object-cover rounded-md mb-2"
+                        data-testid="image-preview"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setEditFeaturedImage(null)}
+                        className="absolute top-2 right-2"
+                        data-testid="button-remove-image"
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Remove Image
+                      </Button>
+                    </div>
+                  ) : (
+                    <div
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      className="border-2 border-dashed border-border rounded-md p-8 text-center hover-elevate cursor-pointer"
+                      onClick={() => document.getElementById("image-upload-input")?.click()}
+                      data-testid="image-upload-zone"
+                    >
+                      <input
+                        id="image-upload-input"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file);
+                        }}
+                        data-testid="input-image-upload"
+                      />
+                      {isUploadingImage ? (
+                        <div className="flex flex-col items-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                          <p className="text-sm text-muted-foreground">Processing image...</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <Upload className="h-12 w-12 text-muted-foreground mb-2" />
+                          <p className="text-sm font-medium mb-1">Click to upload or drag and drop</p>
+                          <p className="text-xs text-muted-foreground">JPG, PNG, GIF up to 10MB</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
