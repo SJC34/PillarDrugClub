@@ -444,10 +444,29 @@ export default function AdminBlogPage() {
         let quality = 0.85;
         let base64Image = canvas.toDataURL("image/jpeg", quality);
 
+        // Calculate actual byte size (base64 encoding adds ~33% overhead)
+        const getBase64Size = (base64String: string) => {
+          // Remove data URL prefix and calculate bytes
+          const base64Data = base64String.split(',')[1] || base64String;
+          return (base64Data.length * 3) / 4;
+        };
+
         // If still too large, reduce quality
-        while (base64Image.length > 200 * 1024 && quality > 0.5) {
+        while (getBase64Size(base64Image) > 200 * 1024 && quality > 0.5) {
           quality -= 0.05;
           base64Image = canvas.toDataURL("image/jpeg", quality);
+        }
+
+        // Final size check
+        const finalSize = getBase64Size(base64Image);
+        if (finalSize > 200 * 1024) {
+          setIsUploadingImage(false);
+          toast({
+            title: "Image Too Large",
+            description: `Unable to compress image below 200KB (final size: ${Math.round(finalSize / 1024)}KB). Please use a smaller or simpler image.`,
+            variant: "destructive",
+          });
+          return;
         }
 
         setEditFeaturedImage(base64Image);
@@ -455,7 +474,7 @@ export default function AdminBlogPage() {
 
         toast({
           title: "Image Uploaded",
-          description: `Image resized to ${Math.round(width)}x${Math.round(height)}px`,
+          description: `Image resized to ${Math.round(width)}x${Math.round(height)}px (${Math.round(finalSize / 1024)}KB)`,
         });
       };
 
