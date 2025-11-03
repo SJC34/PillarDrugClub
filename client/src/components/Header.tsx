@@ -174,14 +174,14 @@ export default function Header() {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-[100] md:hidden">
-            <div className="fixed inset-0 z-[100]" style={{ backgroundColor: 'rgba(13, 148, 136, 0.5)' }} onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
-            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-[101]" style={{ backgroundColor: 'rgba(13, 148, 136, 0.95)' }} data-testid="mobile-menu-panel">
+            <div className="fixed inset-0 z-[100] bg-black/50" onClick={() => setIsMenuOpen(false)} data-testid="mobile-menu-backdrop" />
+            <div className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-[101] bg-primary" data-testid="mobile-menu-panel">
               <div className="flex flex-col h-full">
-                <div className="px-6 py-4 border-b border-teal-700">
+                <div className="px-6 py-4 border-b border-primary-foreground/20">
                   <div className="flex items-center gap-2">
-                    <a href="/" className="text-xl font-black flex items-center gap-2 !text-white hover:!text-teal-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                    <a href="/" className="text-xl font-black flex items-center gap-2 text-white hover:text-white/90 transition-colors" onClick={() => setIsMenuOpen(false)}>
                       pillar drug club
-                      <Pill className="h-5 w-5 !text-white" />
+                      <Pill className="h-5 w-5 text-white" />
                     </a>
                   </div>
                 </div>
@@ -190,16 +190,16 @@ export default function Header() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block text-lg font-bold !text-white transition-all py-3 px-4 rounded-lg hover:!bg-white/40 active:!bg-white/50"
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)', border: '2px solid rgba(255, 255, 255, 0.5)' }}
                       onClick={() => setIsMenuOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
-                      {item.name}
+                      <Button className="w-full justify-start text-lg font-bold bg-teal-700 text-white hover:bg-teal-600 border-0">
+                        {item.name}
+                      </Button>
                     </a>
                   ))}
                 </div>
-                <div className="px-6 py-6 border-t border-teal-700 space-y-3">
+                <div className="px-6 py-6 border-t border-primary-foreground/20 space-y-3">
                   {isAuthenticated ? (
                     <>
                       <div className="flex items-center gap-3 mb-4 px-4">
@@ -209,24 +209,23 @@ export default function Header() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-bold !text-white text-sm">
+                          <p className="font-bold text-white text-sm">
                             {user?.firstName} {user?.lastName}
                           </p>
-                          <p className="text-xs !text-teal-100">
+                          <p className="text-xs text-teal-100">
                             {user?.email}
                           </p>
                         </div>
                       </div>
                       <a href="/settings" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" data-testid="mobile-button-settings">
+                        <Button className="w-full font-bold bg-teal-700 text-white hover:bg-teal-600 border-0" data-testid="mobile-button-settings">
                           <Settings className="mr-2 h-4 w-4" />
                           ACCOUNT SETTINGS
                         </Button>
                       </a>
                       <Button 
                         onClick={handleSignOut}
-                        variant="outline" 
-                        className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" 
+                        className="w-full font-bold bg-teal-700 text-white hover:bg-teal-600 border-0" 
                         data-testid="mobile-button-sign-out"
                       >
                         <LogOut className="mr-2 h-4 w-4" />
@@ -236,12 +235,12 @@ export default function Header() {
                   ) : (
                     <>
                       <a href="/login" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full font-bold !text-white !border-white hover:!bg-white hover:!text-teal-600" data-testid="mobile-button-login">
+                        <Button className="w-full font-bold bg-teal-700 text-white hover:bg-teal-600 border-0" data-testid="mobile-button-login">
                           SIGN IN
                         </Button>
                       </a>
                       <a href="/register" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full font-bold !bg-white !text-teal-600 hover:!bg-teal-50" data-testid="mobile-button-signup">
+                        <Button className="w-full font-bold bg-white text-teal-600 hover:bg-teal-50 border-0" data-testid="mobile-button-signup">
                           GET STARTED
                         </Button>
                       </a>
