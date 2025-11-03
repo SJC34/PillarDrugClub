@@ -57,7 +57,7 @@ export default function BlogPage() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Healthcare Blog</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-4">The Pillar Post 🗞️</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Expert insights on medications, pharmacy news, and healthcare savings. 
             Get trusted information to help you make informed healthcare decisions.

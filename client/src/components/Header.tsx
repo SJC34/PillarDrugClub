@@ -42,8 +42,7 @@ export default function Header() {
     { name: "MEDICATIONS", href: "/medications" },
     { name: "COST CALCULATOR", href: "/cost-calculator" },
     { name: "DASHBOARD", href: "/dashboard" },
-    { name: "PRESCRIPTIONS", href: "/prescriptions" },
-    { name: "ORDERS", href: "/orders" },
+    { name: "PILLAR POST", href: "/blog" },
   ];
 
   return (
