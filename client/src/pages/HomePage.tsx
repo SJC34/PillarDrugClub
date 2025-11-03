@@ -15,6 +15,7 @@ import {
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { ComingSoonModal } from "@/components/ComingSoonModal";
+import { BlogCarousel } from "@/components/BlogCarousel";
 import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema } from "@/components/SEOHead";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 import joinVideo from "@assets/join-pillar-video.mp4";
@@ -448,6 +449,9 @@ export default function HomePage() {
           </Accordion>
         </div>
       </section>
+
+      {/* Blog Carousel */}
+      <BlogCarousel />
 
       {/* CTA Section */}
       <section className="py-12 md:py-16 px-4 sm:px-6 bg-primary text-primary-foreground">
