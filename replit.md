@@ -63,7 +63,7 @@ Preferred communication style: Simple, everyday language.
     - **Reports & Analytics**: Comprehensive reporting with charts and export options.
     - **Medication Pricing Management**: Bulk medication price updates via CSV upload with robust validation.
     - **Referral Monitoring**: Oversight for the member referral program with fraud detection and analytics.
-    - **Hybrid Blog System**: Dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG):
+    - **Hybrid Blog System ("The Pillar Post 🗞️")**: Dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG):
         - **Architecture**: Two-service system with Node.js backend (port 5000) for general content and Python FastAPI service (port 8001) for medical RAG
         - **General AI Blog** (TypeScript/GPT-4):
             - Topic, category, tone, keywords, and target length customization
@@ -80,6 +80,15 @@ Preferred communication style: Simple, everyday language.
         - **Database Schema**: blog_posts (general), medical_blog_posts (RAG with compliance metadata), document_chunks (vector store)
         - **Public Pages**: /blog index with search/filtering, /blog/:slug with complete SEO, schema.org MedicalWebPage markup for medical posts
         - **Security**: Admin-only generation/editing, public read-only access, proper CORS for FastAPI service
+        - **GoodRx-Style Redesign (Nov 2025)**: Complete visual overhaul to match professional blog aesthetics of GoodRx.com/health:
+            - **Hero Section**: Large "The Answers You Need." heading with "From pharmacists and healthcare experts you can trust" subtitle
+            - **Article Cards**: shadcn Card components with featured images (when available) or gradient fallbacks, maintaining design system consistency
+            - **Professional Bylines**: "Written by [Author]" and "Updated on [Date]" formatting throughout all blog views
+            - **Homepage Carousel**: Auto-rotating 6-post carousel with category badges, read time, publication dates, and author attribution
+            - **Metadata Display**: Complete article information including category, date, read time estimates, and view counts
+            - **Navigation Updates**: "PILLAR POST" link added to main navigation menu; prescriptions/orders moved to dashboard-only access
+            - **Typography Improvements**: Enhanced readability with better spacing, larger titles, and clearer content hierarchy
+            - **Responsive Design**: Mobile-first cards with proper aspect ratios, touch-friendly interactions, and adaptive layouts
         - **Bug Fixes (Nov 2025)**:
             - **Pagination Response Handling**: Fixed AdminBlogPage to properly handle paginated API response `{posts: [], total: 0}` instead of expecting raw array, preventing "posts.map is not a function" runtime error
             - **Admin Role Authentication**: Fixed session management to include user role, enabling proper admin access control for blog generation endpoints
