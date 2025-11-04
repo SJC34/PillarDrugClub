@@ -113,6 +113,71 @@ Format the response as a JSON object with:
   }
 }
 
+export async function generateSEOKeywords(title: string): Promise<string[]> {
+  const prompt = `You are an SEO expert specializing in healthcare and pharmacy content.
+
+Given this blog post title: "${title}"
+
+Generate 8-12 high-value SEO keywords that would help this article rank well in search engines.
+
+Requirements:
+1. Include a mix of:
+   - Primary keywords (2-3 words, high search volume)
+   - Long-tail keywords (3-5 words, specific)
+   - Related terms and synonyms
+2. Focus on healthcare, medication, and pharmacy terms
+3. Consider user search intent (informational, commercial, navigational)
+4. Avoid keyword stuffing - only relevant, natural terms
+5. Include semantic variations
+
+Return ONLY a JSON array of keywords, like: ["keyword1", "keyword2", "keyword3"]`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are an SEO expert who generates high-value, relevant keywords for healthcare and pharmacy content."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.5,
+      max_tokens: 500
+    });
+
+    const responseText = completion.choices[0].message.content;
+    if (!responseText) {
+      throw new Error("No response from OpenAI");
+    }
+
+    const result = JSON.parse(responseText);
+    
+    // Handle different possible response formats
+    if (Array.isArray(result)) {
+      return result;
+    } else if (result.keywords && Array.isArray(result.keywords)) {
+      return result.keywords;
+    } else if (result.seoKeywords && Array.isArray(result.seoKeywords)) {
+      return result.seoKeywords;
+    } else {
+      // If we got an object with values, try to extract them
+      const values = Object.values(result);
+      if (values.length > 0 && Array.isArray(values[0])) {
+        return values[0] as string[];
+      }
+      throw new Error("Unexpected response format from OpenAI");
+    }
+  } catch (error) {
+    console.error("Error generating SEO keywords:", error);
+    throw new Error("Failed to generate SEO keywords. Please try again.");
+  }
+}
+
 export async function improveBlogPost(content: string, instructions: string) {
   const prompt = `You are editing a blog post for Pillar Drug Club. Here's the current content:
 

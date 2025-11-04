@@ -74,6 +74,7 @@ export default function AdminBlogPage() {
   const [keywords, setKeywords] = useState("");
   const [targetLength, setTargetLength] = useState("medium");
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
+  const [isGeneratingKeywords, setIsGeneratingKeywords] = useState(false);
 
   // Medical RAG State
   const [medicalTopic, setMedicalTopic] = useState("");
@@ -367,6 +368,52 @@ export default function AdminBlogPage() {
     setEditMetaKeywords("");
     setEditStatus("draft");
     setEditFeaturedImage(null);
+    setIsGeneratingKeywords(false);
+  };
+
+  // Generate SEO keywords using AI
+  const generateSeoKeywords = async () => {
+    if (!topic.trim()) {
+      toast({
+        title: "Topic Required",
+        description: "Please enter a blog post topic/title first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingKeywords(true);
+
+    try {
+      const response = await fetch("/api/blog/generate-seo-keywords", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ title: topic }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to generate keywords");
+      }
+
+      const data = await response.json();
+      setKeywords(data.keywords.join(", "));
+      
+      toast({
+        title: "Keywords Generated!",
+        description: `${data.keywords.length} SEO keywords added`,
+      });
+    } catch (error: any) {
+      console.error("SEO keyword generation error:", error);
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate keywords",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingKeywords(false);
+    }
   };
 
   // Image upload and resize handler
@@ -711,7 +758,30 @@ export default function AdminBlogPage() {
                     </div>
 
                     <div>
-                      <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={generateSeoKeywords}
+                          disabled={isGeneratingKeywords || !topic.trim()}
+                          data-testid="button-generate-seo-keywords"
+                          className="h-8"
+                        >
+                          {isGeneratingKeywords ? (
+                            <>
+                              <Clock className="h-3 w-3 mr-1 animate-spin" />
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="h-3 w-3 mr-1" />
+                              AI Keywords
+                            </>
+                          )}
+                        </Button>
+                      </div>
                       <Input
                         id="keywords"
                         placeholder="e.g., diabetes, metformin, blood sugar"
@@ -719,6 +789,9 @@ export default function AdminBlogPage() {
                         onChange={(e) => setKeywords(e.target.value)}
                         data-testid="input-keywords"
                       />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Enter manually or click AI Keywords to generate from your topic
+                      </p>
                     </div>
 
                     <div>

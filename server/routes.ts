@@ -3496,6 +3496,50 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // Generate SEO keywords from title (admin only)
+  app.post("/api/blog/generate-seo-keywords", async (req: any, res) => {
+    try {
+      console.log("🔑 SEO keyword generation request received");
+      
+      if (!req.isAuthenticated()) {
+        console.log("❌ User not authenticated");
+        return res.status(403).json({ error: "Authentication required", message: "Please log in to continue" });
+      }
+      
+      if (req.user?.role !== "admin") {
+        console.log("❌ User not admin:", req.user?.role);
+        return res.status(403).json({ error: "Admin access required", message: "Only admins can generate SEO keywords" });
+      }
+
+      const { title } = req.body;
+      console.log("🔑 Generating keywords for title:", title);
+      
+      if (!title) {
+        return res.status(400).json({ error: "Title is required" });
+      }
+
+      // Import AI module
+      const { generateSEOKeywords } = await import("./blog-ai");
+      
+      console.log("🤖 Calling OpenAI to generate SEO keywords...");
+      const keywords = await generateSEOKeywords(title);
+      
+      console.log("✅ SEO keywords generated successfully:", keywords);
+      res.json({ keywords });
+    } catch (error: any) {
+      console.error("❌ Error generating SEO keywords:", error);
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.split('\n').slice(0, 3).join('\n')
+      });
+      res.status(500).json({ 
+        error: "Failed to generate SEO keywords", 
+        message: error.message || "Unknown error occurred. Please check server logs." 
+      });
+    }
+  });
+
   // Create blog post (admin only)
   app.post("/api/blog/posts", async (req: any, res) => {
     try {
