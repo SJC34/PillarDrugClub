@@ -1,10 +1,10 @@
 {
   "medicationName": "Divalproex Sod",
   "dosingInfo": {
-    "dosesPerDay": 1,
+    "dosesPerDay": 2,
     "isShortCourse": true,
-    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Divalproex sodium extended-release tablets are an extended-release product intended for once-a-day oral administration. Divalproex sodium extended-release tablets should be swallowed whole and should not be crushed or chewed. • Divalproex sodium extended-release tablets are intended for once-a-day oral administration. Divalproex sodium extended-release tablets should be swallowed whole and should not be crushed or chewed ( 2.1 , 2.2 ). • Mania: Initial dose is 25 mg/k",
-    "fetchedAt": "2025-10-08T17:42:03.132Z"
+    "rawDosageText": "2 DOSAGE AND ADMINISTRATION Divalproex sodium delayed-release tablets are intended for oral administration. Divalproex sodium delayed-release tablets should be swallowed whole and should not be crushed or chewed. Patients should be informed to take divalproex sodium delayed-release tablets every day as prescribed. If a dose is missed it should be taken as soon as possible, unless it is almost time for the next dose. If a dose is skipped, the patient should not double the next dose. Divalproex so",
+    "fetchedAt": "2025-11-07T20:10:27.748Z"
   },
-  "fetchedAt": "2025-10-08T17:42:03.300Z"
+  "fetchedAt": "2025-11-07T20:10:30.598Z"
 }
