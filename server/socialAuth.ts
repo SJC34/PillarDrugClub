@@ -105,10 +105,6 @@ export async function setupSocialAuth(app: Express) {
       ? `https://${process.env.REPLIT_DOMAINS.split(",")[0]}`
       : "http://localhost:5000";
 
-  console.log('[OAuth] CUSTOM_DOMAIN:', process.env.CUSTOM_DOMAIN);
-  console.log('[OAuth] REPLIT_DOMAINS:', process.env.REPLIT_DOMAINS);
-  console.log('[OAuth] Using callback URL:', callbackURL);
-
   // Google OAuth Strategy
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     passport.use(
