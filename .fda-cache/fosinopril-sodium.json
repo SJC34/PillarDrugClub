@@ -1,9 +1,10 @@
 {
   "medicationName": "Fosinopril Sodium",
   "dosingInfo": {
+    "dosesPerDay": 1,
     "isShortCourse": false,
-    "rawDosageText": "DOSAGE AND ADMINISTRATION Fosinopril is an effective treatment of hypertension in once-daily doses of 10 to 80 mg, while hydrochlorothiazide is effective in doses of 12.5 to 50 mg per day. In clinical trials of fosinopril/hydrochlorothiazide combination therapy using fosinopril doses of 2.5 to 40 mg and hydrochlorothiazide doses at 5 to 37.5 mg, the antihypertensive effects increased with increasing dose of either component. The hazards (see WARNINGS ) of fosinopril are generally rare and appare",
-    "fetchedAt": "2025-10-08T17:52:13.987Z"
+    "rawDosageText": "DOSAGE AND ADMINISTRATION Hypertension Adults The recommended initial dose of fosinopril sodium tablets USP is 10 mg once a day, both as monotherapy and when the drug is added to a diuretic. Dosage should then be adjusted according to blood pressure response at peak (2 to 6 hours) and trough (about 24 hours after dosing) blood levels. The usual dosage range needed to maintain a response at trough is 20 to 40 mg but some patients appear to have a further response to 80 mg. In some patients treate",
+    "fetchedAt": "2025-11-07T20:16:40.539Z"
   },
-  "fetchedAt": "2025-10-08T17:52:14.145Z"
+  "fetchedAt": "2025-11-07T20:16:40.709Z"
 }
