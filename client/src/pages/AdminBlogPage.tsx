@@ -111,6 +111,7 @@ export default function AdminBlogPage() {
       tone?: string;
       keywords?: string[];
       targetLength?: string;
+      writingStyle?: string;
     }) => {
       const response = await fetch("/api/blog/generate", {
         method: "POST",
