@@ -2,6 +2,12 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
+import { 
+  securityHeaders, 
+  generalRateLimiter, 
+  validateSessionTimeout 
+} from "./securityMiddleware";
+import { autoAuditMiddleware } from "./auditLogger";
 
 const app = express();
 
@@ -22,12 +28,24 @@ app.get("/api/ping", (req, res) => {
   });
 });
 
+// Security Headers - Apply HIPAA-compliant security headers
+app.use(securityHeaders);
+
 // Stripe webhook needs raw body for signature verification
 app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }));
 
 // Apply JSON parsing to all other routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Rate Limiting - General rate limiter for all API routes
+app.use('/api/', generalRateLimiter);
+
+// Session Timeout - Validate session hasn't expired (30 min inactivity)
+app.use(validateSessionTimeout);
+
+// Audit Logging - Automatically log all PHI access and admin actions
+app.use(autoAuditMiddleware);
 
 app.use((req, res, next) => {
   const start = Date.now();

@@ -47,6 +47,16 @@ export const users = pgTable("users", {
   hwPatientId: integer("hw_patient_id"), // HealthWarehouse patient ID
   deletedAt: timestamp("deleted_at"), // Soft delete timestamp
   deletionReason: text("deletion_reason"), // Reason for deletion/deactivation
+  failedLoginAttempts: integer("failed_login_attempts").default(0),
+  accountLockedUntil: timestamp("account_locked_until"),
+  lastLoginAt: timestamp("last_login_at"),
+  lastLoginIp: text("last_login_ip"),
+  passwordChangedAt: timestamp("password_changed_at"),
+  passwordExpiresAt: timestamp("password_expires_at"),
+  mfaEnabled: boolean("mfa_enabled").default(false),
+  mfaSecret: text("mfa_secret"),
+  privacyPolicyAcceptedAt: timestamp("privacy_policy_accepted_at"),
+  hipaaConsentAt: timestamp("hipaa_consent_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -441,3 +451,101 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
 
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
+
+// HIPAA Audit Logs - Track all PHI access and administrative actions
+export const auditLogs = pgTable("audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  actionType: text("action_type").notNull(), // login, logout, view_phi, update_phi, delete, etc.
+  resourceType: text("resource_type"), // user, prescription, medication, refill, etc.
+  resourceId: varchar("resource_id"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  deviceInfo: jsonb("device_info"),
+  phiAccessed: boolean("phi_accessed").default(false),
+  details: jsonb("details"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+}, (table) => [
+  index("idx_audit_user").on(table.userId),
+  index("idx_audit_action").on(table.actionType),
+  index("idx_audit_timestamp").on(table.timestamp),
+  index("idx_audit_phi").on(table.phiAccessed),
+]);
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+export type AuditLog = typeof auditLogs.$inferSelect;
+
+// Security Events - Track failed logins, suspicious activity, account lockouts
+export const securityEvents = pgTable("security_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  eventType: text("event_type").notNull(), // failed_login, account_lockout, suspicious_activity, password_reset, etc.
+  email: text("email"), // Track email even if user doesn't exist
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  severity: text("severity", { enum: ["low", "medium", "high", "critical"] }).default("medium"),
+  resolved: boolean("resolved").default(false),
+  details: jsonb("details"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+}, (table) => [
+  index("idx_security_user").on(table.userId),
+  index("idx_security_email").on(table.email),
+  index("idx_security_type").on(table.eventType),
+  index("idx_security_timestamp").on(table.timestamp),
+]);
+
+export const insertSecurityEventSchema = createInsertSchema(securityEvents).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertSecurityEvent = z.infer<typeof insertSecurityEventSchema>;
+export type SecurityEvent = typeof securityEvents.$inferSelect;
+
+// Password History - Prevent password reuse (HIPAA requires password history)
+export const passwordHistory = pgTable("password_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_password_history_user").on(table.userId),
+]);
+
+export const insertPasswordHistorySchema = createInsertSchema(passwordHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPasswordHistory = z.infer<typeof insertPasswordHistorySchema>;
+export type PasswordHistory = typeof passwordHistory.$inferSelect;
+
+// User Sessions - Track active sessions for device management
+export const userSessions = pgTable("user_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  sessionId: varchar("session_id").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  deviceInfo: jsonb("device_info"),
+  lastActivity: timestamp("last_activity").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_user_sessions_user").on(table.userId),
+  index("idx_user_sessions_session").on(table.sessionId),
+  index("idx_user_sessions_expires").on(table.expiresAt),
+]);
+
+export const insertUserSessionSchema = createInsertSchema(userSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
+export type UserSession = typeof userSessions.$inferSelect;

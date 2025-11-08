@@ -19,6 +19,14 @@ import { generatePrescriptionRequestPDF, generateMessageTemplate, generateRefund
 import { sendSMS } from "./twilio";
 import { sendEmail, sendEmailWithAttachment } from "./resend";
 import multer from "multer";
+import { 
+  authRateLimiter,
+  checkAccountLockout,
+  recordFailedLogin,
+  resetFailedLoginAttempts,
+  requireSecurePassword
+} from "./securityMiddleware";
+import { createAuditLog, createSecurityEvent } from "./auditLogger";
 
 // Initialize Stripe with graceful fallback
 let stripe: Stripe | null = null;
@@ -113,18 +121,45 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Email/password authentication routes with session management
-  app.post("/api/auth/register", async (req: any, res) => {
+  app.post("/api/auth/register", authRateLimiter, async (req: any, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
+      
+      // Validate password strength (HIPAA requirement)
+      if (userData.password) {
+        const passwordValidation = requireSecurePassword(userData.password);
+        if (!passwordValidation.valid) {
+          return res.status(400).json({ 
+            error: "Password does not meet security requirements",
+            details: passwordValidation.errors 
+          });
+        }
+      }
       
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email || "");
       if (existingUser) {
+        await createSecurityEvent(req, {
+          eventType: 'registration_attempt_duplicate_email',
+          email: userData.email,
+          severity: 'low',
+          details: { reason: 'email_already_exists' },
+        });
         return res.status(400).json({ error: "User already exists with this email" });
       }
       
       // Create user
       const user = await storage.createUser(userData);
+      
+      // Log successful registration
+      await createAuditLog(req, {
+        userId: user.id,
+        actionType: 'user_registration',
+        resourceType: 'user',
+        resourceId: user.id,
+        phiAccessed: false,
+        details: { email: user.email, method: 'email_password' },
+      });
       
       // Create session for the newly registered user
       req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role }, (err: any) => {
@@ -143,7 +178,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  app.post("/api/auth/login", async (req: any, res) => {
+  app.post("/api/auth/login", authRateLimiter, async (req: any, res) => {
     try {
       const { email, password } = req.body;
       
@@ -151,9 +186,25 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(400).json({ error: "Email and password are required" });
       }
       
+      // Check if account is locked out (HIPAA security requirement)
+      const isLocked = await checkAccountLockout(email);
+      if (isLocked) {
+        await createSecurityEvent(req, {
+          eventType: 'login_attempt_locked_account',
+          email,
+          severity: 'high',
+          details: { reason: 'account_locked' },
+        });
+        return res.status(423).json({ 
+          error: "Account temporarily locked",
+          message: "Too many failed login attempts. Please try again in 30 minutes or contact support."
+        });
+      }
+      
       // Find user by email
       const user = await storage.getUserByEmail(email);
       if (!user || !user.password) {
+        await recordFailedLogin(email, req);
         return res.status(401).json({ error: "Invalid email or password" });
       }
       
@@ -161,8 +212,22 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const dbStorage = storage as any;
       const isValidPassword = await dbStorage.verifyPassword(password, user.password);
       if (!isValidPassword) {
+        await recordFailedLogin(email, req);
         return res.status(401).json({ error: "Invalid email or password" });
       }
+      
+      // Reset failed login attempts on successful login
+      await resetFailedLoginAttempts(user.id);
+      
+      // Log successful login
+      await createAuditLog(req, {
+        userId: user.id,
+        actionType: 'user_login',
+        resourceType: 'user',
+        resourceId: user.id,
+        phiAccessed: false,
+        details: { email: user.email, method: 'email_password' },
+      });
       
       // Establish session using passport
       req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role }, (err: any) => {
@@ -183,6 +248,21 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
   // Logout endpoint
   app.post("/api/auth/logout", async (req: any, res) => {
+    const user = req.user as any;
+    const userId = user?.id;
+    
+    // Log logout event
+    if (userId) {
+      await createAuditLog(req, {
+        userId,
+        actionType: 'user_logout',
+        resourceType: 'user',
+        resourceId: userId,
+        phiAccessed: false,
+        details: { email: user?.email },
+      });
+    }
+    
     req.logout((err: any) => {
       if (err) {
         return res.status(500).json({ error: "Logout failed" });
