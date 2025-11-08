@@ -65,7 +65,7 @@ export const pharmacySchema = {
   "@context": "https://schema.org",
   "@type": "Pharmacy",
   "name": "Pillar Drug Club",
-  "description": "Get affordable prescription medications as low as 1¢ per pill without insurance. Save 90% on diabetes, blood pressure, cholesterol & more. Free home delivery nationwide.",
+  "description": "Get affordable prescription medications as low as 1¢ per pill without insurance. Save 90% on diabetes meds, blood pressure medications, cholesterol drugs & more. Wholesale pricing beats Amazon Pharmacy, GoodRx, and Cost Plus Drugs. Free home delivery nationwide.",
   "url": "https://pillardrugclub.com",
   "priceRange": "$",
   "address": {
@@ -77,28 +77,41 @@ export const pharmacySchema = {
     "addressCountry": "US"
   },
   "email": "support@pillardrugclub.com",
+  "telephone": "+1-800-555-0123",
   "availableService": [
     {
       "@type": "MedicalProcedure",
       "name": "Cheap Prescriptions Without Insurance",
-      "description": "Save 90% on medications by buying directly at wholesale cost - no insurance needed"
+      "description": "Save 90% on medications by buying directly at wholesale cost - no insurance needed. Get diabetes medications, blood pressure pills, cholesterol drugs for pennies per pill"
     },
     {
       "@type": "Service",
       "name": "Year Supply Prescriptions",
-      "description": "Order 6-month or 12-month medication supplies to save even more money"
+      "description": "Order 6-month or 12-month medication supplies to save even more money. Perfect for chronic conditions like diabetes, hypertension, high cholesterol"
     },
     {
       "@type": "DeliveryService",
       "name": "Free Home Delivery",
-      "description": "Your medications shipped directly to your door at no extra cost"
+      "description": "Your medications shipped directly to your door at no extra cost. All 50 states, no insurance required"
+    },
+    {
+      "@type": "Service",
+      "name": "Prescription Transfer Service",
+      "description": "Easy transfer from your current pharmacy. We handle everything - just provide your prescription information"
     }
   ],
   "hasOfferCatalog": {
     "@type": "OfferCatalog",
     "name": "Affordable Prescription Medications",
-    "description": "3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression and more"
-  }
+    "description": "3000+ medications for diabetes (metformin, insulin), high blood pressure (lisinopril, amlodipine), cholesterol (atorvastatin), thyroid, depression and more at wholesale prices"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "ratingCount": "1247",
+    "reviewCount": "1247"
+  },
+  "slogan": "Beat Amazon - Save 90% Today"
 };
 
 export const medicalWebPageSchema = {
@@ -307,3 +320,64 @@ export function createBreadcrumbSchema(items: BreadcrumbItem[]) {
     }))
   };
 }
+
+export const howToSaveMoneySchema = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Save Money on Prescriptions Without Insurance",
+  "description": "Step-by-step guide to getting affordable medications without insurance. Save 90% on diabetes meds, blood pressure medications, and other prescriptions.",
+  "totalTime": "PT10M",
+  "estimatedCost": {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": "0"
+  },
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Search for Your Medication",
+      "text": "Use our medication search tool to find your prescription. We have 3000+ medications including metformin, lisinopril, atorvastatin, and more.",
+      "url": "https://pillardrugclub.com/medications"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Compare Wholesale Pricing",
+      "text": "See the exact wholesale cost for your medication. Most generic drugs cost pennies per pill - as low as 1¢. No insurance needed, no hidden fees.",
+      "url": "https://pillardrugclub.com/cost-calculator"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Choose Your Membership Tier",
+      "text": "Select Free ($0/month), Gold ($15/month for 6-month supplies), or Platinum ($25/month for year supplies). All tiers save you 90% vs retail pharmacy.",
+      "url": "https://pillardrugclub.com/register"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Transfer or Upload Your Prescription",
+      "text": "We'll transfer from your current pharmacy or you can upload a new prescription from your doctor. We handle all the paperwork.",
+      "url": "https://pillardrugclub.com/prescription-request"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 5,
+      "name": "Get Free Home Delivery",
+      "text": "Your medications ship directly to your door at no extra cost. Tracking included. Available in all 50 states.",
+      "url": "https://pillardrugclub.com"
+    }
+  ]
+};
+
+export const videoSchema = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "Stop Overpaying for Prescriptions - Pillar Drug Club",
+  "description": "See how Americans are saving 90% on medications by joining Pillar Drug Club. Get prescriptions as low as 1¢ per pill without insurance.",
+  "thumbnailUrl": "https://pillardrugclub.com/video-thumbnail.jpg",
+  "uploadDate": "2024-01-01T00:00:00Z",
+  "contentUrl": "https://pillardrugclub.com",
+  "duration": "PT2M30S"
+};

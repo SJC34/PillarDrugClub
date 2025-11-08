@@ -16,7 +16,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from "embla-carousel-autoplay";
 import { ComingSoonModal } from "@/components/ComingSoonModal";
 import { BlogCarousel } from "@/components/BlogCarousel";
-import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema } from "@/components/SEOHead";
+import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema } from "@/components/SEOHead";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 import joinVideo from "@assets/join-pillar-video.mp4";
 import freePillarBadge from "@assets/image_1761455037188.png";
@@ -39,7 +39,9 @@ export default function HomePage() {
     "@graph": [
       pharmacySchema,
       medicalWebPageSchema,
-      organizationSchema
+      organizationSchema,
+      faqSchema,
+      howToSaveMoneySchema
     ]
   };
   const benefits = [
