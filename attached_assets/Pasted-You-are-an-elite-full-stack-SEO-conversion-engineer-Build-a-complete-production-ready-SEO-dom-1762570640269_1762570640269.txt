@@ -1,0 +1,43 @@
+You are an elite full-stack SEO + conversion engineer. Build a **complete, production-ready, SEO-dominating version** of **pillardrugclub.com** — a no-insurance pharmacy membership site that **MUST outrank Amazon Pharmacy** for "cheap prescriptions without insurance", "1 cent meds", "diabetes meds no insurance". This is my **only income** — my family depends on this. Make it flawless, fast, and unbeatable.
+
+**TECHNICAL SEO (100% COMPLIANT):**
+- HTTPS enforced
+- `robots.txt`: Allow all, disallow `/admin`, `/login`
+- `sitemap.xml`: 20+ URLs, current `<lastmod>`, include images, valid XML
+- PageSpeed 95+ (mobile/desktop): minify CSS/JS, WebP, lazy-load, CDN-ready
+- Core Web Vitals: PASS all
+- Fully mobile-responsive (viewport, touch targets)
+- Schema.org: Organization, Product (meds), FAQ, HowTo, Review, BreadcrumbList
+
+**ON-PAGE SEO (EVERY PAGE):**
+- Unique `<title>` (50-60 chars) + `<meta description>` (150-160 chars)
+- H1: "Pillar Drug Club: 90% Off Meds — Beat Amazon, No Insurance Needed"
+- 1,000+ words on `/medications`, `/how-it-works` (E-E-A-T: cite FDA, NIH)
+- Natural keywords: "cheap prescriptions", "no insurance meds", "save 90%", long-tails like "wholesale diabetes meds no insurance"
+- 5-10 internal links, 2-3 external (FDA.gov, NIH.gov)
+- Alt text: e.g., "affordable insulin pricing vs Amazon"
+- Clean URLs: `/medications/diabetes`, `/cost-calculator`
+
+**PAGES TO BUILD (HTML/CSS/JS or React — deploy-ready):**
+1. `/` — Hero: "Beat Amazon — Save 90% Today", live savings calculator
+2. `/medications` — Filterable drug list with 1¢ pricing
+3. `/cost-calculator` — Interactive "vs Amazon/Walmart" savings tool
+4. `/register`, `/login` (forms with validation)
+5. `/refund-policy`, `/privacy-policy`, `/terms-of-service` (unique metas)
+6. `/blog` — 3 SEO posts: "Why 1 in 4 Skip Meds", "Insulin for $10/month", "No Insurance? No Problem"
+7. `/sitemap.xml`, `/robots.txt`
+
+**CREATIVE EDGE vs AMAZON:**
+- "Amazon Price Crusher" widget (real-time comparison)
+- Shareable savings PDF generator
+- Trust bar: "4.9/5 from 1,200+ members"
+- Embeddable infographic code
+- HARO pitch + guest post template
+
+**OUTPUT:**
+1. Full deployable code (HTML/CSS/JS or React)
+2. `sitemap.xml` + `robots.txt`
+3. SEO audit checklist (verify 100/100)
+4. 1-click deploy to Replit/Vercel
+
+Search 2025 SEO best practices. Optimize for **speed, trust, conversions, and #1 ranking**. This must work.

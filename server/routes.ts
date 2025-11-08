@@ -93,6 +93,99 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     });
   });
 
+  // ===== SEO: Dynamic Sitemap Generation =====
+  // Generate XML sitemap for search engines
+  app.get('/sitemap.xml', async (req, res) => {
+    try {
+      const domain = process.env.CUSTOM_DOMAIN || 
+        (process.env.REPLIT_DOMAINS ? process.env.REPLIT_DOMAINS.split(",")[0] : "pillardrugclub.com");
+      const baseUrl = `https://${domain}`;
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Static public pages with SEO priority
+      const staticPages = [
+        { url: '/', priority: 1.0, changefreq: 'daily' },
+        { url: '/medications', priority: 0.9, changefreq: 'daily' },
+        { url: '/cost-calculator', priority: 0.9, changefreq: 'weekly' },
+        { url: '/blog', priority: 0.8, changefreq: 'daily' },
+        { url: '/refund-policy', priority: 0.5, changefreq: 'monthly' },
+        { url: '/privacy-policy', priority: 0.5, changefreq: 'monthly' },
+        { url: '/terms-of-service', priority: 0.5, changefreq: 'monthly' },
+      ];
+      
+      // Get all published blog posts
+      const blogPosts = await storage.getBlogPosts({ 
+        status: 'published',
+        limit: 1000 
+      });
+      
+      // Get all medications
+      const medications = await storage.searchMedications({ limit: 2000 });
+      
+      // Build XML sitemap
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n';
+      xml += '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n';
+      
+      // Add static pages
+      staticPages.forEach(page => {
+        xml += '  <url>\n';
+        xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
+        xml += `    <lastmod>${today}</lastmod>\n`;
+        xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+        xml += `    <priority>${page.priority}</priority>\n`;
+        xml += '  </url>\n';
+      });
+      
+      // Add blog posts
+      blogPosts.forEach((post: any) => {
+        const pubDate = post.publishedAt 
+          ? new Date(post.publishedAt).toISOString().split('T')[0]
+          : today;
+        xml += '  <url>\n';
+        xml += `    <loc>${baseUrl}/blog/${post.slug}</loc>\n`;
+        xml += `    <lastmod>${pubDate}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.7</priority>\n`;
+        if (post.featuredImage) {
+          xml += `    <image:image>\n`;
+          xml += `      <image:loc>${post.featuredImage}</image:loc>\n`;
+          xml += `      <image:title>${escapeXml(post.title)}</image:title>\n`;
+          xml += `    </image:image>\n`;
+        }
+        xml += '  </url>\n';
+      });
+      
+      // Add medication pages (top 500 for performance)
+      medications.slice(0, 500).forEach((med: any) => {
+        xml += '  <url>\n';
+        xml += `    <loc>${baseUrl}/medications/${med.id}</loc>\n`;
+        xml += `    <lastmod>${today}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.6</priority>\n`;
+        xml += '  </url>\n';
+      });
+      
+      xml += '</urlset>';
+      
+      res.header('Content-Type', 'application/xml');
+      res.send(xml);
+    } catch (error: any) {
+      console.error('Error generating sitemap:', error);
+      res.status(500).send('Error generating sitemap');
+    }
+  });
+  
+  // Helper function to escape XML special characters
+  function escapeXml(unsafe: string): string {
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
   // Get authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
     try {

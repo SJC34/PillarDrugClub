@@ -1,0 +1,26 @@
+# Pillar Drug Club - Robots.txt
+# Updated: November 2025
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /prescriptions
+Disallow: /refills
+Disallow: /orders
+Disallow: /checkout
+Disallow: /cart
+Disallow: /prescription-request
+Disallow: /cancel-subscription
+Disallow: /subscribe
+Disallow: /subscription
+
+# Sitemap location
+Sitemap: https://pillardrugclub.com/sitemap.xml
+
+# Crawl-delay for good citizenship
+Crawl-delay: 1

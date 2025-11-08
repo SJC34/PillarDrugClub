@@ -155,13 +155,20 @@ export async function resetFailedLoginAttempts(userId: string): Promise<void> {
 }
 
 export function validateSessionTimeout(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() && req.session) {
+  // Skip session validation for public endpoints (sitemap, robots.txt, health checks, etc.)
+  const publicPaths = ['/sitemap.xml', '/robots.txt', '/health', '/api/ping'];
+  if (publicPaths.some(path => req.path === path)) {
+    return next();
+  }
+  
+  // Only validate session if authentication middleware is available
+  if (typeof (req as any).isAuthenticated === 'function' && (req as any).isAuthenticated() && req.session) {
     const now = Date.now();
     const lastActivity = req.session.lastActivity || now;
     const TIMEOUT_MS = 30 * 60 * 1000;
 
     if (now - lastActivity > TIMEOUT_MS) {
-      req.logout((err) => {
+      (req as any).logout((err: any) => {
         if (err) console.error('Logout error:', err);
         
         createSecurityEvent(req, {
