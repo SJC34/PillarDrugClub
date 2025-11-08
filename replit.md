@@ -16,7 +16,12 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
 - **Backend**: Express.js with TypeScript provides RESTful APIs, backed by a PostgreSQL database with Drizzle ORM.
 - **Authentication & Authorization**: Dual authentication via email/password and Google OAuth, using Passport.js for session management and a robust role-based access control system. Session management now properly includes user role for admin features.
 - **Coming Soon Waitlist Modal**: A pre-launch waitlist collection system integrated into the HomePage for collecting user contact information with Zod validation and database persistence.
-- **SEO Optimization System**: Comprehensive SEO with dynamic meta tags, healthcare schema markup (JSON-LD), and a keyword strategy targeting competitive healthcare terms.
+- **SEO Optimization System** (November 2025): Production-ready SEO infrastructure targeting competitive healthcare keywords to outrank Amazon Pharmacy, GoodRx, and Cost Plus Drugs. Features include:
+  - **Robots.txt & Sitemap**: Blocks admin routes, dynamic sitemap.xml includes 500+ medication pages and blog posts
+  - **Schema.org Markup**: Enhanced pharmacy schema with competitive keywords, AggregateRating (4.9/5), HowTo schema for featured snippets, FAQ schema, Video schema, Breadcrumb schemas. Counter-based unique script IDs prevent collisions when multiple schemas load concurrently
+  - **Meta Tag Optimization**: High-intent keywords on HomePage, MedicationsPage, BlogPage, and all 4 RegisterPage steps. SSR-safe `getBaseUrl()` helper for environment-aware canonical URLs
+  - **Target Keywords**: "cheap prescriptions without insurance", "prescription drug club membership", "wholesale medication prices", "diabetes meds without insurance"
+  - **Technical Implementation**: SEOHead component with unique counter-based script IDs (prevents schema collisions), SSR-compatible URL helpers, metadata persistence across multi-step flows
 - **Multi-Step Registration**: A 4-step onboarding process covering social authentication, tier selection, user details, prescription preferences, and Stripe membership payment.
 - **Payment Processing**: Integrated Stripe for subscription-based membership across three tiers.
 - **PDF Prescription System**: Generates branded PDF prescription request forms with SureScripts pharmacy lookup information, distributed via email and SMS using PDFKit, Resend, and Twilio.
