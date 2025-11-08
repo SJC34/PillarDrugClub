@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon, Pill, User, LogOut, Settings } from "lucide-react";
+import { Menu, X, Sun, Moon, Pill, User, LogOut, Settings, ShieldCheck, LayoutDashboard } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -129,16 +129,34 @@ export default function Header() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    {user?.role === "admin" && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <a href="/admin" className="cursor-pointer" data-testid="menu-item-admin-dashboard">
+                            <ShieldCheck className="mr-2 h-4 w-4" />
+                            Admin Dashboard
+                          </a>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <a href="/dashboard" className="cursor-pointer" data-testid="menu-item-user-dashboard">
+                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                            User Dashboard
+                          </a>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {user?.role !== "admin" && (
+                      <DropdownMenuItem asChild>
+                        <a href="/dashboard" className="cursor-pointer" data-testid="menu-item-dashboard">
+                          <User className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </a>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <a href="/settings" className="cursor-pointer" data-testid="menu-item-settings">
                         <Settings className="mr-2 h-4 w-4" />
                         Account Settings
-                      </a>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <a href="/dashboard" className="cursor-pointer" data-testid="menu-item-dashboard">
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
                       </a>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -220,6 +238,26 @@ export default function Header() {
                           </p>
                         </div>
                       </div>
+                      {user?.role === "admin" && (
+                        <>
+                          <a 
+                            href="/admin" 
+                            onClick={() => setIsMenuOpen(false)}
+                            className="block py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors"
+                            data-testid="mobile-button-admin-dashboard"
+                          >
+                            Admin Dashboard
+                          </a>
+                          <a 
+                            href="/dashboard" 
+                            onClick={() => setIsMenuOpen(false)}
+                            className="block py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors"
+                            data-testid="mobile-button-user-dashboard"
+                          >
+                            User Dashboard
+                          </a>
+                        </>
+                      )}
                       <a 
                         href="/settings" 
                         onClick={() => setIsMenuOpen(false)}

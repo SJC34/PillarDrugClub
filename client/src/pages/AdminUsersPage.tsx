@@ -118,11 +118,7 @@ export default function AdminUsersPage() {
   // Suspend user mutation
   const suspendMutation = useMutation({
     mutationFn: async ({ userId, isActive }: { userId: string; isActive: boolean }) => {
-      return apiRequest(`/api/admin/users/${userId}/suspend`, {
-        method: "POST",
-        body: JSON.stringify({ is_active: isActive }),
-        headers: { "Content-Type": "application/json" },
-      });
+      return apiRequest("POST", `/api/admin/users/${userId}/suspend`, { is_active: isActive });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -137,11 +133,7 @@ export default function AdminUsersPage() {
   // Deactivate user mutation
   const deactivateMutation = useMutation({
     mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
-      return apiRequest(`/api/admin/users/${userId}/deactivate`, {
-        method: "POST",
-        body: JSON.stringify({ reason }),
-        headers: { "Content-Type": "application/json" },
-      });
+      return apiRequest("POST", `/api/admin/users/${userId}/deactivate`, { reason });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -156,10 +148,7 @@ export default function AdminUsersPage() {
   // Reactivate user mutation
   const reactivateMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return apiRequest(`/api/admin/users/${userId}/reactivate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
+      return apiRequest("POST", `/api/admin/users/${userId}/reactivate`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -174,11 +163,7 @@ export default function AdminUsersPage() {
   // Delete user mutation
   const deleteMutation = useMutation({
     mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) => {
-      return apiRequest(`/api/admin/users/${userId}/delete`, {
-        method: "POST",
-        body: JSON.stringify({ reason }),
-        headers: { "Content-Type": "application/json" },
-      });
+      return apiRequest("POST", `/api/admin/users/${userId}/delete`, { reason });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -193,10 +178,7 @@ export default function AdminUsersPage() {
   // Recover user mutation
   const recoverMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return apiRequest(`/api/admin/users/${userId}/recover`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
+      return apiRequest("POST", `/api/admin/users/${userId}/recover`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
