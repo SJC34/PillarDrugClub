@@ -134,6 +134,26 @@ export default function RegisterPage() {
   const [selectedTier, setSelectedTier] = useState<"free" | "gold" | "platinum">("free");
   const { toast } = useToast();
 
+  // Parse step from URL (for OAuth redirects) - run on first render only
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get('step');
+    
+    if (stepParam) {
+      const stepNumber = parseInt(stepParam, 10);
+      // Validate and clamp to valid step range (1-4)
+      if (stepNumber >= 1 && stepNumber <= 4) {
+        setCurrentStep(stepNumber as 1 | 2 | 3 | 4);
+        // If starting at step 2, set auth method to social (from OAuth)
+        if (stepNumber === 2) {
+          setAuthMethod("social");
+        }
+      }
+      // Clean up URL to avoid re-triggering
+      window.history.replaceState({}, '', '/register' + (params.get('tier') ? `?tier=${params.get('tier')}` : ''));
+    }
+  }, []);
+
   // Parse tier from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -232,10 +252,14 @@ export default function RegisterPage() {
             // Store in localStorage for consistency
             localStorage.setItem("user", JSON.stringify(userData));
           }
+        } else {
+          // Auth check failed - if we're at step 2 from URL, revert to step 1
+          setCurrentStep(prevStep => prevStep === 2 ? 1 : prevStep);
         }
       } catch (error) {
-        // User not authenticated, stay on step 1
+        // User not authenticated - if we're at step 2 from URL, revert to step 1
         console.log("No authenticated user found");
+        setCurrentStep(prevStep => prevStep === 2 ? 1 : prevStep);
       }
     };
 
