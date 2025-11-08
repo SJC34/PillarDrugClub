@@ -28,9 +28,18 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
 - **Refund Policy System**: Comprehensive, transparent refund and cancellation policy with two-tier refund structure and annual commitment terms, available as web content and downloadable PDF.
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including Executive Dashboard, User Management (deactivate, soft delete, suspend, delete, recover), Financial Dashboard, Communication Center, Reports & Analytics, and Medication Pricing Management. Admin users can toggle between Admin Dashboard and User Dashboard via the header menu for seamless role switching.
 - **Hybrid Blog System ("The Pillar Post 🗞️")**: A dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG). Features include an admin interface for content generation, AI-powered SEO keyword generator that analyzes blog titles to suggest 8-12 optimized keywords, compliance review workflow, and a GoodRx-style visual redesign with featured image uploads (client-side resizing, compression, base64 storage).
+- **HIPAA Security Infrastructure** (November 2025): Comprehensive HIPAA-compliant security controls including:
+  - **Audit Logging System**: Tracks ALL PHI access (authorized & unauthorized), authentication events, admin actions. 6-year retention with indexed queries. Device fingerprinting (IP, user agent, browser/OS/device).
+  - **Field-Level Encryption**: AES-256-CBC encryption for sensitive PHI (medical info, addresses). PBKDF2-SHA512 password hashing (100k iterations). Mandatory ENCRYPTION_KEY in production (fails fast if missing).
+  - **Session Security**: 30-minute automatic timeout, device tracking, session regeneration on login, secure cookies (httpOnly, secure, sameSite:lax for CSRF protection).
+  - **API Security**: Rate limiting (100 req/15min general, 5 req/15min auth), Helmet.js security headers (CSP, HSTS, XSS protection), input validation.
+  - **Authentication Security**: Account lockout after 5 failed attempts (30-min duration), strong password requirements (12+ chars, complexity, history tracking), password expiration (90 days), MFA-ready schema.
+  - **Access Controls**: Role-based access (admin/client/broker/company), minimum necessary PHI access enforcement, audit logging of all privilege changes.
+  - **Database Security**: Encrypted connections, PostgreSQL session store, secure password storage with salting.
+  - **Documentation**: Comprehensive SECURITY.md covering all HIPAA Technical & Administrative Safeguards, incident response, and compliance checklist.
 
 ### System Design Choices
-Emphasizes modularity, scalability, and security for sensitive healthcare data, utilizing serverless PostgreSQL and asynchronous communication.
+Emphasizes modularity, scalability, and security for sensitive healthcare data, utilizing serverless PostgreSQL and asynchronous communication. All HIPAA security controls implemented following § 164.312 Technical Safeguards and § 164.308 Administrative Safeguards requirements.
 
 ## External Dependencies
 - **Database Service**: Neon Database (serverless PostgreSQL).
