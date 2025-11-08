@@ -10,7 +10,62 @@ export interface BlogGenerationOptions {
   tone?: "professional" | "friendly" | "educational" | "conversational";
   keywords?: string[];
   targetLength?: "short" | "medium" | "long"; // ~500, ~1000, ~1500+ words
+  writingStyle?: string; // Style of famous writers (e.g., "hemingway", "gladwell", etc.)
 }
+
+// Legendary Writing Styles Library
+export const writingStyles = {
+  hemingway: {
+    name: "Ernest Hemingway",
+    description: "Short, declarative sentences. Sparse prose. No wasted words. Active voice. Concrete nouns and verbs.",
+    prompt: "Write in Ernest Hemingway's distinctive style: use short, declarative sentences with minimal adjectives. Be direct and economical with words. Use active voice and concrete language. Avoid flowery descriptions."
+  },
+  gladwell: {
+    name: "Malcolm Gladwell",
+    description: "Narrative storytelling. Surprising insights. Compelling anecdotes. Research-backed conclusions. Accessible science.",
+    prompt: "Write in Malcolm Gladwell's style: start with a surprising anecdote or counterintuitive insight. Weave together stories with research. Make complex ideas accessible through real-world examples. Build to an 'aha!' moment."
+  },
+  godin: {
+    name: "Seth Godin",
+    description: "Short paragraphs. Bold ideas. Direct address. Provocative questions. Challenge assumptions.",
+    prompt: "Write in Seth Godin's style: use short, punchy paragraphs. Challenge conventional thinking. Ask provocative questions. Address the reader directly. Make bold statements that shift perspective."
+  },
+  ferriss: {
+    name: "Tim Ferriss",
+    description: "Tactical advice. Step-by-step frameworks. Data-driven. Personal experiments. Actionable takeaways.",
+    prompt: "Write in Tim Ferriss's style: provide tactical, actionable advice with specific frameworks. Include data and personal experiments. Use numbered lists and clear step-by-step processes. Focus on optimization and efficiency."
+  },
+  keller: {
+    name: "Gary Keller",
+    description: "Focus on ONE thing. Simple frameworks. Question-based insights. Practical wisdom.",
+    prompt: "Write in Gary Keller's style: focus on the ONE most important insight. Use simple, powerful frameworks. Ask focusing questions. Provide practical wisdom that cuts through complexity."
+  },
+  newport: {
+    name: "Cal Newport",
+    description: "Deep research. Clear arguments. Case studies. Evidence-based. Thoughtful analysis.",
+    prompt: "Write in Cal Newport's style: build arguments with deep research and evidence. Use case studies and real examples. Analyze thoughtfully without hype. Focus on sustainable, evidence-backed strategies."
+  },
+  holiday: {
+    name: "Ryan Holiday",
+    description: "Stoic wisdom. Historical examples. Timeless principles. Short chapters. Modern applications.",
+    prompt: "Write in Ryan Holiday's style: draw on historical examples and timeless wisdom. Connect ancient philosophy to modern challenges. Use compelling stories from history. Keep prose clear and impactful."
+  },
+  brown: {
+    name: "Brené Brown",
+    description: "Vulnerable storytelling. Research insights. Empathetic tone. Personal connection. Authentic voice.",
+    prompt: "Write in Brené Brown's style: combine personal vulnerability with research insights. Use warm, empathetic language. Connect emotionally with readers. Share authentic experiences alongside academic findings."
+  },
+  clear: {
+    name: "James Clear",
+    description: "Systems over goals. Small habits. Scientific backing. Real examples. Progressive frameworks.",
+    prompt: "Write in James Clear's style: focus on systems and small, incremental improvements. Back claims with science. Use the '1% better' philosophy. Provide actionable frameworks with real-world examples."
+  },
+  default: {
+    name: "Professional Healthcare Writer",
+    description: "Balanced, authoritative, accessible. Clear structure. Evidence-based. Patient-focused.",
+    prompt: "Write in a professional yet accessible healthcare writing style. Balance authority with warmth. Use clear structure and evidence-based information. Focus on helping patients make informed decisions."
+  }
+};
 
 export async function generateBlogPost(options: BlogGenerationOptions) {
   const {
@@ -18,7 +73,8 @@ export async function generateBlogPost(options: BlogGenerationOptions) {
     category,
     tone = "professional",
     keywords = [],
-    targetLength = "medium"
+    targetLength = "medium",
+    writingStyle = "default"
   } = options;
 
   const lengthGuidance = {
@@ -39,6 +95,11 @@ export async function generateBlogPost(options: BlogGenerationOptions) {
     ? `Include these keywords naturally: ${keywords.join(", ")}.` 
     : "";
 
+  const selectedStyle = writingStyles[writingStyle as keyof typeof writingStyles] || writingStyles.default;
+  const styleInstruction = writingStyle !== "default" 
+    ? `\n\nWRITING STYLE:\n${selectedStyle.prompt}\n`
+    : "";
+
   const prompt = `You are a professional healthcare content writer for Pillar Drug Club, a prescription medication platform offering wholesale pricing directly to consumers.
 
 Write a comprehensive, SEO-optimized blog post on the following topic: "${topic}"
@@ -47,7 +108,7 @@ Category: ${category}
 Context: ${categoryContext[category]}
 Tone: ${tone}
 Length: ${lengthGuidance[targetLength]}
-${keywordsText}
+${keywordsText}${styleInstruction}
 
 Requirements:
 1. Write an engaging, informative article that provides real value to readers

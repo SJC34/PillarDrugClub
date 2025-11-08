@@ -3634,8 +3634,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(403).json({ error: "Admin access required", message: "Only admins can generate blog posts" });
       }
 
-      const { topic, category, tone, keywords, targetLength } = req.body;
-      console.log("📝 Generation params:", { topic, category, tone, keywords, targetLength });
+      const { topic, category, tone, keywords, targetLength, writingStyle } = req.body;
+      console.log("📝 Generation params:", { topic, category, tone, keywords, targetLength, writingStyle });
       
       if (!topic || !category) {
         return res.status(400).json({ error: "Topic and category are required" });
@@ -3650,7 +3650,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         category,
         tone,
         keywords,
-        targetLength
+        targetLength,
+        writingStyle
       });
       
       console.log("✅ Blog post generated successfully");
@@ -3720,10 +3721,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(403).json({ error: "Admin access required" });
       }
 
+      // Format author name with credentials if available
+      const authorName = req.user.credentials
+        ? `${req.user.firstName} ${req.user.lastName}, ${req.user.credentials}`
+        : `${req.user.firstName} ${req.user.lastName}`;
+      
       const postData = {
         ...req.body,
         authorId: req.user.id,
-        authorName: `${req.user.firstName} ${req.user.lastName}`
+        authorName
       };
       
       const post = await storage.createBlogPost(postData);

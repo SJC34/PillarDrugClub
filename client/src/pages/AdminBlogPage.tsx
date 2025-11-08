@@ -73,6 +73,7 @@ export default function AdminBlogPage() {
   const [tone, setTone] = useState("professional");
   const [keywords, setKeywords] = useState("");
   const [targetLength, setTargetLength] = useState("medium");
+  const [writingStyle, setWritingStyle] = useState("default");
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [isGeneratingKeywords, setIsGeneratingKeywords] = useState(false);
 
@@ -303,6 +304,7 @@ export default function AdminBlogPage() {
         tone,
         keywords: keywords ? keywords.split(",").map(k => k.trim()) : undefined,
         targetLength,
+        writingStyle,
       });
     } else {
       if (!medicalTopic) {
@@ -806,6 +808,30 @@ export default function AdminBlogPage() {
                           <SelectItem value="long">Long (1200-1800 words)</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="writingStyle">Writing Style</Label>
+                      <Select value={writingStyle} onValueChange={setWritingStyle}>
+                        <SelectTrigger id="writingStyle" data-testid="select-writing-style">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="default">Professional Healthcare Writer</SelectItem>
+                          <SelectItem value="hemingway">Ernest Hemingway - Short, direct prose</SelectItem>
+                          <SelectItem value="gladwell">Malcolm Gladwell - Narrative storytelling</SelectItem>
+                          <SelectItem value="godin">Seth Godin - Bold, punchy ideas</SelectItem>
+                          <SelectItem value="ferriss">Tim Ferriss - Tactical frameworks</SelectItem>
+                          <SelectItem value="keller">Gary Keller - Focus on ONE thing</SelectItem>
+                          <SelectItem value="newport">Cal Newport - Deep research</SelectItem>
+                          <SelectItem value="holiday">Ryan Holiday - Stoic wisdom</SelectItem>
+                          <SelectItem value="brown">Brené Brown - Vulnerable storytelling</SelectItem>
+                          <SelectItem value="clear">James Clear - Small habits, systems</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Emulate the writing style of legendary authors and bloggers
+                      </p>
                     </div>
 
                     <Button
