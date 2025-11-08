@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface SEOHeadProps {
   title?: string;
@@ -7,12 +7,23 @@ interface SEOHeadProps {
   schema?: object;
 }
 
+export function getBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  return 'https://pillardrugclub.com';
+}
+
+let schemaIdCounter = 0;
+
 export function SEOHead({ 
   title, 
   description, 
   canonical,
   schema 
 }: SEOHeadProps) {
+  const scriptIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (title) {
       document.title = title;
@@ -44,7 +55,11 @@ export function SEOHead({
     }
 
     if (schema) {
-      const scriptId = 'schema-org-jsonld';
+      if (!scriptIdRef.current) {
+        scriptIdRef.current = `schema-org-jsonld-${++schemaIdCounter}`;
+      }
+      
+      const scriptId = scriptIdRef.current;
       let script: HTMLScriptElement | null = document.getElementById(scriptId) as HTMLScriptElement;
       
       if (!script) {
@@ -55,6 +70,13 @@ export function SEOHead({
       }
       
       script.textContent = JSON.stringify(schema);
+      
+      return () => {
+        const existingScript = document.getElementById(scriptId);
+        if (existingScript && existingScript.id === scriptIdRef.current) {
+          existingScript.remove();
+        }
+      };
     }
   }, [title, description, canonical, schema]);
 

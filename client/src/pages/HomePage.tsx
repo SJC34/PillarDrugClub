@@ -16,7 +16,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from "embla-carousel-autoplay";
 import { ComingSoonModal } from "@/components/ComingSoonModal";
 import { BlogCarousel } from "@/components/BlogCarousel";
-import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema } from "@/components/SEOHead";
+import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 import joinVideo from "@assets/join-pillar-video.mp4";
 import freePillarBadge from "@assets/image_1761455037188.png";
@@ -80,7 +80,7 @@ export default function HomePage() {
       <SEOHead
         title="Save 90% on Prescriptions | Get Meds Without Insurance - Pillar Drug Club"
         description="Can't afford your prescriptions? Get medications for as low as 1¢ per pill. No insurance needed. Free delivery. Save hundreds on diabetes, blood pressure, cholesterol & more."
-        canonical="https://pillardrugclub.com"
+        canonical={getBaseUrl()}
         schema={combinedSchema}
       />
 

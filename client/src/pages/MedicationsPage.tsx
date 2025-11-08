@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, ShoppingCart, Info } from "lucide-react";
 import { Link } from "wouter";
 import { MedicationSearch } from "@/components/MedicationSearch";
+import { SEOHead, pharmacySchema, createBreadcrumbSchema, getBaseUrl } from "@/components/SEOHead";
 
 interface Medication {
   id: string;
@@ -71,8 +72,25 @@ export default function MedicationsPage() {
     "Antibiotics", "Pain Relief", "Blood Pressure", "Heart Medications"
   ];
 
+  const baseUrl = getBaseUrl();
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: baseUrl },
+    { name: "Medications", url: `${baseUrl}/medications` }
+  ]);
+
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [pharmacySchema, breadcrumbSchema]
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <SEOHead
+        title="Cheap Prescription Medications Without Insurance | 3000+ Drugs - Pillar Drug Club"
+        description="Browse 3000+ prescription medications at wholesale prices. Diabetes meds, blood pressure pills, cholesterol drugs as low as 1¢ per pill. No insurance needed. Free delivery nationwide."
+        canonical={`${baseUrl}/medications`}
+        schema={combinedSchema}
+      />
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">

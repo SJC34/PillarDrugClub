@@ -20,6 +20,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { MedicationSearch } from "@/components/MedicationSearch";
 import { handleDateInputChange } from "@/lib/dateFormatter";
+import { SEOHead, pharmacySchema, createBreadcrumbSchema, getBaseUrl } from "@/components/SEOHead";
 import freePillarBadge from "@assets/image_1761455037188.png";
 import goldPillarBadge from "@assets/image_1761454767191.png";
 import platinumPillarBadge from "@assets/image_1761453800697.png";
@@ -484,15 +485,33 @@ export default function RegisterPage() {
 
   const rxType = step3Form.watch("rxType");
 
+  const baseUrl = getBaseUrl();
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: baseUrl },
+    { name: "Join", url: `${baseUrl}/register` }
+  ]);
+
+  const combinedSchema = {
+    "@context": "https://schema.org",
+    "@graph": [pharmacySchema, breadcrumbSchema]
+  };
+
   // Step 1: Choose Authentication Method
   if (currentStep === 1) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $15/month</p>
-          </div>
+      <>
+        <SEOHead
+          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          canonical={`${baseUrl}/register`}
+          schema={combinedSchema}
+        />
+        <div className="min-h-screen flex items-center justify-center px-4 py-8">
+          <div className="w-full max-w-md">
+            <div className="text-center mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
+              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $15/month</p>
+            </div>
 
           <Card className="border-secondary/20">
             <CardHeader>
@@ -566,18 +585,26 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   // Step 2: Collect Additional Details
   if (currentStep === 2) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-2xl">
-          <div className="text-center mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Your Information</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Complete your profile to continue</p>
-          </div>
+      <>
+        <SEOHead
+          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          canonical={`${baseUrl}/register`}
+          schema={combinedSchema}
+        />
+        <div className="min-h-screen flex items-center justify-center px-4 py-8">
+          <div className="w-full max-w-2xl">
+            <div className="text-center mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Your Information</h1>
+              <p className="text-sm md:text-base text-muted-foreground">Complete your profile to continue</p>
+            </div>
 
           {/* Tier Selection */}
           <Card className="border-secondary/20 mb-6">
@@ -921,18 +948,26 @@ export default function RegisterPage() {
           </Card>
         </div>
       </div>
+      </>
     );
   }
 
   // Step 3: RX Preference
   if (currentStep === 3) {
     return (
-      <div className="min-h-screen px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Prescription Setup</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Do you need to request a new prescription from your doctor?</p>
-          </div>
+      <>
+        <SEOHead
+          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          canonical={`${baseUrl}/register`}
+          schema={combinedSchema}
+        />
+        <div className="min-h-screen px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Prescription Setup</h1>
+              <p className="text-sm md:text-base text-muted-foreground">Do you need to request a new prescription from your doctor?</p>
+            </div>
 
           <Card className="border-secondary/20">
             <CardHeader>
@@ -1110,24 +1145,32 @@ export default function RegisterPage() {
           </Card>
         </div>
       </div>
+      </>
     );
   }
 
   // Step 4: Payment
   if (currentStep === 4 && clientSecret) {
     return (
-      <div className="min-h-screen px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-6 md:mb-8">
-            <Link href="/">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Pill className="h-8 w-8 text-teal-600" />
-                <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
-              </div>
-            </Link>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Complete Your Registration</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Step 4 of 4 - Subscribe to access wholesale pricing</p>
-          </div>
+      <>
+        <SEOHead
+          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          canonical={`${baseUrl}/register`}
+          schema={combinedSchema}
+        />
+        <div className="min-h-screen px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-6 md:mb-8">
+              <Link href="/">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <Pill className="h-8 w-8 text-teal-600" />
+                  <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
+                </div>
+              </Link>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Complete Your Registration</h1>
+              <p className="text-sm md:text-base text-muted-foreground">Step 4 of 4 - Subscribe to access wholesale pricing</p>
+            </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Benefits */}
@@ -1199,6 +1242,7 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
