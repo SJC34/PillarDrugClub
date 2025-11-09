@@ -169,6 +169,13 @@ export interface IStorage {
       recentOrders: Array<{ id: string; orderNumber: string; status: string; total: string; createdAt: string }>;
     };
   }>;
+
+  // Content Queue
+  getContentQueue(): Promise<any[]>;
+  getContentQueueItem(id: string): Promise<any | undefined>;
+  createContentQueueItem(item: any): Promise<any>;
+  updateContentQueueItem(id: string, updates: any): Promise<any | undefined>;
+  deleteContentQueueItem(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -2728,6 +2735,39 @@ export class DbStorage extends MemStorage {
     await db.update(blogPosts)
       .set({ viewCount: sql`${blogPosts.viewCount} + 1` })
       .where(eq(blogPosts.id, id));
+  }
+
+  // Content Queue Methods
+  async getContentQueue(): Promise<any[]> {
+    const { contentQueue } = await import("@shared/schema");
+    return db.select().from(contentQueue).orderBy(desc(contentQueue.scheduledFor));
+  }
+
+  async getContentQueueItem(id: string): Promise<any | undefined> {
+    const { contentQueue } = await import("@shared/schema");
+    const result = await db.select().from(contentQueue).where(eq(contentQueue.id, id));
+    return result[0];
+  }
+
+  async createContentQueueItem(item: any): Promise<any> {
+    const { contentQueue } = await import("@shared/schema");
+    const result = await db.insert(contentQueue).values(item).returning();
+    return result[0];
+  }
+
+  async updateContentQueueItem(id: string, updates: any): Promise<any | undefined> {
+    const { contentQueue } = await import("@shared/schema");
+    const result = await db.update(contentQueue)
+      .set(updates)
+      .where(eq(contentQueue.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteContentQueueItem(id: string): Promise<boolean> {
+    const { contentQueue } = await import("@shared/schema");
+    const result = await db.delete(contentQueue).where(eq(contentQueue.id, id)).returning();
+    return result.length > 0;
   }
 }
 

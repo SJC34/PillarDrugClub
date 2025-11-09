@@ -3800,4 +3800,140 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       res.status(500).json({ error: "Failed to generate SEO metadata", message: error.message });
     }
   });
+
+  // ===== CONTENT AUTOMATION API ENDPOINTS =====
+  
+  // Generate multi-channel content (admin only)
+  app.post("/api/content/generate-multi-channel", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { generateMultiChannelContent } = await import("./content-automation");
+      const content = await generateMultiChannelContent(req.body);
+      
+      res.json(content);
+    } catch (error: any) {
+      console.error("Error generating multi-channel content:", error);
+      res.status(500).json({ error: "Failed to generate content", message: error.message });
+    }
+  });
+
+  // Queue content for publishing (admin only)
+  app.post("/api/content/queue", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const queueItem = await storage.createContentQueueItem(req.body);
+      res.json(queueItem);
+    } catch (error: any) {
+      console.error("Error queuing content:", error);
+      res.status(500).json({ error: "Failed to queue content", message: error.message });
+    }
+  });
+
+  // Get content queue (admin only)
+  app.get("/api/content/queue", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const queue = await storage.getContentQueue();
+      res.json(queue);
+    } catch (error: any) {
+      console.error("Error fetching content queue:", error);
+      res.status(500).json({ error: "Failed to fetch queue", message: error.message });
+    }
+  });
+
+  // Update content queue item status (admin only)
+  app.patch("/api/content/queue/:id", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const updated = await storage.updateContentQueueItem(req.params.id, req.body);
+      if (!updated) {
+        return res.status(404).json({ error: "Queue item not found" });
+      }
+      
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating queue item:", error);
+      res.status(500).json({ error: "Failed to update queue item", message: error.message });
+    }
+  });
+
+  // Delete content queue item (admin only)
+  app.delete("/api/content/queue/:id", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const success = await storage.deleteContentQueueItem(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Queue item not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting queue item:", error);
+      res.status(500).json({ error: "Failed to delete queue item", message: error.message });
+    }
+  });
+
+  // Verify social media credentials (admin only)
+  app.get("/api/content/verify-credentials", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { isTwitterConfigured, verifyCredentials: verifyTwitter } = await import("./services/twitter-service");
+      const { isRedditConfigured, verifyRedditCredentials } = await import("./services/reddit-service");
+      const { isMailchimpConfigured, verifyMailchimpCredentials } = await import("./services/mailchimp-service");
+
+      const credentials: any = {
+        twitter: { configured: isTwitterConfigured() },
+        reddit: { configured: isRedditConfigured() },
+        mailchimp: { configured: isMailchimpConfigured() }
+      };
+
+      // Try to verify each service
+      if (credentials.twitter.configured) {
+        try {
+          credentials.twitter.account = await verifyTwitter();
+        } catch (error: any) {
+          credentials.twitter.error = error.message;
+        }
+      }
+
+      if (credentials.reddit.configured) {
+        try {
+          credentials.reddit.account = await verifyRedditCredentials();
+        } catch (error: any) {
+          credentials.reddit.error = error.message;
+        }
+      }
+
+      if (credentials.mailchimp.configured) {
+        try {
+          credentials.mailchimp.account = await verifyMailchimpCredentials();
+        } catch (error: any) {
+          credentials.mailchimp.error = error.message;
+        }
+      }
+
+      res.json(credentials);
+    } catch (error: any) {
+      console.error("Error verifying credentials:", error);
+      res.status(500).json({ error: "Failed to verify credentials", message: error.message });
+    }
+  });
 }

@@ -5,12 +5,16 @@ let redditClient: Snoowrap | null = null;
 
 function getRedditClient(): Snoowrap {
   if (!redditClient) {
+    if (!isRedditConfigured()) {
+      throw new Error("Reddit API credentials not configured. Please set REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USERNAME, and REDDIT_PASSWORD environment variables.");
+    }
+    
     redditClient = new Snoowrap({
       userAgent: process.env.REDDIT_USER_AGENT || "PillarDrugClub/1.0",
-      clientId: process.env.REDDIT_CLIENT_ID || "",
-      clientSecret: process.env.REDDIT_CLIENT_SECRET || "",
-      username: process.env.REDDIT_USERNAME || "",
-      password: process.env.REDDIT_PASSWORD || "",
+      clientId: process.env.REDDIT_CLIENT_ID!,
+      clientSecret: process.env.REDDIT_CLIENT_SECRET!,
+      username: process.env.REDDIT_USERNAME!,
+      password: process.env.REDDIT_PASSWORD!,
     });
   }
   return redditClient;

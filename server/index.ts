@@ -120,6 +120,14 @@ app.use((req, res, next) => {
     .then(() => log(`✅ Storage data initialized`))
     .catch((error) => log(`⚠️ Warning: Storage initialization encountered issues: ${error}`));
 
+  // Initialize content automation scheduler
+  import("./services/scheduler-service")
+    .then((scheduler) => {
+      scheduler.initializeScheduler();
+      log(`✅ Content scheduler initialized`);
+    })
+    .catch((error) => log(`⚠️ Warning: Scheduler initialization failed: ${error}`));
+
   // Start listening AFTER all critical middleware is ready
   server.listen({
     port,
