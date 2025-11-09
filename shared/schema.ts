@@ -550,3 +550,45 @@ export const insertUserSessionSchema = createInsertSchema(userSessions).omit({
 
 export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
 export type UserSession = typeof userSessions.$inferSelect;
+
+// Content Queue - Multi-channel content automation
+export const contentQueue = pgTable("content_queue", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  scheduledFor: timestamp("scheduled_for").notNull(),
+  status: text("status", { enum: ["pending", "processing", "published", "failed"] }).default("pending").notNull(),
+  contentType: text("content_type", { enum: ["blog", "x_thread", "x_tip", "x_poll", "reddit_post", "youtube_short"] }).notNull(),
+  
+  // Unified content payload
+  topic: text("topic").notNull(),
+  tone: text("tone").notNull(),
+  keywords: text("keywords").array().default(sql`'{}'::text[]`),
+  writingStyle: text("writing_style"),
+  
+  // Generated content (JSON payloads)
+  blogContent: jsonb("blog_content"), // { title, content, excerpt, seoTitle, seoDescription, seoKeywords, tags }
+  xThreadContent: jsonb("x_thread_content"), // { tweets: string[] }
+  xTipContent: jsonb("x_tip_content"), // { text: string }
+  xPollContent: jsonb("x_poll_content"), // { question: string, options: string[] }
+  redditContent: jsonb("reddit_content"), // { title: string, body: string, subreddit: string }
+  videoScript: jsonb("video_script"), // { hook: string, tips: string[], cta: string }
+  
+  // Publishing tracking
+  publishedAt: timestamp("published_at"),
+  publishedUrl: text("published_url"),
+  platformPostId: text("platform_post_id"), // Tweet ID, Reddit post ID, YouTube video ID, etc.
+  errorMessage: text("error_message"),
+  retryCount: integer("retry_count").default(0).notNull(),
+}, (table) => [
+  index("idx_content_queue_status").on(table.status),
+  index("idx_content_queue_scheduled").on(table.scheduledFor),
+  index("idx_content_queue_type").on(table.contentType),
+]);
+
+export const insertContentQueueSchema = createInsertSchema(contentQueue).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertContentQueue = z.infer<typeof insertContentQueueSchema>;
+export type ContentQueue = typeof contentQueue.$inferSelect;
