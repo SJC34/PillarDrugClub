@@ -17,7 +17,8 @@ import {
   Mail,
   Upload,
   Gift,
-  PenTool
+  PenTool,
+  Rocket
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -348,6 +349,22 @@ export default function AdminDashboardPage() {
                     <div>
                       <p className="font-semibold text-foreground">AI Blog Manager</p>
                       <p className="text-sm text-muted-foreground">Generate SEO content with AI</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/automation">
+              <Card className="hover-elevate cursor-pointer transition-all border-2 border-emerald-200" data-testid="card-content-automation">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-emerald-100 rounded-lg">
+                      <Rocket className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Content Automation</p>
+                      <p className="text-sm text-muted-foreground">24/7 multi-channel marketing</p>
                     </div>
                   </div>
                 </CardContent>
