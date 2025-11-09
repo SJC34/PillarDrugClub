@@ -5,6 +5,7 @@ Pillar Drug Club is a membership-based prescription pharmacy platform delivering
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
+Primary admin user: Seth Collins, Pharm.D. (seth@pillardrugclub.com)
 
 ## System Architecture
 
@@ -59,3 +60,9 @@ Emphasizes modularity, scalability, and security for sensitive healthcare data, 
 - **Medication Data**: SJC Pharmacy pricing CSV file, openFDA Drug Label API.
 - **Communication Services**: Twilio (SMS), Resend (email).
 - **AI Content Generation**: OpenAI GPT-4, Python FastAPI RAG service.
+- **Automated Content Marketing Engine** (In Development - 10-13 week roadmap): Comprehensive multi-channel content automation system designed to scale to 10K+ members with zero human intervention. Four-phase implementation:
+  - **Phase 1 (Weeks 1-4)**: Multi-format AI content generation (blog + X thread + Reddit post + video script), content queue database, cron-based auto-publishing, 30-day content calendar
+  - **Phase 2 (Weeks 5-7)**: Mailchimp API integration, member email sync, automation triggers (welcome series, savings reports, refill reminders, referral rewards)
+  - **Phase 3 (Weeks 8-10)**: YouTube Shorts pipeline (FFmpeg video generation), X/Twitter auto-posting, Reddit auto-posting, background job queue (BullMQ/Redis), referral → discount automation loop
+  - **Phase 4 (Weeks 11-12)**: Analytics dashboard, performance tracking, scaling optimizations for 10K members
+  - **Documentation**: See `ARCHITECTURE.md` for full system design and `API_CREDENTIALS.md` for required credentials
