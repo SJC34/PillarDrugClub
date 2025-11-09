@@ -3803,8 +3803,32 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
   // ===== CONTENT AUTOMATION API ENDPOINTS =====
   
+  // Get service status (admin only)
+  app.get("/api/content-automation/status", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { isTwitterConfigured } = await import("./services/twitter-service");
+      const { isRedditConfigured } = await import("./services/reddit-service");
+      const { isMailchimpConfigured } = await import("./services/mailchimp-service");
+
+      res.json({
+        blog: true, // Always available
+        twitter: isTwitterConfigured(),
+        reddit: isRedditConfigured(),
+        mailchimp: isMailchimpConfigured(),
+        youtube: false // Coming soon
+      });
+    } catch (error: any) {
+      console.error("Error getting service status:", error);
+      res.status(500).json({ error: "Failed to get service status", message: error.message });
+    }
+  });
+  
   // Generate multi-channel content (admin only)
-  app.post("/api/content/generate-multi-channel", async (req: any, res) => {
+  app.post("/api/content-automation/generate-multi-channel", async (req: any, res) => {
     try {
       if (!req.isAuthenticated() || req.user?.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -3821,7 +3845,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Queue content for publishing (admin only)
-  app.post("/api/content/queue", async (req: any, res) => {
+  app.post("/api/content-automation/queue", async (req: any, res) => {
     try {
       if (!req.isAuthenticated() || req.user?.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -3836,7 +3860,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Get content queue (admin only)
-  app.get("/api/content/queue", async (req: any, res) => {
+  app.get("/api/content-automation/queue", async (req: any, res) => {
     try {
       if (!req.isAuthenticated() || req.user?.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -3851,7 +3875,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Update content queue item status (admin only)
-  app.patch("/api/content/queue/:id", async (req: any, res) => {
+  app.patch("/api/content-automation/queue/:id", async (req: any, res) => {
     try {
       if (!req.isAuthenticated() || req.user?.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -3870,7 +3894,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Delete content queue item (admin only)
-  app.delete("/api/content/queue/:id", async (req: any, res) => {
+  app.delete("/api/content-automation/queue/:id", async (req: any, res) => {
     try {
       if (!req.isAuthenticated() || req.user?.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
@@ -3889,7 +3913,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Verify social media credentials (admin only)
-  app.get("/api/content/verify-credentials", async (req: any, res) => {
+  app.get("/api/content-automation/verify-credentials", async (req: any, res) => {
     try {
       if (!req.isAuthenticated() || req.user?.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
