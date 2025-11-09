@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
+import type { GeneratedContent } from "@shared/content-automation";
 
 interface ContentQueueItem {
   id: string;
@@ -59,32 +60,6 @@ interface ServiceStatus {
   youtube: boolean;
 }
 
-interface MultiChannelContent {
-  blog: {
-    title: string;
-    content: string;
-    excerpt: string;
-    category: string;
-    tags: string[];
-    metaDescription: string;
-  };
-  xThread: {
-    tweets: string[];
-    hashtags: string[];
-  };
-  reddit: {
-    title: string;
-    body: string;
-    subreddit: string;
-  };
-  youtubeScript: {
-    title: string;
-    script: string;
-    description: string;
-    tags: string[];
-  };
-}
-
 export default function AdminContentAutomationPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
@@ -93,7 +68,7 @@ export default function AdminContentAutomationPage() {
   const [topic, setTopic] = useState("");
   const [targetAudience, setTargetAudience] = useState("healthcare_consumers");
   const [contentGoal, setContentGoal] = useState("education");
-  const [generatedContent, setGeneratedContent] = useState<MultiChannelContent | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
 
   // Manual Scheduling State
   const [selectedChannel, setSelectedChannel] = useState<string>("blog_post");
@@ -250,24 +225,24 @@ export default function AdminContentAutomationPage() {
     }
 
     // Schedule Reddit post (30 minutes after blog)
-    if (serviceStatus?.reddit) {
+    if (serviceStatus?.reddit && generatedContent.redditPost) {
       const redditTime = new Date(scheduledDateTime.getTime() + 30 * 60 * 1000);
       scheduleContentMutation.mutate({
         contentType: "reddit_post",
         topic,
         scheduledFor: redditTime.toISOString(),
-        redditContent: generatedContent.reddit,
+        redditContent: generatedContent.redditPost,
       });
     }
 
     // Schedule YouTube Short (1 hour after blog)
-    if (serviceStatus?.youtube) {
+    if (serviceStatus?.youtube && generatedContent.videoScript) {
       const youtubeTime = new Date(scheduledDateTime.getTime() + 60 * 60 * 1000);
       scheduleContentMutation.mutate({
         contentType: "youtube_short",
         topic,
         scheduledFor: youtubeTime.toISOString(),
-        youtubeContent: generatedContent.youtubeScript,
+        youtubeContent: generatedContent.videoScript,
       });
     }
   };
@@ -605,7 +580,7 @@ export default function AdminContentAutomationPage() {
                 )}
 
                 {/* Generated Content Preview */}
-                {generatedContent && (
+                {generatedContent && generatedContent.blog && (
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold">Generated Content</h3>
@@ -622,96 +597,116 @@ export default function AdminContentAutomationPage() {
                     </div>
 
                     {/* Blog Post Preview */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Blog Post
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div>
-                          <p className="text-sm font-medium">Title:</p>
-                          <p className="text-sm">{generatedContent.blog.title}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Excerpt:</p>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
-                            {generatedContent.blog.excerpt}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Content Length:</p>
-                          <p className="text-sm">{generatedContent.blog.content.length} characters</p>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    {generatedContent.blog && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Blog Post
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <div>
+                            <p className="text-sm font-medium">Title:</p>
+                            <p className="text-sm">{generatedContent.blog.title}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Excerpt:</p>
+                            <p className="text-sm text-muted-foreground line-clamp-3">
+                              {generatedContent.blog.excerpt}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Content Length:</p>
+                            <p className="text-sm">{generatedContent.blog.content?.length || 0} characters</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {/* X Thread Preview */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Twitter className="h-4 w-4" />
-                          X/Twitter Thread
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <p className="text-sm font-medium">{generatedContent.xThread.tweets.length} tweets</p>
-                        <div className="space-y-2">
-                          {generatedContent.xThread.tweets.slice(0, 3).map((tweet, i) => (
-                            <div key={i} className="text-sm p-2 bg-muted rounded">
-                              {i + 1}. {tweet.substring(0, 100)}{tweet.length > 100 ? "..." : ""}
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
+                    {generatedContent.xThread && generatedContent.xThread.tweets && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Twitter className="h-4 w-4" />
+                            X/Twitter Thread
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <p className="text-sm font-medium">{generatedContent.xThread.tweets.length} tweets</p>
+                          <div className="space-y-2">
+                            {generatedContent.xThread.tweets.slice(0, 3).map((tweet, i) => (
+                              <div key={i} className="text-sm p-2 bg-muted rounded">
+                                {i + 1}. {tweet.substring(0, 100)}{tweet.length > 100 ? "..." : ""}
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {/* Reddit Post Preview */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Reddit Post
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div>
-                          <p className="text-sm font-medium">Title:</p>
-                          <p className="text-sm">{generatedContent.reddit.title}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Subreddit:</p>
-                          <p className="text-sm">r/{generatedContent.reddit.subreddit}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Body Length:</p>
-                          <p className="text-sm">{generatedContent.reddit.body.length} characters</p>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    {generatedContent.redditPost && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Reddit Post
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <div>
+                            <p className="text-sm font-medium">Title:</p>
+                            <p className="text-sm">{generatedContent.redditPost.title}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Subreddit:</p>
+                            <p className="text-sm">r/{generatedContent.redditPost.subreddit}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Body Length:</p>
+                            <p className="text-sm">{generatedContent.redditPost.body?.length || 0} characters</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {/* YouTube Script Preview */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Video className="h-4 w-4" />
-                          YouTube Short Script
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div>
-                          <p className="text-sm font-medium">Title:</p>
-                          <p className="text-sm">{generatedContent.youtubeScript.title}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Script:</p>
-                          <p className="text-sm text-muted-foreground line-clamp-4">
-                            {generatedContent.youtubeScript.script}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    {generatedContent.videoScript && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Video className="h-4 w-4" />
+                            YouTube Short Script
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <div>
+                            <p className="text-sm font-medium">Hook:</p>
+                            <p className="text-sm">{generatedContent.videoScript.hook}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Problem:</p>
+                            <p className="text-sm text-muted-foreground">
+                              {generatedContent.videoScript.problem}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Tips:</p>
+                            <div className="space-y-1">
+                              {generatedContent.videoScript.tips?.map((tip, i) => (
+                                <p key={i} className="text-sm">• {tip}</p>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Duration:</p>
+                            <p className="text-sm">{generatedContent.videoScript.duration} seconds</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {/* Scheduling Options */}
                     <Card className="border-primary">

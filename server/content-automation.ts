@@ -1,58 +1,13 @@
 import OpenAI from "openai";
 import { writingStyles } from "./blog-ai";
+import type { MultiChannelContentOptions, GeneratedContent } from "@shared/content-automation";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export interface MultiChannelContentOptions {
-  topic: string;
-  tone?: "professional" | "friendly" | "educational" | "conversational" | "urgent";
-  keywords?: string[];
-  writingStyle?: string;
-  generateBlog?: boolean;
-  generateXThread?: boolean;
-  generateXTip?: boolean;
-  generateXPoll?: boolean;
-  generateRedditPost?: boolean;
-  generateVideoScript?: boolean;
-  targetAudience?: "new_members" | "existing" | "general";
-  cta?: string; // Call to action (default: pillardrugclub.com/join)
-}
-
-export interface GeneratedContent {
-  blog?: {
-    title: string;
-    content: string;
-    excerpt: string;
-    seoTitle: string;
-    seoDescription: string;
-    seoKeywords: string[];
-    tags: string[];
-  };
-  xThread?: {
-    tweets: string[]; // 10-15 tweet thread
-  };
-  xTip?: {
-    text: string; // Single actionable tip tweet
-  };
-  xPoll?: {
-    question: string;
-    options: string[]; // 2-4 options
-  };
-  redditPost?: {
-    title: string;
-    body: string;
-    subreddit: string; // Suggested subreddit
-  };
-  videoScript?: {
-    hook: string; // 0-3 seconds
-    problem: string; // 3-8 seconds
-    tips: string[]; // 3 tips, 12 seconds each
-    cta: string; // Final 5-10 seconds
-    duration: number; // Total seconds
-  };
-}
+// Re-export types for convenience
+export type { MultiChannelContentOptions, GeneratedContent };
 
 /**
  * Generate multi-channel content from a single topic
@@ -79,10 +34,16 @@ export async function generateMultiChannelContent(
   const selectedStyle = writingStyles[writingStyle as keyof typeof writingStyles] || writingStyles.default;
   const keywordsText = keywords.length > 0 ? keywords.join(", ") : "";
 
-  const audienceContext = {
+  const audienceContext: Record<string, string> = {
     new_members: "Focus on introducing concepts and building trust with people new to alternative pharmacy options.",
     existing: "Speak to engaged members who understand the value proposition. Provide deeper insights and advanced tips.",
-    general: "Write for a broad audience including both prospects and members. Balance education with value demonstration."
+    general: "Write for a broad audience including both prospects and members. Balance education with value demonstration.",
+    healthcare_consumers: "Speak to informed healthcare consumers who understand medical terminology and value transparency.",
+    seniors: "Address the medication needs and budget concerns of older adults (65+) on fixed incomes.",
+    chronic_conditions: "Target patients managing chronic conditions who require ongoing medication and cost predictability.",
+    cost_conscious: "Target people actively seeking ways to reduce medication costs and stretch their healthcare budget.",
+    small_business: "Focus on business owners looking to provide affordable medication benefits to employees.",
+    families: "Target families managing medication costs for multiple family members."
   };
 
   // Prepare the multi-format generation prompt
@@ -92,7 +53,7 @@ TOPIC: "${topic}"
 
 CONTEXT:
 - Tone: ${tone}
-- Audience: ${targetAudience} (${audienceContext[targetAudience]})
+- Audience: ${targetAudience} (${audienceContext[targetAudience] || audienceContext.general})
 - Keywords: ${keywordsText}
 - CTA: ${cta}
 - Writing Style: ${selectedStyle.description}
