@@ -90,17 +90,31 @@ export default function AdminContentAutomationPage() {
   // Generate multi-channel content
   const generateMultiChannelMutation = useMutation({
     mutationFn: async (data: { topic: string; targetAudience: string; contentGoal: string }) => {
-      const response = await fetch("/api/content-automation/generate-multi-channel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to generate content");
+      console.log("🚀 Starting content generation request:", data);
+      
+      try {
+        const response = await fetch("/api/content-automation/generate-multi-channel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(data),
+        });
+        
+        console.log("📡 Response status:", response.status, response.statusText);
+        
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
+          console.error("❌ Server error:", error);
+          throw new Error(error.message || `Failed to generate content (${response.status})`);
+        }
+        
+        const result = await response.json();
+        console.log("✅ Content generated successfully:", result);
+        return result;
+      } catch (err) {
+        console.error("🔥 Request failed:", err);
+        throw err;
       }
-      return response.json();
     },
     onSuccess: (data) => {
       setGeneratedContent(data);
@@ -110,6 +124,7 @@ export default function AdminContentAutomationPage() {
       });
     },
     onError: (error: any) => {
+      console.error("💥 Mutation error:", error);
       toast({
         title: "Generation Failed",
         description: error.message || "Failed to generate content",
