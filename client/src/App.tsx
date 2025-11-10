@@ -4,6 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import ComingSoonPage from "@/pages/ComingSoonPage";
 import HomePage from "@/pages/HomePage";
 import MedicationsPage from "@/pages/MedicationsPage";
@@ -54,19 +56,45 @@ function Router() {
       <Route path="/register" component={RegisterPage} />
       <Route path="/subscribe" component={SubscriptionPage} />
       <Route path="/subscription" component={SubscriptionPage} />
-      <Route path="/dashboard" component={DashboardPage} />
-      <Route path="/settings" component={SettingsPage} />
-      <Route path="/admin" component={AdminDashboardPage} />
-      <Route path="/admin-portal" component={AdminPortalPage} />
-      <Route path="/admin/dashboard" component={AdminDashboardPage} />
-      <Route path="/admin/users" component={AdminUsersPage} />
-      <Route path="/admin/financial" component={AdminFinancialPage} />
-      <Route path="/admin/communications" component={AdminCommunicationsPage} />
-      <Route path="/admin/reports" component={AdminReportsPage} />
-      <Route path="/admin/pricing" component={AdminMedicationPricingPage} />
-      <Route path="/admin/referrals" component={AdminReferralsPage} />
-      <Route path="/admin/blog" component={AdminBlogPage} />
-      <Route path="/admin/automation" component={AdminContentAutomationPage} />
+      <Route path="/dashboard">
+        <ProtectedRoute><DashboardPage /></ProtectedRoute>
+      </Route>
+      <Route path="/settings">
+        <ProtectedRoute><SettingsPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin">
+        <ProtectedRoute requiredRole="admin"><AdminDashboardPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin-portal">
+        <ProtectedRoute requiredRole="admin"><AdminPortalPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/dashboard">
+        <ProtectedRoute requiredRole="admin"><AdminDashboardPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/users">
+        <ProtectedRoute requiredRole="admin"><AdminUsersPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/financial">
+        <ProtectedRoute requiredRole="admin"><AdminFinancialPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/communications">
+        <ProtectedRoute requiredRole="admin"><AdminCommunicationsPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/reports">
+        <ProtectedRoute requiredRole="admin"><AdminReportsPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/pricing">
+        <ProtectedRoute requiredRole="admin"><AdminMedicationPricingPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/referrals">
+        <ProtectedRoute requiredRole="admin"><AdminReferralsPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/blog">
+        <ProtectedRoute requiredRole="admin"><AdminBlogPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/automation">
+        <ProtectedRoute requiredRole="admin"><AdminContentAutomationPage /></ProtectedRoute>
+      </Route>
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/my-list" component={MyMedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
@@ -112,10 +140,12 @@ function App() {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AppContent />
-          <Toaster />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <AppContent />
+            <Toaster />
+          </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </HelmetProvider>
   );

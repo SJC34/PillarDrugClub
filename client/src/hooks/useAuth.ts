@@ -1,15 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
-import type { User } from "@shared/schema";
+// Re-export useAuth from AuthContext for backwards compatibility
+export { useAuth } from "@/contexts/AuthContext";
 
-export function useAuth() {
-  const { data: user, isLoading } = useQuery<User>({
-    queryKey: ["/api/auth/user"],
-    retry: false,
-  });
+// Add a helper to maintain backwards compatibility with existing code
+import { useAuth as useAuthContext } from "@/contexts/AuthContext";
 
+export function useAuthCompat() {
+  const { user, isLoading, login, logout, refreshUser } = useAuthContext();
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
+    login,
+    logout,
+    refreshUser,
   };
 }

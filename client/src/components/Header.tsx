@@ -16,21 +16,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { user, isAuthenticated } = useAuth();
+  const { user, logout } = useAuth();
+  const isAuthenticated = !!user;
 
-  const handleSignOut = async () => {
-    try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        window.location.href = "/login";
-      }
-    } catch (error) {
-      console.error("Logout failed:", error);
-      window.location.href = "/login";
-    }
+  const handleSignOut = () => {
+    logout();
   };
 
   const getUserInitials = () => {

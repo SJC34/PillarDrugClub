@@ -106,6 +106,13 @@ export default function AdminContentAutomationPage() {
         console.log("📡 Response status:", response.status, response.statusText);
         
         if (!response.ok) {
+          // Handle authentication errors specifically
+          if (response.status === 401 || response.status === 403) {
+            const error = await response.json().catch(() => ({ message: "Session expired" }));
+            console.error("❌ Authentication error:", error);
+            throw new Error("Your session has expired. Please refresh the page to log in again.");
+          }
+          
           const error = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
           console.error("❌ Server error:", error);
           throw new Error(error.message || `Failed to generate content (${response.status})`);
