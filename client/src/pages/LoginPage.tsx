@@ -23,11 +23,29 @@ export default function LoginPage() {
   const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { user, login } = useAuth();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
   
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema)
   });
+
+  // Redirect after login once user state is updated
+  useEffect(() => {
+    if (shouldRedirect && user) {
+      const userRole = user.role || "client";
+      if (userRole === "admin") {
+        setLocation("/admin");
+      } else if (userRole === "broker") {
+        setLocation("/broker");
+      } else if (userRole === "company") {
+        setLocation("/company");
+      } else {
+        setLocation("/dashboard");
+      }
+      setShouldRedirect(false);
+    }
+  }, [shouldRedirect, user, setLocation]);
 
   // Check for error parameter in URL (from OAuth failures)
   useEffect(() => {
@@ -77,17 +95,8 @@ export default function LoginPage() {
         description: "Welcome back to Pillar Drug Club!"
       });
       
-      // Redirect based on user role
-      const userRole = result.user.role || "client";
-      if (userRole === "admin") {
-        setLocation("/admin");
-      } else if (userRole === "broker") {
-        setLocation("/broker");
-      } else if (userRole === "company") {
-        setLocation("/company");
-      } else {
-        setLocation("/dashboard");
-      }
+      // Trigger redirect in useEffect after user state is updated
+      setShouldRedirect(true);
     } catch (error: any) {
       console.error("Login error:", error);
       toast({

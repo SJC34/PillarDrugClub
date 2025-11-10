@@ -29,15 +29,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Load user from localStorage on mount
   useEffect(() => {
     const loadUser = async () => {
+      console.log("[AuthContext] Starting loadUser...");
       try {
         // First check localStorage for immediate UI update
         const storedUser = localStorage.getItem("pillar_user");
+        console.log("[AuthContext] localStorage user:", storedUser ? "found" : "not found");
         if (storedUser) {
           try {
             const parsedUser = JSON.parse(storedUser);
+            console.log("[AuthContext] Setting user from localStorage:", parsedUser.email);
             setUser(parsedUser);
           } catch {
             // Invalid JSON in localStorage, clear it
+            console.warn("[AuthContext] Invalid JSON in localStorage, clearing");
             localStorage.removeItem("pillar_user");
           }
         }
@@ -47,30 +51,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           credentials: "include",
         });
 
-        if (response.ok) {
+        console.log("[AuthContext] Server response status:", response.status);
+        if (response.status === 304) {
+          // Not Modified - keep current user from localStorage
+          // 304 responses have no body, so don't try to parse JSON
+          console.log("[AuthContext] Session validated (304 Not Modified)");
+        } else if (response.ok) {
           const data = await response.json();
+          console.log("[AuthContext] Server response data:", data);
           if (data.user) {
+            console.log("[AuthContext] Updating user from server:", data.user.email);
             setUser(data.user);
             localStorage.setItem("pillar_user", JSON.stringify(data.user));
           } else {
             // Server says no user, clear everything
+            console.warn("[AuthContext] Server says no user, clearing session");
             localStorage.removeItem("pillar_user");
             setUser(null);
           }
         } else if (response.status === 401 || response.status === 403) {
           // Authentication failed - clear session
+          console.warn("[AuthContext] Authentication failed, clearing session");
           localStorage.removeItem("pillar_user");
           setUser(null);
         } else {
           // Server error (500, 503, etc.) - keep localStorage user for resilience
           // Don't clear user on transient server errors
-          console.warn("Server error while checking auth, keeping cached user:", response.status);
+          console.warn("[AuthContext] Server error while checking auth, keeping cached user:", response.status);
         }
       } catch (error) {
-        console.error("Failed to load user:", error);
+        console.error("[AuthContext] Failed to load user:", error);
         // On network error, keep localStorage user for offline-first UX
         // but log the error for debugging
       } finally {
+        console.log("[AuthContext] Setting isLoading=false");
         setIsLoading(false);
       }
     };
@@ -115,7 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: "include",
       });
 
-      if (response.ok) {
+      if (response.status === 304) {
+        // Not Modified - keep current user
+        console.log("Session validated (304 Not Modified)");
+      } else if (response.ok) {
         try {
           const data = await response.json();
           if (data.user) {

@@ -61,7 +61,8 @@ type Step3RxPreferenceForm = z.infer<typeof step3RxPreferenceSchema>;
 
 // Load Stripe
 const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-const stripePromise = STRIPE_PUBLIC_KEY ? loadStripe(STRIPE_PUBLIC_KEY) : null;
+// Only load Stripe if we have a valid public key (starts with pk_)
+const stripePromise = (STRIPE_PUBLIC_KEY && STRIPE_PUBLIC_KEY.startsWith('pk_')) ? loadStripe(STRIPE_PUBLIC_KEY) : null;
 
 // Payment form component
 const PaymentForm = ({ clientSecret, onSuccess }: { clientSecret: string; onSuccess: () => void }) => {

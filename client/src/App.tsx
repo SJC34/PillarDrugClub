@@ -95,6 +95,9 @@ function Router() {
       <Route path="/admin/automation">
         <ProtectedRoute requiredRole="admin"><AdminContentAutomationPage /></ProtectedRoute>
       </Route>
+      <Route path="/admin/content-automation">
+        <ProtectedRoute requiredRole="admin"><AdminContentAutomationPage /></ProtectedRoute>
+      </Route>
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/my-list" component={MyMedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
