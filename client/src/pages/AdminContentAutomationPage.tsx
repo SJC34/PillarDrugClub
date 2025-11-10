@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { 
@@ -27,11 +28,13 @@ import {
   Send,
   Rocket,
   Zap,
-  ArrowLeft
+  ArrowLeft,
+  Eye
 } from "lucide-react";
 import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import type { GeneratedContent } from "@shared/content-automation";
+import AdminContentPreviewPage from "./AdminContentPreviewPage";
 
 interface ContentQueueItem {
   id: string;
@@ -599,16 +602,29 @@ export default function AdminContentAutomationPage() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold">Generated Content</h3>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setGeneratedContent(null);
-                          setTopic("");
-                        }}
-                        data-testid="button-reset"
-                      >
-                        Start Over
-                      </Button>
+                      <div className="flex gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="default" data-testid="button-preview-all">
+                              <Eye className="h-4 w-4 mr-2" />
+                              Preview All Content
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto">
+                            <AdminContentPreviewPage content={generatedContent} topic={topic} />
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setGeneratedContent(null);
+                            setTopic("");
+                          }}
+                          data-testid="button-reset"
+                        >
+                          Start Over
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Blog Post Preview */}

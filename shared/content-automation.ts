@@ -51,4 +51,13 @@ export interface GeneratedContent {
     cta: string; // Final 5-10 seconds
     duration: number; // Total seconds
   };
+  video?: {
+    url?: string; // Video URL (uploaded, generated, or manual)
+    prompt: string; // Sora prompt for video generation
+    sourceType: "manual" | "runway" | "pika" | "sora" | "uploaded"; // How video was created
+    status: "awaiting_upload" | "generating" | "completed" | "failed";
+    uploadedAt?: string; // Timestamp when video was added
+    operatorNotes?: string; // Admin notes about the video
+    error?: string;
+  };
 }

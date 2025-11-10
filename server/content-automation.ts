@@ -152,8 +152,14 @@ Return a JSON object with all requested content formats.`;
       throw new Error("No content generated from OpenAI");
     }
 
-    const parsedContent = JSON.parse(content);
-    return parsedContent as GeneratedContent;
+    const parsedContent = JSON.parse(content) as GeneratedContent;
+    
+    // Generate video data if video script was requested
+    if (generateVideoScript && parsedContent.videoScript) {
+      parsedContent.video = await generateVideoData(parsedContent.videoScript);
+    }
+    
+    return parsedContent;
 
   } catch (error: any) {
     console.error("Error generating multi-channel content:", error);
@@ -227,5 +233,96 @@ Return JSON: { "question": "...", "options": ["...", "...", "..."] }`;
   } catch (error: any) {
     console.error("Error generating poll:", error);
     throw new Error(`Poll generation failed: ${error.message}`);
+  }
+}
+
+/**
+ * Generate a Sora AI video prompt from video script
+ * NOTE: Sora API is not yet publicly available (expected Q1 2026)
+ * This generates the prompt that will be used when the API launches
+ */
+export async function generateSoraVideoPrompt(videoScript: GeneratedContent['videoScript']): Promise<string> {
+  if (!videoScript) {
+    throw new Error("No video script provided");
+  }
+
+  const prompt = `Create a detailed Sora AI video generation prompt for this YouTube short script:
+
+HOOK (0-3s): ${videoScript.hook}
+PROBLEM (3-8s): ${videoScript.problem}
+TIP 1 (8-20s): ${videoScript.tips[0]}
+TIP 2 (20-32s): ${videoScript.tips[1]}
+TIP 3 (32-44s): ${videoScript.tips[2]}
+CTA (44-60s): ${videoScript.cta}
+
+Generate a cinematic Sora prompt that:
+- Describes visual scenes for each segment
+- Includes text overlays that match the script timing
+- Specifies camera movements and transitions
+- Maintains professional pharmacy/healthcare aesthetic
+- Creates engaging, scroll-stopping visuals
+- Duration: exactly 60 seconds
+- Aspect ratio: 9:16 (vertical for YouTube Shorts)
+
+Return only the Sora prompt, optimized for video generation.`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+
+    return completion.choices[0]?.message?.content?.trim() || "";
+  } catch (error: any) {
+    console.error("Error generating Sora prompt:", error);
+    throw new Error(`Sora prompt generation failed: ${error.message}`);
+  }
+}
+
+/**
+ * Generate video data with Sora-ready prompt
+ * Returns prompt for manual video creation using Runway, Pika, or future Sora API
+ */
+export async function generateVideoData(
+  videoScript: GeneratedContent['videoScript']
+): Promise<GeneratedContent['video']> {
+  try {
+    // Generate the Sora-optimized video prompt
+    const soraPrompt = await generateSoraVideoPrompt(videoScript);
+
+    console.log("📹 Video prompt generated for manual creation");
+    console.log("💡 Use this prompt with: Runway Gen-3, Pika, or upload your own video");
+
+    // TODO: When Sora API becomes available (Q1 2026), implement:
+    // const response = await openai.videos.generate({
+    //   model: "sora-2",
+    //   prompt: soraPrompt,
+    //   duration: 60,
+    //   aspect_ratio: "9:16"
+    // });
+    // return { 
+    //   status: "completed", 
+    //   prompt: soraPrompt, 
+    //   url: response.url,
+    //   sourceType: "sora",
+    //   uploadedAt: new Date().toISOString()
+    // };
+
+    return {
+      prompt: soraPrompt,
+      sourceType: "manual",
+      status: "awaiting_upload",
+      operatorNotes: "Use the prompt with Runway Gen-3, Pika Labs, or manually upload your video. Paste the video URL when ready."
+    };
+  } catch (error: any) {
+    console.error("❌ Error generating video data:", error);
+    return {
+      prompt: "",
+      sourceType: "manual",
+      status: "failed",
+      error: `Failed to generate video prompt: ${error.message}`
+    };
   }
 }
