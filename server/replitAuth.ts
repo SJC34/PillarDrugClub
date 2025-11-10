@@ -34,7 +34,9 @@ export function getSession() {
   
   // Only use secure cookies in production or when using HTTPS
   const isProduction = process.env.NODE_ENV === 'production';
-  const useSecureCookies = isProduction || process.env.REPLIT_DEPLOYMENT === '1';
+  // IMPORTANT: Always use secure cookies on Replit (even in development) since it's served over HTTPS
+  // This fixes mobile Safari cookie issues where sameSite='lax' doesn't work over HTTPS
+  const useSecureCookies = isProduction || process.env.REPLIT_DEPLOYMENT === '1' || !!process.env.REPLIT_DOMAINS;
   
   // Extract domain from REPLIT_DOMAINS for cookie sharing across subdomains
   const domain = process.env.REPLIT_DOMAINS?.split(',')[0]?.replace(/^https?:\/\//, '').split(':')[0] || undefined;
