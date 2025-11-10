@@ -1,14 +1,26 @@
-import { TwitterApi } from "twitter-api-v2";
+import { TwitterApi, TwitterApiReadWrite } from "twitter-api-v2";
 
-// Initialize Twitter client
-const twitterClient = new TwitterApi({
-  appKey: process.env.TWITTER_API_KEY || "",
-  appSecret: process.env.TWITTER_API_SECRET || "",
-  accessToken: process.env.TWITTER_ACCESS_TOKEN || "",
-  accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET || "",
-});
+// Lazy initialization of Twitter client
+let twitterClient: TwitterApi | null = null;
+let rwClient: TwitterApiReadWrite | null = null;
 
-const rwClient = twitterClient.readWrite;
+function getTwitterClient() {
+  if (!isTwitterConfigured()) {
+    throw new Error("Twitter API credentials not configured");
+  }
+  
+  if (!twitterClient) {
+    twitterClient = new TwitterApi({
+      appKey: process.env.TWITTER_API_KEY!,
+      appSecret: process.env.TWITTER_API_SECRET!,
+      accessToken: process.env.TWITTER_ACCESS_TOKEN!,
+      accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!,
+    });
+    rwClient = twitterClient.readWrite;
+  }
+  
+  return rwClient!;
+}
 
 export interface TweetThread {
   tweets: string[];
@@ -25,7 +37,8 @@ export interface TweetPoll {
  */
 export async function postTweet(text: string): Promise<{ id: string; url: string }> {
   try {
-    const tweet = await rwClient.v2.tweet(text);
+    const client = getTwitterClient();
+    const tweet = await client.v2.tweet(text);
     
     return {
       id: tweet.data.id,
@@ -43,13 +56,14 @@ export async function postTweet(text: string): Promise<{ id: string; url: string
  */
 export async function postThread(thread: TweetThread): Promise<{ tweetIds: string[]; url: string }> {
   try {
+    const client = getTwitterClient();
     const tweetIds: string[] = [];
     let previousTweetId: string | undefined;
 
     for (const tweetText of thread.tweets) {
       const tweet = previousTweetId
-        ? await rwClient.v2.reply(tweetText, previousTweetId)
-        : await rwClient.v2.tweet(tweetText);
+        ? await client.v2.reply(tweetText, previousTweetId)
+        : await client.v2.tweet(tweetText);
 
       tweetIds.push(tweet.data.id);
       previousTweetId = tweet.data.id;
@@ -71,7 +85,8 @@ export async function postThread(thread: TweetThread): Promise<{ tweetIds: strin
  */
 export async function postPoll(poll: TweetPoll): Promise<{ id: string; url: string }> {
   try {
-    const tweet = await rwClient.v2.tweet({
+    const client = getTwitterClient();
+    const tweet = await client.v2.tweet({
       text: poll.question,
       poll: {
         options: poll.options,
@@ -106,7 +121,8 @@ export function isTwitterConfigured(): boolean {
  */
 export async function verifyCredentials(): Promise<{ username: string; name: string }> {
   try {
-    const me = await rwClient.v2.me();
+    const client = getTwitterClient();
+    const me = await client.v2.me();
     return {
       username: me.data.username,
       name: me.data.name
