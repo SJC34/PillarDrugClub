@@ -3837,7 +3837,35 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const { generateMultiChannelContent } = await import("./content-automation");
       const content = await generateMultiChannelContent(req.body);
       
-      res.json(content);
+      // Automatically persist generated content to queue
+      const queueItem = await storage.createContentQueueItem({
+        topic: content.topic,
+        tone: req.body.tone || "Professional",
+        keywords: content.seoKeywords || [],
+        contentType: "multi_channel",
+        blogContent: content.blogPost ? {
+          title: content.blogPost.title || content.topic,
+          content: content.blogPost.content || content.blogPost,
+          excerpt: content.blogPost.excerpt || "",
+        } : null,
+        xThreadContent: content.xThread ? { tweets: content.xThread } : null,
+        redditContent: content.redditPost ? {
+          title: content.topic,
+          body: content.redditPost,
+          subreddit: "pharmacy"
+        } : null,
+        videoScript: content.youtubeScript ? {
+          hook: content.youtubeScript.substring(0, 200),
+          tips: [content.youtubeScript],
+          cta: "Subscribe for more healthcare tips"
+        } : null,
+        status: "draft",
+        scheduledFor: null,
+      });
+      
+      console.log("✅ Content generated and queued:", queueItem.id);
+      
+      res.json({ ...content, queueItemId: queueItem.id });
     } catch (error: any) {
       console.error("Error generating multi-channel content:", error);
       res.status(500).json({ error: "Failed to generate content", message: error.message });

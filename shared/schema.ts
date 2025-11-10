@@ -555,9 +555,9 @@ export type UserSession = typeof userSessions.$inferSelect;
 export const contentQueue = pgTable("content_queue", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  scheduledFor: timestamp("scheduled_for").notNull(),
-  status: text("status", { enum: ["pending", "processing", "published", "failed"] }).default("pending").notNull(),
-  contentType: text("content_type", { enum: ["blog", "x_thread", "x_tip", "x_poll", "reddit_post", "youtube_video"] }).notNull(),
+  scheduledFor: timestamp("scheduled_for"),  // Nullable - draft content may not be scheduled yet
+  status: text("status", { enum: ["pending", "processing", "published", "failed", "draft"] }).default("draft").notNull(),
+  contentType: text("content_type", { enum: ["blog", "x_thread", "x_tip", "x_poll", "reddit_post", "youtube_video", "multi_channel"] }).notNull(),
   
   // Unified content payload
   topic: text("topic").notNull(),

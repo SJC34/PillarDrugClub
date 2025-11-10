@@ -59,10 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else if (response.ok) {
           const data = await response.json();
           console.log("[AuthContext] Server response data:", data);
-          if (data.user) {
-            console.log("[AuthContext] Updating user from server:", data.user.email);
-            setUser(data.user);
-            localStorage.setItem("pillar_user", JSON.stringify(data.user));
+          // Backend returns user object directly, not wrapped in { user: ... }
+          if (data && data.id) {
+            console.log("[AuthContext] Updating user from server:", data.email);
+            setUser(data);
+            localStorage.setItem("pillar_user", JSON.stringify(data));
           } else {
             // Server says no user, clear everything
             console.warn("[AuthContext] Server says no user, clearing session");
@@ -135,9 +136,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else if (response.ok) {
         try {
           const data = await response.json();
-          if (data.user) {
-            setUser(data.user);
-            localStorage.setItem("pillar_user", JSON.stringify(data.user));
+          // Backend returns user object directly
+          if (data && data.id) {
+            setUser(data);
+            localStorage.setItem("pillar_user", JSON.stringify(data));
           } else {
             // Server says no user, clear everything
             localStorage.removeItem("pillar_user");
