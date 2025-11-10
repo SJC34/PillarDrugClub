@@ -91,7 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     loadUser();
-  }, []);
+
+    // Keep-alive: Refresh session every 15 minutes to prevent 30-minute timeout
+    const keepAliveInterval = setInterval(async () => {
+      console.log("[AuthContext] Keep-alive: Refreshing session...");
+      if (user) {
+        await loadUser();
+      }
+    }, 15 * 60 * 1000); // 15 minutes
+
+    return () => clearInterval(keepAliveInterval);
+  }, [user]);
 
   const login = (userData: User) => {
     setUser(userData);

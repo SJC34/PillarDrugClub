@@ -3834,6 +3834,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(403).json({ error: "Admin access required" });
       }
 
+      // Keep session alive during long-running operation (20-40 seconds)
+      req.session.touch();
+
       const { generateMultiChannelContent } = await import("./content-automation");
       const content = await generateMultiChannelContent(req.body);
       

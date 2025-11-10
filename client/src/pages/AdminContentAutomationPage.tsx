@@ -35,6 +35,7 @@ import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import type { GeneratedContent } from "@shared/content-automation";
 import AdminContentPreviewPage from "./AdminContentPreviewPage";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ContentQueueItem {
   id: string;
@@ -65,6 +66,7 @@ interface ServiceStatus {
 
 export default function AdminContentAutomationPage() {
   const { toast } = useToast();
+  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   
   // Multi-Channel Generation State
@@ -110,7 +112,9 @@ export default function AdminContentAutomationPage() {
           if (response.status === 401 || response.status === 403) {
             const error = await response.json().catch(() => ({ message: "Session expired" }));
             console.error("❌ Authentication error:", error);
-            throw new Error("Your session has expired. Please refresh the page to log in again.");
+            // Logout and redirect to login
+            await logout();
+            throw new Error("Your session has expired. Redirecting to login...");
           }
           
           const error = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
