@@ -35,7 +35,7 @@ import type { GeneratedContent } from "@shared/content-automation";
 
 interface ContentQueueItem {
   id: string;
-  contentType: "blog_post" | "x_thread" | "x_tip" | "x_poll" | "reddit_post" | "youtube_short";
+  contentType: "blog_post" | "x_thread" | "x_tip" | "x_poll" | "reddit_post" | "youtube_video";
   topic: string;
   scheduledFor: string;
   status: "pending" | "processing" | "published" | "failed";
@@ -235,11 +235,11 @@ export default function AdminContentAutomationPage() {
       });
     }
 
-    // Schedule YouTube Short (1 hour after blog)
+    // Schedule YouTube video (1 hour after blog)
     if (serviceStatus?.youtube && generatedContent.videoScript) {
       const youtubeTime = new Date(scheduledDateTime.getTime() + 60 * 60 * 1000);
       scheduleContentMutation.mutate({
-        contentType: "youtube_short",
+        contentType: "youtube_video",
         topic,
         scheduledFor: youtubeTime.toISOString(),
         youtubeContent: generatedContent.videoScript,
@@ -273,7 +273,7 @@ export default function AdminContentAutomationPage() {
       case "x_tip":
       case "x_poll": return Twitter;
       case "reddit_post": return FileText;
-      case "youtube_short": return Video;
+      case "youtube_video": return Video;
       default: return FileText;
     }
   };
@@ -678,7 +678,7 @@ export default function AdminContentAutomationPage() {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Video className="h-4 w-4" />
-                            YouTube Short Script
+                            YouTube Video Script
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
@@ -749,7 +749,7 @@ export default function AdminContentAutomationPage() {
                             <li>• Blog Post: {scheduledDate && scheduledTime ? `${scheduledDate} at ${scheduledTime}` : "Immediately"}</li>
                             <li>• X Thread: 15 minutes after blog</li>
                             <li>• Reddit Post: 30 minutes after blog</li>
-                            <li>• YouTube Short: 1 hour after blog</li>
+                            <li>• YouTube video: 1 hour after blog</li>
                           </ul>
                         </div>
 

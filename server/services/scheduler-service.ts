@@ -116,9 +116,9 @@ export async function processContentQueue(): Promise<void> {
             }
             break;
 
-          case "youtube_short":
+          case "youtube_video":
             // YouTube posting will be implemented in Phase 3
-            console.log("YouTube Shorts posting not yet implemented");
+            console.log("YouTube video posting not yet implemented");
             break;
         }
 

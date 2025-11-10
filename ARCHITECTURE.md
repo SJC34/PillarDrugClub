@@ -166,7 +166,7 @@ The Pillar Drug Club Content Marketing Engine is a comprehensive, fully-automate
   tone: string
   keywords: string[]
   
-  content_types: string[] // ["blog", "x_thread", "youtube_short"]
+  content_types: string[] // ["blog", "x_thread", "youtube_video"]
   
   auto_generate: boolean
   auto_publish: boolean
@@ -235,7 +235,7 @@ All times in America/New_York timezone:
 ```
 8:00 AM Daily:
   - Publish scheduled blog post
-  - Upload YouTube Short
+  - Upload YouTube video (short-form)
   - Mailchimp: Send daily savings tip
 
 12:00 PM Daily:
@@ -324,7 +324,7 @@ Scheduled Publication via Cron
 - Resources section
 - Soft CTA (no hard selling)
 
-**Video Script (YouTube Shorts):**
+**Video Script (YouTube - Short-Form):**
 - Hook (first 3 seconds)
 - Problem statement
 - 3 quick tips

@@ -557,7 +557,7 @@ export const contentQueue = pgTable("content_queue", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   scheduledFor: timestamp("scheduled_for").notNull(),
   status: text("status", { enum: ["pending", "processing", "published", "failed"] }).default("pending").notNull(),
-  contentType: text("content_type", { enum: ["blog", "x_thread", "x_tip", "x_poll", "reddit_post", "youtube_short"] }).notNull(),
+  contentType: text("content_type", { enum: ["blog", "x_thread", "x_tip", "x_poll", "reddit_post", "youtube_video"] }).notNull(),
   
   // Unified content payload
   topic: text("topic").notNull(),
