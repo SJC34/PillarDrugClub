@@ -36,7 +36,11 @@ export function getSession() {
   const isProduction = process.env.NODE_ENV === 'production';
   const useSecureCookies = isProduction || process.env.REPLIT_DEPLOYMENT === '1';
   
+  // Extract domain from REPLIT_DOMAINS for cookie sharing across subdomains
+  const domain = process.env.REPLIT_DOMAINS?.split(',')[0]?.replace(/^https?:\/\//, '').split(':')[0] || undefined;
+  
   return session({
+    name: 'pillar.sid',  // Explicit cookie name for better tracking
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
     resave: false,
@@ -44,6 +48,8 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: useSecureCookies,
+      sameSite: useSecureCookies ? 'none' : 'lax',  // 'none' for HTTPS to support mobile Safari
+      domain: useSecureCookies && domain ? `.${domain}` : undefined,  // Share cookie across subdomains in production
       maxAge: sessionTtl,
     },
   });
