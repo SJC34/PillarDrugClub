@@ -198,6 +198,7 @@ export async function setupSocialAuth(app: Express) {
 
   passport.deserializeUser(async (user: any, done) => {
     console.log('[Passport] 🔓 Deserializing user:', user?.id || 'NO_ID');
+    console.log('[Passport] 🔓 Session user role:', user?.role || 'NO_ROLE');
     
     try {
       // For social auth, the full user object is already in session
@@ -206,6 +207,8 @@ export async function setupSocialAuth(app: Express) {
         const dbUser = await storage.getUser(user.id);
         if (dbUser) {
           console.log('[Passport] ✅ User verified from database:', dbUser.email);
+          console.log('[Passport] ✅ Database user role:', dbUser.role || 'NO_ROLE');
+          console.log('[Passport] ✅ Database user keys:', Object.keys(dbUser));
           done(null, dbUser);
         } else {
           console.log('[Passport] ⚠️ User not found in database, using session data');
