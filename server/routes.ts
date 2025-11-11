@@ -193,6 +193,12 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(401).json({ message: "Not authenticated" });
       }
       
+      // Update session activity to prevent timeout during keep-alive pings
+      if (req.session) {
+        req.session.lastActivity = Date.now();
+        req.session.touch();
+      }
+      
       // Get user ID from session
       const userId = req.user.id;
       
@@ -3844,18 +3850,18 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       
       // Automatically persist generated content to queue
       const queueItem = await storage.createContentQueueItem({
-        topic: content.topic,
+        topic: req.body.topic, // Use user's input topic, not AI-generated content.topic
         tone: req.body.tone || "Professional",
         keywords: content.seoKeywords || [],
         contentType: "multi_channel",
         blogContent: content.blogPost ? {
-          title: content.blogPost.title || content.topic,
+          title: content.blogPost.title || req.body.topic,
           content: content.blogPost.content || content.blogPost,
           excerpt: content.blogPost.excerpt || "",
         } : null,
         xThreadContent: content.xThread ? { tweets: content.xThread } : null,
         redditContent: content.redditPost ? {
-          title: content.topic,
+          title: req.body.topic,
           body: content.redditPost,
           subreddit: "pharmacy"
         } : null,
