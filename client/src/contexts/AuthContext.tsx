@@ -93,15 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadUser();
   }, []);
 
-  // Keep-alive: Refresh session every 15 minutes to prevent 30-minute timeout
-  useEffect(() => {
-    const keepAliveInterval = setInterval(async () => {
-      console.log("[AuthContext] Keep-alive: Refreshing session...");
-      await refreshUser();
-    }, 15 * 60 * 1000); // 15 minutes
-
-    return () => clearInterval(keepAliveInterval);
-  }, []);
+  // Client-side keep-alive REMOVED: Rolling session cookies (express-session with rolling=true)
+  // now auto-extend sessions on every request. Client pings are no longer needed and actually
+  // prevent proper HIPAA 30-minute idle timeout enforcement.
 
   const login = (userData: User) => {
     setUser(userData);

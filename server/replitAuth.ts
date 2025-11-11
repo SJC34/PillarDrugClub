@@ -23,12 +23,17 @@ const getOidcConfig = memoize(
 );
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  // HIPAA 30-minute session timeout with rolling expiration
+  // Rolling cookies automatically extend the session on every request,
+  // eliminating the need for client-side keep-alive pings
+  const sessionTimeoutMs = 30 * 60 * 1000; // 30 minutes (HIPAA compliance)
+  const absoluteTtlMs = 7 * 24 * 60 * 60 * 1000; // 7 days absolute maximum
+  
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: true, // Allow table creation if missing
-    ttl: sessionTtl,
+    createTableIfMissing: true,
+    ttl: absoluteTtlMs, // Database TTL for cleanup (absolute max)
     tableName: "sessions",
   });
   
@@ -47,12 +52,13 @@ export function getSession() {
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    rolling: true, // ✨ KEY FIX: Auto-extend session on every request (eliminates need for client keep-alive)
     cookie: {
       httpOnly: true,
       secure: useSecureCookies,
       sameSite: useSecureCookies ? 'none' : 'lax',  // 'none' for HTTPS to support mobile Safari
       domain: useSecureCookies && domain ? `.${domain}` : undefined,  // Share cookie across subdomains in production
-      maxAge: sessionTtl,
+      maxAge: sessionTimeoutMs, // 30-minute sliding window (not 7 days!)
     },
   });
 }

@@ -193,11 +193,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(401).json({ message: "Not authenticated" });
       }
       
-      // Update session activity to prevent timeout during keep-alive pings
-      if (req.session) {
-        req.session.lastActivity = Date.now();
-        req.session.touch();
-      }
+      // Rolling session cookies auto-extend on every request (no manual touch needed)
       
       // Get user ID from session
       const userId = req.user.id;
@@ -3840,10 +3836,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(403).json({ error: "Admin access required" });
       }
 
-      // Keep session alive during long-running operation (20-40 seconds)
-      // Update lastActivity to prevent session timeout middleware from rejecting this request
-      req.session.lastActivity = Date.now();
-      req.session.touch();
+      // Rolling session cookies auto-extend on every request,
+      // so long-running operations (20-40 seconds) no longer timeout
 
       const { generateMultiChannelContent } = await import("./content-automation");
       const content = await generateMultiChannelContent(req.body);
