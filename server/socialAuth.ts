@@ -148,23 +148,38 @@ export async function setupSocialAuth(app: Express) {
 
     app.get(
       "/api/auth/google/callback",
-      passport.authenticate("google", { failureRedirect: "/login" }),
+      passport.authenticate("google", { failureRedirect: "/login?error=auth_failed" }),
       (req: any, res) => {
+        console.log('[OAuth] 🔍 Callback received');
+        console.log('[OAuth] User object:', req.user ? 'EXISTS' : 'MISSING');
+        console.log('[OAuth] Session ID:', req.sessionID);
+        console.log('[OAuth] Is authenticated?', req.isAuthenticated());
+        
+        if (!req.user) {
+          console.error('[OAuth] ❌ No user object after authentication');
+          return res.redirect("/login?error=no_user");
+        }
+        
         // 🔧 CRITICAL FIX: Explicitly save session before redirect
         // Without this, the redirect can happen before session is committed to database,
         // causing the browser to hit /dashboard before cookies/session are ready
         req.session.save((err: any) => {
           if (err) {
-            console.error('[OAuth] Session save error:', err);
+            console.error('[OAuth] ❌ Session save error:', err);
             return res.redirect("/login?error=session_save_failed");
           }
+          
+          console.log('[OAuth] ✅ Session saved successfully');
+          console.log('[OAuth] Session after save - authenticated?', req.isAuthenticated());
           
           // Check if this is a new user who needs to complete registration
           const user = req.user;
           if (user && user.isNewUser) {
+            console.log('[OAuth] 🆕 New user - redirecting to registration step 2');
             // New user - skip step 1 (social auth already done), go to step 2 (user details)
             res.redirect("/register?step=2");
           } else {
+            console.log('[OAuth] 👤 Existing user - redirecting to dashboard');
             // Existing user - go to dashboard
             res.redirect("/dashboard");
           }
@@ -175,11 +190,35 @@ export async function setupSocialAuth(app: Express) {
 
 
   passport.serializeUser((user: any, done) => {
+    console.log('[Passport] 💾 Serializing user:', user?.id || 'NO_ID');
+    // Store the entire user object in the session
+    // This works because our session store handles object serialization
     done(null, user);
   });
 
-  passport.deserializeUser((user: any, done) => {
-    done(null, user);
+  passport.deserializeUser(async (user: any, done) => {
+    console.log('[Passport] 🔓 Deserializing user:', user?.id || 'NO_ID');
+    
+    try {
+      // For social auth, the full user object is already in session
+      // Just verify the user still exists in database
+      if (user?.id) {
+        const dbUser = await storage.getUser(user.id);
+        if (dbUser) {
+          console.log('[Passport] ✅ User verified from database:', dbUser.email);
+          done(null, dbUser);
+        } else {
+          console.log('[Passport] ⚠️ User not found in database, using session data');
+          done(null, user);
+        }
+      } else {
+        console.log('[Passport] ⚠️ No user ID in session');
+        done(null, user);
+      }
+    } catch (error) {
+      console.error('[Passport] ❌ Deserialization error:', error);
+      done(null, user); // Fallback to session user
+    }
   });
 
   // Fallback route for unconfigured Google OAuth
