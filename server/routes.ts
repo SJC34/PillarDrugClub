@@ -3835,6 +3835,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       }
 
       // Keep session alive during long-running operation (20-40 seconds)
+      // Update lastActivity to prevent session timeout middleware from rejecting this request
+      req.session.lastActivity = Date.now();
       req.session.touch();
 
       const { generateMultiChannelContent } = await import("./content-automation");
