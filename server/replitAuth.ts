@@ -37,14 +37,16 @@ export function getSession() {
     tableName: "sessions",
   });
   
-  // Only use secure cookies in production or when using HTTPS
   const isProduction = process.env.NODE_ENV === 'production';
-  // IMPORTANT: Always use secure cookies on Replit (even in development) since it's served over HTTPS
-  // This fixes mobile Safari cookie issues where sameSite='lax' doesn't work over HTTPS
   const useSecureCookies = isProduction || process.env.REPLIT_DEPLOYMENT === '1' || !!process.env.REPLIT_DOMAINS;
   
-  // Extract domain from REPLIT_DOMAINS for cookie sharing across subdomains
-  const domain = process.env.REPLIT_DOMAINS?.split(',')[0]?.replace(/^https?:\/\//, '').split(':')[0] || undefined;
+  // 🔧 CRITICAL FIX: Only set cookie.domain for custom domains in production
+  // Setting domain to REPLIT_DOMAINS causes browsers to reject cookies when accessed
+  // from preview URLs, embedded browsers, or non-matching hostnames
+  // Let browsers use the current request hostname by default (domain: undefined)
+  const cookieDomain = process.env.CUSTOM_DOMAIN 
+    ? `.${process.env.CUSTOM_DOMAIN}` 
+    : undefined;
   
   return session({
     name: 'pillar.sid',  // Explicit cookie name for better tracking
@@ -52,13 +54,13 @@ export function getSession() {
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
-    rolling: true, // ✨ KEY FIX: Auto-extend session on every request (eliminates need for client keep-alive)
+    rolling: true, // ✨ Auto-extend session on every request (eliminates need for client keep-alive)
     cookie: {
       httpOnly: true,
       secure: useSecureCookies,
       sameSite: useSecureCookies ? 'none' : 'lax',  // 'none' for HTTPS to support mobile Safari
-      domain: useSecureCookies && domain ? `.${domain}` : undefined,  // Share cookie across subdomains in production
-      maxAge: sessionTimeoutMs, // 30-minute sliding window (not 7 days!)
+      domain: cookieDomain,  // Only set for CUSTOM_DOMAIN, otherwise let browser use request hostname
+      maxAge: sessionTimeoutMs, // 30-minute sliding window (HIPAA compliance)
     },
   });
 }
