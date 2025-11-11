@@ -150,15 +150,25 @@ export async function setupSocialAuth(app: Express) {
       "/api/auth/google/callback",
       passport.authenticate("google", { failureRedirect: "/login" }),
       (req: any, res) => {
-        // Check if this is a new user who needs to complete registration
-        const user = req.user;
-        if (user && user.isNewUser) {
-          // New user - skip step 1 (social auth already done), go to step 2 (user details)
-          res.redirect("/register?step=2");
-        } else {
-          // Existing user - go to dashboard
-          res.redirect("/dashboard");
-        }
+        // 🔧 CRITICAL FIX: Explicitly save session before redirect
+        // Without this, the redirect can happen before session is committed to database,
+        // causing the browser to hit /dashboard before cookies/session are ready
+        req.session.save((err: any) => {
+          if (err) {
+            console.error('[OAuth] Session save error:', err);
+            return res.redirect("/login?error=session_save_failed");
+          }
+          
+          // Check if this is a new user who needs to complete registration
+          const user = req.user;
+          if (user && user.isNewUser) {
+            // New user - skip step 1 (social auth already done), go to step 2 (user details)
+            res.redirect("/register?step=2");
+          } else {
+            // Existing user - go to dashboard
+            res.redirect("/dashboard");
+          }
+        });
       }
     );
   }
