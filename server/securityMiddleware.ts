@@ -28,7 +28,7 @@ export const generalRateLimiter = rateLimit({
 
 export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 10, // Increased from 5 to balance security with UX (per-account lockout provides additional protection)
   skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,

@@ -45,7 +45,7 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
   - **Audit Logging System**: Tracks ALL PHI access (authorized & unauthorized), authentication events, admin actions. 6-year retention with indexed queries. Device fingerprinting (IP, user agent, browser/OS/device).
   - **Field-Level Encryption**: AES-256-CBC encryption for sensitive PHI (medical info, addresses). PBKDF2-SHA512 password hashing (100k iterations). Mandatory ENCRYPTION_KEY in production (fails fast if missing).
   - **Session Security**: 30-minute automatic timeout, device tracking, session regeneration on login, secure cookies (httpOnly, secure, sameSite:lax for CSRF protection).
-  - **API Security**: Rate limiting (100 req/15min general, 5 req/15min auth), Helmet.js security headers (CSP, HSTS, XSS protection), input validation.
+  - **API Security**: Rate limiting (100 req/15min general, 10 req/15min auth), Helmet.js security headers (CSP, HSTS, XSS protection), input validation.
   - **Authentication Security**: Account lockout after 5 failed attempts (30-min duration), strong password requirements (12+ chars, complexity, history tracking), password expiration (90 days), MFA-ready schema.
   - **Access Controls**: Role-based access (admin/client/broker/company), minimum necessary PHI access enforcement, audit logging of all privilege changes.
   - **Database Security**: Encrypted connections, PostgreSQL session store, secure password storage with salting.
