@@ -105,7 +105,7 @@ export async function createCampaign(options: {
         from_name: options.fromName || "Pillar Drug Club",
         reply_to: options.replyTo || "seth@pillardrugclub.com",
       }
-    });
+    }) as any;
 
     // Set campaign content
     await mailchimp.campaigns.setContent(campaign.id, {
@@ -140,7 +140,8 @@ export async function sendCampaign(campaignId: string): Promise<void> {
  */
 export async function scheduleCampaign(campaignId: string, scheduleTime: Date): Promise<void> {
   try {
-    await mailchimp.campaigns.schedule(campaignId, {
+    // Note: Mailchimp API v3 uses actions.schedule endpoint
+    await (mailchimp.campaigns as any).schedule(campaignId, {
       schedule_time: scheduleTime.toISOString()
     });
     console.log(`✅ Campaign ${campaignId} scheduled for ${scheduleTime}`);
@@ -187,7 +188,7 @@ export function isMailchimpConfigured(): boolean {
  */
 export async function verifyMailchimpCredentials(): Promise<{ accountName: string; email: string }> {
   try {
-    const response = await mailchimp.ping.get();
+    const response = await mailchimp.ping.get() as any;
     
     return {
       accountName: response.account_name || "Unknown",
@@ -209,7 +210,7 @@ export async function getListInfo(): Promise<any> {
       throw new Error("MAILCHIMP_AUDIENCE_ID not configured");
     }
 
-    const list = await mailchimp.lists.getList(listId);
+    const list = await (mailchimp.lists as any).getList(listId);
     
     return {
       name: list.name,
