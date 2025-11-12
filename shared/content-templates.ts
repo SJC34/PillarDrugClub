@@ -5,8 +5,19 @@
  * with optimal style packs for Blog, X/Twitter, Reddit, and YouTube.
  */
 
+// Template ID type
+export type TemplateId = 
+  | "professional_health_blog"
+  | "viral_health_tips"
+  | "patient_stories"
+  | "medication_guides"
+  | "healthcare_news"
+  | "cost_savings_tips"
+  | "industry_analysis"
+  | "pharmacy_qa";
+
 export interface ContentTemplate {
-  id: string;
+  id: TemplateId;
   name: string;
   description: string;
   useCase: string;

@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { 
@@ -29,11 +32,14 @@ import {
   Rocket,
   Zap,
   ArrowLeft,
-  Eye
+  Eye,
+  ChevronDown,
+  Check
 } from "lucide-react";
 import { Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import type { GeneratedContent } from "@shared/content-automation";
+import { CONTENT_TEMPLATES, type TemplateId } from "@shared/content-templates";
 import AdminContentPreviewPage from "./AdminContentPreviewPage";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -74,6 +80,10 @@ export default function AdminContentAutomationPage() {
   const [targetAudience, setTargetAudience] = useState("healthcare_consumers");
   const [contentGoal, setContentGoal] = useState("education");
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
+  
+  // Creator Style Engine State
+  const [generationMode, setGenerationMode] = useState<"simple" | "professional">("simple");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<TemplateId>("professional_health_blog");
 
   // Manual Scheduling State
   const [selectedChannel, setSelectedChannel] = useState<string>("blog_post");
@@ -94,7 +104,7 @@ export default function AdminContentAutomationPage() {
 
   // Generate multi-channel content
   const generateMultiChannelMutation = useMutation({
-    mutationFn: async (data: { topic: string; targetAudience: string; contentGoal: string }) => {
+    mutationFn: async (data: { topic: string; targetAudience: string; contentGoal: string; generationMode?: string; templatePreset?: string }) => {
       console.log("🚀 Starting content generation request:", data);
       
       try {
@@ -223,6 +233,8 @@ export default function AdminContentAutomationPage() {
       topic,
       targetAudience,
       contentGoal,
+      generationMode,
+      templatePreset: generationMode === "professional" ? selectedTemplateId : undefined,
     });
   };
 
@@ -542,7 +554,95 @@ export default function AdminContentAutomationPage() {
               <CardContent className="space-y-6">
                 {/* Generation Form */}
                 {!generatedContent && (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    {/* Generation Mode Toggle */}
+                    <div className="space-y-3">
+                      <Label>Generation Mode</Label>
+                      <ToggleGroup 
+                        type="single" 
+                        value={generationMode} 
+                        onValueChange={(value) => value && setGenerationMode(value as "simple" | "professional")}
+                        className="justify-start"
+                        data-testid="toggle-generation-mode"
+                      >
+                        <ToggleGroupItem value="simple" aria-label="Quick Mode" data-testid="toggle-mode-simple">
+                          <Zap className="h-4 w-4 mr-2" />
+                          Quick
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="professional" aria-label="Professional Mode" data-testid="toggle-mode-professional">
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Professional
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                      
+                      {/* Mode Explainer */}
+                      <Collapsible defaultOpen className="space-y-2">
+                        <CollapsibleTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover-elevate p-2 rounded-md" data-testid="toggle-mode-explainer">
+                          <ChevronDown className="h-4 w-4" />
+                          <span>What's the difference?</span>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="text-sm text-muted-foreground space-y-1 pl-6">
+                          <p><strong>Quick:</strong> Fast AI content generation with balanced style for all channels</p>
+                          <p><strong>Professional:</strong> Advanced Creator Style Engine with 8 specialized templates optimized for specific use cases and audiences</p>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
+
+                    {/* Template Selector (Professional Mode Only) */}
+                    {generationMode === "professional" && (
+                      <div className="space-y-3">
+                        <Label>Content Template</Label>
+                        <RadioGroup value={selectedTemplateId} onValueChange={(value) => setSelectedTemplateId(value as TemplateId)}>
+                          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                            {CONTENT_TEMPLATES.map((template) => (
+                              <div key={template.id} className="relative">
+                                <RadioGroupItem
+                                  value={template.id}
+                                  id={template.id}
+                                  className="peer sr-only"
+                                  data-testid={`radio-template-${template.id}`}
+                                />
+                                <Label
+                                  htmlFor={template.id}
+                                  className="flex flex-col gap-3 p-4 cursor-pointer rounded-md border-2 border-muted bg-card hover-elevate peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary peer-data-[state=checked]:ring-offset-2"
+                                  data-testid={`card-template-${template.id}`}
+                                >
+                                  <div className="flex items-start justify-between">
+                                    <div className="space-y-1 flex-1">
+                                      <div className="font-semibold">{template.name}</div>
+                                      <div className="text-xs text-muted-foreground">{template.description}</div>
+                                    </div>
+                                    {selectedTemplateId === template.id && (
+                                      <Check className="h-5 w-5 text-primary flex-shrink-0" data-testid={`check-template-${template.id}`} />
+                                    )}
+                                  </div>
+                                  
+                                  <div className="flex flex-wrap gap-1">
+                                    <Badge variant="secondary" className="text-xs">
+                                      <FileText className="h-3 w-3 mr-1" />
+                                      {template.stylePacks.blog.replace(/_/g, ' ')}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      <Twitter className="h-3 w-3 mr-1" />
+                                      {template.stylePacks.x.replace(/_/g, ' ')}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      <FileText className="h-3 w-3 mr-1" />
+                                      {template.stylePacks.reddit.replace(/_/g, ' ')}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      <Video className="h-3 w-3 mr-1" />
+                                      {template.stylePacks.youtube.replace(/_/g, ' ')}
+                                    </Badge>
+                                  </div>
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    )}
+                    
                     <div className="space-y-2">
                       <Label htmlFor="topic">Content Topic</Label>
                       <Input
