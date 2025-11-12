@@ -20,14 +20,38 @@ export function getSession() {
     tableName: "sessions",
   });
   
+  // 🔧 Environment-aware cookie configuration
+  // Replit dev: HTTP, changing preview URLs → sameSite:'lax', secure:false, no domain
+  // Production: HTTPS, custom domain → sameSite:'none', secure:true, domain set
   const isProduction = process.env.NODE_ENV === 'production';
-  const useSecureCookies = isProduction || process.env.REPLIT_DEPLOYMENT === '1' || !!process.env.REPLIT_DOMAINS;
+  const customDomain = process.env.CUSTOM_DOMAIN;
   
-  // 🔧 CRITICAL FIX: NEVER set cookie.domain unless actually on the custom domain
-  // Setting cookie.domain when accessing from Replit preview URLs causes browsers
-  // to reject the Set-Cookie header entirely, making sessions impossible
-  // SOLUTION: Leave domain undefined - browser will use the current hostname
-  const cookieDomain = undefined;  // Let browser use request hostname (works for both dev and prod)
+  // 🔒 SECURITY: Validate production environment has CUSTOM_DOMAIN configured
+  // Without this, production cookies would be insecure (secure=false) and vulnerable
+  if (isProduction && !customDomain) {
+    throw new Error(
+      'SECURITY ERROR: Production environment requires CUSTOM_DOMAIN environment variable. ' +
+      'This ensures secure cookies (HTTPS) are properly configured. ' +
+      'Set CUSTOM_DOMAIN=pillardrugclub.com in your production environment.'
+    );
+  }
+  
+  // Use secure cookies only in production (which requires HTTPS)
+  const useSecureCookies = isProduction;
+  
+  // In production with custom domain, set domain for cross-subdomain cookies
+  // In dev (Replit preview URLs), leave undefined so browser uses current hostname
+  // Strip any protocol prefix from domain (https://, http://)
+  const cookieDomain = isProduction && customDomain 
+    ? `.${customDomain.replace(/^https?:\/\//, '')}` 
+    : undefined;
+  
+  // SameSite strategy:
+  // - 'lax': Works with OAuth redirects on HTTP (Replit dev)
+  // - 'none': Required for cross-site requests on HTTPS (production with Stripe, etc)
+  const sameSiteSetting = useSecureCookies ? 'none' : 'lax';
+  
+  console.log(`🍪 Session cookie config: secure=${useSecureCookies}, sameSite=${sameSiteSetting}, domain=${cookieDomain || 'current-host'}`);
   
   return session({
     name: 'pillar.sid',  // Explicit cookie name for better tracking
@@ -39,8 +63,8 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: useSecureCookies,
-      sameSite: useSecureCookies ? 'none' : 'lax',  // 'none' for HTTPS to support mobile Safari
-      domain: cookieDomain,  // Only set for CUSTOM_DOMAIN, otherwise let browser use request hostname
+      sameSite: sameSiteSetting,
+      domain: cookieDomain,
       maxAge: sessionTimeoutMs, // 30-minute sliding window (HIPAA compliance)
     },
   });
@@ -163,29 +187,58 @@ export async function setupSocialAuth(app: Express) {
           return res.redirect("/login?error=no_user");
         }
         
-        // 🔧 CRITICAL FIX: Explicitly save session before redirect
-        // Without this, the redirect can happen before session is committed to database,
-        // causing the browser to hit /dashboard before cookies/session are ready
-        req.session.save((err: any) => {
-          if (err) {
-            console.error('[OAuth] ❌ Session save error:', err);
-            return res.redirect("/login?error=session_save_failed");
+        const user = req.user;
+        
+        // 🔒 SECURITY: Regenerate session ID to prevent session fixation attacks
+        // CRITICAL: Must preserve passport session data during regeneration
+        const oldSessionData = { ...req.session };
+        req.session.regenerate((regenerateErr: any) => {
+          if (regenerateErr) {
+            console.error('[OAuth] ❌ Session regenerate error:', regenerateErr);
+            return res.redirect("/login?error=session_regenerate_failed");
           }
           
-          console.log('[OAuth] ✅ Session saved successfully');
-          console.log('[OAuth] Session after save - authenticated?', req.isAuthenticated());
+          console.log('[OAuth] ✅ Session regenerated, new ID:', req.sessionID);
           
-          // Check if this is a new user who needs to complete registration
-          const user = req.user;
-          if (user && user.isNewUser) {
-            console.log('[OAuth] 🆕 New user - redirecting to registration step 2');
-            // New user - skip step 1 (social auth already done), go to step 2 (user details)
-            res.redirect("/register?step=2");
-          } else {
-            console.log('[OAuth] 👤 Existing user - redirecting to dashboard');
-            // Existing user - go to dashboard
-            res.redirect("/dashboard");
-          }
+          // 🔧 CRITICAL: Restore passport data to regenerated session
+          // Without this, the new session is empty and user appears logged out
+          Object.assign(req.session, oldSessionData);
+          
+          // Re-authenticate user with regenerated session
+          req.login(user, (loginErr: any) => {
+            if (loginErr) {
+              console.error('[OAuth] ❌ Login error:', loginErr);
+              return res.redirect("/login?error=login_failed");
+            }
+            
+            console.log('[OAuth] ✅ User logged in with regenerated session');
+            console.log('[OAuth] User role:', user?.role || 'NO_ROLE');
+            console.log('[OAuth] Session passport data:', req.session.passport);
+            
+            // 💾 CRITICAL: Force save session to PostgreSQL before redirect
+            // This prevents race condition where redirect happens before session is persisted
+            req.session.save((saveErr: any) => {
+              if (saveErr) {
+                console.error('[OAuth] ❌ Session save error:', saveErr);
+                return res.redirect("/login?error=session_save_failed");
+              }
+              
+              console.log('[OAuth] ✅ Session saved to database');
+              console.log('[OAuth] Final authenticated state:', req.isAuthenticated());
+              
+              // 🎯 Role-based dashboard routing
+              if (user && user.isNewUser) {
+                console.log('[OAuth] 🆕 New user - redirecting to registration step 2');
+                res.redirect("/register?step=2");
+              } else if (user?.role === 'admin') {
+                console.log('[OAuth] 👨‍💼 Admin user - redirecting to admin dashboard');
+                res.redirect("/admin/dashboard");
+              } else {
+                console.log('[OAuth] 👤 Regular user - redirecting to member dashboard');
+                res.redirect("/dashboard");
+              }
+            });
+          });
         });
       }
     );
