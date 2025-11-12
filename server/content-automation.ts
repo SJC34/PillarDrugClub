@@ -128,7 +128,42 @@ BRAND VOICE:
 - No insurance jargon
 - Practical, actionable advice
 
-Return a JSON object with all requested content formats.`;
+CRITICAL: You MUST return a JSON object with the following EXACT structure:
+{
+  ${generateBlog ? `"blog": {
+    "title": "string (under 60 chars)",
+    "content": "string (1500+ words markdown)",
+    "excerpt": "string (100-150 chars)",
+    "seoTitle": "string (under 60 chars)",
+    "seoDescription": "string (under 160 chars)",
+    "seoKeywords": ["array", "of", "keywords"],
+    "tags": ["array", "of", "tags"]
+  },` : ''}
+  ${generateXThread ? `"xThread": {
+    "tweets": ["array of 10-15 tweets, each under 280 chars"]
+  },` : ''}
+  ${generateXTip ? `"xTip": {
+    "text": "string (single tweet under 280 chars)"
+  },` : ''}
+  ${generateXPoll ? `"xPoll": {
+    "question": "string (under 280 chars)",
+    "options": ["array", "of", "2-4", "options"]
+  },` : ''}
+  ${generateRedditPost ? `"redditPost": {
+    "title": "string (question format)",
+    "body": "string (800-1000 words)",
+    "subreddit": "string (r/suggested)"
+  },` : ''}
+  ${generateVideoScript ? `"videoScript": {
+    "hook": "string (0-3 second script)",
+    "problem": "string (3-8 second script)",
+    "tips": ["array", "of", "3 tips"],
+    "cta": "string (final CTA)",
+    "duration": 60
+  }` : ''}
+}
+
+ALL requested sections MUST be present in your response. Do not omit any section marked above.`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -136,7 +171,7 @@ Return a JSON object with all requested content formats.`;
       messages: [
         {
           role: "system",
-          content: "You are an expert multi-channel content strategist specializing in pharmacy and healthcare. You create platform-optimized content that drives engagement and conversions."
+          content: "You are an expert multi-channel content strategist specializing in pharmacy and healthcare. You create platform-optimized content that drives engagement and conversions. You ALWAYS return complete JSON with all requested sections - never omit content."
         },
         {
           role: "user",
@@ -152,14 +187,40 @@ Return a JSON object with all requested content formats.`;
       throw new Error("No content generated from OpenAI");
     }
 
-    const parsedContent = JSON.parse(content) as GeneratedContent;
+    let parsedContent: any;
+    try {
+      parsedContent = JSON.parse(content);
+    } catch (parseError) {
+      console.error("❌ Failed to parse OpenAI response:", content);
+      throw new Error("Invalid JSON response from AI");
+    }
+
+    // Validate required sections are present
+    const missingPlatforms: string[] = [];
+    if (generateBlog && !parsedContent.blog) missingPlatforms.push("blog");
+    if (generateXThread && !parsedContent.xThread) missingPlatforms.push("xThread");
+    if (generateXTip && !parsedContent.xTip) missingPlatforms.push("xTip");
+    if (generateXPoll && !parsedContent.xPoll) missingPlatforms.push("xPoll");
+    if (generateRedditPost && !parsedContent.redditPost) missingPlatforms.push("redditPost");
+    if (generateVideoScript && !parsedContent.videoScript) missingPlatforms.push("videoScript");
+
+    if (missingPlatforms.length > 0) {
+      console.error("❌ AI response missing platforms:", missingPlatforms);
+      console.error("📄 Received content keys:", Object.keys(parsedContent));
+      throw new Error(`AI failed to generate content for: ${missingPlatforms.join(", ")}. Please try again.`);
+    }
+
+    console.log("✅ All requested platforms generated successfully:", Object.keys(parsedContent));
+    
+    // Cast to proper type
+    const typedContent = parsedContent as GeneratedContent;
     
     // Generate video data if video script was requested
-    if (generateVideoScript && parsedContent.videoScript) {
-      parsedContent.video = await generateVideoData(parsedContent.videoScript);
+    if (generateVideoScript && typedContent.videoScript) {
+      typedContent.video = await generateVideoData(typedContent.videoScript);
     }
     
-    return parsedContent;
+    return typedContent;
 
   } catch (error: any) {
     console.error("Error generating multi-channel content:", error);
