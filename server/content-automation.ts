@@ -1,6 +1,8 @@
 import OpenAI from "openai";
 import { writingStyles } from "./blog-ai";
 import type { MultiChannelContentOptions, GeneratedContent } from "@shared/content-automation";
+import { getTemplate, type BlogStylePack, type XStylePack, type RedditStylePack, type YouTubeStylePack } from "@shared/content-templates";
+import { CREATOR_STYLE_ENGINE_PROMPT } from "./prompts/creator-style-engine";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,8 +12,177 @@ const openai = new OpenAI({
 export type { MultiChannelContentOptions, GeneratedContent };
 
 /**
+ * Build Creator Style Engine prompt with channel-specific style packs
+ */
+function buildCreatorStyleEnginePrompt(
+  topic: string,
+  tone: string,
+  targetAudience: string,
+  cta: string,
+  keywords: string[],
+  contentGoal: string,
+  stylePacks: {
+    blog?: BlogStylePack;
+    x?: XStylePack;
+    reddit?: RedditStylePack;
+    youtube?: YouTubeStylePack;
+  },
+  generators: {
+    generateBlog: boolean;
+    generateXThread: boolean;
+    generateXTip: boolean;
+    generateXPoll: boolean;
+    generateRedditPost: boolean;
+    generateVideoScript: boolean;
+  }
+): string {
+  const keywordsText = keywords.length > 0 ? keywords.join(", ") : "";
+  
+  return `${CREATOR_STYLE_ENGINE_PROMPT}
+
+INPUT PARAMETERS:
+- topic: "${topic}"
+- goal: ${contentGoal}
+- tone: ${tone}
+- audience: ${targetAudience}
+- keywords: ${keywordsText}
+- call_to_action: ${cta}
+
+STYLE PACKS FOR EACH CHANNEL:
+${generators.generateBlog ? `- blog: ${stylePacks.blog || 'authority_educator'}` : ''}
+${(generators.generateXThread || generators.generateXTip) ? `- x: ${stylePacks.x || 'viral_hook_thread'}` : ''}
+${generators.generateRedditPost ? `- reddit_post: ${stylePacks.reddit || 'ama_transparency'}` : ''}
+${generators.generateVideoScript ? `- youtube_script: ${stylePacks.youtube || 'educational_velocity'}` : ''}
+
+CHANNEL-SPECIFIC REQUIREMENTS:
+
+${generators.generateBlog ? `
+BLOG POST (channel: blog, style: ${stylePacks.blog || 'authority_educator'}):
+- 1,500+ words minimum
+- SEO-optimized with H2/H3 headings
+- Include statistics, examples, actionable tips
+- Natural keyword integration: ${keywordsText}
+- Clear intro, body, conclusion structure
+- End with CTA linking to: ${cta}
+` : ''}
+
+${generators.generateXThread ? `
+X/TWITTER THREAD (channel: x_thread, style: ${stylePacks.x || 'viral_hook_thread'}):
+- 10-15 tweets minimum
+- First tweet: strong hook (curiosity gap or bold promise)
+- 8-12 value tweets with insights/tips
+- Include 1-2 data/stat tweets
+- 1 engagement tweet (question or bold statement)
+- Final tweet with CTA and link: ${cta}
+- Each tweet MUST be under 280 characters
+- Use line breaks for readability
+- Thread indicators (1/15, 2/15, etc.)
+` : ''}
+
+${generators.generateXTip ? `
+X/TWITTER TIP (channel: x_tip, style: ${stylePacks.x || 'viral_hook_thread'}):
+- Single actionable tweet
+- Under 280 characters
+- Clear value proposition
+- Professional pharmacy voice
+- Optional CTA or link
+` : ''}
+
+${generators.generateXPoll ? `
+X/TWITTER POLL (channel: x_poll):
+- Engaging question related to topic
+- 2-4 answer options (each under 25 chars)
+- Drives engagement and data collection
+- Related to pharmacy/healthcare savings
+` : ''}
+
+${generators.generateRedditPost ? `
+REDDIT POST (channel: reddit_post, style: ${stylePacks.reddit || 'ama_transparency'}):
+- 800-1000 words
+- Engaging title in question format
+- Personal/relatable opener
+- Value-packed body with bullet points
+- Helpful resources section
+- Soft CTA (no hard selling on Reddit)
+- Suggest appropriate subreddit (r/diabetes, r/frugal, r/personalfinance, etc.)
+` : ''}
+
+${generators.generateVideoScript ? `
+YOUTUBE SCRIPT (channel: youtube_script, style: ${stylePacks.youtube || 'educational_velocity'}):
+- 60-second script format
+- Hook (0-3s): Attention-grabbing statement
+- Problem (3-8s): Pain point description
+- Tip 1 (8-20s): First solution with visual text cue
+- Tip 2 (20-32s): Second solution with visual text cue
+- Tip 3 (32-44s): Third solution with visual text cue
+- CTA (44-60s): Call to action with URL display: ${cta}
+- Include [B-ROLL] and [ON SCREEN TEXT] cues where helpful
+` : ''}
+
+CRITICAL: You MUST return a JSON object with the following EXACT structure:
+${(() => {
+  const jsonParts: string[] = [];
+  
+  if (generators.generateBlog) {
+    jsonParts.push(`  "blog": {
+    "title": "string (under 60 chars)",
+    "content": "string (1500+ words markdown)",
+    "excerpt": "string (100-150 chars)",
+    "seoTitle": "string (under 60 chars)",
+    "seoDescription": "string (under 160 chars)",
+    "seoKeywords": ["array", "of", "keywords"],
+    "tags": ["array", "of", "tags"]
+  }`);
+  }
+  
+  if (generators.generateXThread) {
+    jsonParts.push(`  "xThread": {
+    "tweets": ["array of 10-15 tweets, each under 280 chars"]
+  }`);
+  }
+  
+  if (generators.generateXTip) {
+    jsonParts.push(`  "xTip": {
+    "text": "string (single tweet under 280 chars)"
+  }`);
+  }
+  
+  if (generators.generateXPoll) {
+    jsonParts.push(`  "xPoll": {
+    "question": "string (under 280 chars)",
+    "options": ["array", "of", "2-4", "options"]
+  }`);
+  }
+  
+  if (generators.generateRedditPost) {
+    jsonParts.push(`  "redditPost": {
+    "title": "string (question format)",
+    "body": "string (800-1000 words)",
+    "subreddit": "string (r/suggested)"
+  }`);
+  }
+  
+  if (generators.generateVideoScript) {
+    jsonParts.push(`  "videoScript": {
+    "hook": "string (0-3 second script)",
+    "problem": "string (3-8 second script)",
+    "tips": ["array", "of", "3 tips"],
+    "cta": "string (final CTA)",
+    "duration": 60
+  }`);
+  }
+  
+  return '{\n' + jsonParts.join(',\n') + '\n}';
+})()}
+
+ALL requested sections MUST be present in your response. Do not omit any section.
+Follow your assigned Creator Style Pack precisely for each channel while meeting all structural requirements above.`;
+}
+
+/**
  * Generate multi-channel content from a single topic
  * Returns content optimized for each platform
+ * Supports both simple mode (default) and professional mode (Creator Style Engine)
  */
 export async function generateMultiChannelContent(
   options: MultiChannelContentOptions
@@ -28,8 +199,30 @@ export async function generateMultiChannelContent(
     generateRedditPost = true,
     generateVideoScript = true,
     targetAudience = "general",
-    cta = "pillardrugclub.com/join"
+    contentGoal = "education",
+    cta = "pillardrugclub.com/join",
+    generationMode = "simple",
+    templatePreset
   } = options;
+
+  // Check if using professional mode with Creator Style Engine
+  const isProfessionalMode = generationMode === "professional" && templatePreset;
+  let stylePacks: { blog?: BlogStylePack; x?: XStylePack; reddit?: RedditStylePack; youtube?: YouTubeStylePack } | null = null;
+  
+  if (isProfessionalMode) {
+    const template = getTemplate(templatePreset!);
+    if (!template) {
+      console.warn(`⚠️ Template ${templatePreset} not found, falling back to simple mode`);
+    } else {
+      console.log(`✅ Using Creator Style Engine template: ${template.name}`);
+      stylePacks = {
+        blog: generateBlog ? template.stylePacks.blog : undefined,
+        x: generateXThread || generateXTip ? template.stylePacks.x : undefined,
+        reddit: generateRedditPost ? template.stylePacks.reddit : undefined,
+        youtube: generateVideoScript ? template.stylePacks.youtube : undefined
+      };
+    }
+  }
 
   const selectedStyle = writingStyles[writingStyle as keyof typeof writingStyles] || writingStyles.default;
   const keywordsText = keywords.length > 0 ? keywords.join(", ") : "";
@@ -46,8 +239,36 @@ export async function generateMultiChannelContent(
     families: "Target families managing medication costs for multiple family members."
   };
 
-  // Prepare the multi-format generation prompt
-  const prompt = `You are a content strategist for Pillar Drug Club - a prescription pharmacy platform offering wholesale medication prices without insurance hassles.
+  // Build prompt based on mode (simple or professional)
+  let userPrompt: string;
+  let systemPrompt: string;
+  
+  if (isProfessionalMode && stylePacks) {
+    // Professional mode: Use Creator Style Engine
+    console.log(`📝 Using Creator Style Engine with style packs:`, stylePacks);
+    systemPrompt = "You are the Creator Style Engine - an expert multi-channel content generator for Pillar Drug Club. You adapt content structure, pacing, and tone to match selected Creator Style Packs while maintaining medical accuracy and healthcare best practices.";
+    userPrompt = buildCreatorStyleEnginePrompt(
+      topic,
+      tone,
+      targetAudience,
+      cta,
+      keywords,
+      contentGoal,
+      stylePacks,
+      {
+        generateBlog,
+        generateXThread,
+        generateXTip,
+        generateXPoll,
+        generateRedditPost,
+        generateVideoScript
+      }
+    );
+  } else {
+    // Simple mode: Use default content strategist prompt
+    console.log(`📝 Using simple mode content generation`);
+    systemPrompt = "You are an expert multi-channel content strategist specializing in pharmacy and healthcare. You create platform-optimized content that drives engagement and conversions. You ALWAYS return complete JSON with all requested sections - never omit content.";
+    userPrompt = `You are a content strategist for Pillar Drug Club - a prescription pharmacy platform offering wholesale medication prices without insurance hassles.
 
 TOPIC: "${topic}"
 
@@ -129,8 +350,11 @@ BRAND VOICE:
 - Practical, actionable advice
 
 CRITICAL: You MUST return a JSON object with the following EXACT structure:
-{
-  ${generateBlog ? `"blog": {
+${(() => {
+  const jsonParts: string[] = [];
+  
+  if (generateBlog) {
+    jsonParts.push(`  "blog": {
     "title": "string (under 60 chars)",
     "content": "string (1500+ words markdown)",
     "excerpt": "string (100-150 chars)",
@@ -138,32 +362,51 @@ CRITICAL: You MUST return a JSON object with the following EXACT structure:
     "seoDescription": "string (under 160 chars)",
     "seoKeywords": ["array", "of", "keywords"],
     "tags": ["array", "of", "tags"]
-  },` : ''}
-  ${generateXThread ? `"xThread": {
+  }`);
+  }
+  
+  if (generateXThread) {
+    jsonParts.push(`  "xThread": {
     "tweets": ["array of 10-15 tweets, each under 280 chars"]
-  },` : ''}
-  ${generateXTip ? `"xTip": {
+  }`);
+  }
+  
+  if (generateXTip) {
+    jsonParts.push(`  "xTip": {
     "text": "string (single tweet under 280 chars)"
-  },` : ''}
-  ${generateXPoll ? `"xPoll": {
+  }`);
+  }
+  
+  if (generateXPoll) {
+    jsonParts.push(`  "xPoll": {
     "question": "string (under 280 chars)",
     "options": ["array", "of", "2-4", "options"]
-  },` : ''}
-  ${generateRedditPost ? `"redditPost": {
+  }`);
+  }
+  
+  if (generateRedditPost) {
+    jsonParts.push(`  "redditPost": {
     "title": "string (question format)",
     "body": "string (800-1000 words)",
     "subreddit": "string (r/suggested)"
-  },` : ''}
-  ${generateVideoScript ? `"videoScript": {
+  }`);
+  }
+  
+  if (generateVideoScript) {
+    jsonParts.push(`  "videoScript": {
     "hook": "string (0-3 second script)",
     "problem": "string (3-8 second script)",
     "tips": ["array", "of", "3 tips"],
     "cta": "string (final CTA)",
     "duration": 60
-  }` : ''}
-}
+  }`);
+  }
+  
+  return '{\n' + jsonParts.join(',\n') + '\n}';
+})()}
 
 ALL requested sections MUST be present in your response. Do not omit any section marked above.`;
+  }
 
   try {
     const completion = await openai.chat.completions.create({
@@ -171,11 +414,11 @@ ALL requested sections MUST be present in your response. Do not omit any section
       messages: [
         {
           role: "system",
-          content: "You are an expert multi-channel content strategist specializing in pharmacy and healthcare. You create platform-optimized content that drives engagement and conversions. You ALWAYS return complete JSON with all requested sections - never omit content."
+          content: systemPrompt
         },
         {
           role: "user",
-          content: prompt
+          content: userPrompt
         }
       ],
       response_format: { type: "json_object" },

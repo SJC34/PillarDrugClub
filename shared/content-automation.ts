@@ -17,6 +17,10 @@ export interface MultiChannelContentOptions {
   targetAudience?: "new_members" | "existing" | "general" | "healthcare_consumers" | "seniors" | "chronic_conditions" | "cost_conscious" | "small_business" | "families";
   contentGoal?: "education" | "awareness" | "conversion" | "engagement";
   cta?: string; // Call to action (default: pillardrugclub.com/join)
+  
+  // Creator Style Engine parameters
+  generationMode?: "simple" | "professional";
+  templatePreset?: string; // Template ID from content-templates.ts
 }
 
 export interface GeneratedContent {
