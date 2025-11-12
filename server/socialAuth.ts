@@ -98,11 +98,16 @@ async function upsertUserFromProfile(profile: any, provider: string) {
     });
   }
 
+  // Fetch the complete user record to ensure we have all fields including role
+  const fullUser = await storage.getUser(userId);
+  
   return {
     id: userId,
     email: email,
     firstName: firstName || existingUser?.firstName || "",
     lastName: lastName || existingUser?.lastName || "",
+    role: fullUser?.role || existingUser?.role || "client",  // ✅ CRITICAL: Include role for admin checks
+    profileImageUrl: profileImageUrl || existingUser?.profileImageUrl || "",
     provider: provider,
     isNewUser: isNewUser,
   };
@@ -201,15 +206,15 @@ export async function setupSocialAuth(app: Express) {
     console.log('[Passport] 🔓 Session user role:', user?.role || 'NO_ROLE');
     
     try {
-      // For social auth, the full user object is already in session
-      // Just verify the user still exists in database
+      // ✅ CRITICAL: Always fetch fresh user from database to ensure req.user has latest data including role
+      // This prevents role drift and ensures admin checks work correctly
       if (user?.id) {
         const dbUser = await storage.getUser(user.id);
         if (dbUser) {
           console.log('[Passport] ✅ User verified from database:', dbUser.email);
           console.log('[Passport] ✅ Database user role:', dbUser.role || 'NO_ROLE');
-          console.log('[Passport] ✅ Database user keys:', Object.keys(dbUser));
-          done(null, dbUser);
+          console.log('[Passport] ✅ Full user object:', JSON.stringify(dbUser, null, 2));
+          done(null, dbUser); // ✅ Always use database user (includes role, subscriptionTier, etc.)
         } else {
           console.log('[Passport] ⚠️ User not found in database, using session data');
           done(null, user);
