@@ -58,6 +58,7 @@ export const users = pgTable("users", {
   mfaSecret: text("mfa_secret"),
   privacyPolicyAcceptedAt: timestamp("privacy_policy_accepted_at"),
   hipaaConsentAt: timestamp("hipaa_consent_at"),
+  preferredContentTemplate: text("preferred_content_template"), // User's default content template preset
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -564,6 +565,14 @@ export const contentQueue = pgTable("content_queue", {
   tone: text("tone").notNull(),
   keywords: text("keywords").array().default(sql`'{}'::text[]`),
   writingStyle: text("writing_style"),
+  
+  // Creator Style Engine fields
+  generationMode: text("generation_mode", { enum: ["simple", "professional"] }).default("simple"),
+  templatePreset: text("template_preset"), // e.g., "professional_health_blog", "viral_twitter_growth"
+  stylePackBlog: text("style_pack_blog"), // Blog style: deep_dive_analyst, authority_educator, etc.
+  stylePackX: text("style_pack_x"), // X/Twitter style: viral_hook_thread, data_driven_thread, etc.
+  stylePackReddit: text("style_pack_reddit"), // Reddit style: ama_transparency, emotional_longform, etc.
+  stylePackYoutube: text("style_pack_youtube"), // YouTube style: high_retention_storyteller, educational_velocity, etc.
   
   // Generated content (JSON payloads)
   blogContent: jsonb("blog_content"), // { title, content, excerpt, seoTitle, seoDescription, seoKeywords, tags }
