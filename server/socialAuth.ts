@@ -23,13 +23,11 @@ export function getSession() {
   const isProduction = process.env.NODE_ENV === 'production';
   const useSecureCookies = isProduction || process.env.REPLIT_DEPLOYMENT === '1' || !!process.env.REPLIT_DOMAINS;
   
-  // 🔧 CRITICAL FIX: Only set cookie.domain for custom domains in production
-  // Setting domain to REPLIT_DOMAINS causes browsers to reject cookies when accessed
-  // from preview URLs, embedded browsers, or non-matching hostnames
-  // Let browsers use the current request hostname by default (domain: undefined)
-  const cookieDomain = process.env.CUSTOM_DOMAIN 
-    ? `.${process.env.CUSTOM_DOMAIN}` 
-    : undefined;
+  // 🔧 CRITICAL FIX: NEVER set cookie.domain unless actually on the custom domain
+  // Setting cookie.domain when accessing from Replit preview URLs causes browsers
+  // to reject the Set-Cookie header entirely, making sessions impossible
+  // SOLUTION: Leave domain undefined - browser will use the current hostname
+  const cookieDomain = undefined;  // Let browser use request hostname (works for both dev and prod)
   
   return session({
     name: 'pillar.sid',  // Explicit cookie name for better tracking
