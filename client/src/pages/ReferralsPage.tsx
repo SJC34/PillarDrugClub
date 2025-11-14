@@ -21,22 +21,9 @@ import { QRCodeSVG } from "qrcode.react";
 export default function ReferralsPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-
-  useEffect(() => {
-    if (authLoading) return;
-    
-    if (!isAuthenticated) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to access your referral dashboard.",
-        variant: "destructive",
-      });
-      setLocation("/login");
-    }
-  }, [authLoading, isAuthenticated]);
 
   const { data: referralCode, isLoading: codeLoading } = useQuery({
     queryKey: ["/api/users", user?.id, "referral-code"],
@@ -58,7 +45,7 @@ export default function ReferralsPage() {
     enabled: !!user?.id,
   });
 
-  if (authLoading || codeLoading) {
+  if (codeLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

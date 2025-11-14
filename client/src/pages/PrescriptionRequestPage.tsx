@@ -76,7 +76,7 @@ type PrescriptionRequestForm = z.infer<typeof prescriptionRequestSchema>;
 export default function PrescriptionRequestPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [submissionStatus, setSubmissionStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -137,9 +137,10 @@ export default function PrescriptionRequestPage() {
     }
   };
 
-  // Prepopulate form with user data when authenticated
+  // Prepopulate form with user data when available
   useEffect(() => {
-    if (user && isAuthenticated) {
+    // ProtectedRoute ensures user is authenticated - just check if user data exists
+    if (user) {
       const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
       const allergies = user.drugAllergies?.join(', ') || '';
       
@@ -153,7 +154,7 @@ export default function PrescriptionRequestPage() {
         doctorForm.setValue("drugAllergies", allergies);
       }
     }
-  }, [user, isAuthenticated]);
+  }, [user]);
 
   // Prepopulate medication fields from URL parameters
   useEffect(() => {
@@ -173,24 +174,14 @@ export default function PrescriptionRequestPage() {
     }
   }, []);
 
-  // Handle form submission with authentication check
+  // Handle form submission
   const handleDoctorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     console.log("handleDoctorSubmit called");
     console.log("Form errors:", doctorForm.formState.errors);
     
-    // Check authentication first
-    if (!isAuthenticated || !user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to submit prescription requests.",
-        variant: "destructive"
-      });
-      setLocation("/login");
-      return;
-    }
-    
+    // ProtectedRoute handles authentication - just validate form
     // Validate form first
     const isValid = await doctorForm.trigger();
     if (!isValid) {

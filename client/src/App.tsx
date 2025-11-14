@@ -102,11 +102,15 @@ function Router() {
       <Route path="/medications/my-list" component={MyMedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />
-      <Route path="/prescription-request" component={PrescriptionRequestPage} />
+      <Route path="/prescription-request">
+        <ProtectedRoute><PrescriptionRequestPage /></ProtectedRoute>
+      </Route>
       <Route path="/prescriptions" component={PrescriptionsPage} />
       <Route path="/refills" component={RefillsPage} />
       <Route path="/refills/history" component={RefillHistoryPage} />
-      <Route path="/referrals" component={ReferralsPage} />
+      <Route path="/referrals">
+        <ProtectedRoute><ReferralsPage /></ProtectedRoute>
+      </Route>
       <Route path="/cancel-subscription" component={CancelSubscriptionPage} />
       <Route path="/refund-policy" component={RefundPolicyPage} />
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />

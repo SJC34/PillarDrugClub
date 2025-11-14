@@ -34,26 +34,14 @@ import platinumPillarBadge from "@assets/image_1761453800697.png";
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("loading");
   const [showDoctorSearch, setShowDoctorSearch] = useState(false);
   const [showAllergiesEdit, setShowAllergiesEdit] = useState(false);
   const [allergiesInput, setAllergiesInput] = useState("");
 
   useEffect(() => {
-    // Check if user is logged in
-    if (authLoading) return;
-    
-    if (!isAuthenticated) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to access your dashboard.",
-        variant: "destructive",
-      });
-      setLocation("/login");
-      return;
-    }
-
+    // ProtectedRoute handles authentication - we only check subscription here
     if (!user?.id) return;
 
     // Check subscription status
@@ -74,7 +62,7 @@ export default function DashboardPage() {
         console.error("Error checking subscription:", error);
         setSubscriptionStatus("error");
       });
-  }, [authLoading, isAuthenticated, user]);
+  }, [user]);
 
   // Fetch user's prescription requests
   const { 

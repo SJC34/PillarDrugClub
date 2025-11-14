@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sun, Moon, Pill, User, LogOut, Settings, ShieldCheck, LayoutDashboard } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
@@ -57,23 +58,23 @@ export default function Header() {
             </Button>
 
             {/* Brand name with pill symbol */}
-            <a href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
+            <Link href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
               pillar drug club
               <Pill className="h-5 w-5 text-secondary" />
-            </a>
+            </Link>
           </div>
             
           {/* Desktop Navigation - centered */}
           <nav className="hidden lg:flex items-center space-x-8">
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className="text-sm font-bold text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
                 data-testid={`link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -122,32 +123,32 @@ export default function Header() {
                     {user?.role === "admin" && (
                       <>
                         <DropdownMenuItem asChild>
-                          <a href="/admin" className="cursor-pointer" data-testid="menu-item-admin-dashboard">
+                          <Link href="/admin" className="cursor-pointer" data-testid="menu-item-admin-dashboard">
                             <ShieldCheck className="mr-2 h-4 w-4" />
                             Admin Dashboard
-                          </a>
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <a href="/dashboard" className="cursor-pointer" data-testid="menu-item-user-dashboard">
+                          <Link href="/dashboard" className="cursor-pointer" data-testid="menu-item-user-dashboard">
                             <LayoutDashboard className="mr-2 h-4 w-4" />
                             User Dashboard
-                          </a>
+                          </Link>
                         </DropdownMenuItem>
                       </>
                     )}
                     {user?.role !== "admin" && (
                       <DropdownMenuItem asChild>
-                        <a href="/dashboard" className="cursor-pointer" data-testid="menu-item-dashboard">
+                        <Link href="/dashboard" className="cursor-pointer" data-testid="menu-item-dashboard">
                           <User className="mr-2 h-4 w-4" />
                           Dashboard
-                        </a>
+                        </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <a href="/settings" className="cursor-pointer" data-testid="menu-item-settings">
+                      <Link href="/settings" className="cursor-pointer" data-testid="menu-item-settings">
                         <Settings className="mr-2 h-4 w-4" />
                         Account Settings
-                      </a>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -163,16 +164,16 @@ export default function Header() {
               </div>
             ) : (
               <div className="hidden md:flex items-center space-x-3">
-                <a href="/login">
+                <Link href="/login">
                   <Button variant="ghost" size="sm" className="font-bold" data-testid="button-login">
                     SIGN IN
                   </Button>
-                </a>
-                <a href="/register">
+                </Link>
+                <Link href="/register">
                   <Button size="sm" className="font-bold px-4" data-testid="button-signup">
                     GET STARTED
                   </Button>
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -186,17 +187,17 @@ export default function Header() {
               <div className="flex flex-col h-full py-8 bg-white dark:bg-gray-950">
                 {/* Logo Header */}
                 <div className="px-6 pb-4 bg-white dark:bg-gray-950">
-                  <a href="/" className="text-xl font-black flex items-center gap-2 text-gray-900 dark:text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                  <Link href="/" className="text-xl font-black flex items-center gap-2 text-gray-900 dark:text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                     pillar drug club
                     <Pill className="h-5 w-5 text-primary" />
-                  </a>
+                  </Link>
                 </div>
                 
                 {/* Navigation Links */}
                 <nav className="flex-1 bg-white dark:bg-gray-950">
                   <div className="space-y-1">
                     {navigation.map((item, index) => (
-                      <a
+                      <Link
                         key={item.name}
                         href={item.href}
                         onClick={() => setIsMenuOpen(false)}
@@ -204,7 +205,7 @@ export default function Header() {
                         data-testid={`mobile-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                       >
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </nav>
@@ -230,32 +231,32 @@ export default function Header() {
                       </div>
                       {user?.role === "admin" && (
                         <>
-                          <a 
+                          <Link 
                             href="/admin" 
                             onClick={() => setIsMenuOpen(false)}
                             className="block py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors"
                             data-testid="mobile-button-admin-dashboard"
                           >
                             Admin Dashboard
-                          </a>
-                          <a 
+                          </Link>
+                          <Link 
                             href="/dashboard" 
                             onClick={() => setIsMenuOpen(false)}
                             className="block py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors"
                             data-testid="mobile-button-user-dashboard"
                           >
                             User Dashboard
-                          </a>
+                          </Link>
                         </>
                       )}
-                      <a 
+                      <Link 
                         href="/settings" 
                         onClick={() => setIsMenuOpen(false)}
                         className="block py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors"
                         data-testid="mobile-button-settings"
                       >
                         Account Settings
-                      </a>
+                      </Link>
                       <button 
                         onClick={handleSignOut}
                         className="block w-full text-left py-3 text-lg font-semibold text-gray-900 dark:text-white hover:text-primary transition-colors" 
@@ -266,16 +267,16 @@ export default function Header() {
                     </>
                   ) : (
                     <>
-                      <a href="/login" onClick={() => setIsMenuOpen(false)} className="block">
+                      <Link href="/login" onClick={() => setIsMenuOpen(false)} className="block">
                         <Button variant="outline" className="w-full justify-center text-lg font-bold py-6 bg-white dark:bg-gray-900" data-testid="mobile-button-login">
                           SIGN IN
                         </Button>
-                      </a>
-                      <a href="/register" onClick={() => setIsMenuOpen(false)} className="block">
+                      </Link>
+                      <Link href="/register" onClick={() => setIsMenuOpen(false)} className="block">
                         <Button className="w-full justify-center text-lg font-bold py-6" data-testid="mobile-button-signup">
                           GET STARTED
                         </Button>
-                      </a>
+                      </Link>
                     </>
                   )}
                 </div>
