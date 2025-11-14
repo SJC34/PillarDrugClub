@@ -1549,8 +1549,12 @@ export class MemStorage implements IStorage {
     try {
       await this.importInitialPrescribers();
       await this.importInitialPharmacies();
+      
+      // Load medications (blocking but batched with setImmediate for responsiveness)
+      // This ensures catalog is ready when server starts serving requests
       await this.loadImportedMedications();
-      console.log('✅ Initial data import completed successfully');
+      
+      console.log('✅ Initial data import completed');
     } catch (error) {
       console.error('❌ Error during initial data import:', error);
     }
@@ -1831,16 +1835,53 @@ export class DbStorage extends MemStorage {
 
   async loadImportedMedications() {
     try {
-      // Import medications from pharmacy CSV
-      const { importMedicationsFromCSV } = await import('../scripts/import-pharmacy-csv');
-      const medications = await importMedicationsFromCSV();
+      // Check if medications already exist in database
+      const existingCount = await db.select({ count: sql<number>`count(*)` }).from(medicationsTable);
+      const count = Number(existingCount[0]?.count || 0);
       
-      // Save medications to database (not in-memory Map)
-      for (const med of medications) {
-        await this.createMedication(med);
+      if (count >= 1800) {
+        console.log(`✅ Medications already loaded (${count} in database), skipping import`);
+        return;
       }
       
-      console.log(`✅ Loaded ${medications.length} medications from pharmacy CSV to database`);
+      console.log(`🔄 Loading ${count < 100 ? 'all' : 'missing'} medications from pharmacy CSV...`);
+      
+      // Import medications from pharmacy CSV
+      const { importMedicationsFromCSV } = await import('../scripts/import-pharmacy-csv');
+      const medicationsToLoad = await importMedicationsFromCSV();
+      
+      console.log(`📦 Starting chunked import of ${medicationsToLoad.length} medications...`);
+      
+      // Batch insert medications in chunks of 100 with setImmediate() between batches
+      // This allows the event loop to process HTTP requests during import
+      const BATCH_SIZE = 100;
+      let processed = 0;
+      
+      for (let i = 0; i < medicationsToLoad.length; i += BATCH_SIZE) {
+        const batch = medicationsToLoad.slice(i, i + BATCH_SIZE);
+        
+        // Insert batch
+        for (const med of batch) {
+          try {
+            await this.createMedication(med);
+            processed++;
+          } catch (error) {
+            // Skip duplicates silently
+          }
+        }
+        
+        // Log progress every 5 batches (500 medications)
+        if ((i + BATCH_SIZE) % 500 === 0) {
+          console.log(`📊 Progress: ${processed}/${medicationsToLoad.length} medications imported`);
+        }
+        
+        // Yield to event loop between batches so server can respond to requests
+        if (i + BATCH_SIZE < medicationsToLoad.length) {
+          await new Promise(resolve => setImmediate(resolve));
+        }
+      }
+      
+      console.log(`✅ Loaded ${processed} medications from pharmacy CSV to database`);
     } catch (error) {
       console.log('⚠️  Could not load pharmacy CSV medications:', error);
       console.log('Using sample medications only');

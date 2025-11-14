@@ -31,6 +31,13 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
 - **Medication Search & Pricing**: CSV-based medication catalog for search and pricing, integrated with openFDA Drug Label API for annual pricing calculation.
 - **Medication Refill System**: Automated refill request workflow with status tracking and admin oversight.
 - **Personal Medication List**: User-managed list with OpenFDA integration for data enrichment and real-time drug-drug interaction checking.
+- **Clinical Safety Tools** (Gold/Platinum Only - November 2025): HIPAA-compliant medication management with FDA-powered safety analysis. Features include:
+  - **Medication Autocomplete**: Dual-source search supporting PDC catalog (1,857 medications) + manual entry for external pharmacies
+  - **Side Effect Analyzer**: Aggregates adverse reactions across medications with likelihood scoring (high >10%, moderate 1-10%, low <1%). Groups effects by frequency with visual indicators
+  - **Drug Interaction Checker**: Pairwise analysis with severity classification (major/moderate/minor). Detects contraindications and dosage adjustments
+  - **OpenFDA Integration**: Free API with 7-day in-memory cache (memoize), 30-day database cache. Enriches 1,857 medications with drug labels from disk cache
+  - **Tier Gating**: Free members see upgrade CTAs, Gold/Platinum access full analysis features
+  - **Performance**: 3-second startup with skip logic (medications persist in database). Cold start (empty DB): ~10-15 minutes for FDA enrichment (acceptable for MVP, optimization planned)
 - **Refund Policy System**: Comprehensive, transparent refund and cancellation policy with two-tier refund structure and annual commitment terms, available as web content and downloadable PDF.
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including Executive Dashboard, User Management (deactivate, soft delete, suspend, delete, recover), Financial Dashboard, Communication Center, Reports & Analytics, and Medication Pricing Management. Admin users can toggle between Admin Dashboard and User Dashboard via the header menu for seamless role switching.
 - **Hybrid Blog System ("The Pillar Post 🗞️")**: A dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG). Features include an admin interface for content generation, AI-powered SEO keyword generator that analyzes blog titles to suggest 8-12 optimized keywords, compliance review workflow, and a GoodRx-style visual redesign with featured image uploads (client-side resizing, compression, base64 storage).

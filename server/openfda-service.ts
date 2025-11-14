@@ -125,10 +125,11 @@ const getDrugLabelUncached = async (genericName: string): Promise<FDADrugLabel |
   }
 };
 
-// Memoized version - cache for 30 days
+// Memoized version - cache for 7 days (JavaScript setTimeout max is ~24.8 days)
+// Database cache still uses 30-day TTL for long-term storage
 export const getDrugLabel = memoize(getDrugLabelUncached, {
   promise: true,
-  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (604,800,000 ms - safe for setTimeout)
   max: 2000, // Cache up to 2000 different drugs
 });
 

@@ -239,7 +239,8 @@ export async function importMedicationsFromCSV(): Promise<Medication[]> {
     const medications = parsePharmacyCSV(csvContent);
     console.log(`✅ Parsed ${medications.length} medications from CSV`);
     
-    // Enrich with FDA data (this may take several minutes due to rate limiting)
+    // Enrich with FDA data (blocking to ensure cached data is persisted)
+    // Batching in storage layer (setImmediate) keeps server responsive
     const enrichedMedications = await enrichMedicationsWithFDAData(medications);
     
     return enrichedMedications;
