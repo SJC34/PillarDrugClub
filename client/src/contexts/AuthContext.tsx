@@ -7,8 +7,11 @@ interface User {
   firstName: string;
   lastName: string;
   role: "admin" | "client" | "broker" | "company";
+  subscriptionTier?: "free" | "gold" | "platinum";
   membershipTier?: string;
   profileImageUrl?: string;
+  drugAllergies?: string[];
+  createdAt?: string;
 }
 
 interface AuthContextType {
