@@ -58,6 +58,25 @@ function generateReferralCode(firstName?: string, lastName?: string): string {
   return `PILLAR${randomPart}`;
 }
 
+// Middleware to check if user has Gold or Platinum tier
+function requireGoldOrPlatinum(req: any, res: any, next: any) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  
+  const user = req.user;
+  if (user.subscriptionTier !== 'gold' && user.subscriptionTier !== 'platinum') {
+    return res.status(403).json({ 
+      error: "Premium feature", 
+      message: "This feature is only available for Gold and Platinum members",
+      requiredTier: "gold",
+      currentTier: user.subscriptionTier
+    });
+  }
+  
+  next();
+}
+
 export async function registerRoutes(app: Express, server: Server): Promise<void> {
   // Setup Google OAuth authentication
   // This also sets up the session middleware
@@ -1893,48 +1912,69 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  // User Medications Routes
-  app.get("/api/users/:userId/medications", async (req, res) => {
+  // ============= USER MEDICATIONS ROUTES =============
+  
+  // Get user's medications
+  app.get("/api/users/:userId/medications", async (req: any, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     
-    if (req.user.id !== req.params.userId) {
+    // Authorization check: user can only access their own medications (admins can access anyone's)
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
+      await createAuditLog({
+        userId: req.user.id,
+        action: 'UNAUTHORIZED_PHI_ACCESS_ATTEMPT',
+        resourceType: 'user_medications',
+        resourceId: req.params.userId,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        status: 'FAILED',
+        details: `User ${req.user.id} attempted to access medications for user ${req.params.userId}`
+      });
       return res.status(403).json({ error: "Forbidden" });
     }
+    
+    // Log authorized PHI access
+    await createAuditLog({
+      userId: req.user.id,
+      action: 'PHI_ACCESS',
+      resourceType: 'user_medications',
+      resourceId: req.params.userId,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      status: 'SUCCESS'
+    });
 
     try {
       const medications = await storage.getUserActiveMedications(req.params.userId);
       
-      // Fetch OpenFDA data for each medication if needed
-      const { getDrugLabel, checkDrugInteractions } = await import("./openfda-service");
+      // Fetch OpenFDA data for each medication if needed (30-day cache)
+      const { getDrugLabel } = await import("./openfda-service");
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
       
       // Enrich medications with FDA data
       const enrichedMeds = await Promise.all(medications.map(async (med) => {
-        if (!med.fdaData || (med.lastFdaCheck && Date.now() - new Date(med.lastFdaCheck).getTime() > 24 * 60 * 60 * 1000)) {
-          // Fetch fresh FDA data if not cached or older than 24 hours
+        const cacheExpired = !med.cacheExpiresAt || new Date(med.cacheExpiresAt).getTime() < Date.now();
+        
+        if (!med.openFdaCache || cacheExpired) {
+          // Fetch fresh FDA data if not cached or cache expired
           const fdaData = await getDrugLabel(med.genericName || med.medicationName);
           if (fdaData) {
-            // Update cache
+            // Update cache with 30-day TTL
+            const cacheExpiresAt = new Date(Date.now() + thirtyDaysMs);
             await storage.updateUserMedication(med.id, {
-              fdaData,
-              lastFdaCheck: new Date()
+              openFdaCache: fdaData,
+              lastFdaSync: new Date(),
+              cacheExpiresAt
             });
-            return { ...med, fdaData };
+            return { ...med, openFdaCache: fdaData, lastFdaSync: new Date(), cacheExpiresAt };
           }
         }
         return med;
       }));
       
-      // Check for drug interactions
-      const interactionCheck = await checkDrugInteractions(
-        enrichedMeds.map(m => ({ genericName: m.genericName || m.medicationName }))
-      );
-      
-      res.json({ 
-        medications: enrichedMeds,
-        interactions: interactionCheck 
-      });
+      res.json({ medications: enrichedMeds });
     } catch (error: any) {
       console.error("Error fetching medications:", error);
       res.status(500).json({ 
@@ -1944,17 +1984,28 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  app.post("/api/users/:userId/medications", async (req, res) => {
+  // Add new medication
+  app.post("/api/users/:userId/medications", async (req: any, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     
-    if (req.user.id !== req.params.userId) {
+    // Authorization check with admin override
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
       return res.status(403).json({ error: "Forbidden" });
+    }
+    
+    // Validate required fields
+    if (!req.body.medicationName && !req.body.genericName) {
+      return res.status(400).json({ 
+        error: "Validation error",
+        message: "Either medicationName or genericName is required" 
+      });
     }
 
     try {
       const { getDrugLabel } = await import("./openfda-service");
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
       
       // Fetch FDA data for the new medication
       const fdaData = await getDrugLabel(req.body.genericName || req.body.medicationName);
@@ -1962,8 +2013,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const medication = await storage.addUserMedication({
         userId: req.params.userId,
         ...req.body,
-        fdaData,
-        lastFdaCheck: new Date(),
+        openFdaCache: fdaData,
+        lastFdaSync: new Date(),
+        cacheExpiresAt: new Date(Date.now() + thirtyDaysMs),
         fromPrescription: req.body.fromPrescription || false,
       });
       
@@ -1977,12 +2029,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  app.delete("/api/users/:userId/medications/:medicationId", async (req, res) => {
+  // Delete medication
+  app.delete("/api/users/:userId/medications/:medicationId", async (req: any, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     
-    if (req.user.id !== req.params.userId) {
+    // Authorization check with admin override
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -1993,6 +2047,113 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       console.error("Error removing medication:", error);
       res.status(500).json({ 
         error: "Failed to remove medication", 
+        message: error.message 
+      });
+    }
+  });
+
+  // ============= MEDICATION ANALYSIS ROUTES (Gold/Platinum Only) =============
+  
+  // Get side effect analysis for user's medications
+  app.get("/api/medication-analysis/side-effects/:userId", requireGoldOrPlatinum, async (req: any, res) => {
+    // Authorization check with admin override
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    
+    // Log PHI access for HIPAA compliance
+    await createAuditLog({
+      userId: req.user.id,
+      action: 'PHI_ACCESS',
+      resourceType: 'medication_analysis',
+      resourceId: req.params.userId,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      status: 'SUCCESS',
+      details: 'Side effect analysis accessed'
+    });
+
+    try {
+      const medications = await storage.getUserActiveMedications(req.params.userId);
+      
+      if (medications.length === 0) {
+        return res.json({ sideEffects: [], medicationCount: 0 });
+      }
+      
+      const { aggregateSideEffects } = await import("./openfda-service");
+      const sideEffects = await aggregateSideEffects(
+        medications.map(m => ({ genericName: m.genericName || m.medicationName }))
+      );
+      
+      res.json({ 
+        sideEffects,
+        medicationCount: medications.length,
+        medications: medications.map(m => ({ 
+          id: m.id,
+          name: m.medicationName,
+          genericName: m.genericName
+        }))
+      });
+    } catch (error: any) {
+      console.error("Error analyzing side effects:", error);
+      res.status(500).json({ 
+        error: "Failed to analyze side effects", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Get drug interaction analysis for user's medications
+  app.get("/api/medication-analysis/interactions/:userId", requireGoldOrPlatinum, async (req: any, res) => {
+    // Authorization check with admin override
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    
+    // Log PHI access for HIPAA compliance
+    await createAuditLog({
+      userId: req.user.id,
+      action: 'PHI_ACCESS',
+      resourceType: 'medication_analysis',
+      resourceId: req.params.userId,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      status: 'SUCCESS',
+      details: 'Drug interaction analysis accessed'
+    });
+
+    try {
+      const medications = await storage.getUserActiveMedications(req.params.userId);
+      
+      if (medications.length < 2) {
+        return res.json({ 
+          hasInteractions: false, 
+          interactions: [],
+          medicationCount: medications.length,
+          message: medications.length === 0 
+            ? "No medications added yet"
+            : "Add at least 2 medications to check for interactions"
+        });
+      }
+      
+      const { checkDrugInteractions } = await import("./openfda-service");
+      const interactionCheck = await checkDrugInteractions(
+        medications.map(m => ({ genericName: m.genericName || m.medicationName }))
+      );
+      
+      res.json({ 
+        ...interactionCheck,
+        medicationCount: medications.length,
+        medications: medications.map(m => ({ 
+          id: m.id,
+          name: m.medicationName,
+          genericName: m.genericName
+        }))
+      });
+    } catch (error: any) {
+      console.error("Error checking drug interactions:", error);
+      res.status(500).json({ 
+        error: "Failed to check interactions", 
         message: error.message 
       });
     }
@@ -2980,21 +3141,6 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       console.error("Error fetching financial metrics:", error);
       res.status(500).json({ 
         error: "Failed to fetch financial metrics", 
-        message: error.message 
-      });
-    }
-  });
-
-  // Get user's current medications (active prescriptions)
-  app.get("/api/users/:userId/medications", async (req, res) => {
-    try {
-      // For now, return mock data since we need customer ID mapping
-      // In production, this would fetch real prescription data
-      res.json({ medications: [] });
-    } catch (error: any) {
-      console.error("Error fetching user medications:", error);
-      res.status(500).json({ 
-        error: "Failed to fetch medications", 
         message: error.message 
       });
     }

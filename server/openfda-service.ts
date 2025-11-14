@@ -50,7 +50,23 @@ interface OpenFDAResult {
   active_ingredient?: string[];
 }
 
-// Cache FDA responses for 24 hours (86400000 ms)
+// Side Effect Analysis Types
+export interface SideEffectOccurrence {
+  effect: string;
+  medicationCount: number; // How many medications list this side effect
+  medications: string[]; // Which medications list it
+  likelihood: 'low' | 'moderate' | 'high'; // Based on how many meds share it
+  severity?: string; // From FDA warnings if available
+}
+
+export interface DrugInteractionDetail {
+  medication1: string;
+  medication2: string;
+  warning: string;
+  severity: 'minor' | 'moderate' | 'major'; // Derived from warning text
+}
+
+// Cache FDA responses for 30 days (2592000000 ms) - package inserts rarely change
 const getDrugLabelUncached = async (genericName: string): Promise<FDADrugLabel | null> => {
   try {
     // Clean up the generic name for search
@@ -109,11 +125,11 @@ const getDrugLabelUncached = async (genericName: string): Promise<FDADrugLabel |
   }
 };
 
-// Memoized version - cache for 24 hours
+// Memoized version - cache for 30 days
 export const getDrugLabel = memoize(getDrugLabelUncached, {
   promise: true,
-  maxAge: 24 * 60 * 60 * 1000, // 24 hours
-  max: 500, // Cache up to 500 different drugs
+  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  max: 2000, // Cache up to 2000 different drugs
 });
 
 // Helper function to extract food interactions from drug interactions text
@@ -131,20 +147,44 @@ function extractFoodInteractions(drugInteractions: string[]): string[] {
   return foodInteractions;
 }
 
-// Check for drug-drug interactions between multiple medications
+// Determine interaction severity from warning text
+function determineInteractionSeverity(warning: string): 'minor' | 'moderate' | 'major' {
+  const lowerWarning = warning.toLowerCase();
+  
+  // Major severity indicators
+  if (
+    lowerWarning.includes('contraindicated') ||
+    lowerWarning.includes('do not') ||
+    lowerWarning.includes('serious') ||
+    lowerWarning.includes('life-threatening') ||
+    lowerWarning.includes('fatal') ||
+    lowerWarning.includes('death') ||
+    lowerWarning.includes('avoid')
+  ) {
+    return 'major';
+  }
+  
+  // Moderate severity indicators
+  if (
+    lowerWarning.includes('caution') ||
+    lowerWarning.includes('monitor') ||
+    lowerWarning.includes('may increase') ||
+    lowerWarning.includes('may decrease') ||
+    lowerWarning.includes('dosage adjustment')
+  ) {
+    return 'moderate';
+  }
+  
+  // Default to minor
+  return 'minor';
+}
+
+// Check for drug-drug interactions between multiple medications with severity scoring
 export async function checkDrugInteractions(medications: { genericName: string }[]): Promise<{
   hasInteractions: boolean;
-  interactions: Array<{
-    medication1: string;
-    medication2: string;
-    warning: string;
-  }>;
+  interactions: DrugInteractionDetail[];
 }> {
-  const interactions: Array<{
-    medication1: string;
-    medication2: string;
-    warning: string;
-  }> = [];
+  const interactions: DrugInteractionDetail[] = [];
   
   // Fetch FDA data for all medications
   const fdaDataPromises = medications.map(med => getDrugLabel(med.genericName));
@@ -170,10 +210,12 @@ export async function checkDrugInteractions(medications: { genericName: string }
           int.toLowerCase().includes(med2Name)
         );
         
+        const warning = specificWarning || `Potential interaction between ${med1.genericName} and ${med2.genericName}`;
         interactions.push({
           medication1: med1.genericName,
           medication2: med2.genericName,
-          warning: specificWarning || `Potential interaction between ${med1.genericName} and ${med2.genericName}`,
+          warning,
+          severity: determineInteractionSeverity(warning),
         });
       }
     }
@@ -218,4 +260,126 @@ export async function getAllWarnings(medications: { genericName: string }[]): Pr
       boxedWarning: [],
     },
   }));
+}
+
+// Aggregate side effects across all medications with likelihood scoring
+export async function aggregateSideEffects(medications: { genericName: string }[]): Promise<SideEffectOccurrence[]> {
+  // Fetch FDA data for all medications
+  const fdaDataPromises = medications.map(med => getDrugLabel(med.genericName));
+  const fdaDataResults = await Promise.all(fdaDataPromises);
+  
+  // Map to track side effects and which medications list them
+  const sideEffectMap = new Map<string, { medications: string[]; count: number }>();
+  
+  // Process each medication's adverse reactions
+  medications.forEach((med, index) => {
+    const fdaData = fdaDataResults[index];
+    if (!fdaData || !fdaData.warnings.adverseReactions) return;
+    
+    // Parse adverse reactions - they're usually in paragraph form
+    const reactions = fdaData.warnings.adverseReactions;
+    reactions.forEach(reactionText => {
+      // Extract individual side effects from the text
+      // Common format: "The most common adverse reactions include: headache, nausea, dizziness..."
+      const effects = extractSideEffects(reactionText);
+      
+      effects.forEach(effect => {
+        const normalized = effect.trim().toLowerCase();
+        if (!sideEffectMap.has(normalized)) {
+          sideEffectMap.set(normalized, { medications: [], count: 0 });
+        }
+        
+        const entry = sideEffectMap.get(normalized)!;
+        if (!entry.medications.includes(med.genericName)) {
+          entry.medications.push(med.genericName);
+          entry.count++;
+        }
+      });
+    });
+  });
+  
+  // Calculate likelihood based on how many medications share the side effect
+  const totalMedications = medications.length;
+  const sideEffects: SideEffectOccurrence[] = [];
+  
+  sideEffectMap.forEach((data, effect) => {
+    const percentageOfMeds = (data.count / totalMedications) * 100;
+    
+    let likelihood: 'low' | 'moderate' | 'high';
+    if (data.count === 1) {
+      likelihood = 'low';
+    } else if (percentageOfMeds < 50) {
+      likelihood = 'moderate';
+    } else {
+      likelihood = 'high';
+    }
+    
+    sideEffects.push({
+      effect,
+      medicationCount: data.count,
+      medications: data.medications,
+      likelihood,
+    });
+  });
+  
+  // Sort by medication count (most common first)
+  return sideEffects.sort((a, b) => b.medicationCount - a.medicationCount);
+}
+
+// Helper to extract individual side effects from FDA text
+function extractSideEffects(text: string): string[] {
+  const effects: string[] = [];
+  
+  // Common patterns in FDA adverse reaction text
+  const patterns = [
+    /(?:include|are|were):\s*([^.]+)/gi, // "include: X, Y, Z"
+    /(?:such as|including)\s+([^.]+)/gi, // "such as X, Y, Z"
+    /most (?:common|frequent)(?:\s+\w+)*:\s*([^.]+)/gi, // "most common: X, Y, Z"
+  ];
+  
+  patterns.forEach(pattern => {
+    const matches = Array.from(text.matchAll(pattern));
+    for (const match of matches) {
+      if (match[1]) {
+        // Split by commas, semicolons, and "and"
+        const items = match[1].split(/[,;]|\s+and\s+/);
+        items.forEach((item: string) => {
+          const cleaned = item
+            .trim()
+            .replace(/^\(|\)$/g, '') // Remove parentheses
+            .replace(/^\d+%?\s*/, '') // Remove percentages at start
+            .replace(/\([^)]*\)/g, ''); // Remove content in parentheses
+          
+          if (cleaned.length > 2 && cleaned.length < 100) { // Sanity check
+            effects.push(cleaned);
+          }
+        });
+      }
+    }
+  });
+  
+  // Also extract from simple lists (e.g., "headache, nausea, dizziness")
+  if (effects.length === 0) {
+    // Try to extract comma-separated lists
+    const sentences = text.split(/[.!?]/);
+    sentences.forEach(sentence => {
+      if (sentence.includes(',')) {
+        const items = sentence.split(',');
+        if (items.length >= 2 && items.length <= 20) { // Likely a list
+          items.forEach((item: string) => {
+            const cleaned = item
+              .trim()
+              .replace(/^(and|or|the)\s+/i, '')
+              .replace(/^\d+%?\s*/, '');
+            
+            if (cleaned.length > 2 && cleaned.length < 100 && !/^\d+$/.test(cleaned)) {
+              effects.push(cleaned);
+            }
+          });
+        }
+      }
+    });
+  }
+  
+  return effects;
 }

@@ -285,7 +285,7 @@ export const insertRefillRequestSchema = createInsertSchema(refillRequests).omit
 export type InsertRefillRequest = z.infer<typeof insertRefillRequestSchema>;
 export type RefillRequest = typeof refillRequests.$inferSelect;
 
-// User medications table - tracks patient's current medication list
+// User medications table - tracks patient's current medication list (PDC + external)
 export const userMedications = pgTable("user_medications", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -293,18 +293,24 @@ export const userMedications = pgTable("user_medications", {
   prescriptionId: varchar("prescription_id").references(() => prescriptions.id, { onDelete: "set null" }),
   medicationName: text("medication_name").notNull(),
   genericName: text("generic_name"),
-  strength: text("strength").notNull(),
-  dosage: text("dosage").notNull(), // e.g., "1 tablet", "2.5 mg"
-  frequency: text("frequency").notNull(), // e.g., "twice daily", "every 8 hours"
+  brandName: text("brand_name"),
+  strength: text("strength"),
+  dosageForm: text("dosage_form"),
+  dosage: text("dosage"), // Free-form dosage instructions (e.g., "1 tablet", "2.5 mg")
+  frequency: text("frequency"), // e.g., "twice daily", "every 8 hours"
   route: text("route"), // e.g., "oral", "topical", "injection"
   startDate: text("start_date"),
   endDate: text("end_date"),
   prescribedBy: text("prescribed_by"),
   notes: text("notes"),
   isActive: boolean("is_active").notNull().default(true),
+  isFromPdc: boolean("is_from_pdc").notNull().default(false), // True if from PDC catalog
   fromPrescription: boolean("from_prescription").default(false), // Auto-added from prescription
-  fdaData: jsonb("fda_data"), // Cached OpenFDA data
-  lastFdaCheck: timestamp("last_fda_check"),
+  ndcCode: text("ndc_code"),
+  externalSourceName: text("external_source_name"), // e.g., "CVS", "Walgreens" for external medications
+  openFdaCache: jsonb("openfda_cache"), // Cached OpenFDA data (adverse_reactions, drug_interactions)
+  lastFdaSync: timestamp("last_fda_sync"),
+  cacheExpiresAt: timestamp("cache_expires_at"), // 30-day cache TTL
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
