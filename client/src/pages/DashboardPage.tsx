@@ -27,6 +27,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { PrescriptionRequest } from "@shared/pharmacy-schema";
 import { useAuth } from "@/hooks/useAuth";
+import { AllergyAutocomplete } from "@/components/AllergyAutocomplete";
 import freePillarBadge from "@assets/image_1761455037188.png";
 import goldPillarBadge from "@assets/image_1761454767191.png";
 import platinumPillarBadge from "@assets/image_1761453800697.png";
@@ -38,7 +39,7 @@ export default function DashboardPage() {
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("loading");
   const [showDoctorSearch, setShowDoctorSearch] = useState(false);
   const [showAllergiesEdit, setShowAllergiesEdit] = useState(false);
-  const [allergiesInput, setAllergiesInput] = useState("");
+  const [tempAllergies, setTempAllergies] = useState<string[]>([]);
 
   useEffect(() => {
     // ProtectedRoute handles authentication - we only check subscription here
@@ -154,13 +155,14 @@ export default function DashboardPage() {
       return apiRequest('PUT', `/api/users/${user?.id}/allergies`, { drugAllergies: allergies });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['/api/auth/user'] 
-      });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/medication-analysis/side-effects', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/medication-analysis/interactions', user?.id] });
       setShowAllergiesEdit(false);
+      setTempAllergies([]);
       toast({
         title: "Allergies Updated",
-        description: "Your drug allergies have been updated successfully",
+        description: "Your drug allergies have been updated successfully. Clinical analyzer will reflect these changes.",
       });
     },
     onError: (error: any) => {
@@ -174,18 +176,26 @@ export default function DashboardPage() {
 
   // Open allergies edit dialog
   const openAllergiesEdit = () => {
-    const currentAllergies = user?.drugAllergies?.join(', ') || '';
-    setAllergiesInput(currentAllergies);
+    const currentAllergies = user?.drugAllergies || [];
+    setTempAllergies([...currentAllergies]);
     setShowAllergiesEdit(true);
+  };
+
+  // Add allergy from autocomplete
+  const handleAddAllergy = (allergyName: string) => {
+    if (!tempAllergies.includes(allergyName)) {
+      setTempAllergies([...tempAllergies, allergyName]);
+    }
+  };
+
+  // Remove allergy from temp list
+  const handleRemoveAllergy = (allergyToRemove: string) => {
+    setTempAllergies(tempAllergies.filter(a => a !== allergyToRemove));
   };
 
   // Save allergies
   const saveAllergies = () => {
-    const allergiesArray = allergiesInput
-      .split(',')
-      .map(a => a.trim())
-      .filter(a => a.length > 0);
-    updateAllergiesMutation.mutate(allergiesArray);
+    updateAllergiesMutation.mutate(tempAllergies);
   };
 
   if (!user || subscriptionStatus === "loading") {
@@ -883,40 +893,71 @@ export default function DashboardPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setShowAllergiesEdit(false)}
+                    onClick={() => {
+                      setShowAllergiesEdit(false);
+                      setTempAllergies([]);
+                    }}
                     data-testid="button-close-allergies-edit"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
                 <CardDescription>
-                  List any medications you're allergic to, separated by commas
+                  Search and add medications you're allergic to
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="allergies" className="block text-sm font-medium mb-2">
-                      Drug Allergies
+                    <label className="block text-sm font-medium mb-2">
+                      Search Medications
                     </label>
-                    <textarea
-                      id="allergies"
-                      value={allergiesInput}
-                      onChange={(e) => setAllergiesInput(e.target.value)}
-                      placeholder="e.g., Penicillin, Aspirin, Sulfa drugs"
-                      className="w-full min-h-[120px] p-3 border rounded-md focus:ring-2 focus:ring-primary"
-                      data-testid="input-allergies"
+                    <AllergyAutocomplete
+                      onSelect={handleAddAllergy}
+                      existingAllergies={tempAllergies}
+                      placeholder="Search for medication (e.g., Penicillin, Aspirin)"
                     />
                     <p className="text-xs text-muted-foreground mt-2">
-                      Separate multiple allergies with commas
+                      Search for medications using OpenFDA database
                     </p>
                   </div>
+
+                  {tempAllergies.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        Current Allergies ({tempAllergies.length})
+                      </label>
+                      <div className="flex flex-wrap gap-2 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+                        {tempAllergies.map((allergy, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-1 bg-red-100 dark:bg-red-900/30 text-red-900 dark:text-red-100 px-3 py-1 rounded-md"
+                            data-testid={`temp-allergy-${idx}`}
+                          >
+                            <span className="text-sm font-medium">{allergy}</span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 hover:bg-red-200 dark:hover:bg-red-800"
+                              onClick={() => handleRemoveAllergy(allergy)}
+                              data-testid={`button-remove-allergy-${idx}`}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       className="flex-1"
-                      onClick={() => setShowAllergiesEdit(false)}
+                      onClick={() => {
+                        setShowAllergiesEdit(false);
+                        setTempAllergies([]);
+                      }}
                       data-testid="button-cancel-allergies"
                     >
                       Cancel
