@@ -271,7 +271,7 @@ export default function DashboardPage() {
       title: "My Medications",
       description: "Manage your medication list with insights",
       icon: Pill,
-      href: "/medications/my-list",
+      href: "/my-medications",
       color: "bg-purple-50 text-purple-600"
     },
     {
@@ -654,7 +654,7 @@ export default function DashboardPage() {
                   Your active medications with pharmacist insights
                 </CardDescription>
               </div>
-              <Link href="/medications/my-list">
+              <Link href="/my-medications">
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -676,7 +676,7 @@ export default function DashboardPage() {
               <div className="text-center py-8">
                 <Pill className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 mb-4">No active medications on file</p>
-                <Link href="/medications/my-list">
+                <Link href="/my-medications">
                   <Button variant="outline" data-testid="button-add-first-medication">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Medication
@@ -747,7 +747,7 @@ export default function DashboardPage() {
                   </div>
                 ))}
                 <div className="pt-2">
-                  <Link href="/medications/my-list">
+                  <Link href="/my-medications">
                     <Button variant="outline" className="w-full" data-testid="button-view-all-medications">
                       View All Medications & Insights
                       <ArrowRight className="h-4 w-4 ml-2" />
