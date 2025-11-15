@@ -511,28 +511,6 @@ export default function MyMedicationsPage() {
                       </Button>
                     </div>
                   </CardHeader>
-                  {med.openFdaCache && (
-                    <CardContent>
-                      <div className="space-y-2">
-                        {med.openFdaCache.warnings?.boxedWarning?.[0] && (
-                          <Alert variant="destructive" data-testid={`alert-boxed-warning-${med.id}`}>
-                            <AlertTriangle className="h-4 w-4" />
-                            <AlertDescription className="text-sm">
-                              <strong>Boxed Warning:</strong> {med.openFdaCache.warnings.boxedWarning[0].substring(0, 150)}...
-                            </AlertDescription>
-                          </Alert>
-                        )}
-                        {med.openFdaCache.warnings?.warnings?.[0] && (
-                          <Alert data-testid={`alert-warning-${med.id}`}>
-                            <Info className="h-4 w-4" />
-                            <AlertDescription className="text-sm">
-                              <strong>Warning:</strong> {med.openFdaCache.warnings.warnings[0].substring(0, 120)}...
-                            </AlertDescription>
-                          </Alert>
-                        )}
-                      </div>
-                    </CardContent>
-                  )}
                 </Card>
               ))}
             </div>
@@ -608,7 +586,21 @@ export default function MyMedicationsPage() {
                               <div key={idx} className="p-3 rounded-md bg-muted" data-testid={`side-effect-${likelihood}-${idx}`}>
                                 <div className="font-medium mb-1">{effect.effect}</div>
                                 <div className="text-sm text-muted-foreground">
-                                  Caused by: {effect.medications.join(', ')}
+                                  Caused by:{' '}
+                                  {effect.medications.map((med, medIdx) => (
+                                    <span key={medIdx}>
+                                      {medIdx > 0 && ', '}
+                                      <a
+                                        href={`https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(med)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary hover:underline font-medium"
+                                        data-testid={`link-medication-${likelihood}-${idx}-${medIdx}`}
+                                      >
+                                        {med}
+                                      </a>
+                                    </span>
+                                  ))}
                                 </div>
                               </div>
                             ))}

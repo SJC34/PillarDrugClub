@@ -62,6 +62,9 @@ function Router() {
       <Route path="/settings">
         <ProtectedRoute><SettingsPage /></ProtectedRoute>
       </Route>
+      <Route path="/my-medications">
+        <ProtectedRoute><MyMedicationsPage /></ProtectedRoute>
+      </Route>
       <Route path="/admin">
         <ProtectedRoute requiredRole="admin"><AdminDashboardPage /></ProtectedRoute>
       </Route>
@@ -99,7 +102,6 @@ function Router() {
         <ProtectedRoute requiredRole="admin"><AdminContentAutomationPage /></ProtectedRoute>
       </Route>
       <Route path="/medications" component={MedicationsPage} />
-      <Route path="/medications/my-list" component={MyMedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />
       <Route path="/prescription-request">
