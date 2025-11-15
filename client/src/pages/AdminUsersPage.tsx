@@ -60,6 +60,7 @@ interface User {
 
 interface UserDetail extends User {
   phoneNumber: string | null;
+  subscriptionTier: string | null;
   deletedAt?: string | null;
   deletionReason?: string | null;
   stats?: {
@@ -84,6 +85,10 @@ export default function AdminUsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editingRole, setEditingRole] = useState(false);
+  const [editingTier, setEditingTier] = useState(false);
+  const [newRole, setNewRole] = useState<string>("");
+  const [newTier, setNewTier] = useState<string>("");
   const limit = 20;
 
   // Fetch users list
@@ -187,6 +192,50 @@ export default function AdminUsersPage() {
     },
     onError: () => {
       toast({ title: "Failed to recover user", variant: "destructive" });
+    },
+  });
+
+  // Update role mutation
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ userId, role, reason }: { userId: string; role: string; reason?: string }) => {
+      return apiRequest("PATCH", `/api/admin/users/${userId}/role`, { role, reason });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "User role updated successfully" });
+      setEditingRole(false);
+    },
+    onError: (error: any) => {
+      // Show error toast and refetch to revert UI to server state
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ 
+        title: "Failed to update user role", 
+        description: error.message || "An error occurred",
+        variant: "destructive" 
+      });
+      setEditingRole(false);
+    },
+  });
+
+  // Update tier mutation
+  const updateTierMutation = useMutation({
+    mutationFn: async ({ userId, tier, reason }: { userId: string; tier: string; reason?: string }) => {
+      return apiRequest("PATCH", `/api/admin/users/${userId}/subscription-tier`, { tier, reason });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Subscription tier updated successfully" });
+      setEditingTier(false);
+    },
+    onError: (error: any) => {
+      // Show error toast and refetch to revert UI to server state
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ 
+        title: "Failed to update subscription tier",
+        description: error.message || "An error occurred", 
+        variant: "destructive" 
+      });
+      setEditingTier(false);
     },
   });
 
@@ -418,16 +467,121 @@ export default function AdminUsersPage() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Role</Label>
-                    <Badge className={`mt-1 ${getRoleBadge(userDetail.role)}`}>
-                      {userDetail.role || "client"}
-                    </Badge>
+                    <Label className="text-muted-foreground flex items-center justify-between">
+                      Role
+                      {!editingRole && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => {
+                            setEditingRole(true);
+                            setNewRole(userDetail.role || "client");
+                          }}
+                          data-testid="button-edit-role"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </Label>
+                    {editingRole ? (
+                      <div className="flex items-center gap-2 mt-1">
+                        <Select value={newRole} onValueChange={setNewRole}>
+                          <SelectTrigger className="w-32" data-testid="select-new-role">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="client">Client</SelectItem>
+                            <SelectItem value="broker">Broker</SelectItem>
+                            <SelectItem value="company">Company</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button 
+                          size="sm" 
+                          onClick={() => {
+                            const confirmed = confirm(`Change role from ${userDetail.role} to ${newRole}?`);
+                            if (confirmed) {
+                              updateRoleMutation.mutate({ userId: userDetail.id, role: newRole });
+                            }
+                          }}
+                          disabled={updateRoleMutation.isPending}
+                          data-testid="button-save-role"
+                        >
+                          Save
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => setEditingRole(false)}
+                          data-testid="button-cancel-role"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Badge className={`mt-1 ${getRoleBadge(userDetail.role)}`}>
+                        {userDetail.role || "client"}
+                      </Badge>
+                    )}
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Subscription</Label>
-                    <Badge className={`mt-1 ${getStatusBadge(userDetail.subscriptionStatus)}`}>
-                      {userDetail.subscriptionStatus || "none"}
-                    </Badge>
+                    <Label className="text-muted-foreground flex items-center justify-between">
+                      Subscription Tier
+                      {!editingTier && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => {
+                            setEditingTier(true);
+                            setNewTier(userDetail.subscriptionTier || "free");
+                          }}
+                          data-testid="button-edit-tier"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </Label>
+                    {editingTier ? (
+                      <div className="flex items-center gap-2 mt-1">
+                        <Select value={newTier} onValueChange={setNewTier}>
+                          <SelectTrigger className="w-32" data-testid="select-new-tier">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="free">Free</SelectItem>
+                            <SelectItem value="gold">Gold</SelectItem>
+                            <SelectItem value="platinum">Platinum</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button 
+                          size="sm" 
+                          onClick={() => {
+                            const confirmed = confirm(`Upgrade tier from ${userDetail.subscriptionTier} to ${newTier}? (Admin override - billing handled offline)`);
+                            if (confirmed) {
+                              updateTierMutation.mutate({ userId: userDetail.id, tier: newTier });
+                            }
+                          }}
+                          disabled={updateTierMutation.isPending}
+                          data-testid="button-save-tier"
+                        >
+                          Save
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => setEditingTier(false)}
+                          data-testid="button-cancel-tier"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Badge className="mt-1 bg-purple-100 text-purple-800">
+                        {userDetail.subscriptionTier || "free"}
+                      </Badge>
+                    )}
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Member Since</Label>

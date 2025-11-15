@@ -3022,6 +3022,144 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // PATCH /api/admin/users/:userId/role - Update user role
+  app.patch("/api/admin/users/:userId/role", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    // Prevent self-modification
+    if (req.params.userId === user.id) {
+      return res.status(400).json({ error: "Cannot change your own role" });
+    }
+
+    try {
+      // Validate input
+      const roleSchema = z.object({
+        role: z.enum(["admin", "client", "broker", "company"]),
+        reason: z.string().optional()
+      });
+
+      const { role, reason } = roleSchema.parse(req.body);
+      
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const oldRole = targetUser.role;
+      const updatedUser = await storage.updateUserRole(req.params.userId, role, user.id);
+      
+      // Create audit log
+      await createAuditLog(storage, {
+        userId: req.params.userId,
+        actorId: user.id,
+        action: "admin_role_change",
+        entityType: "user",
+        entityId: req.params.userId,
+        description: `Role changed from ${oldRole} to ${role}${reason ? `: ${reason}` : ''}`,
+        metadata: {
+          oldRole,
+          newRole: role,
+          reason,
+          changedBy: fullUser.email
+        },
+        ipAddress: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('user-agent') || 'Unknown'
+      });
+      
+      console.log(`Admin ${user.email} changed user ${targetUser.email} role from ${oldRole} to ${role}`);
+      
+      const { password, ...userResponse } = updatedUser!;
+      
+      res.json({ 
+        user: userResponse,
+        message: "User role updated successfully"
+      });
+    } catch (error: any) {
+      if (error.message === "Cannot remove the last admin user") {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error("Error updating user role:", error);
+      res.status(500).json({ 
+        error: "Failed to update user role", 
+        message: error.message 
+      });
+    }
+  });
+
+  // PATCH /api/admin/users/:userId/subscription-tier - Update subscription tier
+  app.patch("/api/admin/users/:userId/subscription-tier", async (req: any, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as any;
+    const fullUser = await storage.getUser(user.id);
+    if (!fullUser || fullUser.role !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    try {
+      // Validate input
+      const tierSchema = z.object({
+        tier: z.enum(["free", "gold", "platinum"]),
+        reason: z.string().optional()
+      });
+
+      const { tier, reason } = tierSchema.parse(req.body);
+      
+      const targetUser = await storage.getUser(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const oldTier = targetUser.subscriptionTier;
+      // Admin tier changes always use admin_override source (bypass Stripe)
+      const updatedUser = await storage.updateUserTier(req.params.userId, tier, user.id, "admin_override");
+      
+      // Create audit log
+      await createAuditLog(storage, {
+        userId: req.params.userId,
+        actorId: user.id,
+        action: "admin_tier_change",
+        entityType: "user",
+        entityId: req.params.userId,
+        description: `Subscription tier changed from ${oldTier} to ${tier} (admin override)${reason ? `: ${reason}` : ''}`,
+        metadata: {
+          oldTier,
+          newTier: tier,
+          source: "admin_override",
+          reason,
+          changedBy: fullUser.email
+        },
+        ipAddress: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('user-agent') || 'Unknown'
+      });
+      
+      console.log(`Admin ${user.email} changed user ${targetUser.email} tier from ${oldTier} to ${tier} (admin override)`);
+      
+      const { password, ...userResponse } = updatedUser!;
+      
+      res.json({ 
+        user: userResponse,
+        message: "Subscription tier updated successfully (admin override - billing handled offline)"
+      });
+    } catch (error: any) {
+      console.error("Error updating subscription tier:", error);
+      res.status(500).json({ 
+        error: "Failed to update subscription tier", 
+        message: error.message 
+      });
+    }
+  });
+
   // Admin financial tracking endpoints
 
   // GET /api/admin/financial-metrics - Get financial overview and metrics
