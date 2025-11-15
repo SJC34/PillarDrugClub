@@ -59,6 +59,11 @@ export const users = pgTable("users", {
   privacyPolicyAcceptedAt: timestamp("privacy_policy_accepted_at"),
   hipaaConsentAt: timestamp("hipaa_consent_at"),
   preferredContentTemplate: text("preferred_content_template"), // User's default content template preset
+  subscriptionTierSource: text("subscription_tier_source", { enum: ["stripe", "admin_override"] }).default("stripe"),
+  roleLastChangedBy: text("role_last_changed_by"), // Admin user ID who last changed the role
+  roleLastChangedAt: timestamp("role_last_changed_at"),
+  tierLastChangedBy: text("tier_last_changed_by"), // Admin user ID who last changed the tier
+  tierLastChangedAt: timestamp("tier_last_changed_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

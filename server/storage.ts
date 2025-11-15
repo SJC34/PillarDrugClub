@@ -34,6 +34,8 @@ export interface IStorage {
   reactivateUser(id: string): Promise<User | undefined>;
   softDeleteUser(id: string, reason?: string): Promise<User | undefined>;
   recoverDeletedUser(id: string): Promise<User | undefined>;
+  updateUserRole(userId: string, role: string, changedBy: string): Promise<User | undefined>;
+  updateUserTier(userId: string, tier: string, changedBy: string, source: "stripe" | "admin_override"): Promise<User | undefined>;
 
   // Cart
   getCartItems(userId: string): Promise<any[]>;
@@ -2108,6 +2110,43 @@ export class DbStorage extends MemStorage {
         updatedAt: new Date(),
       })
       .where(eq(users.id, id))
+      .returning();
+    
+    return result[0];
+  }
+
+  async updateUserRole(userId: string, role: string, changedBy: string): Promise<User | undefined> {
+    // Prevent removing last admin
+    if (role !== "admin") {
+      const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
+      if (adminUsers.length === 1 && adminUsers[0].id === userId) {
+        throw new Error("Cannot remove the last admin user");
+      }
+    }
+    
+    const result = await db.update(users)
+      .set({
+        role: role as "admin" | "client" | "broker" | "company",
+        roleLastChangedBy: changedBy,
+        roleLastChangedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return result[0];
+  }
+
+  async updateUserTier(userId: string, tier: string, changedBy: string, source: "stripe" | "admin_override"): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set({
+        subscriptionTier: tier as "free" | "gold" | "platinum",
+        subscriptionTierSource: source,
+        tierLastChangedBy: changedBy,
+        tierLastChangedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
       .returning();
     
     return result[0];
