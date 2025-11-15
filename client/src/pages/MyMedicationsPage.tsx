@@ -47,7 +47,11 @@ interface SideEffect {
   effect: string;
   medicationCount: number;
   medications: string[];
-  likelihood: 'low' | 'moderate' | 'high';
+  clinicalFrequency: string | null;
+  frequencyCategory: 'very-common' | 'common' | 'uncommon' | 'rare' | 'very-rare' | 'unknown';
+  severity: 'critical' | 'serious' | 'moderate' | 'minor' | 'unknown';
+  fdaSource: string;
+  likelihood: 'low' | 'moderate' | 'high'; // Legacy field
 }
 
 interface DrugInteraction {
@@ -247,6 +251,56 @@ export default function MyMedicationsPage() {
         {severity.charAt(0).toUpperCase() + severity.slice(1)}
       </Badge>
     );
+  };
+
+  // Helper functions for side effect display
+  const getSideEffectSeverityBadge = (severity: 'critical' | 'serious' | 'moderate' | 'minor' | 'unknown') => {
+    const config = {
+      critical: { variant: "destructive" as const, label: "CRITICAL" },
+      serious: { variant: "destructive" as const, label: "Serious" },
+      moderate: { variant: "default" as const, label: "Moderate" },
+      minor: { variant: "secondary" as const, label: "Minor" },
+      unknown: { variant: "secondary" as const, label: "Unknown" }
+    };
+    
+    const { variant, label } = config[severity];
+    
+    return (
+      <Badge variant={variant} data-testid={`badge-severity-${severity}`} className={severity === 'critical' ? 'font-bold' : ''}>
+        {label}
+      </Badge>
+    );
+  };
+
+  const getFrequencyBadge = (category: string, frequencyText: string | null) => {
+    const labels = {
+      'very-common': 'Very Common (≥10%)',
+      'common': 'Common (1-10%)',
+      'uncommon': 'Uncommon (0.1-1%)',
+      'rare': 'Rare (0.01-0.1%)',
+      'very-rare': 'Very Rare (<0.01%)',
+      'unknown': 'Frequency Unknown'
+    };
+    
+    // Use specific text if available, otherwise use standard label
+    const displayText = frequencyText || labels[category as keyof typeof labels] || 'Unknown';
+    
+    return (
+      <Badge variant="outline" data-testid={`badge-frequency-${category}`}>
+        {displayText}
+      </Badge>
+    );
+  };
+
+  const getSeverityGroupLabel = (severity: string) => {
+    const labels = {
+      critical: 'Life-Threatening Side Effects',
+      serious: 'Serious Side Effects (Require Medical Attention)',
+      moderate: 'Moderate Side Effects',
+      minor: 'Minor Side Effects',
+      unknown: 'Other Side Effects'
+    };
+    return labels[severity as keyof typeof labels] || 'Side Effects';
   };
 
   if (medicationsLoading) {
@@ -536,15 +590,19 @@ export default function MyMedicationsPage() {
                   <ul className="space-y-1 text-sm text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
-                      <span>Side effects grouped by likelihood (high, moderate, low)</span>
+                      <span>Clinical frequency data (e.g., &quot;Rare &lt;0.1%&quot;, &quot;Common 1-10%&quot;)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
-                      <span>See which medications cause each side effect</span>
+                      <span>Severity classification (Critical, Serious, Moderate, Minor)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
-                      <span>FDA-sourced safety information</span>
+                      <span>FDA Boxed Warning detection for life-threatening risks</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
+                      <span>Direct links to official FDA drug labels on DailyMed</span>
                     </li>
                   </ul>
                 </div>
@@ -562,31 +620,66 @@ export default function MyMedicationsPage() {
             </div>
           ) : (
             <>
+              {/* Clinical Disclaimer */}
+              <Alert className="border-blue-200 bg-blue-50" data-testid="alert-clinical-disclaimer">
+                <Info className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-sm text-blue-900">
+                  <strong>Important:</strong> This is educational information from FDA drug labels, not medical advice. 
+                  "Rare" does not mean impossible - all medications carry some risk. If you experience any unusual 
+                  symptoms or have concerns, contact your healthcare provider or pharmacist immediately. 
+                  Do not stop taking prescribed medications without consulting your doctor.
+                </AlertDescription>
+              </Alert>
+
               {sideEffectsData && sideEffectsData.sideEffects.length > 0 ? (
                 <>
-                  {['high', 'moderate', 'low'].map((likelihood) => {
+                  {['critical', 'serious', 'moderate', 'minor', 'unknown'].map((severityLevel) => {
                     const effects = sideEffectsData.sideEffects.filter(
-                      (se) => se.likelihood === likelihood
+                      (se) => se.severity === severityLevel
                     );
                     if (effects.length === 0) return null;
 
                     return (
-                      <Card key={likelihood} data-testid={`card-side-effects-${likelihood}`}>
+                      <Card 
+                        key={severityLevel} 
+                        data-testid={`card-side-effects-${severityLevel}`}
+                        className={severityLevel === 'critical' ? 'border-red-300 bg-red-50/50' : ''}
+                      >
                         <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            {getLikelihoodBadge(likelihood as 'low' | 'moderate' | 'high')}
+                          <CardTitle className="flex items-center gap-2 flex-wrap">
+                            <span className={severityLevel === 'critical' ? 'text-red-700' : ''}>
+                              {getSeverityGroupLabel(severityLevel)}
+                            </span>
                             <span className="text-base font-normal text-muted-foreground">
-                              {effects.length} side effect{effects.length !== 1 ? 's' : ''}
+                              ({effects.length} effect{effects.length !== 1 ? 's' : ''})
                             </span>
                           </CardTitle>
+                          {severityLevel === 'critical' && (
+                            <CardDescription className="text-red-700 font-medium">
+                              Seek immediate medical attention if you experience any of these symptoms
+                            </CardDescription>
+                          )}
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-3">
                             {effects.map((effect, idx) => (
-                              <div key={idx} className="p-3 rounded-md bg-muted" data-testid={`side-effect-${likelihood}-${idx}`}>
-                                <div className="font-medium mb-1">{effect.effect}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  Caused by:{' '}
+                              <div 
+                                key={idx} 
+                                className={cn(
+                                  "p-4 rounded-md border",
+                                  severityLevel === 'critical' ? 'bg-white border-red-200' : 'bg-muted border-transparent'
+                                )}
+                                data-testid={`side-effect-${severityLevel}-${idx}`}
+                              >
+                                <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
+                                  <div className="font-medium text-base capitalize flex-1">{effect.effect}</div>
+                                  <div className="flex gap-2 flex-wrap">
+                                    {getSideEffectSeverityBadge(effect.severity)}
+                                    {getFrequencyBadge(effect.frequencyCategory, effect.clinicalFrequency)}
+                                  </div>
+                                </div>
+                                <div className="text-sm text-muted-foreground mb-2">
+                                  <span className="font-medium">Listed in:</span>{' '}
                                   {effect.medications.map((med, medIdx) => (
                                     <span key={medIdx}>
                                       {medIdx > 0 && ', '}
@@ -595,13 +688,19 @@ export default function MyMedicationsPage() {
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-primary hover:underline font-medium"
-                                        data-testid={`link-medication-${likelihood}-${idx}-${medIdx}`}
+                                        data-testid={`link-medication-${severityLevel}-${idx}-${medIdx}`}
                                       >
                                         {med}
                                       </a>
                                     </span>
                                   ))}
                                 </div>
+                                {effect.fdaSource === 'boxed_warning' && (
+                                  <div className="text-xs text-red-600 font-medium flex items-center gap-1 mt-2">
+                                    <XCircle className="h-3 w-3" />
+                                    FDA Boxed Warning
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>

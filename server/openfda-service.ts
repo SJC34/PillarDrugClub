@@ -55,8 +55,12 @@ export interface SideEffectOccurrence {
   effect: string;
   medicationCount: number; // How many medications list this side effect
   medications: string[]; // Which medications list it
-  likelihood: 'low' | 'moderate' | 'high'; // Based on how many meds share it
-  severity?: string; // From FDA warnings if available
+  clinicalFrequency: string | null; // Raw frequency text from FDA (e.g., "common (1-10%)")
+  frequencyCategory: 'very-common' | 'common' | 'uncommon' | 'rare' | 'very-rare' | 'unknown'; // Standardized frequency
+  severity: 'critical' | 'serious' | 'moderate' | 'minor' | 'unknown'; // Medical severity
+  fdaSource: string; // Which label section (adverse_reactions, boxed_warning, etc.)
+  // Legacy field - kept for backward compatibility but now based on clinical frequency
+  likelihood: 'low' | 'moderate' | 'high';
 }
 
 export interface DrugInteractionDetail {
@@ -263,73 +267,387 @@ export async function getAllWarnings(medications: { genericName: string }[]): Pr
   }));
 }
 
-// Aggregate side effects across all medications with likelihood scoring
+// Aggregate side effects across all medications with clinical frequency and severity
 export async function aggregateSideEffects(medications: { genericName: string }[]): Promise<SideEffectOccurrence[]> {
   // Fetch FDA data for all medications
   const fdaDataPromises = medications.map(med => getDrugLabel(med.genericName));
   const fdaDataResults = await Promise.all(fdaDataPromises);
   
-  // Map to track side effects and which medications list them
-  const sideEffectMap = new Map<string, { medications: string[]; count: number }>();
+  // Map to track side effects with all their metadata
+  interface SideEffectData {
+    medications: string[];
+    count: number;
+    frequencies: (string | null)[];
+    contexts: string[];
+    sources: string[];
+  }
   
-  // Process each medication's adverse reactions
+  const sideEffectMap = new Map<string, SideEffectData>();
+  
+  // Process each medication's adverse reactions and boxed warnings
   medications.forEach((med, index) => {
     const fdaData = fdaDataResults[index];
-    if (!fdaData || !fdaData.warnings.adverseReactions) return;
+    if (!fdaData) return;
     
-    // Parse adverse reactions - they're usually in paragraph form
-    const reactions = fdaData.warnings.adverseReactions;
-    reactions.forEach(reactionText => {
-      // Extract individual side effects from the text
-      // Common format: "The most common adverse reactions include: headache, nausea, dizziness..."
-      const effects = extractSideEffects(reactionText);
-      
-      effects.forEach(effect => {
-        const normalized = effect.trim().toLowerCase();
-        if (!sideEffectMap.has(normalized)) {
-          sideEffectMap.set(normalized, { medications: [], count: 0 });
-        }
+    const boxedWarnings = fdaData.warnings.boxedWarning || [];
+    
+    // Process adverse reactions
+    if (fdaData.warnings.adverseReactions) {
+      fdaData.warnings.adverseReactions.forEach(reactionText => {
+        const parsedEffects = extractSideEffectsEnhanced(reactionText, boxedWarnings);
         
-        const entry = sideEffectMap.get(normalized)!;
-        if (!entry.medications.includes(med.genericName)) {
-          entry.medications.push(med.genericName);
-          entry.count++;
-        }
+        parsedEffects.forEach(parsed => {
+          const normalized = parsed.effect.trim().toLowerCase();
+          
+          if (!sideEffectMap.has(normalized)) {
+            sideEffectMap.set(normalized, {
+              medications: [],
+              count: 0,
+              frequencies: [],
+              contexts: [],
+              sources: [],
+            });
+          }
+          
+          const entry = sideEffectMap.get(normalized)!;
+          if (!entry.medications.includes(med.genericName)) {
+            entry.medications.push(med.genericName);
+            entry.count++;
+            entry.frequencies.push(parsed.frequencyText);
+            entry.contexts.push(parsed.contextText);
+            entry.sources.push('adverse_reactions');
+          }
+        });
       });
-    });
+    }
+    
+    // Also check boxed warnings for critical side effects
+    if (boxedWarnings.length > 0) {
+      boxedWarnings.forEach(warning => {
+        const parsedEffects = extractSideEffectsEnhanced(warning, boxedWarnings);
+        
+        parsedEffects.forEach(parsed => {
+          const normalized = parsed.effect.trim().toLowerCase();
+          
+          if (!sideEffectMap.has(normalized)) {
+            sideEffectMap.set(normalized, {
+              medications: [],
+              count: 0,
+              frequencies: [],
+              contexts: [],
+              sources: [],
+            });
+          }
+          
+          const entry = sideEffectMap.get(normalized)!;
+          
+          // For boxed warnings, ALWAYS append the source (even if medication already listed)
+          // This ensures critical effects are properly elevated
+          if (!entry.medications.includes(med.genericName)) {
+            // First time seeing this medication for this effect
+            entry.medications.push(med.genericName);
+            entry.count++;
+          }
+          
+          // Always add boxed warning context and source regardless of medication duplicates
+          entry.frequencies.push(parsed.frequencyText);
+          entry.contexts.push(parsed.contextText);
+          entry.sources.push('boxed_warning');
+        });
+      });
+    }
   });
   
-  // Calculate likelihood based on how many medications share the side effect
-  const totalMedications = medications.length;
+  // Build final side effect occurrences with frequency and severity
   const sideEffects: SideEffectOccurrence[] = [];
   
   sideEffectMap.forEach((data, effect) => {
-    const percentageOfMeds = (data.count / totalMedications) * 100;
+    // Determine the most specific frequency available
+    let bestFrequency: string | null = null;
+    let bestFrequencyCategory: 'very-common' | 'common' | 'uncommon' | 'rare' | 'very-rare' | 'unknown' = 'unknown';
     
+    // Prioritize: specific percentage > frequency category > null
+    for (const freq of data.frequencies) {
+      if (freq) {
+        const category = classifyFrequencyCategory(freq);
+        if (category !== 'unknown') {
+          bestFrequency = freq;
+          bestFrequencyCategory = category;
+          break; // Use first valid frequency found
+        }
+      }
+    }
+    
+    // Determine severity - use the highest severity found across all contexts
+    let severity: 'critical' | 'serious' | 'moderate' | 'minor' | 'unknown' = 'unknown';
+    const boxedWarnings = fdaDataResults
+      .filter(fda => fda && fda.warnings.boxedWarning)
+      .flatMap(fda => fda!.warnings.boxedWarning || []);
+    
+    // Define severity ranking for comparison
+    const severityRank = { critical: 4, serious: 3, moderate: 2, minor: 1, unknown: 0 };
+    
+    for (let i = 0; i < data.contexts.length; i++) {
+      const contextSeverity = determineSideEffectSeverity(
+        effect,
+        data.contexts[i],
+        boxedWarnings
+      );
+      
+      // Upgrade severity if we find something more serious
+      if (severityRank[contextSeverity] > severityRank[severity]) {
+        severity = contextSeverity;
+      }
+    }
+    
+    // FDA Boxed Warnings are reserved for the most serious adverse reactions
+    // They indicate significant risk of serious or life-threatening events
+    // Therefore, anything from a boxed warning should be at least critical
+    if (data.sources.includes('boxed_warning')) {
+      if (severityRank[severity] < severityRank.critical) {
+        severity = 'critical';
+      }
+    }
+    
+    // Determine FDA source - prioritize boxed warnings
+    const fdaSource = data.sources.includes('boxed_warning') 
+      ? 'boxed_warning' 
+      : 'adverse_reactions';
+    
+    // Legacy likelihood field - now based on clinical frequency, not medication count
     let likelihood: 'low' | 'moderate' | 'high';
-    if (data.count === 1) {
-      likelihood = 'low';
-    } else if (percentageOfMeds < 50) {
+    if (bestFrequencyCategory === 'very-common' || bestFrequencyCategory === 'common') {
+      likelihood = 'high';
+    } else if (bestFrequencyCategory === 'uncommon' || bestFrequencyCategory === 'rare') {
       likelihood = 'moderate';
     } else {
-      likelihood = 'high';
+      likelihood = 'low'; // very-rare or unknown
     }
     
     sideEffects.push({
       effect,
       medicationCount: data.count,
       medications: data.medications,
+      clinicalFrequency: bestFrequency,
+      frequencyCategory: bestFrequencyCategory,
+      severity,
+      fdaSource,
       likelihood,
     });
   });
   
-  // Sort by medication count (most common first)
-  return sideEffects.sort((a, b) => b.medicationCount - a.medicationCount);
+  // Sort by severity first (critical first), then frequency, then medication count
+  const severityRank = { critical: 4, serious: 3, moderate: 2, minor: 1, unknown: 0 };
+  const frequencyRank = { 'very-common': 5, common: 4, uncommon: 3, rare: 2, 'very-rare': 1, unknown: 0 };
+  
+  return sideEffects.sort((a, b) => {
+    // First by severity (highest first)
+    if (severityRank[a.severity] !== severityRank[b.severity]) {
+      return severityRank[b.severity] - severityRank[a.severity];
+    }
+    // Then by frequency (most common first)
+    if (frequencyRank[a.frequencyCategory] !== frequencyRank[b.frequencyCategory]) {
+      return frequencyRank[b.frequencyCategory] - frequencyRank[a.frequencyCategory];
+    }
+    // Finally by medication count
+    return b.medicationCount - a.medicationCount;
+  });
 }
 
-// Helper to extract individual side effects from FDA text
-function extractSideEffects(text: string): string[] {
-  const effects: string[] = [];
+// Helper to parse frequency information from FDA text
+interface ParsedSideEffect {
+  effect: string;
+  frequencyText: string | null; // Raw frequency (e.g., "common (1-10%)", "rare")
+  contextText: string; // Full sentence for severity analysis
+}
+
+function parseFrequencyFromText(text: string): string | null {
+  const lowerText = text.toLowerCase();
+  
+  // Common FDA frequency patterns - more specific patterns first
+  const frequencyPatterns = [
+    // Very common patterns
+    /very\s+common\s*\(?\s*[>≥]\s*1[\/]10\s*\)?/i,
+    /very\s+common\s*\(?\s*[>≥]\s*10%\s*\)?/i,
+    // Common patterns
+    /common\s*\(?\s*1[\/]10\s*to\s*1[\/]100\s*\)?/i,
+    /common\s*\(?\s*[>≥]?\s*1%\s*(?:to|and)?\s*[<?]?\s*10%\s*\)?/i,
+    // Uncommon patterns
+    /uncommon\s*\(?\s*1[\/]100\s*to\s*1[\/]1,?000\s*\)?/i,
+    /uncommon\s*\(?\s*[>≥]?\s*0\.1%\s*(?:to|and)?\s*[<?]?\s*1%\s*\)?/i,
+    /infrequent\s*\(?\s*[>≥]?\s*0\.1%\s*(?:to|and)?\s*[<?]?\s*1%\s*\)?/i,
+    // Rare patterns
+    /very\s+rare\s*\(?\s*[<]\s*1[\/]10,?000\s*\)?/i,
+    /very\s+rare\s*\(?\s*[<]\s*0\.01%\s*\)?/i,
+    /rare\s*\(?\s*1[\/]1,?000\s*to\s*1[\/]10,?000\s*\)?/i,
+    /rare\s*\(?\s*[>≥]?\s*0\.01%\s*(?:to|and)?\s*[<?]?\s*0\.1%\s*\)?/i,
+    // Isolated percentage with context (e.g., "approximately 5%", "about 2%")
+    /(?:approximately|about|roughly|~)?\s*(\d+(?:\.\d+)?%)/i,
+  ];
+  
+  // Try to match specific frequency patterns first
+  for (const pattern of frequencyPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      return match[0].trim();
+    }
+  }
+  
+  // Check for frequency keywords alone (less preferred - no specific rate)
+  // Only return these if no percentage patterns were found
+  if (lowerText.includes('very common')) return 'very common';
+  if (lowerText.includes('common') && !lowerText.includes('uncommon')) return 'common';
+  if (lowerText.includes('uncommon') || lowerText.includes('infrequent')) return 'uncommon';
+  if (lowerText.includes('very rare')) return 'very rare';
+  if (lowerText.includes('rare') && !lowerText.includes('very rare')) return 'rare';
+  
+  return null;
+}
+
+// Classify frequency category from parsed frequency text
+function classifyFrequencyCategory(frequencyText: string | null): 'very-common' | 'common' | 'uncommon' | 'rare' | 'very-rare' | 'unknown' {
+  if (!frequencyText) return 'unknown';
+  
+  const lower = frequencyText.toLowerCase();
+  
+  // Very common: ≥10% or ≥1/10
+  if (lower.includes('very common')) return 'very-common';
+  
+  // Common: 1-10% or 1/100 to 1/10
+  if (lower.includes('common') && !lower.includes('very') && !lower.includes('un')) return 'common';
+  
+  // Uncommon: 0.1-1% or 1/1000 to 1/100
+  if (lower.includes('uncommon') || lower.includes('infrequent')) return 'uncommon';
+  
+  // Rare: 0.01-0.1% or 1/10000 to 1/1000
+  if (lower.includes('rare') && !lower.includes('very')) return 'rare';
+  
+  // Very rare: <0.01% or <1/10000
+  if (lower.includes('very rare')) return 'very-rare';
+  
+  // Parse percentage if present
+  const percentMatch = lower.match(/(\d+(?:\.\d+)?)%/);
+  if (percentMatch) {
+    const percent = parseFloat(percentMatch[1]);
+    if (percent >= 10) return 'very-common';
+    if (percent >= 1) return 'common';
+    if (percent >= 0.1) return 'uncommon';
+    if (percent >= 0.01) return 'rare';
+    return 'very-rare';
+  }
+  
+  return 'unknown';
+}
+
+// Determine severity based on side effect name and context
+function determineSideEffectSeverity(effect: string, contextText: string, boxedWarnings: string[]): 'critical' | 'serious' | 'moderate' | 'minor' | 'unknown' {
+  const lowerEffect = effect.toLowerCase();
+  const lowerContext = contextText.toLowerCase();
+  const allBoxedWarnings = boxedWarnings.join(' ').toLowerCase();
+  
+  // CRITICAL: Life-threatening conditions
+  const criticalKeywords = [
+    'death', 'fatal', 'fatality', 'life-threatening', 'life threatening',
+    'anaphylaxis', 'anaphylactic', 'anaphylactoid',
+    'stevens-johnson', 'stevens johnson', 'sjs', 'lyell',
+    'toxic epidermal necrolysis', 'ten',
+    'angioedema', 'angioneurotic edema',
+    'respiratory failure', 'respiratory arrest',
+    'cardiac arrest', 'sudden cardiac death',
+    'myocardial infarction', 'acute mi', 'heart attack',
+    'torsades de pointes', 'torsade', 'qt prolongation severe',
+    'ventricular fibrillation', 'ventricular tachycardia',
+    'stroke', 'cerebrovascular accident', 'hemorrhagic stroke',
+    'suicidal', 'suicide', 'suicidality',
+    'hepatic failure', 'liver failure', 'acute liver failure', 'fulminant hepatitis',
+    'renal failure', 'kidney failure', 'acute renal failure',
+    'bone marrow suppression', 'bone marrow failure',
+    'agranulocytosis', 'aplastic anemia', 'aplastic anaemia',
+    'thrombocytopenia severe', 'severe thrombocytopenia',
+    'seizure', 'status epilepticus',
+    'coma',
+    'malignant hyperthermia',
+    'neuroleptic malignant syndrome', 'nms',
+    'serotonin syndrome',
+    'hemorrhage life-threatening', 'life-threatening bleeding',
+    'gastrointestinal perforation',
+  ];
+  
+  for (const keyword of criticalKeywords) {
+    if (lowerEffect.includes(keyword) || lowerContext.includes(keyword) || allBoxedWarnings.includes(keyword)) {
+      return 'critical';
+    }
+  }
+  
+  // SERIOUS: Requires medical attention
+  const seriousKeywords = [
+    'hospitalization',
+    'arrhythmia', 'tachycardia severe', 'bradycardia severe',
+    'hypertension severe', 'hypotension severe',
+    'bleeding', 'hemorrhage',
+    'thrombosis', 'embolism',
+    'pancreatitis',
+    'hepatitis', 'hepatotoxicity',
+    'nephrotoxicity', 'acute kidney injury',
+    'rhabdomyolysis',
+    'neutropenia',
+    'infection serious', 'sepsis',
+    'pneumonia',
+    'ulceration',
+    'vision loss', 'blindness',
+    'hearing loss', 'deafness',
+  ];
+  
+  for (const keyword of seriousKeywords) {
+    if (lowerEffect.includes(keyword) || lowerContext.includes(keyword)) {
+      return 'serious';
+    }
+  }
+  
+  // MODERATE: Discomforting but manageable
+  const moderateKeywords = [
+    'rash',
+    'dizziness', 'vertigo',
+    'fatigue', 'weakness',
+    'insomnia', 'sleep',
+    'anxiety',
+    'tremor',
+    'palpitation',
+    'edema',
+    'constipation',
+    'diarrhea',
+    'vomiting',
+    'weight gain', 'weight loss',
+  ];
+  
+  for (const keyword of moderateKeywords) {
+    if (lowerEffect.includes(keyword)) {
+      return 'moderate';
+    }
+  }
+  
+  // MINOR: Mild and transient
+  const minorKeywords = [
+    'headache',
+    'nausea',
+    'dry mouth',
+    'drowsiness',
+    'mild',
+  ];
+  
+  for (const keyword of minorKeywords) {
+    if (lowerEffect.includes(keyword)) {
+      return 'minor';
+    }
+  }
+  
+  // Default to unknown if we can't classify
+  return 'unknown';
+}
+
+// Enhanced helper to extract individual side effects from FDA text with frequency preservation
+function extractSideEffectsEnhanced(text: string, boxedWarnings: string[] = []): ParsedSideEffect[] {
+  const effects: ParsedSideEffect[] = [];
   
   // Common patterns in FDA adverse reaction text
   const patterns = [
@@ -338,21 +656,52 @@ function extractSideEffects(text: string): string[] {
     /most (?:common|frequent)(?:\s+\w+)*:\s*([^.]+)/gi, // "most common: X, Y, Z"
   ];
   
+  // Track which sentence each effect came from for context
+  const sentences = text.split(/[.!]/);
+  
   patterns.forEach(pattern => {
     const matches = Array.from(text.matchAll(pattern));
     for (const match of matches) {
       if (match[1]) {
+        // Find which sentence this match belongs to
+        const matchIndex = match.index || 0;
+        let contextSentence = text;
+        for (const sentence of sentences) {
+          if (text.indexOf(sentence, matchIndex - 200) !== -1 && text.indexOf(sentence, matchIndex - 200) <= matchIndex) {
+            contextSentence = sentence;
+            break;
+          }
+        }
+        
+        // Parse frequency from the context
+        const frequency = parseFrequencyFromText(contextSentence);
+        
         // Split by commas, semicolons, and "and"
         const items = match[1].split(/[,;]|\s+and\s+/);
         items.forEach((item: string) => {
-          const cleaned = item
-            .trim()
-            .replace(/^\(|\)$/g, '') // Remove parentheses
-            .replace(/^\d+%?\s*/, '') // Remove percentages at start
-            .replace(/\([^)]*\)/g, ''); // Remove content in parentheses
+          // Preserve percentage in parentheses but extract the effect name
+          const percentMatch = item.match(/^(.*?)\s*\((\d+%)\)$/);
+          let cleaned = item.trim();
+          let itemFrequency = frequency;
+          
+          if (percentMatch) {
+            cleaned = percentMatch[1].trim();
+            itemFrequency = percentMatch[2]; // Use specific percentage if present
+          } else {
+            cleaned = item
+              .trim()
+              .replace(/^\(|\)$/g, ''); // Remove outer parentheses only
+          }
+          
+          // Clean up but DON'T remove all parenthetical content (may contain frequency)
+          cleaned = cleaned.replace(/^(and|or|the)\s+/i, '');
           
           if (cleaned.length > 2 && cleaned.length < 100) { // Sanity check
-            effects.push(cleaned);
+            effects.push({
+              effect: cleaned,
+              frequencyText: itemFrequency,
+              contextText: contextSentence,
+            });
           }
         });
       }
@@ -361,20 +710,22 @@ function extractSideEffects(text: string): string[] {
   
   // Also extract from simple lists (e.g., "headache, nausea, dizziness")
   if (effects.length === 0) {
-    // Try to extract comma-separated lists
-    const sentences = text.split(/[.!?]/);
     sentences.forEach(sentence => {
       if (sentence.includes(',')) {
+        const frequency = parseFrequencyFromText(sentence);
         const items = sentence.split(',');
         if (items.length >= 2 && items.length <= 20) { // Likely a list
           items.forEach((item: string) => {
             const cleaned = item
               .trim()
-              .replace(/^(and|or|the)\s+/i, '')
-              .replace(/^\d+%?\s*/, '');
+              .replace(/^(and|or|the)\s+/i, '');
             
             if (cleaned.length > 2 && cleaned.length < 100 && !/^\d+$/.test(cleaned)) {
-              effects.push(cleaned);
+              effects.push({
+                effect: cleaned,
+                frequencyText: frequency,
+                contextText: sentence,
+              });
             }
           });
         }
