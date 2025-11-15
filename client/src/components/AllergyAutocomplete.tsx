@@ -134,31 +134,26 @@ export function AllergyAutocomplete({
 
       {showResults && searchResults.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-[300px] overflow-y-auto">
-          <Command>
-            <CommandList>
-              <CommandGroup>
-                {searchResults.map((medication) => (
-                  <CommandItem
-                    key={medication.rxcui}
-                    value={medication.name}
-                    onSelect={() => handleSelectAllergy(medication)}
-                    className="cursor-pointer"
-                    data-testid={`allergy-result-${medication.rxcui}`}
-                  >
-                    <Pill className="h-4 w-4 mr-2 text-red-500" />
-                    <div className="flex flex-col">
-                      <span className="font-medium">{medication.name}</span>
-                      {medication.rxnormId && (
-                        <span className="text-xs text-muted-foreground">
-                          RxNorm: {medication.rxnormId}
-                        </span>
-                      )}
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
+          <div className="p-1" data-testid="allergy-results-list">
+            {searchResults.map((medication, idx) => (
+              <div
+                key={medication.rxcui || idx}
+                onClick={() => handleSelectAllergy(medication)}
+                className="flex items-center gap-2 px-3 py-2 rounded-sm cursor-pointer hover-elevate active-elevate-2"
+                data-testid={`allergy-option-${idx}`}
+              >
+                <Pill className="h-4 w-4 text-red-500" />
+                <div className="flex flex-col">
+                  <span className="font-medium text-sm">{medication.name}</span>
+                  {medication.rxnormId && (
+                    <span className="text-xs text-muted-foreground">
+                      RxNorm: {medication.rxnormId}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

@@ -35,7 +35,7 @@ import platinumPillarBadge from "@assets/image_1761453800697.png";
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("loading");
   const [showDoctorSearch, setShowDoctorSearch] = useState(false);
   const [showAllergiesEdit, setShowAllergiesEdit] = useState(false);
@@ -152,12 +152,19 @@ export default function DashboardPage() {
   // Update drug allergies mutation
   const updateAllergiesMutation = useMutation({
     mutationFn: async (allergies: string[]) => {
+      console.log('[DashboardPage] Updating allergies for user:', user?.id, 'allergies:', allergies);
       return apiRequest('PUT', `/api/users/${user?.id}/allergies`, { drugAllergies: allergies });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      console.log('[DashboardPage] Allergies updated successfully, refreshing user data');
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.invalidateQueries({ queryKey: ['/api/medication-analysis/side-effects', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['/api/medication-analysis/interactions', user?.id] });
+      
+      // Wait for refreshUser to complete and return updated user data
+      const updatedUser = await refreshUser();
+      console.log('[DashboardPage] User refreshed, new allergies:', updatedUser?.drugAllergies);
+      
       setShowAllergiesEdit(false);
       setTempAllergies([]);
       toast({
@@ -166,6 +173,7 @@ export default function DashboardPage() {
       });
     },
     onError: (error: any) => {
+      console.error('[DashboardPage] Failed to update allergies:', error);
       toast({
         title: "Failed to Update Allergies",
         description: error.message || "Could not update your drug allergies",
@@ -195,6 +203,15 @@ export default function DashboardPage() {
 
   // Save allergies
   const saveAllergies = () => {
+    if (!user?.id) {
+      toast({
+        title: "Session Expired",
+        description: "Please log in again to update your allergies",
+        variant: "destructive",
+      });
+      setShowAllergiesEdit(false);
+      return;
+    }
     updateAllergiesMutation.mutate(tempAllergies);
   };
 

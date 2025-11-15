@@ -19,7 +19,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (user: User) => void;
   logout: () => void;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const refreshUser = async () => {
+  const refreshUser = async (): Promise<User | null> => {
     try {
       const response = await fetch("/api/auth/user", {
         credentials: "include",
@@ -140,6 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.status === 304) {
         // Not Modified - keep current user
         console.log("Session validated (304 Not Modified)");
+        return user; // Return current user
       } else if (response.ok) {
         try {
           const data = await response.json();
@@ -147,26 +148,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (data && data.id) {
             setUser(data);
             localStorage.setItem("pillar_user", JSON.stringify(data));
+            return data; // Return updated user
           } else {
             // Server says no user, clear everything
             localStorage.removeItem("pillar_user");
             setUser(null);
+            return null;
           }
         } catch (parseError) {
           // JSON parse error - malformed response, keep cached user for resilience
           console.error("Failed to parse user data, keeping cached user:", parseError);
+          return user; // Return current user on parse error
         }
       } else if (response.status === 401 || response.status === 403) {
         // Authentication failed - clear session
         localStorage.removeItem("pillar_user");
         setUser(null);
+        return null;
       } else {
         // Server error (500, 503, etc.) - keep localStorage user for resilience
         console.warn("Server error while refreshing auth, keeping cached user:", response.status);
+        return user; // Return current user on server error
       }
     } catch (error) {
       console.error("Failed to refresh user (network error), keeping cached user:", error);
       // On network error, keep localStorage user for offline-first UX
+      return user; // Return current user on network error
     }
   };
 
