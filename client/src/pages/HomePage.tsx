@@ -241,14 +241,14 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Gold Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $15
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                  $180
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <CardDescription className="font-bold">1-3 medications</CardDescription>
+                <CardDescription className="font-bold">Billed annually</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">6-month & 1-year supply access</p>
+                  <p className="text-sm font-bold text-primary">Up to 6-month supply access</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
@@ -287,10 +287,10 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Platinum Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $25
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                  $300
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <CardDescription className="font-bold">4+ medications</CardDescription>
+                <CardDescription className="font-bold">Billed annually</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
@@ -409,7 +409,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month) and Platinum ($25/month) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
+                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($180/year for 6-month supplies) and Platinum ($300/year for 6 & 12-month supplies) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
               </AccordionContent>
             </AccordionItem>
 
