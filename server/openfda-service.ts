@@ -735,3 +735,78 @@ function extractSideEffectsEnhanced(text: string, boxedWarnings: string[] = []):
   
   return effects;
 }
+
+// ============= SIMPLE SIDE EFFECTS ANALYSIS (Per Medication) =============
+// Returns top 10 most common side effects for each individual medication
+export interface SimpleSideEffect {
+  effect: string;
+  likelihood: 'low' | 'moderate' | 'high';
+}
+
+export interface MedicationSideEffects {
+  medicationName: string;
+  sideEffects: SimpleSideEffect[];
+}
+
+export async function getSimpleSideEffects(medications: { genericName: string }[]): Promise<MedicationSideEffects[]> {
+  const results: MedicationSideEffects[] = [];
+  
+  for (const med of medications) {
+    const fdaLabel = await getDrugLabel(med.genericName);
+    
+    if (!fdaLabel) {
+      results.push({
+        medicationName: med.genericName,
+        sideEffects: []
+      });
+      continue;
+    }
+    
+    // Extract all side effects from adverse reactions
+    const adverseReactions = fdaLabel.warnings.adverseReactions || [];
+    const allEffects: Map<string, string> = new Map();
+    
+    adverseReactions.forEach(section => {
+      const parsed = extractSideEffectsEnhanced(section, []);
+      parsed.forEach(p => {
+        const normalized = p.effect.trim().toLowerCase();
+        if (!allEffects.has(normalized)) {
+          allEffects.set(normalized, p.frequencyText);
+        }
+      });
+    });
+    
+    // Convert to array and sort by likelihood
+    const effectsList: SimpleSideEffect[] = Array.from(allEffects.entries())
+      .map(([effect, frequency]) => {
+        // Simple likelihood based on frequency keywords
+        let likelihood: 'low' | 'moderate' | 'high' = 'low';
+        
+        // Handle null/undefined frequency gracefully
+        const lowerFreq = (frequency || '').toLowerCase();
+        if (lowerFreq.includes('very common') || lowerFreq.includes('>10%')) {
+          likelihood = 'high';
+        } else if (lowerFreq.includes('common') || (lowerFreq.match(/\d+%/) && parseInt(lowerFreq) >= 1)) {
+          likelihood = 'moderate';
+        }
+        
+        return {
+          effect,
+          likelihood
+        };
+      })
+      .sort((a, b) => {
+        // Sort by likelihood: high > moderate > low
+        const order = { high: 3, moderate: 2, low: 1 };
+        return order[b.likelihood] - order[a.likelihood];
+      })
+      .slice(0, 10); // Top 10 only
+    
+    results.push({
+      medicationName: med.genericName,
+      sideEffects: effectsList
+    });
+  }
+  
+  return results;
+}
