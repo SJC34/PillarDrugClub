@@ -529,11 +529,20 @@ export default function PrescriptionRequestPage() {
                             <SelectValue placeholder="Select supply length" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="30">30-day supply (#30)</SelectItem>
-                            <SelectItem value="90">90-day supply (#90)</SelectItem>
+                            {/* Free tier: 30 and 90 day only */}
+                            {user?.subscriptionTier === "free" && (
+                              <>
+                                <SelectItem value="30">30-day supply (#30)</SelectItem>
+                                <SelectItem value="90">90-day supply (#90)</SelectItem>
+                              </>
+                            )}
+                            
+                            {/* Gold tier: 180 day only */}
                             {user?.subscriptionTier === "gold" && (
                               <SelectItem value="180">6-month supply (#180)</SelectItem>
                             )}
+                            
+                            {/* Platinum tier: 180 and 360 day */}
                             {user?.subscriptionTier === "platinum" && (
                               <>
                                 <SelectItem value="180">6-month supply (#180)</SelectItem>
@@ -544,12 +553,12 @@ export default function PrescriptionRequestPage() {
                         </Select>
                         {user?.subscriptionTier === "free" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Upgrade to Gold for 6-month supplies or Platinum for 1-year supplies
+                            Free tier: 30 and 90-day supplies only. Upgrade to Gold ($180/year) for 6-month supplies or Platinum ($300/year) for 1-year supplies.
                           </p>
                         )}
                         {user?.subscriptionTier === "gold" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Upgrade to Platinum for 1-year supply access
+                            Gold tier: 6-month supplies only. Upgrade to Platinum ($300/year) for 1-year supply access.
                           </p>
                         )}
                         {doctorForm.formState.errors.quantity && (

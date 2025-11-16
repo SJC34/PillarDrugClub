@@ -1459,14 +1459,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     try {
       // Validate request data
       const pdfRequestSchema = z.object({
-        userId: z.string().optional(),
+        userId: z.string().min(1, "User ID is required"),
         patientName: z.string().min(2, "Patient name is required"),
         patientEmail: z.string().optional(),
         patientPhone: z.string().optional(),
         dateOfBirth: z.string().optional(),
         medicationName: z.string().min(2, "Medication name is required"),
         dosage: z.string().min(1, "Dosage is required"),
-        quantity: z.string().min(1, "Quantity is required"),
+        quantity: z.string().regex(/^\d+$/, "Quantity must be a valid number"),
         doctorName: z.string().min(2, "Doctor name is required"),
         doctorPhone: z.string().optional(),
         doctorEmail: z.union([z.string().email(), z.literal("")]).optional(),
@@ -1481,15 +1481,57 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
       const validatedData = pdfRequestSchema.parse(req.body);
       
-      // Fetch patient email/phone from request or from user profile if userId is provided
-      let patientEmail = validatedData.patientEmail || '';
-      let patientPhone = validatedData.patientPhone || '';
-      if (validatedData.userId) {
-        const user = await storage.getUser(validatedData.userId);
-        if (user) {
-          // Use user profile data if not provided in request
-          if (!patientEmail) patientEmail = user.email || '';
-          if (!patientPhone) patientPhone = user.phoneNumber || '';
+      // Require userId for tier-based validation
+      const user = await storage.getUser(validatedData.userId);
+      if (!user) {
+        return res.status(404).json({
+          error: "User not found",
+          message: "You must be logged in to request a prescription."
+        });
+      }
+      
+      // Fetch patient email/phone from request or from user profile
+      let patientEmail = validatedData.patientEmail || user.email || '';
+      let patientPhone = validatedData.patientPhone || user.phoneNumber || '';
+      
+      // Normalize tier to lowercase for consistent comparison
+      const userTier = (user.subscriptionTier || 'free').toLowerCase();
+      
+      // Validate supply length based on subscription tier
+      const quantity = parseInt(validatedData.quantity, 10);
+      
+      // Guard against NaN and invalid values
+      if (!Number.isInteger(quantity) || quantity <= 0) {
+        return res.status(400).json({
+          error: "Invalid quantity",
+          message: "Supply length must be a valid positive number."
+        });
+      }
+      
+      // Tier-specific validation (case-insensitive)
+      if (userTier === 'free') {
+        // Free tier: 30 and 90 days only
+        if (quantity !== 30 && quantity !== 90) {
+          return res.status(403).json({
+            error: "Invalid supply length for Free tier",
+            message: "Free members can only request 30 or 90-day supplies. Upgrade to Gold ($180/year) for 6-month supplies or Platinum ($300/year) for 1-year supplies."
+          });
+        }
+      } else if (userTier === 'gold') {
+        // Gold tier: 180 days only
+        if (quantity !== 180) {
+          return res.status(403).json({
+            error: "Invalid supply length for Gold tier",
+            message: "Gold members can only request 6-month (180-day) supplies. Upgrade to Platinum ($300/year) for 1-year supply access."
+          });
+        }
+      } else if (userTier === 'platinum') {
+        // Platinum tier: 180 or 360 days only
+        if (quantity !== 180 && quantity !== 360) {
+          return res.status(403).json({
+            error: "Invalid supply length for Platinum tier",
+            message: "Platinum members can only request 6-month (180-day) or 1-year (360-day) supplies."
+          });
         }
       }
       
