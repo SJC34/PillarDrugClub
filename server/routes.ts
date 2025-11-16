@@ -2077,16 +2077,16 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const medications = await storage.getUserActiveMedications(req.params.userId);
       
       if (medications.length === 0) {
-        return res.json({ medicationSideEffects: [], medicationCount: 0 });
+        return res.json({ grouped: { high: [], moderate: [], low: [] }, medicationCount: 0 });
       }
       
-      const { getSimpleSideEffects } = await import("./openfda-service");
-      const medicationSideEffects = await getSimpleSideEffects(
+      const { getGroupedSideEffects } = await import("./openfda-service");
+      const grouped = await getGroupedSideEffects(
         medications.map(m => ({ genericName: m.genericName || m.medicationName }))
       );
       
       res.json({ 
-        medicationSideEffects,
+        grouped,
         medicationCount: medications.length
       });
     } catch (error: any) {

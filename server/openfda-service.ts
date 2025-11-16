@@ -745,7 +745,101 @@ export interface SimpleSideEffect {
 
 export interface MedicationSideEffects {
   medicationName: string;
+  genericName: string; // Clean generic name for FDA links
   sideEffects: SimpleSideEffect[];
+}
+
+// ============= GROUPED SIDE EFFECTS (By Effect, Not Medication) =============
+// Returns side effects grouped by effect name with medications listed underneath
+export interface MedicationCausingEffect {
+  name: string;
+  genericName: string;
+  fdaLink: string; // DailyMed link to FDA package insert
+}
+
+export interface GroupedSideEffect {
+  effect: string;
+  likelihood: 'low' | 'moderate' | 'high'; // Highest likelihood among all medications
+  medications: MedicationCausingEffect[]; // All medications that list this effect
+}
+
+export interface GroupedSideEffectsResponse {
+  high: GroupedSideEffect[];
+  moderate: GroupedSideEffect[];
+  low: GroupedSideEffect[];
+}
+
+export async function getGroupedSideEffects(medications: { genericName: string }[]): Promise<GroupedSideEffectsResponse> {
+  // First, get per-medication side effects
+  const perMedicationData = await getSimpleSideEffects(medications);
+  
+  // Build a map: side effect -> { highest likelihood, list of medications, display name with original casing }
+  const effectMap = new Map<string, {
+    likelihood: 'low' | 'moderate' | 'high';
+    medications: Map<string, { displayName: string; genericName: string }>;
+    displayName: string; // Original casing for display
+  }>();
+  
+  const likelihoodRank = { high: 3, moderate: 2, low: 1 };
+  
+  perMedicationData.forEach(medData => {
+    medData.sideEffects.forEach(sideEffect => {
+      const normalized = sideEffect.effect.toLowerCase();
+      
+      if (!effectMap.has(normalized)) {
+        const meds = new Map<string, { displayName: string; genericName: string }>();
+        // Key by genericName to prevent duplicates and ensure clean FDA links
+        meds.set(medData.genericName, { 
+          displayName: medData.medicationName,
+          genericName: medData.genericName
+        });
+        effectMap.set(normalized, {
+          likelihood: sideEffect.likelihood,
+          medications: meds,
+          displayName: sideEffect.effect // Keep original casing
+        });
+      } else {
+        const existing = effectMap.get(normalized)!;
+        // Take highest likelihood
+        if (likelihoodRank[sideEffect.likelihood] > likelihoodRank[existing.likelihood]) {
+          existing.likelihood = sideEffect.likelihood;
+        }
+        // Key by genericName to prevent duplicates and ensure clean FDA links
+        existing.medications.set(medData.genericName, {
+          displayName: medData.medicationName,
+          genericName: medData.genericName
+        });
+      }
+    });
+  });
+  
+  // Convert to grouped arrays
+  const grouped: GroupedSideEffectsResponse = {
+    high: [],
+    moderate: [],
+    low: []
+  };
+  
+  effectMap.forEach((data, normalized) => {
+    const medications: MedicationCausingEffect[] = Array.from(data.medications.values()).map(medInfo => ({
+      name: medInfo.displayName,
+      genericName: medInfo.genericName,
+      fdaLink: `https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(medInfo.genericName)}`
+    }));
+    
+    grouped[data.likelihood].push({
+      effect: data.displayName, // Use original casing
+      likelihood: data.likelihood,
+      medications: medications.sort((a, b) => a.name.localeCompare(b.name))
+    });
+  });
+  
+  // Sort each group alphabetically by effect name
+  grouped.high.sort((a, b) => a.effect.localeCompare(b.effect));
+  grouped.moderate.sort((a, b) => a.effect.localeCompare(b.effect));
+  grouped.low.sort((a, b) => a.effect.localeCompare(b.effect));
+  
+  return grouped;
 }
 
 export async function getSimpleSideEffects(medications: { genericName: string }[]): Promise<MedicationSideEffects[]> {
@@ -757,6 +851,7 @@ export async function getSimpleSideEffects(medications: { genericName: string }[
     if (!fdaLabel) {
       results.push({
         medicationName: med.genericName,
+        genericName: med.genericName,
         sideEffects: []
       });
       continue;
@@ -804,6 +899,7 @@ export async function getSimpleSideEffects(medications: { genericName: string }[
     
     results.push({
       medicationName: med.genericName,
+      genericName: med.genericName,
       sideEffects: effectsList
     });
   }
