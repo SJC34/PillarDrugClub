@@ -531,17 +531,25 @@ export default function PrescriptionRequestPage() {
                           <SelectContent>
                             <SelectItem value="30">30-day supply (#30)</SelectItem>
                             <SelectItem value="90">90-day supply (#90)</SelectItem>
-                            {user?.subscriptionTier !== "free" && (
+                            {user?.subscriptionTier === "gold" && (
+                              <SelectItem value="180">6-month supply (#180)</SelectItem>
+                            )}
+                            {user?.subscriptionTier === "platinum" && (
                               <>
                                 <SelectItem value="180">6-month supply (#180)</SelectItem>
-                                <SelectItem value="365">1-year supply (#365)</SelectItem>
+                                <SelectItem value="360">1-year supply (#360)</SelectItem>
                               </>
                             )}
                           </SelectContent>
                         </Select>
                         {user?.subscriptionTier === "free" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Upgrade to Gold or Platinum for 6-month & 1-year supply access
+                            Upgrade to Gold for 6-month supplies or Platinum for 1-year supplies
+                          </p>
+                        )}
+                        {user?.subscriptionTier === "gold" && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Upgrade to Platinum for 1-year supply access
                           </p>
                         )}
                         {doctorForm.formState.errors.quantity && (

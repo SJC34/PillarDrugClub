@@ -494,15 +494,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Stripe subscription route with two-tier pricing
   app.post("/api/create-subscription", async (req, res) => {
     try {
-      const { userId, plan = 'plus' } = req.body;
+      const { userId, plan } = req.body;
       
       if (!userId) {
         return res.status(400).json({ error: "User ID is required" });
       }
 
       // Validate plan
-      if (plan !== 'basic' && plan !== 'plus') {
-        return res.status(400).json({ error: "Invalid plan. Must be 'basic' or 'plus'" });
+      if (plan !== 'gold' && plan !== 'platinum') {
+        return res.status(400).json({ error: "Invalid plan. Must be 'gold' or 'platinum'" });
       }
       
       const user = await storage.getUser(userId);
@@ -533,26 +533,26 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         await storage.updateUserStripeInfo(userId, customerId, null);
       }
       
-      // Determine price based on plan
-      const planConfig: Record<'basic' | 'plus', { amount: number; name: string; description: string }> = {
-        basic: {
-          amount: 1500, // $15.00 in cents
-          name: 'Pillar Drug Club Foundation Plan',
-          description: 'Monthly membership for 1-3 medications at wholesale pricing'
+      // Determine price based on plan (annual billing)
+      const planConfig: Record<'gold' | 'platinum', { amount: number; name: string; description: string }> = {
+        gold: {
+          amount: 18000, // $180.00 per year in cents
+          name: 'Pillar Drug Club Gold Plan',
+          description: 'Annual membership with up to 6-month prescription supplies at wholesale pricing'
         },
-        plus: {
-          amount: 2500, // $25.00 in cents
-          name: 'Pillar Drug Club Keystone Plan',
-          description: 'Monthly membership for 4+ medications at wholesale pricing'
+        platinum: {
+          amount: 30000, // $300.00 per year in cents
+          name: 'Pillar Drug Club Platinum Plan',
+          description: 'Annual membership with 6-month and 1-year prescription supplies at wholesale pricing'
         }
       };
 
-      const selectedPlan = planConfig[plan as 'basic' | 'plus'];
+      const selectedPlan = planConfig[plan as 'gold' | 'platinum'];
       
       // Create or retrieve the product and price
       // In production, you'd create these once via Stripe Dashboard or a setup script
       // For now, we'll use environment variables or create them dynamically
-      let priceId = plan === 'basic' ? process.env.STRIPE_BASIC_PRICE_ID : process.env.STRIPE_PLUS_PRICE_ID;
+      let priceId = plan === 'gold' ? process.env.STRIPE_GOLD_PRICE_ID : process.env.STRIPE_PLATINUM_PRICE_ID;
       
       if (!priceId) {
         // Create product and price if not configured
@@ -566,7 +566,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
           unit_amount: selectedPlan.amount,
           currency: 'usd',
           recurring: {
-            interval: 'month',
+            interval: 'year',
           },
         });
         
