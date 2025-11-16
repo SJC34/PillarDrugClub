@@ -27,7 +27,7 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
 - **Payment Processing**: Integrated Stripe for subscription-based membership across three tiers.
 - **PDF Prescription System**: Generates branded PDF prescription request forms with SureScripts pharmacy lookup information, distributed via email and SMS using PDFKit, Resend, and Twilio.
 - **Account Settings & Member Dashboard**: Users can manage personal information and view a comprehensive dashboard with medication displays, PCP management, drug allergies, and subscription details.
-- **Medication Ordering Workflow**: Streamlined process for requesting prescriptions with tier-based supply length enforcement.
+- **Medication Ordering Workflow**: Streamlined process for requesting prescriptions with tier-based supply length enforcement. **Supply length restrictions** (November 2025): Free tier limited to 30 and 90-day supplies only. Gold tier ($180/year) restricted to 6-month (180-day) supplies exclusively. Platinum tier ($300/year) accesses 6-month (180-day) and 1-year (360-day) supplies only. Premium tiers cannot request shorter supplies - this enforces the bulk ordering value proposition. Backend validation (server/routes.ts) includes case-insensitive tier checking, NaN guards, and numeric string validation via Zod regex.
 - **Medication Search & Pricing**: CSV-based medication catalog for search and pricing, integrated with openFDA Drug Label API for annual pricing calculation.
 - **Medication Refill System**: Automated refill request workflow with status tracking and admin oversight.
 - **Personal Medication List**: User-managed list with OpenFDA integration for data enrichment and real-time drug-drug interaction checking.
