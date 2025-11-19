@@ -170,7 +170,7 @@ export default function SubscriptionPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, isAuthenticated, user, selectedPlan]);
+  }, [authLoading, user, selectedPlan]);
 
   if (isLoading) {
     return (
