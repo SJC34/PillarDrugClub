@@ -414,7 +414,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($180/year for 6-month supplies) and Platinum ($300/year for 6 & 12-month supplies) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
+                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($180/year for 6-month supplies) and Platinum ($300/year for 6 & 12-month supplies) plans unlock year-supply savings. Even our Foundation Tier ($30/order) saves you 90% vs retail.
               </AccordionContent>
             </AccordionItem>
 
@@ -423,7 +423,7 @@ export default function HomePage() {
                 What if I can't afford my prescriptions?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cant-afford">
-                Start with our Free Tier - $0/month and only $30 per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify.
+                Start with our Foundation Tier - $30 per order, no monthly fees. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply plus the $30 order fee. We also offer payment plans and assistance programs for those who qualify.
               </AccordionContent>
             </AccordionItem>
 
