@@ -503,7 +503,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescription Pharmacy Membership"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -596,7 +596,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescription Pharmacy Membership"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -625,14 +625,14 @@ export default function RegisterPage() {
                       ? "border-primary bg-primary/5"
                       : "border-border hover-elevate"
                   }`}
-                  data-testid="button-select-free"
+                  data-testid="button-select-foundation"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <img src={freePillarBadge} alt="Free" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Free</div>
+                    <img src={freePillarBadge} alt="Foundation" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Foundation</div>
                   </div>
-                  <div className="text-2xl font-bold mb-2">$0<span className="text-sm text-muted-foreground">/mo</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$30 per order fee</div>
+                  <div className="text-2xl font-bold mb-2">$30<span className="text-sm text-muted-foreground">/order</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">Pay as you go</div>
                   <div className="text-xs">Up to 90-day supplies</div>
                 </button>
                 <button
@@ -959,7 +959,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescription Pharmacy Membership"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1156,7 +1156,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescription Pharmacy Membership"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />

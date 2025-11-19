@@ -190,25 +190,25 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Choose Your Savings Plan</h2>
           <p className="text-base md:text-lg text-muted-foreground mb-8 font-bold max-w-3xl mx-auto">
-            Start with our Free Tier, or unlock year-supply wholesale pricing with Gold or Platinum
+            Start with our pay-per-use Foundation Tier, or unlock year-supply wholesale pricing with Gold or Platinum
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Free Tier */}
+            {/* Foundation Tier */}
             <Card className="border-secondary/30">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-3">
-                  <img src={freePillarBadge} alt="Free Tier" className="w-16 h-16 object-contain" />
+                  <img src={freePillarBadge} alt="Foundation Tier" className="w-16 h-16 object-contain" />
                 </div>
-                <CardTitle className="text-xl md:text-2xl font-bold">Free Tier</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Foundation Tier</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-foreground">
-                  $0
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                  $30
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/order</span>
                 </div>
-                <CardDescription className="font-bold">Pay per order</CardDescription>
+                <CardDescription className="font-bold">Pay as you go</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-secondary/10 rounded-lg">
-                  <p className="text-sm font-bold text-secondary">$30 dispensing & shipping per order</p>
+                  <p className="text-sm font-bold text-secondary">No monthly fees • Only pay when you order</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
@@ -229,8 +229,8 @@ export default function HomePage() {
                   </li>
                 </ul>
                 <Link href="/register">
-                  <Button variant="outline" className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-free">
-                    Start Free
+                  <Button variant="outline" className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-foundation">
+                    Get Started
                   </Button>
                 </Link>
               </CardContent>

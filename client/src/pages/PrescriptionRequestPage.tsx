@@ -553,7 +553,7 @@ export default function PrescriptionRequestPage() {
                         </Select>
                         {user?.subscriptionTier === "free" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Free tier: 30 and 90-day supplies only. Upgrade to Gold ($180/year) for 6-month supplies or Platinum ($300/year) for 1-year supplies.
+                            <strong className="text-foreground">Foundation tier ($30/order):</strong> 30 and 90-day supplies only. You will be invoiced $30 per prescription order. Upgrade to Gold ($180/year) for 6-month supplies or Platinum ($300/year) for 1-year supplies with no per-order fees.
                           </p>
                         )}
                         {user?.subscriptionTier === "gold" && (
@@ -950,12 +950,17 @@ export default function PrescriptionRequestPage() {
             <AlertDialogTitle>Confirm Prescription Request</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to generate the prescription request? This will create a PDF and send notifications based on your selected options.
+              {user?.subscriptionTier === "free" && (
+                <span className="block mt-3 font-semibold text-foreground">
+                  ⚠️ Foundation tier: You will be invoiced $30 for this prescription order.
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-confirmation">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDoctorSubmit} data-testid="button-confirm-prescription">
-              Continue
+              {user?.subscriptionTier === "free" ? "Confirm & Accept $30 Fee" : "Continue"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
