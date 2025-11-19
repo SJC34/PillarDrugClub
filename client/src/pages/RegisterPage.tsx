@@ -1212,14 +1212,14 @@ export default function RegisterPage() {
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl md:text-3xl font-bold text-teal-600">
-                      ${selectedTier === "gold" ? "15" : "25"}
+                      ${selectedTier === "gold" ? "180" : "300"}
                     </div>
-                    <div className="text-sm md:text-base text-muted-foreground">per month</div>
+                    <div className="text-sm md:text-base text-muted-foreground">per year</div>
+                    <div className="text-xs md:text-sm text-secondary font-bold mt-1">
+                      Or as low as ${selectedTier === "gold" ? "15" : "25"}/month with flexible payment options
+                    </div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                      {selectedTier === "gold" ? "Gold Plan (1-3 meds)" : "Platinum Plan (4+ meds)"}
-                    </div>
-                    <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
-                      Access to 6-month & 1-year supply pricing
+                      {selectedTier === "gold" ? "Gold Plan - 6-month supplies" : "Platinum Plan - 6-month & 1-year supplies"}
                     </div>
                   </div>
                 </div>

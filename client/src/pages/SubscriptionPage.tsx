@@ -258,6 +258,9 @@ export default function SubscriptionPage() {
                   $180<span className="text-base text-muted-foreground">/year</span>
                 </div>
                 <CardDescription>Billed annually</CardDescription>
+                <div className="mt-2 text-xs text-secondary font-bold">
+                  Or as low as $15/month with flexible payment options
+                </div>
                 <div className="mt-2 text-xs text-muted-foreground">
                   Up to 6-month supplies
                 </div>
@@ -280,6 +283,9 @@ export default function SubscriptionPage() {
                   $300<span className="text-base text-muted-foreground">/year</span>
                 </div>
                 <CardDescription>Billed annually</CardDescription>
+                <div className="mt-2 text-xs text-secondary font-bold">
+                  Or as low as $25/month with flexible payment options
+                </div>
                 <div className="mt-2 text-xs text-muted-foreground">
                   6-month & 1-year supplies
                 </div>

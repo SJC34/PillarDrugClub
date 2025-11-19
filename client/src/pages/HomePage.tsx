@@ -161,10 +161,13 @@ export default function HomePage() {
             Get Your Meds for Pennies
             <span className="text-primary block">As Low As 1¢ Per Pill</span>
           </h1>
-          <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-4">
             Stop overpaying at traditional pharmacies. No insurance needed.
             <br />
             Save 90% on diabetes, blood pressure, cholesterol & more—delivered free to your door.
+          </p>
+          <p className="text-base md:text-lg font-bold text-secondary max-w-2xl mx-auto mb-8">
+            Annual membership from <span className="text-lg md:text-xl">$180/year</span> (or as low as $15/month with flexible payment options)
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
@@ -245,6 +248,7 @@ export default function HomePage() {
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
                 <CardDescription className="font-bold">Billed annually</CardDescription>
+                <p className="text-sm text-secondary font-bold mt-2">Or as low as $15/month</p>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
@@ -291,6 +295,7 @@ export default function HomePage() {
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
                 <CardDescription className="font-bold">Billed annually</CardDescription>
+                <p className="text-sm text-secondary font-bold mt-2">Or as low as $25/month</p>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
@@ -322,7 +327,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual commitment • Gold & Platinum plans billed monthly</p>
+          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual commitment • Flexible payment options available at checkout</p>
         </div>
       </section>
 
