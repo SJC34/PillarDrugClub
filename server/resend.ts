@@ -3,7 +3,16 @@ import { Resend } from 'resend';
 let connectionSettings: any;
 
 async function getCredentials() {
-  // Try connector API first
+  // Prefer environment variables when explicitly set (allows override of connector)
+  if (process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL) {
+    console.log('✅ Using Resend credentials from environment variables');
+    return {
+      apiKey: process.env.RESEND_API_KEY,
+      fromEmail: process.env.RESEND_FROM_EMAIL
+    };
+  }
+
+  // Try connector API as fallback
   try {
     const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
     const xReplitToken = process.env.REPL_IDENTITY 
@@ -31,16 +40,7 @@ async function getCredentials() {
       }
     }
   } catch (connectorError) {
-    console.log('Connector API not available, falling back to environment variables');
-  }
-
-  // Fallback to environment variables
-  if (process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL) {
-    console.log('✅ Using Resend credentials from environment variables');
-    return {
-      apiKey: process.env.RESEND_API_KEY,
-      fromEmail: process.env.RESEND_FROM_EMAIL
-    };
+    console.log('Connector API not available');
   }
 
   throw new Error('Resend credentials not found. Please configure RESEND_API_KEY and RESEND_FROM_EMAIL');
