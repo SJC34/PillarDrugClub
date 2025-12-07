@@ -15,6 +15,12 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { 
   CheckCircle, 
   Phone as PhoneIcon,
@@ -22,13 +28,19 @@ import {
   Loader2,
   Calendar,
   Clock,
-  Truck,
-  Pill,
+  Users,
+  Shield,
   User,
   Heart,
-  Star,
-  MessageCircle,
-  Stethoscope
+  Pill,
+  ArrowRight,
+  Building2,
+  Stethoscope,
+  Package,
+  HeadphonesIcon,
+  FileCheck,
+  Sparkles,
+  ChevronRight
 } from "lucide-react";
 import sethPhoto from "@assets/IMG_3299_1765089660918.jpeg";
 
@@ -42,6 +54,7 @@ type SignupFormValues = z.infer<typeof signupFormSchema>;
 
 export default function PreLaunchPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<SignupFormValues>({
@@ -78,65 +91,12 @@ export default function PreLaunchPage() {
     signupMutation.mutate(data);
   };
 
-  const benefits = [
-    {
-      icon: Calendar,
-      title: "Annual Medication Supplies",
-      description: "Get 6 or 12-month supplies of your medications — no more monthly refill hassles"
-    },
-    {
-      icon: Truck,
-      title: "Delivered to Your Door",
-      description: "Skip the pharmacy lines. Your medications arrive at home on your schedule"
-    },
-    {
-      icon: Clock,
-      title: "Refill Coordination",
-      description: "We manage refill timing and prescriber renewals so you never run out"
-    },
-    {
-      icon: MessageCircle,
-      title: "Free Initial Consult",
-      description: "Talk with a pharmacist about your medications, savings opportunities, and care plan"
-    }
-  ];
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    setMobileMenuOpen(false);
+  };
 
-  const includedServices = [
-    "Free initial pharmacist consultation",
-    "6 or 12-month medication supplies",
-    "Refill coordination and renewal reminders",
-    "Transparent cash pricing — no insurance needed",
-    "Home delivery included",
-    "Ongoing clinical medication reviews",
-    "Drug interaction monitoring",
-    "Direct pharmacist phone/text access"
-  ];
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center px-4">
-        <Card className="max-w-lg w-full border-2 border-primary/20 shadow-2xl">
-          <CardContent className="p-8 md:p-12 text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-              <CheckCircle className="h-10 w-10 text-primary" />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-black mb-4 text-foreground">
-              Welcome to Pillar!
-            </h2>
-            <p className="text-lg text-muted-foreground mb-6">
-              Thank you for your interest in Concierge Pharmacy. We'll reach out personally within 24-48 hours to discuss your needs.
-            </p>
-            <div className="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground">
-              <p className="font-semibold text-foreground mb-1">What happens next:</p>
-              <p>Dr. Seth Collins, Pharm.D. will contact you directly to learn about your medications and how we can help you save.</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const SignupForm = ({ idSuffix = "" }: { idSuffix?: string }) => (
+  const SignupForm = ({ idSuffix = "", variant = "default" }: { idSuffix?: string; variant?: "default" | "hero" }) => (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
         <FormField
@@ -152,7 +112,7 @@ export default function PreLaunchPage() {
                     placeholder="Full name"
                     {...field}
                     disabled={signupMutation.isPending}
-                    className="h-12 text-base pl-10"
+                    className="h-12 text-base pl-10 bg-white"
                     data-testid={`input-name-prelaunch${idSuffix}`}
                   />
                 </div>
@@ -174,7 +134,7 @@ export default function PreLaunchPage() {
                     placeholder="Email address"
                     {...field}
                     disabled={signupMutation.isPending}
-                    className="h-12 text-base pl-10"
+                    className="h-12 text-base pl-10 bg-white"
                     data-testid={`input-email-prelaunch${idSuffix}`}
                   />
                 </div>
@@ -193,10 +153,10 @@ export default function PreLaunchPage() {
                   <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="tel"
-                    placeholder="Phone number (e.g., 555-123-4567)"
+                    placeholder="Phone number"
                     {...field}
                     disabled={signupMutation.isPending}
-                    className="h-12 text-base pl-10"
+                    className="h-12 text-base pl-10 bg-white"
                     data-testid={`input-phone-prelaunch${idSuffix}`}
                   />
                 </div>
@@ -207,7 +167,7 @@ export default function PreLaunchPage() {
         />
         <Button 
           type="submit" 
-          className="w-full h-12 text-base font-bold"
+          className={`w-full h-12 text-base font-semibold ${variant === "hero" ? "bg-teal-600 hover:bg-teal-700" : ""}`}
           disabled={signupMutation.isPending}
           data-testid={`button-join-prelaunch${idSuffix}`}
         >
@@ -217,113 +177,295 @@ export default function PreLaunchPage() {
               Joining...
             </>
           ) : (
-            "Request Early Access"
+            <>
+              Get Started in 3 Minutes
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
           )}
         </Button>
       </form>
     </Form>
   );
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute top-60 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-12 md:pt-20 md:pb-16">
-          {/* Logo/Brand */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
-                pillar drug club
-              </h2>
-              <Pill className="h-6 w-6 md:h-7 md:w-7 text-primary" />
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <Card className="max-w-lg w-full border border-gray-200 shadow-xl">
+          <CardContent className="p-8 md:p-12 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-teal-50 mb-6">
+              <CheckCircle className="h-10 w-10 text-teal-600" />
             </div>
-            <p className="text-sm text-muted-foreground">Concierge Pharmacy Services</p>
-          </div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">
+              Welcome to Pillar Drug Club
+            </h2>
+            <p className="text-lg text-gray-600 mb-6">
+              Thank you for your interest in our concierge medication service. We'll reach out personally within 24-48 hours to discuss your needs.
+            </p>
+            <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+              <p className="font-semibold text-gray-900 mb-1">What happens next:</p>
+              <p>Dr. Seth Collins, Pharm.D. will contact you directly to learn about your medications and create your personalized care plan.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-          {/* Main Heading */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <Stethoscope className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-primary">Limited to 600 Members</span>
+  const valueProps = [
+    {
+      icon: HeadphonesIcon,
+      title: "Concierge Medication Management",
+      description: "Personal pharmacist support for refills, renewals, and medication questions — no more pharmacy phone trees."
+    },
+    {
+      icon: Calendar,
+      title: "Predictable, Transparent Costs",
+      description: "Know exactly what you'll pay. Pass-through pricing with no hidden fees or insurance surprises."
+    },
+    {
+      icon: Package,
+      title: "Fewer Refills, Fewer Headaches",
+      description: "6–12 month supplies when clinically appropriate. One shipment instead of monthly pharmacy trips."
+    }
+  ];
+
+  const howItWorks = [
+    {
+      step: 1,
+      title: "Share Your Medication List",
+      description: "Tell us what you take. We'll review your medications and identify savings opportunities."
+    },
+    {
+      step: 2,
+      title: "We Coordinate Everything",
+      description: "Behind the scenes, we work with your prescriber and our licensed pharmacy partners."
+    },
+    {
+      step: 3,
+      title: "Medications Arrive at Your Door",
+      description: "6–12 month supplies delivered directly to you, with refill coordination handled."
+    },
+    {
+      step: 4,
+      title: "Ongoing Concierge Support",
+      description: "Questions? Renewals? Changes? Your personal pharmacist is just a call or text away."
+    }
+  ];
+
+  const membershipPlans = [
+    {
+      name: "Essential",
+      price: "$180",
+      period: "/year",
+      description: "Perfect for individuals with stable medication needs",
+      features: [
+        "6-month medication supplies",
+        "Concierge refill coordination",
+        "Pass-through medication pricing",
+        "Email & phone support",
+        "Prescription transfer assistance"
+      ],
+      cta: "Choose Essential",
+      popular: false
+    },
+    {
+      name: "Premier",
+      price: "$300",
+      period: "/year",
+      description: "For those who want comprehensive medication management",
+      features: [
+        "12-month medication supplies",
+        "Priority concierge support",
+        "Annual pharmacist medication review",
+        "Drug interaction monitoring",
+        "Direct pharmacist text line",
+        "Family member coordination"
+      ],
+      cta: "Choose Premier",
+      popular: true
+    },
+    {
+      name: "Executive",
+      price: "$600",
+      period: "/year",
+      description: "White-glove service for complex medication needs",
+      features: [
+        "Everything in Premier",
+        "Dedicated concierge pharmacist",
+        "Unlimited medication reviews",
+        "Specialty medication support",
+        "Clinic coordination services",
+        "Same-day response guarantee"
+      ],
+      cta: "Choose Executive",
+      popular: false
+    }
+  ];
+
+  const faqs = [
+    {
+      question: "Are you a pharmacy?",
+      answer: "No. Pillar Drug Club is a concierge medication management membership. We partner with licensed U.S. pharmacies to fulfill your prescriptions, but we focus on coordination, convenience, and personal service — not retail pharmacy operations."
+    },
+    {
+      question: "Do I need insurance to use Pillar Drug Club?",
+      answer: "No insurance required. Our transparent cash pricing is often lower than insurance copays for generic medications. We work outside the insurance system to provide simple, predictable costs."
+    },
+    {
+      question: "Why are your prices lower than my pharmacy?",
+      answer: "Traditional pharmacies have high overhead and opaque pricing. We use pass-through pricing from high-volume pharmacy partners and don't mark up medications. You pay what we pay, plus your membership."
+    },
+    {
+      question: "What medications can I get through Pillar?",
+      answer: "We focus on chronic, maintenance medications — things like blood pressure, cholesterol, diabetes, thyroid, and mental health medications. We specialize in FDA-approved generics. Controlled substances and specialty medications may have limitations."
+    },
+    {
+      question: "What happens if my dose changes mid-year?",
+      answer: "Your concierge pharmacist coordinates dose changes with your prescriber at no extra charge. We'll adjust your remaining supply and ensure a smooth transition."
+    },
+    {
+      question: "Where do you ship?",
+      answer: "We ship to all 50 U.S. states. Shipping is included in your membership — no extra delivery fees."
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-2">
+              <Pill className="h-6 w-6 text-teal-600" />
+              <span className="text-xl font-bold text-gray-900">Pillar Drug Club</span>
             </div>
             
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 text-foreground leading-tight">
-              Annual Medication Supplies
-              <br />
-              <span className="text-primary">Managed For You</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              6 and 12-month prescriptions delivered to your door. Refill coordination handled. 
-              Transparent cash pricing — no insurance hassles. Free initial consult included.
-            </p>
-          </div>
-
-          {/* Pricing */}
-          <div className="text-center mb-8">
-            <div className="inline-block bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-2xl p-6 md:p-8 border-2 border-primary/20">
-              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Annual Membership
-              </p>
-              <p className="text-5xl md:text-6xl font-black text-primary mb-2">$600</p>
-              <p className="text-lg text-muted-foreground">per year</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                That's just <span className="font-bold text-foreground">$50/month</span> for complete medication management
-              </p>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              <button onClick={() => scrollToSection('how-it-works')} className="text-gray-600 hover:text-gray-900 text-sm font-medium" data-testid="nav-how-it-works">
+                How It Works
+              </button>
+              <button onClick={() => scrollToSection('membership')} className="text-gray-600 hover:text-gray-900 text-sm font-medium" data-testid="nav-membership">
+                Membership
+              </button>
+              <button onClick={() => scrollToSection('clinics')} className="text-gray-600 hover:text-gray-900 text-sm font-medium" data-testid="nav-clinics">
+                For Clinics
+              </button>
+              <button onClick={() => scrollToSection('safety')} className="text-gray-600 hover:text-gray-900 text-sm font-medium" data-testid="nav-safety">
+                Safety
+              </button>
+              <button onClick={() => scrollToSection('faq')} className="text-gray-600 hover:text-gray-900 text-sm font-medium" data-testid="nav-faq">
+                FAQ
+              </button>
             </div>
-          </div>
 
-          {/* Signup Form */}
-          <div className="max-w-md mx-auto mb-12">
-            <Card className="border-2 border-primary/20 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Heart className="h-5 w-5 text-primary" />
-                  <h3 className="text-lg font-bold text-foreground">Join the Waitlist</h3>
-                </div>
-                <SignupForm />
-                <p className="text-xs text-muted-foreground mt-3 text-center">
-                  We'll reach out personally to discuss your pharmacy needs.
-                </p>
-              </CardContent>
-            </Card>
+            <Button 
+              onClick={() => scrollToSection('signup')}
+              className="bg-teal-600 hover:bg-teal-700"
+              data-testid="nav-cta-become-member"
+            >
+              Become a Member
+            </Button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-gray-50 via-white to-teal-50/30 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-teal-100/50 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 -left-40 w-80 h-80 bg-teal-50/50 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                Your Medication,
+                <span className="text-teal-600"> Managed for You.</span>
+              </h1>
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                Concierge medication membership with 6–12 month supplies, refill coordination, and transparent pricing — all without using insurance.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Button 
+                  size="lg"
+                  onClick={() => scrollToSection('signup')}
+                  className="bg-teal-600 hover:bg-teal-700 text-lg h-14 px-8"
+                  data-testid="hero-cta-get-started"
+                >
+                  Get Started in 3 Minutes
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  onClick={() => scrollToSection('membership')}
+                  className="text-lg h-14 px-8"
+                  data-testid="hero-cta-see-plans"
+                >
+                  See Membership Plans
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
+                <span className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-teal-600" />
+                  No insurance required
+                </span>
+                <span className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-teal-600" />
+                  Licensed U.S. pharmacy partners
+                </span>
+                <span className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-teal-600" />
+                  Transparent pricing
+                </span>
+              </div>
+            </div>
+
+            <div className="lg:pl-8">
+              <Card className="border border-gray-200 shadow-xl" id="signup">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 rounded-full bg-teal-50">
+                      <Sparkles className="h-5 w-5 text-teal-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Start Your Membership</h3>
+                      <p className="text-sm text-gray-500">We'll reach out within 24 hours</p>
+                    </div>
+                  </div>
+                  <SignupForm variant="hero" />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-12 md:py-16 bg-muted/30">
+      {/* Why Pillar - Value Props */}
+      <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-black mb-4 text-foreground">
-              Why Pillar Drug Club?
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              A Better Pharmacy Experience — Finally.
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Skip the monthly pharmacy trips. Get annual supplies delivered, with refill coordination 
-              handled for you. Simple cash pricing — no insurance paperwork, no surprises.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Pillar Drug Club handles the complexity so you can focus on your health.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((benefit, index) => (
-              <Card 
-                key={index}
-                className="border border-border"
-                data-testid={`card-benefit-${index}`}
-              >
-                <CardContent className="p-6 text-center">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
-                    <benefit.icon className="h-7 w-7 text-primary" />
+          <div className="grid md:grid-cols-3 gap-8">
+            {valueProps.map((prop, index) => (
+              <Card key={index} className="border border-gray-100 hover-elevate" data-testid={`value-prop-${index}`}>
+                <CardContent className="p-8">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-teal-50 mb-6">
+                    <prop.icon className="h-7 w-7 text-teal-600" />
                   </div>
-                  <h3 className="text-lg font-bold mb-2 text-foreground">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {benefit.description}
-                  </p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{prop.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{prop.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -331,90 +473,342 @@ export default function PreLaunchPage() {
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-black mb-4 text-foreground">
-              Everything Included
+      {/* How It Works */}
+      <section id="how-it-works" className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              How Pillar Drug Club Works
             </h2>
-            <p className="text-muted-foreground">
-              One annual fee. Complete pharmacy concierge service.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              From signup to doorstep delivery in four simple steps.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            {includedServices.map((service, index) => (
-              <div 
-                key={index}
-                className="flex items-center gap-3 p-4 rounded-lg bg-muted/50"
-                data-testid={`service-item-${index}`}
-              >
-                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-foreground font-medium">{service}</span>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {howItWorks.map((step, index) => (
+              <div key={index} className="relative" data-testid={`how-it-works-step-${step.step}`}>
+                <div className="text-6xl font-bold text-teal-100 mb-4">{step.step}</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-gray-600">{step.description}</p>
+                {index < howItWorks.length - 1 && (
+                  <ChevronRight className="hidden lg:block absolute top-8 -right-4 h-8 w-8 text-teal-200" />
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Meet Your Pharmacist */}
-      <section className="py-12 md:py-16 bg-muted/30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-background rounded-2xl p-8 md:p-12 border border-border">
-            <div className="text-center">
-              <div className="inline-block mb-6">
-                <img 
-                  src={sethPhoto} 
-                  alt="Seth Collins, Pharm.D." 
-                  className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-primary/20 shadow-lg"
-                />
+      {/* Who It's For */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Who Pillar Drug Club Is For
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card className="border border-gray-100" data-testid="who-for-individuals">
+              <CardContent className="p-8">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-teal-50 mb-6">
+                  <Users className="h-7 w-7 text-teal-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Individuals & Families</h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  People who take chronic medications and want predictable access, transparent pricing, and personal support — without the monthly pharmacy hassle.
+                </p>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    Stable, chronic medication regimens
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    Uninsured or high-deductible plans
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    Value convenience and personal service
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-gray-100" data-testid="who-for-clinics">
+              <CardContent className="p-8">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-teal-50 mb-6">
+                  <Building2 className="h-7 w-7 text-teal-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Concierge & DPC Clinics</h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Direct Primary Care and concierge practices looking to reduce refill emergencies and offer patients a premium medication experience.
+                </p>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    Fewer urgent refill requests
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    Transparent pricing for patients
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    Dedicated clinic concierge support
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Membership Plans */}
+      <section id="membership" className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Membership Designed Around Your Life
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Choose the plan that fits your medication needs. All memberships include concierge support and transparent pricing.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {membershipPlans.map((plan, index) => (
+              <Card 
+                key={index} 
+                className={`border relative ${plan.popular ? 'border-teal-600 border-2 shadow-xl' : 'border-gray-200'}`}
+                data-testid={`membership-plan-${plan.name.toLowerCase()}`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="bg-teal-600 text-white text-sm font-semibold px-4 py-1 rounded-full">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                    <span className="text-gray-600">{plan.period}</span>
+                  </div>
+                  <p className="text-gray-600 mb-6">{plan.description}</p>
+                  
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((feature, fIndex) => (
+                      <li key={fIndex} className="flex items-start gap-2">
+                        <CheckCircle className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button 
+                    onClick={() => scrollToSection('signup')}
+                    className={`w-full ${plan.popular ? 'bg-teal-600 hover:bg-teal-700' : ''}`}
+                    variant={plan.popular ? 'default' : 'outline'}
+                    data-testid={`button-choose-${plan.name.toLowerCase()}`}
+                  >
+                    {plan.cta}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Clinics */}
+      <section id="clinics" className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 text-teal-700 text-sm font-medium mb-6">
+                <Stethoscope className="h-4 w-4" />
+                For Healthcare Practices
               </div>
-              <h2 className="text-2xl md:text-3xl font-black mb-4 text-foreground">
-                Meet Your Pharmacist
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                A Medication Concierge Layer for Your Practice
               </h2>
-              <p className="text-xl font-bold text-primary mb-2">Seth Collins, Pharm.D.</p>
-              <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-                Doctor of Pharmacy with a mission to make prescription medications affordable and accessible. 
-                Direct, personal care — not algorithms or call centers.
+              <p className="text-xl text-gray-600 mb-8">
+                Partner with Pillar Drug Club to reduce refill emergencies and give your patients predictable medication access.
               </p>
-              <div className="flex items-center justify-center gap-1 text-primary">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-current" />
+
+              <ul className="space-y-4 mb-8">
+                {[
+                  "6–12 month supply planning for stable medications",
+                  "Fewer urgent refill calls to your practice",
+                  "Dedicated clinic concierge contact",
+                  "Transparent pricing your patients can understand"
+                ].map((item, index) => (
+                  <li key={index} className="flex items-center gap-3">
+                    <div className="p-1 rounded-full bg-teal-50">
+                      <CheckCircle className="h-5 w-5 text-teal-600" />
+                    </div>
+                    <span className="text-gray-700 text-lg">{item}</span>
+                  </li>
                 ))}
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                "Finally, a pharmacist who actually knows my medications and cares about my health."
-              </p>
+              </ul>
+
+              <Button 
+                size="lg"
+                onClick={() => scrollToSection('signup')}
+                className="bg-teal-600 hover:bg-teal-700"
+                data-testid="clinic-cta-book-overview"
+              >
+                Book a 20-Minute Clinic Overview
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="lg:pl-8">
+              <Card className="border border-gray-200 bg-gray-50">
+                <CardContent className="p-8">
+                  <div className="text-center mb-6">
+                    <img 
+                      src={sethPhoto} 
+                      alt="Seth Collins, Pharm.D." 
+                      className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg mx-auto mb-4"
+                    />
+                    <h4 className="text-xl font-bold text-gray-900">Seth Collins, Pharm.D.</h4>
+                    <p className="text-gray-600">Founder & Clinical Pharmacist</p>
+                  </div>
+                  <p className="text-gray-600 text-center italic">
+                    "I started Pillar Drug Club because I saw patients struggling with pharmacy complexity, insurance hurdles, and monthly refill chaos. There's a better way."
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Safety & Standards */}
+      <section id="safety" className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-50 mb-6">
+              <Shield className="h-8 w-8 text-teal-600" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Safety, Standards, and Licensing
+            </h2>
+            <p className="text-xl text-gray-600">
+              Your health and safety are our top priority.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            {[
+              { icon: Building2, text: "Licensed U.S. pharmacy partners only" },
+              { icon: FileCheck, text: "FDA-approved generic medications" },
+              { icon: Stethoscope, text: "Prescription required for all medications" },
+              { icon: Shield, text: "Secure, HIPAA-compliant systems" }
+            ].map((item, index) => (
+              <Card key={index} className="border border-gray-200" data-testid={`safety-item-${index}`}>
+                <CardContent className="p-6 flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-teal-50">
+                    <item.icon className="h-6 w-6 text-teal-600" />
+                  </div>
+                  <span className="text-gray-900 font-medium text-lg">{item.text}</span>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-16 md:py-24 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          <Accordion type="single" collapsible className="space-y-4">
+            {faqs.map((faq, index) => (
+              <AccordionItem 
+                key={index} 
+                value={`faq-${index}`}
+                className="border border-gray-200 rounded-lg px-6"
+                data-testid={`faq-item-${index}`}
+              >
+                <AccordionTrigger className="text-left font-semibold text-gray-900 hover:no-underline py-4">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-600 pb-4">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
       {/* Final CTA */}
-      <section className="py-12 md:py-16">
-        <div className="max-w-lg mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-2xl md:text-3xl font-black mb-4 text-foreground">
-            Ready to Transform Your Pharmacy Experience?
+      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-600 to-teal-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready for a Better Pharmacy Experience?
           </h2>
-          <p className="text-muted-foreground mb-6">
-            Limited to 600 members. Join the waitlist today.
+          <p className="text-xl text-teal-100 mb-8">
+            Join Pillar Drug Club and let us manage your medications so you can focus on living.
           </p>
           
-          <Card className="border-2 border-primary/20 shadow-xl">
-            <CardContent className="p-6">
-              <SignupForm idSuffix="-footer" />
+          <Card className="border-0 shadow-2xl max-w-md mx-auto">
+            <CardContent className="p-6 md:p-8">
+              <SignupForm idSuffix="-footer" variant="hero" />
             </CardContent>
           </Card>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-border">
+      <footer className="py-12 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-sm text-muted-foreground">
-            © 2025 Pillar Drug Club. All rights reserved.
-          </p>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+            <div className="flex items-center gap-2">
+              <Pill className="h-6 w-6 text-teal-400" />
+              <span className="text-xl font-bold text-white">Pillar Drug Club</span>
+            </div>
+            <p className="text-gray-400 text-center md:text-right">
+              Your medication, managed.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm">
+            <button onClick={() => scrollToSection('how-it-works')} className="text-gray-400 hover:text-white">
+              How It Works
+            </button>
+            <button onClick={() => scrollToSection('membership')} className="text-gray-400 hover:text-white">
+              Membership
+            </button>
+            <button onClick={() => scrollToSection('clinics')} className="text-gray-400 hover:text-white">
+              For Clinics
+            </button>
+            <button onClick={() => scrollToSection('safety')} className="text-gray-400 hover:text-white">
+              Safety
+            </button>
+            <button onClick={() => scrollToSection('faq')} className="text-gray-400 hover:text-white">
+              FAQ
+            </button>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8">
+            <p className="text-center text-gray-500 text-sm mb-4">
+              Pillar Drug Club is not insurance and does not replace your licensed prescriber.
+            </p>
+            <p className="text-center text-gray-500 text-sm">
+              © 2025 Pillar Drug Club. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
