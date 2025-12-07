@@ -237,10 +237,13 @@ export default function PreLaunchPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-12 md:pt-20 md:pb-16">
           {/* Logo/Brand */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-black text-primary tracking-tight">
-              PILLAR DRUG CLUB
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">Concierge Pharmacy Services</p>
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
+                pillar drug club
+              </h2>
+              <Pill className="h-6 w-6 md:h-7 md:w-7 text-primary" />
+            </div>
+            <p className="text-sm text-muted-foreground">Concierge Pharmacy Services</p>
           </div>
 
           {/* Main Heading */}
