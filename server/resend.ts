@@ -58,14 +58,16 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
   try {
     const { client, fromEmail } = await getUncachableResendClient();
     
-    await client.emails.send({
+    console.log(`📧 Sending email from: ${fromEmail} to: ${to}`);
+    
+    const result = await client.emails.send({
       from: fromEmail,
       to: to,
       subject: subject,
       html: html
     });
     
-    console.log(`✅ Email sent to ${to}`);
+    console.log(`✅ Email sent to ${to}`, JSON.stringify(result));
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
