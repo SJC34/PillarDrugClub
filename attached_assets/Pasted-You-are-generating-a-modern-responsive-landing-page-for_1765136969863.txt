@@ -1,0 +1,106 @@
+You are generating a modern, responsive landing page for a company called “Pillar Drug Club.”
+
+ABOUT PILLAR:
+- Pillar Drug Club is a concierge-style medication management membership.
+- NOT a pharmacy and NOT insurance.
+- Partners with licensed U.S. pharmacies to provide affordable generic medications.
+- Primary value: concierge service, medication coordination, refill management, and 6–12 month supplies.
+- Secondary value: transparent, predictable, cash-based pricing.
+
+GOAL OF THE PAGE:
+- Convert visitors into members.
+- Convey premium, concierge, white-glove service.
+- De-emphasize “discounts” or bargain language.
+- Emphasize convenience, ease, predictability, and clinical trust.
+
+DESIGN & BRAND:
+- Clean, calm, premium aesthetic (like One Medical, Forward, Levels).
+- White / charcoal background with teal or mint accent.
+- Modern sans-serif fonts.
+- Large spacing, soft gradients, and clear hierarchy.
+- Responsive across mobile and desktop.
+
+TECH:
+- Build using HTML + Tailwind CSS (or React + Tailwind if preferred).
+- Single, scannable landing page with sections commented for easy editing.
+
+STRUCTURE (IN ORDER):
+
+1. **Navigation Bar**
+   - Logo text: “Pillar Drug Club”
+   - Links: How It Works, Membership, For Clinics, Safety, FAQ
+   - Right-aligned button: “Become a Member”
+
+2. **Hero Section**
+   - Headline: “Your Medication, Managed for You.”
+   - Subheadline: Concierge medication membership with 6–12 month supplies, refill coordination, and transparent pricing — all without using insurance.
+   - Primary CTA: “Get Started in 3 Minutes”
+   - Secondary CTA: “See Membership Plans”
+   - Trust line: “No insurance required · Licensed U.S. pharmacy partners · Transparent pricing”
+
+3. **Why Pillar (Value Proposition)**
+   Section Title: “A Better Pharmacy Experience — Finally.”
+   Three Columns:
+   - Concierge Medication Management
+   - Predictable, Transparent Costs
+   - Fewer Refills, Fewer Headaches
+
+4. **How It Works**
+   Section Title: “How Pillar Drug Club Works”
+   Steps:
+   1. Share your med list.
+   2. We coordinate behind the scenes with your prescriber and pharmacy partners.
+   3. Medications arrive at your door (6–12 month supplies when appropriate).
+   4. Ongoing concierge support and renewals.
+
+5. **Who It’s For**
+   Two Columns:
+   - Individuals & families needing predictable medication access
+   - Concierge / Direct Primary Care clinics wanting fewer refill headaches
+
+6. **Membership Plans**
+   Section Title: “Membership Designed Around Your Life”
+   Plans:
+   - Essential Membership: 6-month options, concierge support, pass-through pricing
+   - Premier Membership: 12-month options, priority support, annual pharmacist review
+   - Optional Executive: Dedicated concierge + clinic support
+   Each plan should have a “Choose Plan” button.
+
+7. **For Clinics**
+   Section Title: “A Medication Concierge Layer for Your Practice”
+   Bullets:
+   - 6–12 month supply planning
+   - Fewer refill emergencies
+   - Dedicated clinic concierge contact
+   - Transparent pricing patients can understand
+   CTA: “Book a 20-Minute Clinic Overview”
+
+8. **Safety & Standards**
+   Title: “Safety, Standards, and Licensing”
+   Bullets:
+   - Licensed U.S. pharmacy partners
+   - FDA-approved generics only
+   - Prescription required for all fills
+   - Secure, HIPAA-aware systems
+
+9. **FAQ Section**
+   Include 5–7 FAQs on:
+   - “Are you a pharmacy?”
+   - “Do I need insurance?”
+   - “Why are prices lower?”
+   - “What medications can I get?”
+   - “What happens if my dose changes?”
+   - “Where do you ship?”
+
+10. **Footer**
+   - Short tagline: “Pillar Drug Club — Your medication, managed.”
+   - Links: About, Membership, Clinics, Safety, Terms, Privacy
+   - Small disclaimer: “Pillar Drug Club is not insurance and does not replace your licensed prescriber.”
+
+REQUIREMENTS:
+- Do not use discount-centric language (“cheap meds,” “save 90%,” “1¢ pills”).
+- Emphasize trust, service, convenience, and premium experience.
+- Use placeholder images only.
+- Produce production-ready code with Tailwind classes.
+
+Generate the complete landing page now.
