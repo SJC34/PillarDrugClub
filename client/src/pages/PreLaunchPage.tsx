@@ -20,13 +20,15 @@ import {
   Phone as PhoneIcon,
   Mail,
   Loader2,
-  Stethoscope,
+  Calendar,
   Clock,
-  Shield,
+  Truck,
   Pill,
   User,
   Heart,
-  Star
+  Star,
+  MessageCircle,
+  Stethoscope
 } from "lucide-react";
 
 const signupFormSchema = z.object({
@@ -77,36 +79,36 @@ export default function PreLaunchPage() {
 
   const benefits = [
     {
-      icon: PhoneIcon,
-      title: "Direct Pharmacist Access",
-      description: "Personal phone line to your dedicated Pharm.D. — no call centers, no waiting"
+      icon: Calendar,
+      title: "Annual Medication Supplies",
+      description: "Get 6 or 12-month supplies of your medications — no more monthly refill hassles"
     },
     {
-      icon: Pill,
-      title: "Wholesale Medication Pricing",
-      description: "Save up to 95% on prescriptions — common meds as low as 1¢ per tablet"
+      icon: Truck,
+      title: "Delivered to Your Door",
+      description: "Skip the pharmacy lines. Your medications arrive at home on your schedule"
     },
     {
       icon: Clock,
-      title: "White-Glove Service",
-      description: "We handle refills, prior authorizations, and doctor coordination for you"
+      title: "Refill Coordination",
+      description: "We manage refill timing and prescriber renewals so you never run out"
     },
     {
-      icon: Shield,
-      title: "Year-Supply Prescriptions",
-      description: "6 or 12-month supplies shipped to your door — no monthly pharmacy trips"
+      icon: MessageCircle,
+      title: "Free Initial Consult",
+      description: "Talk with a pharmacist about your medications, savings opportunities, and care plan"
     }
   ];
 
   const includedServices = [
-    "24/7 direct pharmacist phone/text line",
-    "Quarterly medication therapy reviews",
-    "Prior authorization handling",
-    "Refill coordination with your doctor",
+    "Free initial pharmacist consultation",
+    "6 or 12-month medication supplies",
+    "Refill coordination and renewal reminders",
+    "Transparent cash pricing — no insurance needed",
+    "Home delivery included",
+    "Ongoing clinical medication reviews",
     "Drug interaction monitoring",
-    "Priority same-day shipping",
-    "Personalized care plans",
-    "No insurance needed"
+    "Direct pharmacist phone/text access"
   ];
 
   if (submitted) {
@@ -248,13 +250,13 @@ export default function PreLaunchPage() {
             </div>
             
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6 text-foreground leading-tight">
-              Your Personal Pharmacist
+              Annual Medication Supplies
               <br />
-              <span className="text-primary">On Speed Dial</span>
+              <span className="text-primary">Managed For You</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Direct access to a Doctor of Pharmacy. Wholesale medication prices. 
-              White-glove prescription management — all for one annual fee.
+              6 and 12-month prescriptions delivered to your door. Refill coordination handled. 
+              Transparent cash pricing — no insurance hassles. Free initial consult included.
             </p>
           </div>
 
@@ -267,7 +269,7 @@ export default function PreLaunchPage() {
               <p className="text-5xl md:text-6xl font-black text-primary mb-2">$600</p>
               <p className="text-lg text-muted-foreground">per year</p>
               <p className="text-sm text-muted-foreground mt-2">
-                That's just <span className="font-bold text-foreground">$50/month</span> for unlimited pharmacist access
+                That's just <span className="font-bold text-foreground">$50/month</span> for complete medication management
               </p>
             </div>
           </div>
@@ -295,11 +297,11 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-black mb-4 text-foreground">
-              Concierge Pharmacy, Redefined
+              Why Pillar Drug Club?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Traditional concierge medicine costs $1,500-$3,000/year with limited pharmacy support. 
-              We're flipping that model — pharmacy-first concierge care at a fraction of the cost.
+              Skip the monthly pharmacy trips. Get annual supplies delivered, with refill coordination 
+              handled for you. Simple cash pricing — no insurance paperwork, no surprises.
             </p>
           </div>
 
