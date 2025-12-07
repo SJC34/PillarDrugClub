@@ -30,6 +30,7 @@ import {
   MessageCircle,
   Stethoscope
 } from "lucide-react";
+import sethPhoto from "@assets/IMG_3299_1765089660918.jpeg";
 
 const signupFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -359,8 +360,12 @@ export default function PreLaunchPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="bg-background rounded-2xl p-8 md:p-12 border border-border">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-                <Stethoscope className="h-10 w-10 text-primary" />
+              <div className="inline-block mb-6">
+                <img 
+                  src={sethPhoto} 
+                  alt="Seth Collins, Pharm.D." 
+                  className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-primary/20 shadow-lg"
+                />
               </div>
               <h2 className="text-2xl md:text-3xl font-black mb-4 text-foreground">
                 Meet Your Pharmacist
