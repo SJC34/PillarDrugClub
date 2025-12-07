@@ -408,6 +408,27 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         subscribed: validatedData.subscribed ?? true,
       });
       
+      // Send notification email to admin
+      try {
+        const sourceLabel = validatedData.source === "concierge_prelaunch" ? "Concierge Pre-Launch" : "Landing Page";
+        await sendEmail(
+          "seth@pillardrugclub.com",
+          `New ${sourceLabel} Signup: ${validatedData.name}`,
+          `
+            <h2>New Waitlist Signup!</h2>
+            <p><strong>Source:</strong> ${sourceLabel}</p>
+            <p><strong>Name:</strong> ${validatedData.name}</p>
+            <p><strong>Email:</strong> ${validatedData.email}</p>
+            <p><strong>Phone:</strong> ${validatedData.phone}</p>
+            <p><strong>Signed up at:</strong> ${new Date().toLocaleString()}</p>
+            <hr>
+            <p><em>This is an automated notification from Pillar Drug Club.</em></p>
+          `
+        );
+      } catch (emailError) {
+        console.error("Failed to send signup notification email:", emailError);
+      }
+      
       res.json({ 
         success: true, 
         message: "Thanks for signing up! We'll keep you posted.",
