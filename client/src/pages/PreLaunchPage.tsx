@@ -329,6 +329,13 @@ export default function PreLaunchPage() {
             </div>
 
             <Button 
+              variant="ghost"
+              onClick={() => window.location.href = '/login'}
+              data-testid="nav-login"
+            >
+              Log In
+            </Button>
+            <Button 
               onClick={() => scrollToSection('signup')}
               className="bg-primary hover:bg-primary/90"
               data-testid="nav-cta-become-member"
