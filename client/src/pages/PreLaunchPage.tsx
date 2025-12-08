@@ -40,7 +40,8 @@ import {
   HeadphonesIcon,
   FileCheck,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Crown
 } from "lucide-react";
 import sethPhoto from "@assets/IMG_3299_1765089660918.jpeg";
 
@@ -252,55 +253,23 @@ export default function PreLaunchPage() {
     }
   ];
 
-  const membershipPlans = [
-    {
-      name: "Essential",
-      price: "$180",
-      period: "/year",
-      description: "Perfect for individuals with stable medication needs",
-      features: [
-        "6-month medication supplies",
-        "Concierge refill coordination",
-        "Pass-through medication pricing",
-        "Email & phone support",
-        "Prescription transfer assistance"
-      ],
-      cta: "Choose Essential",
-      popular: false
-    },
-    {
-      name: "Premier",
-      price: "$300",
-      period: "/year",
-      description: "For those who want comprehensive medication management",
-      features: [
-        "12-month medication supplies",
-        "Priority concierge support",
-        "Annual pharmacist medication review",
-        "Drug interaction monitoring",
-        "Direct pharmacist text line",
-        "Family member coordination"
-      ],
-      cta: "Choose Premier",
-      popular: true
-    },
-    {
-      name: "Executive",
-      price: "$600",
-      period: "/year",
-      description: "White-glove service for complex medication needs",
-      features: [
-        "Everything in Premier",
-        "Dedicated concierge pharmacist",
-        "Unlimited medication reviews",
-        "Specialty medication support",
-        "Clinic coordination services",
-        "Same-day response guarantee"
-      ],
-      cta: "Choose Executive",
-      popular: false
-    }
-  ];
+  const conciergePlan = {
+    name: "Concierge",
+    price: "$600",
+    period: "/year",
+    description: "White-glove medication management for those who value their time",
+    features: [
+      "Dedicated concierge pharmacist",
+      "12-month medication supplies",
+      "Unlimited medication reviews",
+      "Drug interaction monitoring",
+      "Direct pharmacist text line",
+      "Specialty medication support",
+      "Clinic coordination services",
+      "Same-day response guarantee"
+    ],
+    cta: "Become a Member"
+  };
 
   const faqs = [
     {
@@ -565,60 +534,60 @@ export default function PreLaunchPage() {
         </div>
       </section>
 
-      {/* Membership Plans */}
+      {/* Membership */}
       <section id="membership" className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Membership Designed Around Your Life
+              Concierge Membership
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Choose the plan that fits your medication needs. All memberships include concierge support and transparent pricing.
+              One plan. Complete medication management. No surprises.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {membershipPlans.map((plan, index) => (
-              <Card 
-                key={index} 
-                className={`border relative ${plan.popular ? 'border-teal-600 border-2 shadow-xl' : 'border-gray-200'}`}
-                data-testid={`membership-plan-${plan.name.toLowerCase()}`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-teal-600 text-white text-sm font-semibold px-4 py-1 rounded-full">
-                      Most Popular
-                    </span>
+          <div className="max-w-md mx-auto">
+            <Card 
+              className="border-teal-600 border-2 shadow-xl"
+              data-testid="membership-plan-concierge"
+            >
+              <CardContent className="p-8">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-50 mb-4">
+                    <Crown className="h-8 w-8 text-teal-600" />
                   </div>
-                )}
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-600">{plan.period}</span>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{conciergePlan.name}</h3>
+                  <div className="mb-2">
+                    <span className="text-5xl font-bold text-gray-900">{conciergePlan.price}</span>
+                    <span className="text-gray-600 text-lg">{conciergePlan.period}</span>
                   </div>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
-                  
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature, fIndex) => (
-                      <li key={fIndex} className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-gray-600">{conciergePlan.description}</p>
+                </div>
+                
+                <ul className="space-y-3 mb-8">
+                  {conciergePlan.features.map((feature, fIndex) => (
+                    <li key={fIndex} className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
 
-                  <Button 
-                    onClick={() => scrollToSection('signup')}
-                    className={`w-full ${plan.popular ? 'bg-teal-600 hover:bg-teal-700' : ''}`}
-                    variant={plan.popular ? 'default' : 'outline'}
-                    data-testid={`button-choose-${plan.name.toLowerCase()}`}
-                  >
-                    {plan.cta}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                <Button 
+                  onClick={() => scrollToSection('signup')}
+                  className="w-full bg-teal-600 hover:bg-teal-700"
+                  size="lg"
+                  data-testid="button-choose-concierge"
+                >
+                  {conciergePlan.cta}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  Limited to 600 founding members
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
