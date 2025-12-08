@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -328,13 +329,14 @@ export default function PreLaunchPage() {
               </button>
             </div>
 
-            <Button 
-              variant="ghost"
-              onClick={() => window.location.href = '/login'}
-              data-testid="nav-login"
-            >
-              Log In
-            </Button>
+            <Link href="/login">
+              <Button 
+                variant="ghost"
+                data-testid="nav-login"
+              >
+                Log In
+              </Button>
+            </Link>
             <Button 
               onClick={() => scrollToSection('signup')}
               className="bg-primary hover:bg-primary/90"
