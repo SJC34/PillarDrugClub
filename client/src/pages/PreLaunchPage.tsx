@@ -168,7 +168,7 @@ export default function PreLaunchPage() {
         />
         <Button 
           type="submit" 
-          className={`w-full h-12 text-base font-semibold ${variant === "hero" ? "bg-teal-600 hover:bg-teal-700" : ""}`}
+          className={`w-full h-12 text-base font-semibold ${variant === "hero" ? "bg-primary hover:bg-primary/90" : ""}`}
           disabled={signupMutation.isPending}
           data-testid={`button-join-prelaunch${idSuffix}`}
         >
@@ -193,8 +193,8 @@ export default function PreLaunchPage() {
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <Card className="max-w-lg w-full border border-gray-200 shadow-xl">
           <CardContent className="p-8 md:p-12 text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-teal-50 mb-6">
-              <CheckCircle className="h-10 w-10 text-teal-600" />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
+              <CheckCircle className="h-10 w-10 text-primary" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">
               Welcome to Pillar Drug Club
@@ -305,7 +305,7 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <Pill className="h-6 w-6 text-teal-600" />
+              <Pill className="h-6 w-6 text-primary" />
               <span className="text-xl font-bold text-gray-900">Pillar Drug Club</span>
             </div>
             
@@ -330,7 +330,7 @@ export default function PreLaunchPage() {
 
             <Button 
               onClick={() => scrollToSection('signup')}
-              className="bg-teal-600 hover:bg-teal-700"
+              className="bg-primary hover:bg-primary/90"
               data-testid="nav-cta-become-member"
             >
               Become a Member
@@ -343,7 +343,7 @@ export default function PreLaunchPage() {
       <section className="relative bg-gradient-to-br from-gray-50 via-white to-teal-50/30 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-teal-100/50 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 -left-40 w-80 h-80 bg-teal-50/50 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 -left-40 w-80 h-80 bg-primary/10/50 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
@@ -351,7 +351,7 @@ export default function PreLaunchPage() {
             <div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Your Medication,
-                <span className="text-teal-600"> Managed for You.</span>
+                <span className="text-primary"> Managed for You.</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                 Concierge medication membership with 6–12 month supplies, refill coordination, and transparent pricing — all without using insurance.
@@ -361,7 +361,7 @@ export default function PreLaunchPage() {
                 <Button 
                   size="lg"
                   onClick={() => scrollToSection('signup')}
-                  className="bg-teal-600 hover:bg-teal-700 text-lg h-14 px-8"
+                  className="bg-primary hover:bg-primary/90 text-lg h-14 px-8"
                   data-testid="hero-cta-get-started"
                 >
                   Get Started in 3 Minutes
@@ -380,15 +380,15 @@ export default function PreLaunchPage() {
 
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
                 <span className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-teal-600" />
+                  <CheckCircle className="h-4 w-4 text-primary" />
                   No insurance required
                 </span>
                 <span className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-teal-600" />
+                  <CheckCircle className="h-4 w-4 text-primary" />
                   Licensed U.S. pharmacy partners
                 </span>
                 <span className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-teal-600" />
+                  <CheckCircle className="h-4 w-4 text-primary" />
                   Transparent pricing
                 </span>
               </div>
@@ -398,8 +398,8 @@ export default function PreLaunchPage() {
               <Card className="border border-gray-200 shadow-xl" id="signup">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-full bg-teal-50">
-                      <Sparkles className="h-5 w-5 text-teal-600" />
+                    <div className="p-2 rounded-full bg-primary/10">
+                      <Sparkles className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">Start Your Membership</h3>
@@ -430,8 +430,8 @@ export default function PreLaunchPage() {
             {valueProps.map((prop, index) => (
               <Card key={index} className="border border-gray-100 hover-elevate" data-testid={`value-prop-${index}`}>
                 <CardContent className="p-8">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-teal-50 mb-6">
-                    <prop.icon className="h-7 w-7 text-teal-600" />
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 mb-6">
+                    <prop.icon className="h-7 w-7 text-primary" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{prop.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{prop.description}</p>
@@ -457,7 +457,7 @@ export default function PreLaunchPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {howItWorks.map((step, index) => (
               <div key={index} className="relative" data-testid={`how-it-works-step-${step.step}`}>
-                <div className="text-6xl font-bold text-teal-100 mb-4">{step.step}</div>
+                <div className="text-6xl font-bold text-primary-foreground/80 mb-4">{step.step}</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
                 <p className="text-gray-600">{step.description}</p>
                 {index < howItWorks.length - 1 && (
@@ -481,8 +481,8 @@ export default function PreLaunchPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="border border-gray-100" data-testid="who-for-individuals">
               <CardContent className="p-8">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-teal-50 mb-6">
-                  <Users className="h-7 w-7 text-teal-600" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 mb-6">
+                  <Users className="h-7 w-7 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Individuals & Families</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
@@ -490,15 +490,15 @@ export default function PreLaunchPage() {
                 </p>
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     Stable, chronic medication regimens
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     Uninsured or high-deductible plans
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     Value convenience and personal service
                   </li>
                 </ul>
@@ -507,8 +507,8 @@ export default function PreLaunchPage() {
 
             <Card className="border border-gray-100" data-testid="who-for-clinics">
               <CardContent className="p-8">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-teal-50 mb-6">
-                  <Building2 className="h-7 w-7 text-teal-600" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 mb-6">
+                  <Building2 className="h-7 w-7 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Concierge & DPC Clinics</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
@@ -516,15 +516,15 @@ export default function PreLaunchPage() {
                 </p>
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     Fewer urgent refill requests
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     Transparent pricing for patients
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     Dedicated clinic concierge support
                   </li>
                 </ul>
@@ -548,13 +548,13 @@ export default function PreLaunchPage() {
 
           <div className="max-w-md mx-auto">
             <Card 
-              className="border-teal-600 border-2 shadow-xl"
+              className="border-primary border-2 shadow-xl"
               data-testid="membership-plan-concierge"
             >
               <CardContent className="p-8">
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-50 mb-4">
-                    <Crown className="h-8 w-8 text-teal-600" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                    <Crown className="h-8 w-8 text-primary" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{conciergePlan.name}</h3>
                   <div className="mb-2">
@@ -567,7 +567,7 @@ export default function PreLaunchPage() {
                 <ul className="space-y-3 mb-8">
                   {conciergePlan.features.map((feature, fIndex) => (
                     <li key={fIndex} className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                       <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}
@@ -575,7 +575,7 @@ export default function PreLaunchPage() {
 
                 <Button 
                   onClick={() => scrollToSection('signup')}
-                  className="w-full bg-teal-600 hover:bg-teal-700"
+                  className="w-full bg-primary hover:bg-primary/90"
                   size="lg"
                   data-testid="button-choose-concierge"
                 >
@@ -597,7 +597,7 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 text-teal-700 text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
                 <Stethoscope className="h-4 w-4" />
                 For Healthcare Practices
               </div>
@@ -616,8 +616,8 @@ export default function PreLaunchPage() {
                   "Transparent pricing your patients can understand"
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-3">
-                    <div className="p-1 rounded-full bg-teal-50">
-                      <CheckCircle className="h-5 w-5 text-teal-600" />
+                    <div className="p-1 rounded-full bg-primary/10">
+                      <CheckCircle className="h-5 w-5 text-primary" />
                     </div>
                     <span className="text-gray-700 text-lg">{item}</span>
                   </li>
@@ -627,7 +627,7 @@ export default function PreLaunchPage() {
               <Button 
                 size="lg"
                 onClick={() => scrollToSection('signup')}
-                className="bg-teal-600 hover:bg-teal-700"
+                className="bg-primary hover:bg-primary/90"
                 data-testid="clinic-cta-book-overview"
               >
                 Book a 20-Minute Clinic Overview
@@ -661,8 +661,8 @@ export default function PreLaunchPage() {
       <section id="safety" className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-50 mb-6">
-              <Shield className="h-8 w-8 text-teal-600" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
+              <Shield className="h-8 w-8 text-primary" />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Safety, Standards, and Licensing
@@ -681,8 +681,8 @@ export default function PreLaunchPage() {
             ].map((item, index) => (
               <Card key={index} className="border border-gray-200" data-testid={`safety-item-${index}`}>
                 <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-teal-50">
-                    <item.icon className="h-6 w-6 text-teal-600" />
+                  <div className="p-3 rounded-lg bg-primary/10">
+                    <item.icon className="h-6 w-6 text-primary" />
                   </div>
                   <span className="text-gray-900 font-medium text-lg">{item.text}</span>
                 </CardContent>
@@ -722,12 +722,12 @@ export default function PreLaunchPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-teal-600 to-teal-700">
+      <section className="py-16 md:py-24 bg-gradient-to-br from-primary to-primary/80">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready for a Better Pharmacy Experience?
           </h2>
-          <p className="text-xl text-teal-100 mb-8">
+          <p className="text-xl text-primary-foreground/80 mb-8">
             Join Pillar Drug Club and let us manage your medications so you can focus on living.
           </p>
           
