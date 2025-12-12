@@ -262,7 +262,7 @@ export default function PreLaunchPage() {
     features: [
       "Dedicated concierge pharmacist",
       "12-month medication supplies",
-      "Unlimited medication reviews",
+      "Comprehensive Medication Reviews",
       "Drug interaction monitoring",
       "Direct pharmacist text line",
       "Specialty medication support",
