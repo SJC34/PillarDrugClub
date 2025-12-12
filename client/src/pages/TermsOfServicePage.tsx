@@ -121,7 +121,7 @@ export default function TermsOfServicePage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3">Membership Plans</h3>
+              <h3 className="font-semibold text-lg mb-3">Membership Plan</h3>
               <p className="mb-3">
                 Pillar Drug Club offers two membership tiers:
               </p>

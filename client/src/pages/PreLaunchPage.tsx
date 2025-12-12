@@ -383,7 +383,7 @@ export default function PreLaunchPage() {
                   className="text-lg h-14 px-8"
                   data-testid="hero-cta-see-plans"
                 >
-                  See Membership Plans
+                  See Membership Plan
                 </Button>
               </div>
 
