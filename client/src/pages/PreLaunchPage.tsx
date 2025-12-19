@@ -264,7 +264,6 @@ export default function PreLaunchPage() {
       "12-month medication supplies",
       "Comprehensive Medication Reviews",
       "Drug interaction monitoring",
-      "Direct pharmacist text line",
       "Specialty medication support",
       "Clinic coordination services",
       "Same-day response guarantee"
@@ -493,7 +492,7 @@ export default function PreLaunchPage() {
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 mb-6">
                   <Users className="h-7 w-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Individuals & Families</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Individuals, Families & Caregivers</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
                   People who take chronic medications and want predictable access, transparent pricing, and personal support — without the monthly pharmacy hassle.
                 </p>
@@ -570,6 +569,9 @@ export default function PreLaunchPage() {
                     <span className="text-5xl font-bold text-gray-900">{conciergePlan.price}</span>
                     <span className="text-gray-600 text-lg">{conciergePlan.period}</span>
                   </div>
+                  <p className="text-sm text-primary font-medium mb-2">
+                    Or as low as $50/mo interest-free through Affirm, Klarna, etc.
+                  </p>
                   <p className="text-gray-600">{conciergePlan.description}</p>
                 </div>
                 
