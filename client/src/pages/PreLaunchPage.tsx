@@ -572,7 +572,7 @@ export default function PreLaunchPage() {
                   <p className="text-sm text-gray-500 mb-2">
                     with pay-as-you-go plans
                   </p>
-                  <p className="text-sm text-primary font-medium mb-2">
+                  <p className="text-sm text-gray-900 font-medium mb-2">
                     Or $600/year
                   </p>
                   <p className="text-gray-600">{conciergePlan.description}</p>
