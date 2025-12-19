@@ -566,11 +566,11 @@ export default function PreLaunchPage() {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{conciergePlan.name}</h3>
                   <div className="mb-2">
-                    <span className="text-5xl font-bold text-gray-900">{conciergePlan.price}</span>
-                    <span className="text-gray-600 text-lg">{conciergePlan.period}</span>
+                    <span className="text-5xl font-bold text-gray-900">$50</span>
+                    <span className="text-gray-600 text-lg">/mo</span>
                   </div>
                   <p className="text-sm text-primary font-medium mb-2">
-                    Or as low as $50/mo interest-free through Affirm, Klarna, etc.
+                    Or $600/year with pay-in-full plans
                   </p>
                   <p className="text-gray-600">{conciergePlan.description}</p>
                 </div>
