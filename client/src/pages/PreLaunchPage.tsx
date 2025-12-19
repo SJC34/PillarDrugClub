@@ -304,8 +304,8 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <Pill className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-gray-900">Pillar Drug Club</span>
+              <Pill className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+              <span className="text-base sm:text-xl font-bold text-gray-900 whitespace-nowrap">Pillar Drug Club</span>
             </div>
             
             {/* Desktop Navigation */}
@@ -755,8 +755,8 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-2">
-              <Pill className="h-6 w-6 text-teal-400" />
-              <span className="text-xl font-bold text-white">Pillar Drug Club</span>
+              <Pill className="h-5 w-5 sm:h-6 sm:w-6 text-teal-400 flex-shrink-0" />
+              <span className="text-base sm:text-xl font-bold text-white whitespace-nowrap">Pillar Drug Club</span>
             </div>
             <p className="text-gray-400 text-center md:text-right">
               Your medication, managed.
