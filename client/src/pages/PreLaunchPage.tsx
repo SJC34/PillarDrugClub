@@ -44,7 +44,6 @@ import {
   ChevronRight,
   Crown
 } from "lucide-react";
-import sethPhoto from "@assets/IMG_3299_1765089660918.jpeg";
 
 const signupFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -205,7 +204,7 @@ export default function PreLaunchPage() {
             </p>
             <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
               <p className="font-semibold text-gray-900 mb-1">What happens next:</p>
-              <p>Dr. Seth Collins, Pharm.D. will contact you directly to learn about your medications and create your personalized care plan.</p>
+              <p>Our concierge team will contact you directly to learn about your medications and create your personalized care plan.</p>
             </div>
           </CardContent>
         </Card>
@@ -653,16 +652,14 @@ export default function PreLaunchPage() {
               <Card className="border border-gray-200 bg-gray-50">
                 <CardContent className="p-8">
                   <div className="text-center mb-6">
-                    <img 
-                      src={sethPhoto} 
-                      alt="Seth Collins, Pharm.D." 
-                      className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg mx-auto mb-4"
-                    />
-                    <h4 className="text-xl font-bold text-gray-900">Seth Collins, Pharm.D.</h4>
-                    <p className="text-gray-600">Founder & Clinical Pharmacist</p>
+                    <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center border-4 border-white shadow-lg mx-auto mb-4">
+                      <Stethoscope className="h-12 w-12 text-primary" />
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900">Founded by Pharmacists</h4>
+                    <p className="text-gray-600">Clinical Expertise You Can Trust</p>
                   </div>
                   <p className="text-gray-600 text-center italic">
-                    "I started Pillar Drug Club because I saw patients struggling with pharmacy complexity, insurance hurdles, and monthly refill chaos. There's a better way."
+                    "We started Pillar Drug Club because we saw patients struggling with pharmacy complexity, insurance hurdles, and monthly refill chaos. There's a better way."
                   </p>
                 </CardContent>
               </Card>
