@@ -37,7 +37,6 @@ import {
   ArrowRight,
   Building2,
   Stethoscope,
-  Package,
   HeadphonesIcon,
   FileCheck,
   Sparkles,
@@ -200,11 +199,11 @@ export default function PreLaunchPage() {
               Welcome to Pillar Drug Club
             </h2>
             <p className="text-lg text-gray-600 mb-6">
-              Thank you for your interest in our concierge medication service. We'll reach out personally within 24-48 hours to discuss your needs.
+              Thank you for your interest in our pharmacy consulting service. We'll reach out personally within 24-48 hours to discuss your needs.
             </p>
             <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
               <p className="font-semibold text-gray-900 mb-1">What happens next:</p>
-              <p>Our concierge team will contact you directly to learn about your medications and create your personalized care plan.</p>
+              <p>A pharmacist consultant will contact you to learn about your medications and discuss how we can help you navigate the pharmacy system.</p>
             </div>
           </CardContent>
         </Card>
@@ -215,18 +214,18 @@ export default function PreLaunchPage() {
   const valueProps = [
     {
       icon: HeadphonesIcon,
-      title: "Concierge Medication Management",
-      description: "Personal pharmacist support for refills, renewals, and medication questions — no more pharmacy phone trees."
+      title: "Your Personal Pharmacy Advocate",
+      description: "A dedicated pharmacist consultant who navigates the pharmacy system for you — answering questions, researching options, and advocating on your behalf."
     },
     {
       icon: Calendar,
-      title: "Predictable, Transparent Costs",
-      description: "Know exactly what you'll pay. Pass-through pricing with no hidden fees or insurance surprises."
+      title: "Cost Transparency Research",
+      description: "We research and compare medication costs across pharmacies so you can make informed decisions about where to fill your prescriptions."
     },
     {
-      icon: Package,
-      title: "Fewer Refills, Fewer Headaches",
-      description: "6–12 month supplies when clinically appropriate. One shipment instead of monthly pharmacy trips."
+      icon: Users,
+      title: "Coordination & Communication",
+      description: "We coordinate with your doctors, handle prescription transfers, and communicate with pharmacies so you don't have to."
     }
   ];
 
@@ -234,22 +233,22 @@ export default function PreLaunchPage() {
     {
       step: 1,
       title: "Share Your Medication List",
-      description: "Tell us what you take. We'll review your medications and identify savings opportunities."
+      description: "Tell us what you take. We'll review your medications and research cost-saving opportunities."
     },
     {
       step: 2,
-      title: "We Coordinate Everything",
-      description: "Behind the scenes, we work with your prescriber and our licensed pharmacy partners."
+      title: "We Research & Advocate",
+      description: "Your pharmacist consultant researches the best pharmacy options and pricing for your specific medications."
     },
     {
       step: 3,
-      title: "Medications Arrive at Your Door",
-      description: "6–12 month supplies delivered directly to you, with refill coordination handled."
+      title: "We Coordinate Everything",
+      description: "We communicate with your prescribers and pharmacies, handling transfers and renewals on your behalf."
     },
     {
       step: 4,
-      title: "Ongoing Concierge Support",
-      description: "Questions? Renewals? Changes? Your personal pharmacist is just a call or text away."
+      title: "Ongoing Consulting Support",
+      description: "Questions about your medications? Need help navigating a pharmacy issue? Your consultant is just a call away."
     }
   ];
 
@@ -257,14 +256,14 @@ export default function PreLaunchPage() {
     name: "Concierge",
     price: "$600",
     period: "/year",
-    description: "White-glove medication management for those who value their time",
+    description: "White-glove pharmacy consulting for those who value their time",
     features: [
-      "Dedicated concierge pharmacist",
-      "12-month medication supplies",
+      "Dedicated pharmacist consultant",
       "Comprehensive Medication Reviews",
-      "Drug interaction monitoring",
-      "Specialty medication support",
-      "Clinic coordination services",
+      "Cost comparison research",
+      "Drug interaction analysis",
+      "Prescription coordination",
+      "Provider communication support",
       "Same-day response guarantee"
     ],
     cta: "Become a Member"
@@ -273,27 +272,27 @@ export default function PreLaunchPage() {
   const faqs = [
     {
       question: "Are you a pharmacy?",
-      answer: "No. Pillar Drug Club is a concierge medication management membership. We partner with licensed U.S. pharmacies to fulfill your prescriptions, but we focus on coordination, convenience, and personal service — not retail pharmacy operations."
+      answer: "No. Pillar Drug Club is a pharmacy consulting and advocacy service. We do not dispense, sell, or ship medications. We are pharmacist consultants who help you navigate the pharmacy system, research cost-saving options, and coordinate with your healthcare providers."
     },
     {
-      question: "Do I need insurance to use Pillar Drug Club?",
-      answer: "No insurance required. Our transparent cash pricing is often lower than insurance copays for generic medications. We work outside the insurance system to provide simple, predictable costs."
+      question: "What exactly do you do?",
+      answer: "We provide expert pharmacy consulting services: medication reviews, cost research, prescription coordination with your doctors, and ongoing advocacy. Think of us as your personal pharmacy navigator — we do the legwork so you don't have to."
     },
     {
-      question: "Why are your prices lower than my pharmacy?",
-      answer: "Traditional pharmacies have high overhead and opaque pricing. We use pass-through pricing from high-volume pharmacy partners and don't mark up medications. You pay what we pay, plus your membership."
+      question: "Do I need insurance to use your consulting services?",
+      answer: "No insurance required for our consulting membership. We help both insured and uninsured patients navigate the complex pharmacy landscape and find the most affordable options for their medications."
     },
     {
-      question: "What medications can I get through Pillar?",
-      answer: "We focus on chronic, maintenance medications — things like blood pressure, cholesterol, diabetes, thyroid, and mental health medications. We specialize in FDA-approved generics. Controlled substances and specialty medications may have limitations."
+      question: "How do I actually get my medications?",
+      answer: "You fill your prescriptions at the pharmacy of your choice. We research options and help you find the best prices, but the actual medication purchase is between you and your chosen pharmacy — we are not involved in that transaction."
     },
     {
-      question: "What happens if my dose changes mid-year?",
-      answer: "Your concierge pharmacist coordinates dose changes with your prescriber at no extra charge. We'll adjust your remaining supply and ensure a smooth transition."
+      question: "What types of medications can you help with?",
+      answer: "We can consult on virtually any prescription medication. Our pharmacist consultants specialize in chronic medications like those for blood pressure, cholesterol, diabetes, and mental health — but we're happy to help research any medication."
     },
     {
-      question: "Where do you ship?",
-      answer: "We ship to all 50 U.S. states. Shipping is included in your membership — no extra delivery fees."
+      question: "What happens if my medication changes?",
+      answer: "Your pharmacist consultant helps coordinate with your prescriber and researches updated pricing options. We're here to support you through any medication changes."
     }
   ];
 
@@ -357,11 +356,11 @@ export default function PreLaunchPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Your Medication,
-                <span className="text-primary"> Managed for You.</span>
+                Your Personal
+                <span className="text-primary"> Pharmacy Advocate.</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Concierge medication membership with 6–12 month supplies, refill coordination, and transparent pricing — all without using insurance.
+                Expert pharmacy consulting to help you navigate costs, coordinate prescriptions, and get answers from a real pharmacist — on your schedule.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -388,15 +387,15 @@ export default function PreLaunchPage() {
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
                 <span className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-primary" />
-                  No insurance required
+                  Licensed pharmacist consultants
                 </span>
                 <span className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-primary" />
-                  Licensed U.S. pharmacy partners
+                  Cost research & comparison
                 </span>
                 <span className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-primary" />
-                  Transparent pricing
+                  Prescription coordination
                 </span>
               </div>
             </div>
@@ -426,10 +425,10 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              A Better Pharmacy Experience — Finally.
+              Navigate the Pharmacy System with Confidence
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Pillar Drug Club handles the complexity so you can focus on your health.
+              Our pharmacist consultants handle the complexity so you can focus on your health.
             </p>
           </div>
 
@@ -454,10 +453,10 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              How Pillar Drug Club Works
+              How Our Consulting Works
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From signup to doorstep delivery in four simple steps.
+              From signup to ongoing support in four simple steps.
             </p>
           </div>
 
@@ -493,20 +492,20 @@ export default function PreLaunchPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Individuals, Families & Caregivers</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
-                  People who take chronic medications and want predictable access, transparent pricing, and personal support — without the monthly pharmacy hassle.
+                  People who want expert guidance navigating the pharmacy system, finding cost savings, and getting answers from a real pharmacist.
                 </p>
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    Stable, chronic medication regimens
+                    Managing multiple medications
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    Uninsured or high-deductible plans
+                    Seeking cost-saving options
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    Value convenience and personal service
+                    Want personal pharmacist advocacy
                   </li>
                 </ul>
               </CardContent>
@@ -519,20 +518,20 @@ export default function PreLaunchPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Concierge & DPC Clinics</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
-                  Direct Primary Care and concierge practices looking to reduce refill emergencies and offer patients a premium medication experience.
+                  Direct Primary Care and concierge practices seeking pharmacy consulting support for their patients.
                 </p>
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    Fewer urgent refill requests
+                    Cost research for patient medications
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    Transparent pricing for patients
+                    Prescription coordination support
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    Dedicated clinic concierge support
+                    Dedicated clinic liaison contact
                   </li>
                 </ul>
               </CardContent>
@@ -546,10 +545,10 @@ export default function PreLaunchPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Concierge Membership
+              Consulting Membership
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              One plan. Complete medication management. No surprises.
+              One plan. Expert pharmacy advocacy. No surprises.
             </p>
           </div>
 
@@ -615,18 +614,18 @@ export default function PreLaunchPage() {
                 For Healthcare Practices
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                A Medication Concierge Layer for Your Practice
+                A Pharmacy Consulting Partner for Your Practice
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                Partner with Pillar Drug Club to reduce refill emergencies and give your patients predictable medication access.
+                Partner with Pillar Drug Club to give your patients expert pharmacy navigation and advocacy support.
               </p>
 
               <ul className="space-y-4 mb-8">
                 {[
-                  "6–12 month supply planning for stable medications",
-                  "Fewer urgent refill calls to your practice",
-                  "Dedicated clinic concierge contact",
-                  "Transparent pricing your patients can understand"
+                  "Medication cost research for your patients",
+                  "Prescription coordination support",
+                  "Dedicated clinic liaison contact",
+                  "Help patients navigate pharmacy options"
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-3">
                     <div className="p-1 rounded-full bg-primary/10">
@@ -685,10 +684,10 @@ export default function PreLaunchPage() {
 
           <div className="grid sm:grid-cols-2 gap-6">
             {[
-              { icon: Building2, text: "Licensed U.S. pharmacy partners only" },
-              { icon: FileCheck, text: "FDA-approved generic medications" },
-              { icon: Stethoscope, text: "Prescription required for all medications" },
-              { icon: Shield, text: "Secure, HIPAA-compliant systems" }
+              { icon: Stethoscope, text: "Licensed pharmacist consultants" },
+              { icon: Shield, text: "HIPAA-compliant communication" },
+              { icon: FileCheck, text: "Evidence-based medication guidance" },
+              { icon: Building2, text: "Independent advocacy — no pharmacy affiliations" }
             ].map((item, index) => (
               <Card key={index} className="border border-gray-200" data-testid={`safety-item-${index}`}>
                 <CardContent className="p-6 flex items-center gap-4">
@@ -736,10 +735,10 @@ export default function PreLaunchPage() {
       <section className="py-16 md:py-24 bg-gradient-to-br from-primary to-primary/80">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready for a Better Pharmacy Experience?
+            Ready for Expert Pharmacy Advocacy?
           </h2>
           <p className="text-xl text-primary-foreground/80 mb-8">
-            Join Pillar Drug Club and let us manage your medications so you can focus on living.
+            Join Pillar Drug Club and let our pharmacist consultants navigate the pharmacy system for you.
           </p>
           
           <Card className="border-0 shadow-2xl max-w-md mx-auto">
@@ -759,7 +758,7 @@ export default function PreLaunchPage() {
               <span className="text-base sm:text-xl font-bold text-white whitespace-nowrap">Pillar Drug Club</span>
             </div>
             <p className="text-gray-400 text-center md:text-right">
-              Your medication, managed.
+              Your pharmacy advocate.
             </p>
           </div>
 
@@ -783,7 +782,7 @@ export default function PreLaunchPage() {
 
           <div className="border-t border-gray-800 pt-8">
             <p className="text-center text-gray-500 text-sm mb-4">
-              Pillar Drug Club is not insurance and does not replace your licensed prescriber.
+              Pillar Drug Club is a pharmacy consulting service. We do not dispense, sell, or ship medications. All medication purchases are made directly between you and your chosen pharmacy.
             </p>
             <p className="text-center text-gray-500 text-sm">
               © 2025 Pillar Drug Club. All rights reserved.
