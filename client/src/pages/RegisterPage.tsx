@@ -502,8 +502,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescription Pharmacy Membership"
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -595,8 +595,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescription Pharmacy Membership"
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -625,14 +625,14 @@ export default function RegisterPage() {
                       ? "border-primary bg-primary/5"
                       : "border-border hover-elevate"
                   }`}
-                  data-testid="button-select-free"
+                  data-testid="button-select-foundation"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <img src={freePillarBadge} alt="Free" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Free</div>
+                    <img src={freePillarBadge} alt="Foundation" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Foundation</div>
                   </div>
-                  <div className="text-2xl font-bold mb-2">$0<span className="text-sm text-muted-foreground">/mo</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$30 per order fee</div>
+                  <div className="text-2xl font-bold mb-2">$30<span className="text-sm text-muted-foreground">/order</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">Pay as you go</div>
                   <div className="text-xs">Up to 90-day supplies</div>
                 </button>
                 <button
@@ -649,9 +649,9 @@ export default function RegisterPage() {
                     <img src={goldPillarBadge} alt="Gold" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Gold</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary mb-2">$15<span className="text-sm text-muted-foreground">/mo</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">1-3 medications</div>
-                  <div className="text-xs">6-mo & 1-yr supplies</div>
+                  <div className="text-2xl font-bold text-primary mb-2">$180<span className="text-sm text-muted-foreground">/year</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">Billed annually</div>
+                  <div className="text-xs">Up to 6-month supplies</div>
                 </button>
                 <button
                   type="button"
@@ -670,9 +670,9 @@ export default function RegisterPage() {
                     <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Platinum</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary mb-2">$25<span className="text-sm text-muted-foreground">/mo</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">4+ medications</div>
-                  <div className="text-xs">6-mo & 1-yr supplies</div>
+                  <div className="text-2xl font-bold text-primary mb-2">$300<span className="text-sm text-muted-foreground">/year</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">Billed annually</div>
+                  <div className="text-xs">6-month & 1-year supplies</div>
                 </button>
               </div>
             </CardContent>
@@ -958,8 +958,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescription Pharmacy Membership"
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1155,8 +1155,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescription Pharmacy Membership"
+          description="Join thousands saving 90% on prescriptions. Choose Foundation ($30/order), Gold ($180/year for 6-month supplies), or Platinum ($300/year for extended supplies). No insurance needed. Start saving today."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1212,14 +1212,14 @@ export default function RegisterPage() {
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl md:text-3xl font-bold text-teal-600">
-                      ${selectedTier === "gold" ? "15" : "25"}
+                      ${selectedTier === "gold" ? "180" : "300"}
                     </div>
-                    <div className="text-sm md:text-base text-muted-foreground">per month</div>
+                    <div className="text-sm md:text-base text-muted-foreground">per year</div>
+                    <div className="text-xs md:text-sm text-secondary font-bold mt-1">
+                      Or as low as ${selectedTier === "gold" ? "15" : "25"}/month with flexible payment options
+                    </div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                      {selectedTier === "gold" ? "Gold Plan (1-3 meds)" : "Platinum Plan (4+ meds)"}
-                    </div>
-                    <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
-                      Access to 6-month & 1-year supply pricing
+                      {selectedTier === "gold" ? "Gold Plan - 6-month supplies" : "Platinum Plan - 6-month & 1-year supplies"}
                     </div>
                   </div>
                 </div>

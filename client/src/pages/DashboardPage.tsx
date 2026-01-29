@@ -590,12 +590,12 @@ export default function DashboardPage() {
                   <div className="flex flex-col gap-3">
                     <Link href="/settings?tab=subscription">
                       <Button className="w-full" data-testid="button-upgrade-gold">
-                        Upgrade to Gold ($15/mo)
+                        Upgrade to Gold ($180/year)
                       </Button>
                     </Link>
                     <Link href="/settings?tab=subscription">
                       <Button variant="outline" className="w-full" data-testid="button-upgrade-platinum">
-                        Upgrade to Platinum ($25/mo)
+                        Upgrade to Platinum ($300/year)
                       </Button>
                     </Link>
                   </div>
