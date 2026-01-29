@@ -43,22 +43,11 @@ interface UserMedication {
   cacheExpiresAt: string | null;
 }
 
-interface MedicationCausingEffect {
-  name: string;
-  genericName: string;
-  fdaLink: string;
-}
-
-interface GroupedSideEffect {
+interface SideEffect {
   effect: string;
+  medicationCount: number;
+  medications: string[];
   likelihood: 'low' | 'moderate' | 'high';
-  medications: MedicationCausingEffect[];
-}
-
-interface GroupedSideEffectsResponse {
-  high: GroupedSideEffect[];
-  moderate: GroupedSideEffect[];
-  low: GroupedSideEffect[];
 }
 
 interface DrugInteraction {
@@ -110,7 +99,7 @@ export default function MyMedicationsPage() {
 
   // Fetch side effects analysis (Gold/Platinum only)
   const { data: sideEffectsData, isLoading: sideEffectsLoading } = useQuery<{
-    grouped: GroupedSideEffectsResponse;
+    sideEffects: SideEffect[];
     medicationCount: number;
   }>({
     queryKey: ['/api/medication-analysis/side-effects', user?.id],
@@ -259,7 +248,6 @@ export default function MyMedicationsPage() {
       </Badge>
     );
   };
-
 
   if (medicationsLoading) {
     return (
@@ -539,7 +527,7 @@ export default function MyMedicationsPage() {
                   Premium Feature: Side Effects Analysis
                 </CardTitle>
                 <CardDescription>
-                  Upgrade to Gold or Platinum to view the top 10 most common side effects for each medication
+                  Upgrade to Gold or Platinum to unlock comprehensive side effects analysis grouped by likelihood
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -548,15 +536,15 @@ export default function MyMedicationsPage() {
                   <ul className="space-y-1 text-sm text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
-                      <span>Top 10 most common side effects for each medication</span>
+                      <span>Side effects grouped by likelihood (high, moderate, low)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
-                      <span>Likelihood indicators (high, moderate, low)</span>
+                      <span>See which medications cause each side effect</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary mt-0.5" />
-                      <span>FDA-sourced side effect information</span>
+                      <span>FDA-sourced safety information</span>
                     </li>
                   </ul>
                 </div>
@@ -574,133 +562,53 @@ export default function MyMedicationsPage() {
             </div>
           ) : (
             <>
-              {sideEffectsData && (sideEffectsData.grouped.high.length > 0 || sideEffectsData.grouped.moderate.length > 0 || sideEffectsData.grouped.low.length > 0) ? (
+              {sideEffectsData && sideEffectsData.sideEffects.length > 0 ? (
                 <>
-                  {/* High Likelihood Side Effects */}
-                  {sideEffectsData.grouped.high.length > 0 && (
-                    <Card data-testid="card-high-likelihood">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <AlertTriangle className="h-5 w-5 text-destructive" />
-                          High Likelihood Side Effects
-                          <Badge variant="destructive">{sideEffectsData.grouped.high.length}</Badge>
-                        </CardTitle>
-                        <CardDescription>
-                          Most commonly reported side effects across your medications
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {sideEffectsData.grouped.high.map((sideEffect, idx) => (
-                            <div key={idx} className="p-4 rounded-md border bg-muted" data-testid={`side-effect-high-${idx}`}>
-                              <div className="font-medium text-base mb-2">{sideEffect.effect}</div>
-                              <div className="flex flex-wrap gap-2 items-center text-sm text-muted-foreground">
-                                <span>Caused by:</span>
-                                {sideEffect.medications.map((med, medIdx) => (
-                                  <span key={medIdx}>
-                                    <a
-                                      href={med.fdaLink}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-primary hover:underline font-medium"
-                                      data-testid={`link-medication-high-${idx}-${medIdx}`}
-                                    >
-                                      {med.name}
-                                    </a>
-                                    {medIdx < sideEffect.medications.length - 1 && ', '}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                  {['high', 'moderate', 'low'].map((likelihood) => {
+                    const effects = sideEffectsData.sideEffects.filter(
+                      (se) => se.likelihood === likelihood
+                    );
+                    if (effects.length === 0) return null;
 
-                  {/* Moderate Likelihood Side Effects */}
-                  {sideEffectsData.grouped.moderate.length > 0 && (
-                    <Card data-testid="card-moderate-likelihood">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Info className="h-5 w-5 text-primary" />
-                          Moderate Likelihood Side Effects
-                          <Badge variant="default">{sideEffectsData.grouped.moderate.length}</Badge>
-                        </CardTitle>
-                        <CardDescription>
-                          Occasionally reported side effects
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {sideEffectsData.grouped.moderate.map((sideEffect, idx) => (
-                            <div key={idx} className="p-4 rounded-md border bg-muted" data-testid={`side-effect-moderate-${idx}`}>
-                              <div className="font-medium text-base mb-2">{sideEffect.effect}</div>
-                              <div className="flex flex-wrap gap-2 items-center text-sm text-muted-foreground">
-                                <span>Caused by:</span>
-                                {sideEffect.medications.map((med, medIdx) => (
-                                  <span key={medIdx}>
-                                    <a
-                                      href={med.fdaLink}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-primary hover:underline font-medium"
-                                      data-testid={`link-medication-moderate-${idx}-${medIdx}`}
-                                    >
-                                      {med.name}
-                                    </a>
-                                    {medIdx < sideEffect.medications.length - 1 && ', '}
-                                  </span>
-                                ))}
+                    return (
+                      <Card key={likelihood} data-testid={`card-side-effects-${likelihood}`}>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            {getLikelihoodBadge(likelihood as 'low' | 'moderate' | 'high')}
+                            <span className="text-base font-normal text-muted-foreground">
+                              {effects.length} side effect{effects.length !== 1 ? 's' : ''}
+                            </span>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {effects.map((effect, idx) => (
+                              <div key={idx} className="p-3 rounded-md bg-muted" data-testid={`side-effect-${likelihood}-${idx}`}>
+                                <div className="font-medium mb-1">{effect.effect}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  Caused by:{' '}
+                                  {effect.medications.map((med, medIdx) => (
+                                    <span key={medIdx}>
+                                      {medIdx > 0 && ', '}
+                                      <a
+                                        href={`https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(med)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary hover:underline font-medium"
+                                        data-testid={`link-medication-${likelihood}-${idx}-${medIdx}`}
+                                      >
+                                        {med}
+                                      </a>
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Low Likelihood Side Effects */}
-                  {sideEffectsData.grouped.low.length > 0 && (
-                    <Card data-testid="card-low-likelihood">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Shield className="h-5 w-5 text-muted-foreground" />
-                          Low Likelihood Side Effects
-                          <Badge variant="secondary">{sideEffectsData.grouped.low.length}</Badge>
-                        </CardTitle>
-                        <CardDescription>
-                          Rarely reported side effects
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {sideEffectsData.grouped.low.map((sideEffect, idx) => (
-                            <div key={idx} className="p-4 rounded-md border bg-muted" data-testid={`side-effect-low-${idx}`}>
-                              <div className="font-medium text-base mb-2">{sideEffect.effect}</div>
-                              <div className="flex flex-wrap gap-2 items-center text-sm text-muted-foreground">
-                                <span>Caused by:</span>
-                                {sideEffect.medications.map((med, medIdx) => (
-                                  <span key={medIdx}>
-                                    <a
-                                      href={med.fdaLink}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-primary hover:underline font-medium"
-                                      data-testid={`link-medication-low-${idx}-${medIdx}`}
-                                    >
-                                      {med.name}
-                                    </a>
-                                    {medIdx < sideEffect.medications.length - 1 && ', '}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </>
               ) : (
                 <Card>

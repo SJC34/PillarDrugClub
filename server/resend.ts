@@ -3,16 +3,7 @@ import { Resend } from 'resend';
 let connectionSettings: any;
 
 async function getCredentials() {
-  // Prefer environment variables when explicitly set (allows override of connector)
-  if (process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL) {
-    console.log('✅ Using Resend credentials from environment variables');
-    return {
-      apiKey: process.env.RESEND_API_KEY,
-      fromEmail: process.env.RESEND_FROM_EMAIL
-    };
-  }
-
-  // Try connector API as fallback
+  // Try connector API first
   try {
     const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
     const xReplitToken = process.env.REPL_IDENTITY 
@@ -40,7 +31,16 @@ async function getCredentials() {
       }
     }
   } catch (connectorError) {
-    console.log('Connector API not available');
+    console.log('Connector API not available, falling back to environment variables');
+  }
+
+  // Fallback to environment variables
+  if (process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL) {
+    console.log('✅ Using Resend credentials from environment variables');
+    return {
+      apiKey: process.env.RESEND_API_KEY,
+      fromEmail: process.env.RESEND_FROM_EMAIL
+    };
   }
 
   throw new Error('Resend credentials not found. Please configure RESEND_API_KEY and RESEND_FROM_EMAIL');
@@ -58,16 +58,14 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
   try {
     const { client, fromEmail } = await getUncachableResendClient();
     
-    console.log(`📧 Sending email from: ${fromEmail} to: ${to}`);
-    
-    const result = await client.emails.send({
+    await client.emails.send({
       from: fromEmail,
       to: to,
       subject: subject,
       html: html
     });
     
-    console.log(`✅ Email sent to ${to}`, JSON.stringify(result));
+    console.log(`✅ Email sent to ${to}`);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);

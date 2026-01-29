@@ -529,36 +529,19 @@ export default function PrescriptionRequestPage() {
                             <SelectValue placeholder="Select supply length" />
                           </SelectTrigger>
                           <SelectContent>
-                            {/* Free tier: 30 and 90 day only */}
-                            {user?.subscriptionTier === "free" && (
-                              <>
-                                <SelectItem value="30">30-day supply (#30)</SelectItem>
-                                <SelectItem value="90">90-day supply (#90)</SelectItem>
-                              </>
-                            )}
-                            
-                            {/* Gold tier: 180 day only */}
-                            {user?.subscriptionTier === "gold" && (
-                              <SelectItem value="180">6-month supply (#180)</SelectItem>
-                            )}
-                            
-                            {/* Platinum tier: 180 and 360 day */}
-                            {user?.subscriptionTier === "platinum" && (
+                            <SelectItem value="30">30-day supply (#30)</SelectItem>
+                            <SelectItem value="90">90-day supply (#90)</SelectItem>
+                            {user?.subscriptionTier !== "free" && (
                               <>
                                 <SelectItem value="180">6-month supply (#180)</SelectItem>
-                                <SelectItem value="360">1-year supply (#360)</SelectItem>
+                                <SelectItem value="365">1-year supply (#365)</SelectItem>
                               </>
                             )}
                           </SelectContent>
                         </Select>
                         {user?.subscriptionTier === "free" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            <strong className="text-foreground">Foundation tier ($30/order):</strong> 30 and 90-day supplies only. You will be invoiced $30 per prescription order. Upgrade to Gold ($180/year) for 6-month supplies or Platinum ($300/year) for 1-year supplies with no per-order fees.
-                          </p>
-                        )}
-                        {user?.subscriptionTier === "gold" && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Gold tier: 6-month supplies only. Upgrade to Platinum ($300/year) for 1-year supply access.
+                            Upgrade to Gold or Platinum for 6-month & 1-year supply access
                           </p>
                         )}
                         {doctorForm.formState.errors.quantity && (
@@ -950,17 +933,12 @@ export default function PrescriptionRequestPage() {
             <AlertDialogTitle>Confirm Prescription Request</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to generate the prescription request? This will create a PDF and send notifications based on your selected options.
-              {user?.subscriptionTier === "free" && (
-                <span className="block mt-3 font-semibold text-foreground">
-                  ⚠️ Foundation tier: You will be invoiced $30 for this prescription order.
-                </span>
-              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-confirmation">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDoctorSubmit} data-testid="button-confirm-prescription">
-              {user?.subscriptionTier === "free" ? "Confirm & Accept $30 Fee" : "Continue"}
+              Continue
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

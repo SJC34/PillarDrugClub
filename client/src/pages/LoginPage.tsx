@@ -30,22 +30,6 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema)
   });
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      const userRole = user.role || "client";
-      if (userRole === "admin") {
-        setLocation("/admin");
-      } else if (userRole === "broker") {
-        setLocation("/broker");
-      } else if (userRole === "company") {
-        setLocation("/company");
-      } else {
-        setLocation("/dashboard");
-      }
-    }
-  }, [user, setLocation]);
-
   // Redirect after login once user state is updated
   useEffect(() => {
     if (shouldRedirect && user) {

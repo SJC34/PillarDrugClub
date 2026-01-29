@@ -408,27 +408,6 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         subscribed: validatedData.subscribed ?? true,
       });
       
-      // Send notification email to admin
-      try {
-        const sourceLabel = validatedData.source === "concierge_prelaunch" ? "Concierge Pre-Launch" : "Landing Page";
-        await sendEmail(
-          "seth@pillardrugclub.com",
-          `New ${sourceLabel} Signup: ${validatedData.name}`,
-          `
-            <h2>New Waitlist Signup!</h2>
-            <p><strong>Source:</strong> ${sourceLabel}</p>
-            <p><strong>Name:</strong> ${validatedData.name}</p>
-            <p><strong>Email:</strong> ${validatedData.email}</p>
-            <p><strong>Phone:</strong> ${validatedData.phone}</p>
-            <p><strong>Signed up at:</strong> ${new Date().toLocaleString()}</p>
-            <hr>
-            <p><em>This is an automated notification from Pillar Drug Club.</em></p>
-          `
-        );
-      } catch (emailError) {
-        console.error("Failed to send signup notification email:", emailError);
-      }
-      
       res.json({ 
         success: true, 
         message: "Thanks for signing up! We'll keep you posted.",
@@ -515,15 +494,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Stripe subscription route with two-tier pricing
   app.post("/api/create-subscription", async (req, res) => {
     try {
-      const { userId, plan } = req.body;
+      const { userId, plan = 'plus' } = req.body;
       
       if (!userId) {
         return res.status(400).json({ error: "User ID is required" });
       }
 
       // Validate plan
-      if (plan !== 'gold' && plan !== 'platinum') {
-        return res.status(400).json({ error: "Invalid plan. Must be 'gold' or 'platinum'" });
+      if (plan !== 'basic' && plan !== 'plus') {
+        return res.status(400).json({ error: "Invalid plan. Must be 'basic' or 'plus'" });
       }
       
       const user = await storage.getUser(userId);
@@ -554,26 +533,26 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         await storage.updateUserStripeInfo(userId, customerId, null);
       }
       
-      // Determine price based on plan (annual billing)
-      const planConfig: Record<'gold' | 'platinum', { amount: number; name: string; description: string }> = {
-        gold: {
-          amount: 18000, // $180.00 per year in cents
-          name: 'Pillar Drug Club Gold Plan',
-          description: 'Annual membership with up to 6-month prescription supplies at wholesale pricing'
+      // Determine price based on plan
+      const planConfig: Record<'basic' | 'plus', { amount: number; name: string; description: string }> = {
+        basic: {
+          amount: 1500, // $15.00 in cents
+          name: 'Pillar Drug Club Foundation Plan',
+          description: 'Monthly membership for 1-3 medications at wholesale pricing'
         },
-        platinum: {
-          amount: 30000, // $300.00 per year in cents
-          name: 'Pillar Drug Club Platinum Plan',
-          description: 'Annual membership with 6-month and 1-year prescription supplies at wholesale pricing'
+        plus: {
+          amount: 2500, // $25.00 in cents
+          name: 'Pillar Drug Club Keystone Plan',
+          description: 'Monthly membership for 4+ medications at wholesale pricing'
         }
       };
 
-      const selectedPlan = planConfig[plan as 'gold' | 'platinum'];
+      const selectedPlan = planConfig[plan as 'basic' | 'plus'];
       
       // Create or retrieve the product and price
       // In production, you'd create these once via Stripe Dashboard or a setup script
       // For now, we'll use environment variables or create them dynamically
-      let priceId = plan === 'gold' ? process.env.STRIPE_GOLD_PRICE_ID : process.env.STRIPE_PLATINUM_PRICE_ID;
+      let priceId = plan === 'basic' ? process.env.STRIPE_BASIC_PRICE_ID : process.env.STRIPE_PLUS_PRICE_ID;
       
       if (!priceId) {
         // Create product and price if not configured
@@ -587,7 +566,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
           unit_amount: selectedPlan.amount,
           currency: 'usd',
           recurring: {
-            interval: 'year',
+            interval: 'month',
           },
         });
         
@@ -1480,14 +1459,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     try {
       // Validate request data
       const pdfRequestSchema = z.object({
-        userId: z.string().min(1, "User ID is required"),
+        userId: z.string().optional(),
         patientName: z.string().min(2, "Patient name is required"),
         patientEmail: z.string().optional(),
         patientPhone: z.string().optional(),
         dateOfBirth: z.string().optional(),
         medicationName: z.string().min(2, "Medication name is required"),
         dosage: z.string().min(1, "Dosage is required"),
-        quantity: z.string().regex(/^\d+$/, "Quantity must be a valid number"),
+        quantity: z.string().min(1, "Quantity is required"),
         doctorName: z.string().min(2, "Doctor name is required"),
         doctorPhone: z.string().optional(),
         doctorEmail: z.union([z.string().email(), z.literal("")]).optional(),
@@ -1502,57 +1481,15 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
       const validatedData = pdfRequestSchema.parse(req.body);
       
-      // Require userId for tier-based validation
-      const user = await storage.getUser(validatedData.userId);
-      if (!user) {
-        return res.status(404).json({
-          error: "User not found",
-          message: "You must be logged in to request a prescription."
-        });
-      }
-      
-      // Fetch patient email/phone from request or from user profile
-      let patientEmail = validatedData.patientEmail || user.email || '';
-      let patientPhone = validatedData.patientPhone || user.phoneNumber || '';
-      
-      // Normalize tier to lowercase for consistent comparison
-      const userTier = (user.subscriptionTier || 'free').toLowerCase();
-      
-      // Validate supply length based on subscription tier
-      const quantity = parseInt(validatedData.quantity, 10);
-      
-      // Guard against NaN and invalid values
-      if (!Number.isInteger(quantity) || quantity <= 0) {
-        return res.status(400).json({
-          error: "Invalid quantity",
-          message: "Supply length must be a valid positive number."
-        });
-      }
-      
-      // Tier-specific validation (case-insensitive)
-      if (userTier === 'free') {
-        // Free tier: 30 and 90 days only
-        if (quantity !== 30 && quantity !== 90) {
-          return res.status(403).json({
-            error: "Invalid supply length for Free tier",
-            message: "Free members can only request 30 or 90-day supplies. Upgrade to Gold ($180/year) for 6-month supplies or Platinum ($300/year) for 1-year supplies."
-          });
-        }
-      } else if (userTier === 'gold') {
-        // Gold tier: 180 days only
-        if (quantity !== 180) {
-          return res.status(403).json({
-            error: "Invalid supply length for Gold tier",
-            message: "Gold members can only request 6-month (180-day) supplies. Upgrade to Platinum ($300/year) for 1-year supply access."
-          });
-        }
-      } else if (userTier === 'platinum') {
-        // Platinum tier: 180 or 360 days only
-        if (quantity !== 180 && quantity !== 360) {
-          return res.status(403).json({
-            error: "Invalid supply length for Platinum tier",
-            message: "Platinum members can only request 6-month (180-day) or 1-year (360-day) supplies."
-          });
+      // Fetch patient email/phone from request or from user profile if userId is provided
+      let patientEmail = validatedData.patientEmail || '';
+      let patientPhone = validatedData.patientPhone || '';
+      if (validatedData.userId) {
+        const user = await storage.getUser(validatedData.userId);
+        if (user) {
+          // Use user profile data if not provided in request
+          if (!patientEmail) patientEmail = user.email || '';
+          if (!patientPhone) patientPhone = user.phoneNumber || '';
         }
       }
       
@@ -2140,17 +2077,22 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const medications = await storage.getUserActiveMedications(req.params.userId);
       
       if (medications.length === 0) {
-        return res.json({ grouped: { high: [], moderate: [], low: [] }, medicationCount: 0 });
+        return res.json({ sideEffects: [], medicationCount: 0 });
       }
       
-      const { getGroupedSideEffects } = await import("./openfda-service");
-      const grouped = await getGroupedSideEffects(
+      const { aggregateSideEffects } = await import("./openfda-service");
+      const sideEffects = await aggregateSideEffects(
         medications.map(m => ({ genericName: m.genericName || m.medicationName }))
       );
       
       res.json({ 
-        grouped,
-        medicationCount: medications.length
+        sideEffects,
+        medicationCount: medications.length,
+        medications: medications.map(m => ({ 
+          id: m.id,
+          name: m.medicationName,
+          genericName: m.genericName
+        }))
       });
     } catch (error: any) {
       console.error("Error analyzing side effects:", error);

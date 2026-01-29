@@ -161,13 +161,10 @@ export default function HomePage() {
             Get Your Meds for Pennies
             <span className="text-primary block">As Low As 1¢ Per Pill</span>
           </h1>
-          <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-4">
+          <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
             Stop overpaying at traditional pharmacies. No insurance needed.
             <br />
             Save 90% on diabetes, blood pressure, cholesterol & more—delivered free to your door.
-          </p>
-          <p className="text-base md:text-lg font-bold text-secondary max-w-2xl mx-auto mb-8">
-            Annual membership from <span className="text-lg md:text-xl">$180/year</span> (or as low as $15/month with flexible payment options)
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
@@ -190,25 +187,25 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Choose Your Savings Plan</h2>
           <p className="text-base md:text-lg text-muted-foreground mb-8 font-bold max-w-3xl mx-auto">
-            Start with our pay-per-use Foundation Tier, or unlock year-supply wholesale pricing with Gold or Platinum
+            Start with our Free Tier, or unlock year-supply wholesale pricing with Gold or Platinum
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Foundation Tier */}
+            {/* Free Tier */}
             <Card className="border-secondary/30">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-3">
-                  <img src={freePillarBadge} alt="Foundation Tier" className="w-16 h-16 object-contain" />
+                  <img src={freePillarBadge} alt="Free Tier" className="w-16 h-16 object-contain" />
                 </div>
-                <CardTitle className="text-xl md:text-2xl font-bold">Foundation Tier</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Free Tier</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-foreground">
-                  $30
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/order</span>
+                  $0
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
                 </div>
-                <CardDescription className="font-bold">Pay as you go</CardDescription>
+                <CardDescription className="font-bold">Pay per order</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-secondary/10 rounded-lg">
-                  <p className="text-sm font-bold text-secondary">No monthly fees • Only pay when you order</p>
+                  <p className="text-sm font-bold text-secondary">$30 dispensing & shipping per order</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
@@ -229,8 +226,8 @@ export default function HomePage() {
                   </li>
                 </ul>
                 <Link href="/register">
-                  <Button variant="outline" className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-foundation">
-                    Get Started
+                  <Button variant="outline" className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-free">
+                    Start Free
                   </Button>
                 </Link>
               </CardContent>
@@ -244,15 +241,14 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Gold Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $180
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
+                  $15
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
                 </div>
-                <CardDescription className="font-bold">Billed annually</CardDescription>
-                <p className="text-sm text-secondary font-bold mt-2">Or as low as $15/month</p>
+                <CardDescription className="font-bold">1-3 medications</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">Up to 6-month supply access</p>
+                  <p className="text-sm font-bold text-primary">6-month & 1-year supply access</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
@@ -291,11 +287,10 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Platinum Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $300
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
+                  $25
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
                 </div>
-                <CardDescription className="font-bold">Billed annually</CardDescription>
-                <p className="text-sm text-secondary font-bold mt-2">Or as low as $25/month</p>
+                <CardDescription className="font-bold">4+ medications</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
@@ -327,7 +322,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual commitment • Flexible payment options available at checkout</p>
+          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual commitment • Gold & Platinum plans billed monthly</p>
         </div>
       </section>
 
@@ -414,7 +409,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($180/year for 6-month supplies) and Platinum ($300/year for 6 & 12-month supplies) plans unlock year-supply savings. Even our Foundation Tier ($30/order) saves you 90% vs retail.
+                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month) and Platinum ($25/month) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
               </AccordionContent>
             </AccordionItem>
 
@@ -423,7 +418,7 @@ export default function HomePage() {
                 What if I can't afford my prescriptions?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cant-afford">
-                Start with our Foundation Tier - $30 per order, no monthly fees. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply plus the $30 order fee. We also offer payment plans and assistance programs for those who qualify.
+                Start with our Free Tier - $0/month and only $30 per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify.
               </AccordionContent>
             </AccordionItem>
 
