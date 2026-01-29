@@ -16,15 +16,15 @@ const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 // Only load Stripe if we have a valid public key (starts with pk_)
 const stripePromise = (STRIPE_PUBLIC_KEY && STRIPE_PUBLIC_KEY.startsWith('pk_')) ? loadStripe(STRIPE_PUBLIC_KEY) : null;
 
-const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'gold' | 'platinum' }) => {
+const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const planPrice = selectedPlan === 'gold' ? 180 : 300;
-  const planName = selectedPlan === 'gold' ? 'Gold Plan (6-month supplies)' : 'Platinum Plan (6 & 12-month supplies)';
+  const planPrice = selectedPlan === 'basic' ? 15 : 25;
+  const planName = selectedPlan === 'basic' ? 'Foundation Plan (1-3 meds)' : 'Keystone Plan (4+ meds)';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +67,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'gold' | 'platinum' }) 
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription className="text-sm">
-          By subscribing, you agree to our <a href="/refund-policy" target="_blank" className="underline font-medium hover:text-primary" data-testid="link-checkout-refund-policy">refund policy</a>. Membership is billed annually.
+          By subscribing, you agree to our <a href="/refund-policy" target="_blank" className="underline font-medium hover:text-primary" data-testid="link-checkout-refund-policy">refund policy</a>. Membership requires a 12-month commitment with monthly billing.
         </AlertDescription>
       </Alert>
 
@@ -78,7 +78,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'gold' | 'platinum' }) 
         disabled={!stripe || isLoading}
         data-testid="button-subscribe"
       >
-        {isLoading ? "Processing..." : `Subscribe ${planName} for $${planPrice}/year`}
+        {isLoading ? "Processing..." : `Subscribe ${planName} for $${planPrice}/month`}
       </Button>
     </form>
   );
@@ -87,10 +87,10 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'gold' | 'platinum' }) 
 export default function SubscriptionPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState<'gold' | 'platinum'>('platinum');
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'plus'>('plus');
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 
   const benefits = [
     "Access wholesale prescription pricing",
@@ -105,7 +105,7 @@ export default function SubscriptionPage() {
     if (authLoading) return;
     
     // Check if user is logged in
-    if (!user) {
+    if (!isAuthenticated || !user) {
       toast({
         title: "Authentication Required",
         description: "Please log in to subscribe.",
@@ -170,7 +170,7 @@ export default function SubscriptionPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, user, selectedPlan]);
+  }, [authLoading, isAuthenticated, user, selectedPlan]);
 
   if (isLoading) {
     return (
@@ -248,58 +248,53 @@ export default function SubscriptionPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Select Your Plan</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
             <Card 
-              className={`cursor-pointer transition-all hover-elevate ${selectedPlan === 'gold' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
-              onClick={() => setSelectedPlan('gold')}
-              data-testid="card-plan-gold"
+              className={`cursor-pointer transition-all hover-elevate ${selectedPlan === 'basic' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
+              onClick={() => setSelectedPlan('basic')}
+              data-testid="card-plan-basic"
             >
               <CardHeader>
-                <CardTitle className="text-lg">Gold Plan</CardTitle>
+                <CardTitle className="text-lg">Foundation Plan</CardTitle>
                 <div className="text-2xl font-bold text-primary">
-                  $180<span className="text-base text-muted-foreground">/year</span>
+                  $15<span className="text-base text-muted-foreground">/month</span>
                 </div>
-                <CardDescription>Billed annually</CardDescription>
-                <div className="mt-2 text-xs text-secondary font-bold">
-                  Or as low as $15/month with flexible payment options
-                </div>
+                <CardDescription>1-3 medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  Up to 6-month supplies
+                  12-month commitment required
                 </div>
               </CardHeader>
             </Card>
 
             <Card 
-              className={`cursor-pointer transition-all hover-elevate relative ${selectedPlan === 'platinum' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
-              onClick={() => setSelectedPlan('platinum')}
-              data-testid="card-plan-platinum"
+              className={`cursor-pointer transition-all hover-elevate relative ${selectedPlan === 'plus' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
+              onClick={() => setSelectedPlan('plus')}
+              data-testid="card-plan-plus"
             >
-              {selectedPlan === 'platinum' && (
+              {selectedPlan === 'plus' && (
                 <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
                   SELECTED
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-lg">Platinum Plan</CardTitle>
+                <CardTitle className="text-lg">Keystone Plan</CardTitle>
                 <div className="text-2xl font-bold text-primary">
-                  $300<span className="text-base text-muted-foreground">/year</span>
+                  $25<span className="text-base text-muted-foreground">/month</span>
                 </div>
-                <CardDescription>Billed annually</CardDescription>
-                <div className="mt-2 text-xs text-secondary font-bold">
-                  Or as low as $25/month with flexible payment options
-                </div>
+                <CardDescription>4+ medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  6-month & 1-year supplies
+                  12-month commitment required
                 </div>
               </CardHeader>
             </Card>
           </div>
         </div>
 
-        {/* Annual Billing Notice */}
+        {/* Annual Commitment Notice */}
         <Alert className="mb-8 max-w-3xl mx-auto" data-testid="alert-commitment">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="ml-2">
-            <strong>Annual Billing:</strong> All memberships are billed annually. 
-            See our <a href="/refund-policy" target="_blank" className="underline font-medium hover:text-primary">refund policy</a> for details on cancellations and refunds.
+            <strong>12-Month Commitment:</strong> All memberships require a 12-month annual commitment. 
+            If you cancel before completing 12 monthly payments, a termination fee equal to the 
+            remaining months will apply. After fulfilling your commitment, you can cancel anytime with no fee.
           </AlertDescription>
         </Alert>
 
@@ -334,9 +329,10 @@ export default function SubscriptionPage() {
                 </div>
                 
                 <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                  <h4 className="font-semibold text-gray-900 mb-2">Annual Billing Terms</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">Annual Commitment Terms</h4>
                   <p className="text-sm text-gray-600">
-                    All memberships are billed annually. See our refund policy for details on cancellations and refunds.
+                    All memberships include a 12-month commitment. Early cancellation requires 
+                    payment of remaining months. You can cancel anytime after 12 payments with no fee.
                   </p>
                 </div>
               </div>
@@ -355,11 +351,11 @@ export default function SubscriptionPage() {
               <div className="mb-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-3xl font-bold text-blue-600">
-                    ${selectedPlan === 'gold' ? '180' : '300'}
+                    ${selectedPlan === 'basic' ? '15' : '25'}
                   </div>
-                  <div className="text-gray-600">per year</div>
+                  <div className="text-gray-600">per month</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {selectedPlan === 'gold' ? 'Up to 6-month supplies' : '6-month & 1-year supplies'}
+                    {selectedPlan === 'basic' ? '1-3 medications' : '4+ medications'}
                   </div>
                 </div>
               </div>
@@ -375,7 +371,7 @@ export default function SubscriptionPage() {
                   We use Stripe for payment processing.
                 </div>
                 <div className="text-center text-xs text-gray-500">
-                  By subscribing, you agree to annual billing.
+                  By subscribing, you agree to our 12-month commitment terms.
                 </div>
               </div>
             </CardContent>
