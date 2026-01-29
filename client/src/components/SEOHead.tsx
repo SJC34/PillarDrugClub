@@ -200,7 +200,7 @@ export const faqSchema = {
       "name": "How do I save money on my medications?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($59/year for 6-month supplies) and Platinum ($99/year for up to 1-year supplies) plans unlock extended supply savings plus 50% off order fees. Even our Free Tier saves you 90% vs retail."
+        "text": "Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold – 6 Month ($59/year) and Gold – 12 Month ($99/year) plans unlock extended supply savings with just $10 fulfillment per shipment. Even our Foundation tier saves you significantly vs retail."
       }
     },
     {
@@ -208,7 +208,7 @@ export const faqSchema = {
       "name": "What if I can't afford my prescriptions?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Start with our Free Tier - $0/month and only $30 per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify."
+        "text": "Start with our Foundation tier - $0/year and only $30 fulfillment per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify."
       }
     },
     {
@@ -373,7 +373,7 @@ export const howToSaveMoneySchema = {
       "@type": "HowToStep",
       "position": 3,
       "name": "Choose Your Membership Tier",
-      "text": "Select Free ($0/month), Gold ($59/year for 6-month supplies with 50% off order fees), or Platinum ($99/year for up to 1-year supplies with 50% off order fees). All tiers save you 90% vs retail pharmacy.",
+      "text": "Select Foundation (Free with $30 fulfillment per order), Gold – 6 Month ($59/year with $10 fulfillment per shipment), or Gold – 12 Month ($99/year with $10 fulfillment per shipment). All tiers give you access to wholesale pricing.",
       "url": "https://pillardrugclub.com/register"
     },
     {

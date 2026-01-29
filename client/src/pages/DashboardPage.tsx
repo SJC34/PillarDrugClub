@@ -396,20 +396,20 @@ export default function DashboardPage() {
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
                 {user?.subscriptionTier === "free" && (
-                  <img src={freePillarBadge} alt="Free Tier" className="w-10 h-10 object-contain" />
+                  <img src={freePillarBadge} alt="Foundation" className="w-10 h-10 object-contain" />
                 )}
                 {user?.subscriptionTier === "gold" && (
-                  <img src={goldPillarBadge} alt="Gold Plan" className="w-10 h-10 object-contain" />
+                  <img src={goldPillarBadge} alt="Gold" className="w-10 h-10 object-contain" />
                 )}
                 {user?.subscriptionTier === "platinum" && (
-                  <img src={platinumPillarBadge} alt="Platinum Plan" className="w-10 h-10 object-contain" />
+                  <img src={goldPillarBadge} alt="Gold" className="w-10 h-10 object-contain" />
                 )}
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
                     ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "59" : "99"}
                   </p>
                   <p className="text-sm text-gray-600">
-                    {user?.subscriptionTier === "free" ? "Free Tier" : "Annual Membership"}
+                    {user?.subscriptionTier === "free" ? "Foundation (Free)" : user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Gold – 12 Month"}
                   </p>
                 </div>
               </div>
@@ -516,33 +516,33 @@ export default function DashboardPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   {user?.subscriptionTier === "free" && (
-                    <img src={freePillarBadge} alt="Free Tier" className="w-10 h-10 object-contain" />
+                    <img src={freePillarBadge} alt="Foundation" className="w-10 h-10 object-contain" />
                   )}
                   {user?.subscriptionTier === "gold" && (
-                    <img src={goldPillarBadge} alt="Gold Plan" className="w-10 h-10 object-contain" />
+                    <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-10 h-10 object-contain" />
                   )}
                   {user?.subscriptionTier === "platinum" && (
-                    <img src={platinumPillarBadge} alt="Platinum Plan" className="w-10 h-10 object-contain" />
+                    <img src={goldPillarBadge} alt="Gold – 12 Month" className="w-10 h-10 object-contain" />
                   )}
                   Current Subscription
                   <Badge variant={user?.subscriptionTier === "free" ? "outline" : "default"}>
-                    {user?.subscriptionTier === "free" ? "Free Tier" : 
-                     user?.subscriptionTier === "gold" ? "Gold Plan" : "Platinum Plan"}
+                    {user?.subscriptionTier === "free" ? "Foundation (Free)" : 
+                     user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Gold – 12 Month"}
                   </Badge>
                 </CardTitle>
                 <CardDescription>
                   {user?.subscriptionTier === "free" 
-                    ? "Get access to year-supply pricing with Gold or Platinum" 
-                    : "Access to 6-month and 1-year supply wholesale pricing"}
+                    ? "Upgrade to Gold for extended supply options" 
+                    : user?.subscriptionTier === "gold" ? "Up to 6-month supply access" : "Up to 12-month supply access"}
                 </CardDescription>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-primary">
-                  ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "15" : "25"}
-                  <span className="text-sm text-muted-foreground">/mo</span>
+                  ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "59" : "99"}
+                  <span className="text-sm text-muted-foreground">/year</span>
                 </div>
                 {user?.subscriptionTier === "free" && (
-                  <p className="text-xs text-muted-foreground mt-1">$30 per order fee</p>
+                  <p className="text-xs text-muted-foreground mt-1">$30 fulfillment per order</p>
                 )}
               </div>
             </div>
@@ -551,7 +551,7 @@ export default function DashboardPage() {
             {user?.subscriptionTier === "free" ? (
               <>
                 <div className="mb-6">
-                  <h4 className="font-semibold mb-3">Free Tier Benefits:</h4>
+                  <h4 className="font-semibold mb-3">Foundation Benefits:</h4>
                   <ul className="space-y-2">
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
@@ -576,7 +576,7 @@ export default function DashboardPage() {
                   <ul className="space-y-1.5 mb-4">
                     <li className="flex items-start gap-2 text-sm">
                       <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
-                      <span>6-month and 1-year supply options</span>
+                      <span>6-month or 12-month supply options</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm">
                       <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
@@ -584,18 +584,18 @@ export default function DashboardPage() {
                     </li>
                     <li className="flex items-start gap-2 text-sm">
                       <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
-                      <span>No per-order dispensing fees</span>
+                      <span>Only $10 fulfillment per shipment</span>
                     </li>
                   </ul>
                   <div className="flex flex-col gap-3">
                     <Link href="/settings?tab=subscription">
                       <Button className="w-full" data-testid="button-upgrade-gold">
-                        Upgrade to Gold ($59/year)
+                        Upgrade to Gold – 6 Month ($59/year)
                       </Button>
                     </Link>
                     <Link href="/settings?tab=subscription">
                       <Button variant="outline" className="w-full" data-testid="button-upgrade-platinum">
-                        Upgrade to Platinum ($99/year)
+                        Upgrade to Gold – 12 Month ($99/year)
                       </Button>
                     </Link>
                   </div>
@@ -608,19 +608,19 @@ export default function DashboardPage() {
                   <ul className="space-y-2">
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>6-month and 1-year supply access</span>
+                      <span>{user?.subscriptionTier === "gold" ? "Up to 6-month supply" : "Up to 12-month supply"}</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>Wholesale year-supply pricing</span>
+                      <span>$10 fulfillment per shipment</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>Free home delivery</span>
+                      <span>Wholesale pricing</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>{user?.subscriptionTier === "gold" ? "1-3 medications" : "4+ medications"}</span>
+                      <span>Shipping at carrier rates</span>
                     </li>
                   </ul>
                 </div>
@@ -634,7 +634,7 @@ export default function DashboardPage() {
                   {user?.subscriptionTier === "gold" && (
                     <Link href="/settings?tab=subscription" className="flex-1">
                       <Button className="w-full" data-testid="button-upgrade-to-platinum">
-                        Upgrade to Platinum
+                        Upgrade to Gold – 12 Month
                       </Button>
                     </Link>
                   )}

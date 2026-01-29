@@ -117,14 +117,14 @@ export default function RefundPolicyPage() {
               <div className="flex items-start gap-2">
                 <span className="text-amber-900 dark:text-amber-100">•</span>
                 <div>
-                  <strong className="text-amber-900 dark:text-amber-100">Gold Plan ($59/year):</strong>
+                  <strong className="text-amber-900 dark:text-amber-100">Gold – 6 Month ($59/year):</strong>
                   <span className="text-amber-900 dark:text-amber-100"> No refunds for annual memberships once activated</span>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-amber-900 dark:text-amber-100">•</span>
                 <div>
-                  <strong className="text-amber-900 dark:text-amber-100">Platinum Plan ($99/year):</strong>
+                  <strong className="text-amber-900 dark:text-amber-100">Gold – 12 Month ($99/year):</strong>
                   <span className="text-amber-900 dark:text-amber-100"> No refunds for annual memberships once activated</span>
                 </div>
               </div>

@@ -503,7 +503,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -596,7 +596,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -628,51 +628,51 @@ export default function RegisterPage() {
                   data-testid="button-select-free"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <img src={freePillarBadge} alt="Free" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Free</div>
+                    <img src={freePillarBadge} alt="Foundation" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Foundation</div>
                   </div>
-                  <div className="text-2xl font-bold mb-2">$0<span className="text-sm text-muted-foreground">/mo</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$30 per order fee</div>
-                  <div className="text-xs">Up to 90-day supplies</div>
+                  <div className="text-2xl font-bold mb-2">$0<span className="text-sm text-muted-foreground">/year</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">$30 fulfillment per order</div>
+                  <div className="text-xs">Up to 90-day supply</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedTier("gold")}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-visible ${
                     selectedTier === "gold"
                       ? "border-primary bg-primary/5"
                       : "border-border hover-elevate"
                   }`}
                   data-testid="button-select-gold"
                 >
+                  <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-bold z-10">
+                    MOST POPULAR
+                  </div>
                   <div className="flex items-center gap-2 mb-2">
-                    <img src={goldPillarBadge} alt="Gold" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Gold</div>
+                    <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Gold – 6 Month</div>
                   </div>
                   <div className="text-2xl font-bold text-primary">$59<span className="text-sm text-muted-foreground">/year</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">1-3 medications</div>
-                  <div className="text-xs">50% off order fee • 6-mo supply</div>
+                  <div className="text-xs text-muted-foreground mb-2">$10 fulfillment per shipment</div>
+                  <div className="text-xs">Up to 6-month supply</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedTier("platinum")}
-                  className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-visible ${
+                  className={`p-4 rounded-lg border-2 transition-all text-left ${
                     selectedTier === "platinum"
                       ? "border-primary bg-primary/5"
                       : "border-border hover-elevate"
                   }`}
                   data-testid="button-select-platinum"
                 >
-                  <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-bold z-10">
-                    BEST VALUE
-                  </div>
                   <div className="flex items-center gap-2 mb-2">
-                    <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Platinum</div>
+                    <img src={goldPillarBadge} alt="Gold – 12 Month" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Gold – 12 Month</div>
                   </div>
                   <div className="text-2xl font-bold text-primary">$99<span className="text-sm text-muted-foreground">/year</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">4+ medications</div>
-                  <div className="text-xs">50% off order fee • Up to 1-yr supply</div>
+                  <div className="text-xs text-muted-foreground mb-2">$10 fulfillment per shipment</div>
+                  <div className="text-xs">Up to 12-month supply</div>
                 </button>
               </div>
             </CardContent>
@@ -959,7 +959,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1156,7 +1156,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1216,10 +1216,10 @@ export default function RegisterPage() {
                     </div>
                     <div className="text-sm md:text-base text-muted-foreground">per year</div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                      {selectedTier === "gold" ? "Gold Plan (1-3 meds) • 50% off order fees" : "Platinum Plan (4+ meds) • 50% off order fees"}
+                      {selectedTier === "gold" ? "Gold – 6 Month • $10 fulfillment" : "Gold – 12 Month • $10 fulfillment"}
                     </div>
                     <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
-                      {selectedTier === "gold" ? "6-month supply access" : "Up to 1-year supply access"}
+                      {selectedTier === "gold" ? "Up to 6-month supply" : "Up to 12-month supply"}
                     </div>
                   </div>
                 </div>

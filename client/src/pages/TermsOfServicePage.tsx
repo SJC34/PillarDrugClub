@@ -123,16 +123,20 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-lg mb-3">Membership Plans</h3>
               <p className="mb-3">
-                Pillar Drug Club offers two membership tiers:
+                Pillar Drug Club offers three membership tiers:
               </p>
               <div className="space-y-3">
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="font-semibold">Gold Plan - $59/year</p>
-                  <p className="text-muted-foreground">For members taking 1-3 chronic medications. Includes 50% off order fees and 6-month supply access.</p>
+                  <p className="font-semibold">Foundation (Free) - $0/year</p>
+                  <p className="text-muted-foreground">Best for trying Pillar before committing. Up to 90-day supply with $30 fulfillment per order.</p>
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="font-semibold">Platinum Plan - $99/year</p>
-                  <p className="text-muted-foreground">For members taking 4 or more chronic medications. Includes 50% off order fees and up to 1-year supply access.</p>
+                  <p className="font-semibold">Gold – 6 Month - $59/year</p>
+                  <p className="text-muted-foreground">Best for most people on stable medications. Up to 6-month supply with $10 fulfillment per shipment.</p>
+                </div>
+                <div className="bg-muted p-4 rounded-lg">
+                  <p className="font-semibold">Gold – 12 Month - $99/year</p>
+                  <p className="text-muted-foreground">Best for maximum convenience and zero refills. Up to 12-month supply with $10 fulfillment per shipment.</p>
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted-foreground">
@@ -199,8 +203,9 @@ export default function TermsOfServicePage() {
                 All memberships are billed annually:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
-                <li>Gold Plan: $59/year (includes 50% off order fees and 6-month supply access)</li>
-                <li>Platinum Plan: $99/year (includes 50% off order fees and up to 1-year supply access)</li>
+                <li>Foundation (Free): $0/year with $30 fulfillment per order</li>
+                <li>Gold – 6 Month: $59/year with $10 fulfillment per shipment</li>
+                <li>Gold – 12 Month: $99/year with $10 fulfillment per shipment</li>
               </ul>
             </div>
 
@@ -358,8 +363,8 @@ export default function TermsOfServicePage() {
                 Annual memberships are non-refundable once activated:
               </p>
               <ul className="list-disc list-inside space-y-1 ml-4 text-muted-foreground">
-                <li>Gold Plan ($59/year): No refunds after activation</li>
-                <li>Platinum Plan ($99/year): No refunds after activation</li>
+                <li>Gold – 6 Month ($59/year): No refunds after activation</li>
+                <li>Gold – 12 Month ($99/year): No refunds after activation</li>
               </ul>
             </div>
 

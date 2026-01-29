@@ -24,7 +24,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
   const [isLoading, setIsLoading] = useState(false);
 
   const planPrice = selectedPlan === 'basic' ? 59 : 99;
-  const planName = selectedPlan === 'basic' ? 'Gold Plan (1-3 meds)' : 'Platinum Plan (4+ meds)';
+  const planName = selectedPlan === 'basic' ? 'Gold – 6 Month' : 'Gold – 12 Month';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,18 +248,23 @@ export default function SubscriptionPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Select Your Plan</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
             <Card 
-              className={`cursor-pointer transition-all hover-elevate ${selectedPlan === 'basic' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
+              className={`cursor-pointer transition-all hover-elevate relative ${selectedPlan === 'basic' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
               onClick={() => setSelectedPlan('basic')}
               data-testid="card-plan-basic"
             >
+              {selectedPlan === 'basic' && (
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
+                  MOST POPULAR
+                </div>
+              )}
               <CardHeader>
-                <CardTitle className="text-lg">Gold Plan</CardTitle>
+                <CardTitle className="text-lg">Gold – 6 Month</CardTitle>
                 <div className="text-2xl font-bold text-primary">
                   $59<span className="text-base text-muted-foreground">/year</span>
                 </div>
-                <CardDescription>1-3 medications</CardDescription>
+                <CardDescription>Best for most people on stable medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  50% off order fee • 6-month supply access
+                  $10 fulfillment per shipment • Up to 6-month supply
                 </div>
               </CardHeader>
             </Card>
@@ -275,13 +280,13 @@ export default function SubscriptionPage() {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-lg">Platinum Plan</CardTitle>
+                <CardTitle className="text-lg">Gold – 12 Month</CardTitle>
                 <div className="text-2xl font-bold text-primary">
                   $99<span className="text-base text-muted-foreground">/year</span>
                 </div>
-                <CardDescription>4+ medications</CardDescription>
+                <CardDescription>Best for maximum convenience and zero refills</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  50% off order fee • Up to 1-year supply access
+                  $10 fulfillment per shipment • Up to 12-month supply
                 </div>
               </CardHeader>
             </Card>
@@ -292,7 +297,7 @@ export default function SubscriptionPage() {
         <Alert className="mb-8 max-w-3xl mx-auto" data-testid="alert-commitment">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="ml-2">
-            <strong>Annual Membership:</strong> All memberships are billed annually and include 50% off order fees plus access to extended supply options.
+            <strong>Annual Membership:</strong> All memberships are billed annually. Shipping is passed through at carrier rates.
           </AlertDescription>
         </Alert>
 
@@ -353,7 +358,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div className="text-gray-600">per year</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {selectedPlan === 'basic' ? '1-3 medications • 50% off order fees' : '4+ medications • 50% off order fees'}
+                    {selectedPlan === 'basic' ? 'Gold – 6 Month • $10 fulfillment' : 'Gold – 12 Month • $10 fulfillment'}
                   </div>
                 </div>
               </div>

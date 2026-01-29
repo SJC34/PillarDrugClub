@@ -541,7 +541,7 @@ export default function PrescriptionRequestPage() {
                         </Select>
                         {user?.subscriptionTier === "free" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Upgrade to Gold or Platinum for 6-month & 1-year supply access
+                            Upgrade to Gold for 6-month or 12-month supply access
                           </p>
                         )}
                         {doctorForm.formState.errors.quantity && (

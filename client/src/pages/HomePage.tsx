@@ -187,30 +187,30 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Choose Your Savings Plan</h2>
           <p className="text-base md:text-lg text-muted-foreground mb-8 font-bold max-w-3xl mx-auto">
-            Start with our Free Tier, or unlock year-supply wholesale pricing with Gold or Platinum
+            Simple, transparent membership plans to fit your medication needs
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Free Tier */}
+            {/* Foundation (Free) */}
             <Card className="border-secondary/30">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-3">
-                  <img src={freePillarBadge} alt="Free Tier" className="w-16 h-16 object-contain" />
+                  <img src={freePillarBadge} alt="Foundation" className="w-16 h-16 object-contain" />
                 </div>
-                <CardTitle className="text-xl md:text-2xl font-bold">Free Tier</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Foundation (Free)</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-foreground">
                   $0
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <CardDescription className="font-bold">Pay per order</CardDescription>
+                <CardDescription className="font-bold">Best for trying Pillar before committing</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-secondary/10 rounded-lg">
-                  <p className="text-sm font-bold text-secondary">$30 dispensing & shipping per order</p>
+                  <p className="text-sm font-bold text-secondary">$30 fulfillment per order</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Up to 90-day supplies</span>
+                    <span className="text-sm md:text-base font-bold">Up to 90-day supply</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
@@ -218,7 +218,7 @@ export default function HomePage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">No membership required</span>
+                    <span className="text-sm md:text-base font-bold">Shipping at carrier rates</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
@@ -227,96 +227,96 @@ export default function HomePage() {
                 </ul>
                 <Link href="/register">
                   <Button variant="outline" className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-free">
-                    Start Free
+                    Get Started
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Gold Plan */}
-            <Card className="border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
+            {/* Gold – 6 Month (Most Popular) */}
+            <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10 relative">
+              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
+                MOST POPULAR
+              </div>
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-3">
-                  <img src={goldPillarBadge} alt="Gold Plan" className="w-16 h-16 object-contain" />
+                  <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-16 h-16 object-contain" />
                 </div>
-                <CardTitle className="text-xl md:text-2xl font-bold">Gold Plan</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Gold – 6 Month</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
                   $59
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <CardDescription className="font-bold">1-3 medications</CardDescription>
+                <CardDescription className="font-bold">Best for most people on stable medications</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">50% off order fee • 6-month supply access</p>
+                  <p className="text-sm font-bold text-primary">$10 fulfillment per shipment</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Up to 6-month supply</span>
+                  </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
                     <span className="text-sm md:text-base font-bold">Wholesale pricing</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">No insurance required</span>
+                    <span className="text-sm md:text-base font-bold">Shipping at carrier rates</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Free home delivery</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Transparent pricing</span>
+                    <span className="text-sm md:text-base font-bold">Home delivery</span>
                   </li>
                 </ul>
                 <Link href="/register?tier=gold">
                   <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-gold">
-                    Start Gold Plan
+                    Choose Gold – 6 Month
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Platinum Plan */}
-            <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10 relative">
-              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
-                BEST VALUE
-              </div>
+            {/* Gold – 12 Month */}
+            <Card className="border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-3">
-                  <img src={platinumPillarBadge} alt="Platinum Plan" className="w-16 h-16 object-contain" />
+                  <img src={goldPillarBadge} alt="Gold – 12 Month" className="w-16 h-16 object-contain" />
                 </div>
-                <CardTitle className="text-xl md:text-2xl font-bold">Platinum Plan</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold">Gold – 12 Month</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
                   $99
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <CardDescription className="font-bold">4+ medications</CardDescription>
+                <CardDescription className="font-bold">Best for maximum convenience and zero refills</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">50% off order fee • Up to 1-year supply access</p>
+                  <p className="text-sm font-bold text-primary">$10 fulfillment per shipment</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Wholesale year-supply pricing</span>
+                    <span className="text-sm md:text-base font-bold">Up to 12-month supply</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">No insurance required</span>
+                    <span className="text-sm md:text-base font-bold">Wholesale pricing</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Free home delivery</span>
+                    <span className="text-sm md:text-base font-bold">Shipping at carrier rates</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Maximum savings</span>
+                    <span className="text-sm md:text-base font-bold">Home delivery</span>
                   </li>
                 </ul>
                 <Link href="/register?tier=platinum">
                   <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-platinum">
-                    Start Platinum Plan
+                    Choose Gold – 12 Month
                   </Button>
                 </Link>
               </CardContent>
@@ -409,7 +409,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($59/year for 6-month supplies) and Platinum ($99/year for up to 1-year supplies) plans unlock extended supply savings plus 50% off order fees. Even our Free Tier saves you 90% vs retail.
+                Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold – 6 Month ($59/year) and Gold – 12 Month ($99/year) plans unlock extended supply savings with just $10 fulfillment per shipment.
               </AccordionContent>
             </AccordionItem>
 
@@ -418,7 +418,7 @@ export default function HomePage() {
                 What if I can't afford my prescriptions?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cant-afford">
-                Start with our Free Tier - $0/month and only $30 per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify.
+                Start with our Foundation tier - $0/year and only $30 fulfillment per order. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 90-day supply. We also offer payment plans and assistance programs for those who qualify.
               </AccordionContent>
             </AccordionItem>
 
