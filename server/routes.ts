@@ -533,17 +533,17 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         await storage.updateUserStripeInfo(userId, customerId, null);
       }
       
-      // Determine price based on plan
+      // Determine price based on plan (annual billing)
       const planConfig: Record<'basic' | 'plus', { amount: number; name: string; description: string }> = {
         basic: {
-          amount: 1500, // $15.00 in cents
-          name: 'Pillar Drug Club Foundation Plan',
-          description: 'Monthly membership for 1-3 medications at wholesale pricing'
+          amount: 5900, // $59.00 in cents (annual)
+          name: 'Pillar Drug Club Gold Plan',
+          description: 'Annual membership for 1-3 medications - 50% off order fees, 6-month supply access'
         },
         plus: {
-          amount: 2500, // $25.00 in cents
-          name: 'Pillar Drug Club Keystone Plan',
-          description: 'Monthly membership for 4+ medications at wholesale pricing'
+          amount: 9900, // $99.00 in cents (annual)
+          name: 'Pillar Drug Club Platinum Plan',
+          description: 'Annual membership for 4+ medications - 50% off order fees, up to 1-year supply access'
         }
       };
 
@@ -566,7 +566,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
           unit_amount: selectedPlan.amount,
           currency: 'usd',
           recurring: {
-            interval: 'month',
+            interval: 'year',
           },
         });
         

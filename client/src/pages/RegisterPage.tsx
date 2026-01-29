@@ -502,8 +502,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescriptions from $59/Year"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -511,7 +511,7 @@ export default function RegisterPage() {
           <div className="w-full max-w-md">
             <div className="text-center mb-6 md:mb-8">
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
-              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $15/month (billed annually)</p>
+              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $59/year</p>
             </div>
 
           <Card className="border-secondary/20">
@@ -595,8 +595,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescriptions from $59/Year"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -649,10 +649,9 @@ export default function RegisterPage() {
                     <img src={goldPillarBadge} alt="Gold" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Gold</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary">$15<span className="text-sm text-muted-foreground">/month</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">billed annually $180/yr</div>
+                  <div className="text-2xl font-bold text-primary">$59<span className="text-sm text-muted-foreground">/year</span></div>
                   <div className="text-xs text-muted-foreground mb-2">1-3 medications</div>
-                  <div className="text-xs">6-mo & 1-yr supplies</div>
+                  <div className="text-xs">50% off order fee • 6-mo supply</div>
                 </button>
                 <button
                   type="button"
@@ -671,10 +670,9 @@ export default function RegisterPage() {
                     <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Platinum</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary">$25<span className="text-sm text-muted-foreground">/month</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">billed annually $300/yr</div>
+                  <div className="text-2xl font-bold text-primary">$99<span className="text-sm text-muted-foreground">/year</span></div>
                   <div className="text-xs text-muted-foreground mb-2">4+ medications</div>
-                  <div className="text-xs">6-mo & 1-yr supplies</div>
+                  <div className="text-xs">50% off order fee • Up to 1-yr supply</div>
                 </button>
               </div>
             </CardContent>
@@ -960,8 +958,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescriptions from $59/Year"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1157,8 +1155,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Get Prescriptions for $15/Month"
-          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($15/mo for 6-month supplies), or Platinum ($25/mo for year supplies). No insurance needed. Start saving today."
+          title="Join Pillar Drug Club | Prescriptions from $59/Year"
+          description="Join thousands saving 90% on prescriptions. Choose Free ($0), Gold ($59/yr for 6-month supplies), or Platinum ($99/yr for year supplies). 50% off order fees. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1214,14 +1212,14 @@ export default function RegisterPage() {
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl md:text-3xl font-bold text-teal-600">
-                      ${selectedTier === "gold" ? "15" : "25"}
+                      ${selectedTier === "gold" ? "59" : "99"}
                     </div>
-                    <div className="text-sm md:text-base text-muted-foreground">per month</div>
+                    <div className="text-sm md:text-base text-muted-foreground">per year</div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                      {selectedTier === "gold" ? "Gold Plan (1-3 meds)" : "Platinum Plan (4+ meds)"}
+                      {selectedTier === "gold" ? "Gold Plan (1-3 meds) • 50% off order fees" : "Platinum Plan (4+ meds) • 50% off order fees"}
                     </div>
                     <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
-                      Access to 6-month & 1-year supply pricing
+                      {selectedTier === "gold" ? "6-month supply access" : "Up to 1-year supply access"}
                     </div>
                   </div>
                 </div>

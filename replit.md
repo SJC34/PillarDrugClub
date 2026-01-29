@@ -38,7 +38,11 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
   - **OpenFDA Integration**: Free API with 7-day in-memory cache (memoize), 30-day database cache. Enriches 1,857 medications with drug labels from disk cache
   - **Tier Gating**: Free members see upgrade CTAs, Gold/Platinum access full analysis features
   - **Performance**: 3-second startup with skip logic (medications persist in database). Cold start (empty DB): ~10-15 minutes for FDA enrichment (acceptable for MVP, optimization planned)
-- **Refund Policy System**: Comprehensive, transparent refund and cancellation policy with two-tier refund structure and annual commitment terms, available as web content and downloadable PDF.
+- **Refund Policy System**: Comprehensive, transparent refund and cancellation policy for annual memberships, available as web content and downloadable PDF. Annual memberships are non-refundable once activated.
+- **Membership Pricing** (January 2026): Annual billing model with three tiers:
+  - **Free Tier**: $0/year, access to wholesale pricing with $30 order fee
+  - **Gold Plan**: $59/year, 50% off order fees, 6-month supply access, 1-3 medications
+  - **Platinum Plan**: $99/year, 50% off order fees, up to 1-year supply access, 4+ medications
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including Executive Dashboard, User Management (deactivate, soft delete, suspend, delete, recover), Financial Dashboard, Communication Center, Reports & Analytics, and Medication Pricing Management. Admin users can toggle between Admin Dashboard and User Dashboard via the header menu for seamless role switching.
 - **Hybrid Blog System ("The Pillar Post 🗞️")**: A dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG). Features include an admin interface for content generation, AI-powered SEO keyword generator that analyzes blog titles to suggest 8-12 optimized keywords, compliance review workflow, and a GoodRx-style visual redesign with featured image uploads (client-side resizing, compression, base64 storage).
 - **Sora AI Video Generation System** (November 2025): Dual-track video generation infrastructure for YouTube content marketing with immediate production capability and Q1 2026 API readiness. Features include:

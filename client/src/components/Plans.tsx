@@ -15,7 +15,7 @@ interface Plan {
 export default function Plans() {
   const plans: Plan[] = [
     {
-      name: "Foundation Plan",
+      name: "Gold Plan",
       description: "Perfect for employees with basic prescription needs",
       coverage: "1-4 prescriptions per employee",
       upfrontFee: "$60",
@@ -29,13 +29,13 @@ export default function Plans() {
       highlighted: false
     },
     {
-      name: "Keystone Plan",
+      name: "Platinum Plan",
       description: "Comprehensive coverage for employees with multiple prescriptions",
       coverage: "4+ prescriptions per employee",
       upfrontFee: "$120",
       monthlyFee: "$10 PEPM",
       features: [
-        "All Foundation Plan benefits",
+        "All Gold Plan benefits",
         "Advanced medication management",
         "Priority customer support",
         "Claims assessment and reporting"

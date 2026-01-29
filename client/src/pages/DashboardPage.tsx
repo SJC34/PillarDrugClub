@@ -406,10 +406,10 @@ export default function DashboardPage() {
                 )}
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
-                    ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "15" : "25"}
+                    ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "59" : "99"}
                   </p>
                   <p className="text-sm text-gray-600">
-                    {user?.subscriptionTier === "free" ? "Free Tier" : "Monthly Membership"}
+                    {user?.subscriptionTier === "free" ? "Free Tier" : "Annual Membership"}
                   </p>
                 </div>
               </div>
@@ -567,7 +567,7 @@ export default function DashboardPage() {
                     </li>
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>No monthly commitment</span>
+                      <span>No membership required</span>
                     </li>
                   </ul>
                 </div>
@@ -590,18 +590,12 @@ export default function DashboardPage() {
                   <div className="flex flex-col gap-3">
                     <Link href="/settings?tab=subscription">
                       <Button className="w-full" data-testid="button-upgrade-gold">
-                        <div className="flex flex-col items-center">
-                          <span>Upgrade to Gold ($15/month)</span>
-                          <span className="text-xs opacity-75">billed annually $180/yr</span>
-                        </div>
+                        Upgrade to Gold ($59/year)
                       </Button>
                     </Link>
                     <Link href="/settings?tab=subscription">
                       <Button variant="outline" className="w-full" data-testid="button-upgrade-platinum">
-                        <div className="flex flex-col items-center">
-                          <span>Upgrade to Platinum ($25/month)</span>
-                          <span className="text-xs opacity-75">billed annually $300/yr</span>
-                        </div>
+                        Upgrade to Platinum ($99/year)
                       </Button>
                     </Link>
                   </div>

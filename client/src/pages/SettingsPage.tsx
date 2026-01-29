@@ -337,7 +337,7 @@ export default function SettingsPage() {
                   </Link>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Note: Canceling before completing your 12-month commitment will require a one-time early termination fee.
+                  Note: Annual memberships are non-refundable once activated.
                 </p>
               </CardContent>
             </Card>

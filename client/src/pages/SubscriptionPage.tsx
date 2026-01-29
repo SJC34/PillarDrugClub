@@ -23,9 +23,8 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const planPrice = selectedPlan === 'basic' ? 15 : 25;
-  const planAnnual = selectedPlan === 'basic' ? 180 : 300;
-  const planName = selectedPlan === 'basic' ? 'Foundation Plan (1-3 meds)' : 'Keystone Plan (4+ meds)';
+  const planPrice = selectedPlan === 'basic' ? 59 : 99;
+  const planName = selectedPlan === 'basic' ? 'Gold Plan (1-3 meds)' : 'Platinum Plan (4+ meds)';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +67,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription className="text-sm">
-          By subscribing, you agree to our <a href="/refund-policy" target="_blank" className="underline font-medium hover:text-primary" data-testid="link-checkout-refund-policy">refund policy</a>. Membership requires a 12-month commitment with monthly billing.
+          By subscribing, you agree to our <a href="/refund-policy" target="_blank" className="underline font-medium hover:text-primary" data-testid="link-checkout-refund-policy">refund policy</a>. Annual membership billed once per year.
         </AlertDescription>
       </Alert>
 
@@ -79,12 +78,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
         disabled={!stripe || isLoading}
         data-testid="button-subscribe"
       >
-        {isLoading ? "Processing..." : (
-          <div className="flex flex-col items-center">
-            <span>Subscribe {planName} for ${planPrice}/month</span>
-            <span className="text-xs opacity-75">billed annually ${planAnnual}/yr</span>
-          </div>
-        )}
+        {isLoading ? "Processing..." : `Subscribe ${planName} for $${planPrice}/year`}
       </Button>
     </form>
   );
@@ -259,14 +253,13 @@ export default function SubscriptionPage() {
               data-testid="card-plan-basic"
             >
               <CardHeader>
-                <CardTitle className="text-lg">Foundation Plan</CardTitle>
+                <CardTitle className="text-lg">Gold Plan</CardTitle>
                 <div className="text-2xl font-bold text-primary">
-                  $15<span className="text-base text-muted-foreground">/month</span>
+                  $59<span className="text-base text-muted-foreground">/year</span>
                 </div>
-                <div className="text-xs text-muted-foreground">billed annually $180/yr</div>
                 <CardDescription>1-3 medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  12-month commitment required
+                  50% off order fee • 6-month supply access
                 </div>
               </CardHeader>
             </Card>
@@ -282,27 +275,24 @@ export default function SubscriptionPage() {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-lg">Keystone Plan</CardTitle>
+                <CardTitle className="text-lg">Platinum Plan</CardTitle>
                 <div className="text-2xl font-bold text-primary">
-                  $25<span className="text-base text-muted-foreground">/month</span>
+                  $99<span className="text-base text-muted-foreground">/year</span>
                 </div>
-                <div className="text-xs text-muted-foreground">billed annually $300/yr</div>
                 <CardDescription>4+ medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  12-month commitment required
+                  50% off order fee • Up to 1-year supply access
                 </div>
               </CardHeader>
             </Card>
           </div>
         </div>
 
-        {/* Annual Commitment Notice */}
+        {/* Annual Membership Notice */}
         <Alert className="mb-8 max-w-3xl mx-auto" data-testid="alert-commitment">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="ml-2">
-            <strong>12-Month Commitment:</strong> All memberships require a 12-month annual commitment. 
-            If you cancel before completing 12 monthly payments, a termination fee equal to the 
-            remaining months will apply. After fulfilling your commitment, you can cancel anytime with no fee.
+            <strong>Annual Membership:</strong> All memberships are billed annually and include 50% off order fees plus access to extended supply options.
           </AlertDescription>
         </Alert>
 
@@ -337,10 +327,10 @@ export default function SubscriptionPage() {
                 </div>
                 
                 <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                  <h4 className="font-semibold text-gray-900 mb-2">Annual Commitment Terms</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">Annual Membership Terms</h4>
                   <p className="text-sm text-gray-600">
-                    All memberships include a 12-month commitment. Early cancellation requires 
-                    payment of remaining months. You can cancel anytime after 12 payments with no fee.
+                    Annual memberships are billed once per year and are non-refundable once activated. 
+                    Your membership renews automatically unless cancelled.
                   </p>
                 </div>
               </div>
@@ -359,11 +349,11 @@ export default function SubscriptionPage() {
               <div className="mb-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-3xl font-bold text-blue-600">
-                    ${selectedPlan === 'basic' ? '15' : '25'}
+                    ${selectedPlan === 'basic' ? '59' : '99'}
                   </div>
-                  <div className="text-gray-600">per month</div>
+                  <div className="text-gray-600">per year</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {selectedPlan === 'basic' ? '1-3 medications' : '4+ medications'}
+                    {selectedPlan === 'basic' ? '1-3 medications • 50% off order fees' : '4+ medications • 50% off order fees'}
                   </div>
                 </div>
               </div>
@@ -379,7 +369,7 @@ export default function SubscriptionPage() {
                   We use Stripe for payment processing.
                 </div>
                 <div className="text-center text-xs text-gray-500">
-                  By subscribing, you agree to our 12-month commitment terms.
+                  By subscribing, you agree to our annual membership terms.
                 </div>
               </div>
             </CardContent>

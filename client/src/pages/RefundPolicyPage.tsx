@@ -60,7 +60,7 @@ export default function RefundPolicyPage() {
           </CardHeader>
           <CardContent>
             <p className="text-foreground leading-relaxed">
-              All memberships require a <strong>12-month annual commitment</strong> from the date of subscription activation.
+              All memberships are billed <strong>annually</strong> from the date of subscription activation. Annual memberships are non-refundable once activated.
             </p>
           </CardContent>
         </Card>
@@ -84,7 +84,7 @@ export default function RefundPolicyPage() {
             <div>
               <h4 className="font-semibold text-foreground mb-2">2.2 Membership Fees</h4>
               <p className="text-muted-foreground leading-relaxed">
-                Monthly membership fees are <strong>non-refundable once a prescription has been received</strong> by our partner pharmacy on your behalf. This policy ensures compliance with pharmacy regulations and protects the integrity of our wholesale pricing model.
+                Annual membership fees are <strong>non-refundable once activated</strong>. This policy ensures compliance with pharmacy regulations and protects the integrity of our wholesale pricing model.
               </p>
             </div>
 
@@ -100,32 +100,32 @@ export default function RefundPolicyPage() {
           </CardContent>
         </Card>
 
-        {/* Early Termination Fee */}
+        {/* Annual Membership - No Refunds */}
         <Card className="mb-6 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
               <AlertCircle className="h-5 w-5" />
-              3. Early Termination Fee
+              3. Annual Membership - No Refunds
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-amber-900 dark:text-amber-100 leading-relaxed">
-              If you choose to cancel your membership before completing your 12-month commitment, an early termination fee will apply:
+              Annual memberships are non-refundable once activated:
             </p>
 
             <div className="space-y-2 pl-4">
               <div className="flex items-start gap-2">
                 <span className="text-amber-900 dark:text-amber-100">•</span>
                 <div>
-                  <strong className="text-amber-900 dark:text-amber-100">Foundation Plan ($15/month):</strong>
-                  <span className="text-amber-900 dark:text-amber-100"> $120 termination fee (equivalent to 8 months)</span>
+                  <strong className="text-amber-900 dark:text-amber-100">Gold Plan ($59/year):</strong>
+                  <span className="text-amber-900 dark:text-amber-100"> No refunds for annual memberships once activated</span>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-amber-900 dark:text-amber-100">•</span>
                 <div>
-                  <strong className="text-amber-900 dark:text-amber-100">Keystone Plan ($25/month):</strong>
-                  <span className="text-amber-900 dark:text-amber-100"> $200 termination fee (equivalent to 8 months)</span>
+                  <strong className="text-amber-900 dark:text-amber-100">Platinum Plan ($99/year):</strong>
+                  <span className="text-amber-900 dark:text-amber-100"> No refunds for annual memberships once activated</span>
                 </div>
               </div>
             </div>
@@ -149,7 +149,7 @@ export default function RefundPolicyPage() {
             <ol className="space-y-2 pl-6 list-decimal text-foreground">
               <li>Log into your account at pillardrugclub.com</li>
               <li>Navigate to Account Settings → Cancel Membership</li>
-              <li>Review your commitment status and applicable termination fees</li>
+              <li>Review your membership status</li>
               <li>Confirm cancellation request</li>
               <li>Receive email confirmation with final billing details</li>
             </ol>
@@ -188,8 +188,8 @@ export default function RefundPolicyPage() {
           <CardContent>
             <p className="text-foreground mb-3">You have the right to:</p>
             <ul className="space-y-2 pl-6 list-disc text-muted-foreground">
-              <li>Receive clear disclosure of all fees, commitment terms, and cancellation policies</li>
-              <li>Cancel your membership at any time (subject to termination fees if within commitment period)</li>
+              <li>Receive clear disclosure of all fees and cancellation policies</li>
+              <li>Cancel your membership at any time (annual memberships are non-refundable)</li>
               <li>Access this policy at any time on our website</li>
               <li>Contact customer support with questions about fees or cancellation</li>
               <li>File complaints with state pharmacy boards or consumer protection agencies if you believe this policy violates applicable regulations</li>
@@ -228,8 +228,7 @@ export default function RefundPolicyPage() {
             </p>
             <ul className="space-y-1 pl-6 list-disc text-foreground text-sm">
               <li>All prescription medication sales are final under pharmacy regulations</li>
-              <li>Membership requires a 12-month commitment</li>
-              <li>Early cancellation incurs an 8-month termination fee</li>
+              <li>Annual memberships are non-refundable once activated</li>
               <li>Membership fees are non-refundable after prescriptions are received</li>
             </ul>
           </CardContent>

@@ -307,23 +307,19 @@ export default function CancelSubscriptionPage() {
           <Alert className="mb-6">
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>
-              {feeDetails.message || "You have fulfilled your 12-month commitment. You can cancel without any fees."}
+              {feeDetails.message || "Your annual membership has expired. You can cancel without any fees."}
             </AlertDescription>
           </Alert>
 
           <Card>
             <CardHeader>
-              <CardTitle>Commitment Status</CardTitle>
-              <CardDescription>You've completed your annual commitment</CardDescription>
+              <CardTitle>Membership Status</CardTitle>
+              <CardDescription>Your annual membership has ended</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Months Paid:</span>
-                <span className="font-semibold">{feeDetails.monthsPaid} / 12</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Termination Fee:</span>
-                <span className="font-semibold text-green-600">$0.00</span>
+                <span className="text-muted-foreground">Status:</span>
+                <span className="font-semibold text-green-600">Eligible for cancellation</span>
               </div>
               <Separator />
               <Alert>
@@ -380,15 +376,15 @@ export default function CancelSubscriptionPage() {
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Cancel Subscription</h1>
             <p className="text-sm md:text-base text-muted-foreground">
-              Review your early termination fee
+              Cancel your annual membership
             </p>
           </div>
 
           <Alert variant="destructive" className="mb-6">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Annual Commitment:</strong> You committed to 12 months when you signed up. 
-              Canceling early requires a one-time termination fee.
+              <strong>Annual Membership:</strong> Your annual membership is still active. 
+              Annual memberships are non-refundable once activated.
             </AlertDescription>
           </Alert>
 
@@ -396,64 +392,53 @@ export default function CancelSubscriptionPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
-                Commitment Details
+                Membership Details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Months Paid:</span>
-                <span className="font-semibold">{feeDetails.monthsPaid} / 12</span>
+                <span className="text-muted-foreground">Membership Status:</span>
+                <span className="font-semibold">Active</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Months Remaining:</span>
-                <span className="font-semibold">{feeDetails.remainingMonths}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Monthly Rate:</span>
-                <span className="font-semibold">${((feeDetails.monthlyRate || 0) / 100).toFixed(2)}</span>
+                <span className="text-muted-foreground">Time Remaining:</span>
+                <span className="font-semibold">{feeDetails.remainingMonths} months</span>
               </div>
               <Separator />
-              <div className="flex justify-between items-center text-lg">
-                <span className="font-semibold flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-destructive" />
-                  Early Termination Fee:
-                </span>
-                <span className="font-bold text-destructive">{feeDetails.terminationFeeFormatted}</span>
-              </div>
               <p className="text-sm text-muted-foreground">
-                This fee covers the remaining {feeDetails.remainingMonths} months of your annual commitment.
+                Annual memberships are non-refundable. Your membership will remain active until the end of your billing period.
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Next Steps</CardTitle>
+              <CardTitle>Cancel at End of Period</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                To cancel your subscription, you'll need to pay the early termination fee of{" "}
-                <strong>{feeDetails.terminationFeeFormatted}</strong>. This is a one-time charge.
+                You can cancel your membership to prevent auto-renewal. Your membership will remain active until the end of your current billing period. No refund will be issued for the remaining time.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link href="/settings" className="flex-1">
                   <Button variant="outline" className="w-full" data-testid="button-cancel-action">
-                    Go Back
+                    Keep Membership
                   </Button>
                 </Link>
                 <Button
+                  variant="destructive"
                   className="flex-1"
-                  onClick={() => createPaymentIntentMutation.mutate()}
-                  disabled={createPaymentIntentMutation.isPending}
+                  onClick={() => cancelNoFeeMutation.mutate()}
+                  disabled={cancelNoFeeMutation.isPending}
                   data-testid="button-proceed-payment"
                 >
-                  {createPaymentIntentMutation.isPending ? (
+                  {cancelNoFeeMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Loading...
+                      Canceling...
                     </>
                   ) : (
-                    "Proceed to Payment"
+                    "Cancel Membership"
                   )}
                 </Button>
               </div>
@@ -483,9 +468,9 @@ export default function CancelSubscriptionPage() {
               <Pill className="h-8 w-8 text-primary" />
               <span className="text-xl md:text-2xl font-bold text-foreground">pillar drug club</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Pay Termination Fee</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Process Cancellation</h1>
             <p className="text-sm md:text-base text-muted-foreground">
-              Complete payment to cancel your subscription
+              Complete any outstanding balance to cancel your membership
             </p>
           </div>
 

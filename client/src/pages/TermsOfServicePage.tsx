@@ -127,16 +127,16 @@ export default function TermsOfServicePage() {
               </p>
               <div className="space-y-3">
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="font-semibold">Foundation Plan - $15/month</p>
-                  <p className="text-muted-foreground">For members taking 1-3 chronic medications</p>
+                  <p className="font-semibold">Gold Plan - $59/year</p>
+                  <p className="text-muted-foreground">For members taking 1-3 chronic medications. Includes 50% off order fees and 6-month supply access.</p>
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="font-semibold">Keystone Plan - $25/month</p>
-                  <p className="text-muted-foreground">For members taking 4 or more chronic medications</p>
+                  <p className="font-semibold">Platinum Plan - $99/year</p>
+                  <p className="text-muted-foreground">For members taking 4 or more chronic medications. Includes 50% off order fees and up to 1-year supply access.</p>
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted-foreground">
-                Both plans require a 12-month commitment with monthly billing. See Section 5 for detailed payment terms.
+                Both plans are billed annually. See Section 5 for detailed payment terms.
               </p>
             </div>
           </CardContent>
@@ -196,22 +196,22 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-lg mb-3">Membership Fees</h3>
               <p className="mb-3">
-                All memberships require a 12-month commitment with monthly billing:
+                All memberships are billed annually:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
-                <li>Foundation Plan: $15/month (billed monthly for 12 months = $180 annual commitment)</li>
-                <li>Keystone Plan: $25/month (billed monthly for 12 months = $300 annual commitment)</li>
+                <li>Gold Plan: $59/year (includes 50% off order fees and 6-month supply access)</li>
+                <li>Platinum Plan: $99/year (includes 50% off order fees and up to 1-year supply access)</li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3">Recurring Billing</h3>
+              <h3 className="font-semibold text-lg mb-3">Annual Billing</h3>
               <p className="text-muted-foreground mb-2">
                 By subscribing, you authorize Pillar Drug Club to charge your payment method:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
-                <li>Monthly on your subscription start date</li>
-                <li>Automatically until you cancel or your 12-month commitment ends</li>
+                <li>Annually on your subscription start date</li>
+                <li>Automatically until you cancel (annual memberships are non-refundable)</li>
                 <li>For any applicable prescription medication costs</li>
                 <li>For any other fees associated with our services</li>
               </ul>
@@ -353,13 +353,13 @@ export default function TermsOfServicePage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-base mb-2">Early Termination Fee</h3>
+              <h3 className="font-semibold text-base mb-2">Refund Policy</h3>
               <p className="text-muted-foreground mb-2">
-                If you cancel before completing your 12-month commitment, an early termination fee applies:
+                Annual memberships are non-refundable once activated:
               </p>
               <ul className="list-disc list-inside space-y-1 ml-4 text-muted-foreground">
-                <li>Foundation Plan: $120 early termination fee</li>
-                <li>Keystone Plan: $200 early termination fee</li>
+                <li>Gold Plan ($59/year): No refunds after activation</li>
+                <li>Platinum Plan ($99/year): No refunds after activation</li>
               </ul>
             </div>
 

@@ -503,25 +503,25 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
     doc.fontSize(10)
        .font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
-       .text('If you choose to cancel your membership before completing your 12-month commitment, an early termination fee will apply:', 75, doc.y, { width: 462, lineGap: 4 });
+       .text('Annual memberships are non-refundable once activated:', 75, doc.y, { width: 462, lineGap: 4 });
 
     doc.moveDown(0.5);
     doc.font('Helvetica-Bold')
        .fillColor(BRAND_FOREGROUND)
-       .text('• Foundation Plan ($15/month):', 85, doc.y, { continued: true })
+       .text('• Gold Plan ($59/year):', 85, doc.y, { continued: true })
        .font('Helvetica')
-       .text(' $120 termination fee (equivalent to 8 months)', { width: 452 });
+       .text(' No refunds after activation', { width: 452 });
 
     doc.moveDown(0.3);
     doc.font('Helvetica-Bold')
-       .text('• Keystone Plan ($25/month):', 85, doc.y, { continued: true })
+       .text('• Platinum Plan ($99/year):', 85, doc.y, { continued: true })
        .font('Helvetica')
-       .text(' $200 termination fee (equivalent to 8 months)', { width: 452 });
+       .text(' No refunds after activation', { width: 452 });
 
     doc.moveDown(0.5);
     doc.fontSize(9)
        .fillColor(BRAND_MUTED)
-       .text('This fee compensates for administrative costs, pharmacy network setup, and wholesale pricing arrangements made on your behalf.', 75, doc.y, { width: 462, lineGap: 3 });
+       .text('Annual membership fees cover administrative costs, pharmacy network access, and wholesale pricing arrangements made on your behalf.', 75, doc.y, { width: 462, lineGap: 3 });
 
     doc.moveDown(2);
 

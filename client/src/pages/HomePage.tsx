@@ -218,7 +218,7 @@ export default function HomePage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">No monthly commitment</span>
+                    <span className="text-sm md:text-base font-bold">No membership required</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
@@ -241,20 +241,19 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Gold Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $15
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                  $59
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <div className="text-xs text-muted-foreground">billed annually $180/yr</div>
                 <CardDescription className="font-bold">1-3 medications</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">6-month & 1-year supply access</p>
+                  <p className="text-sm font-bold text-primary">50% off order fee • 6-month supply access</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Wholesale year-supply pricing</span>
+                    <span className="text-sm md:text-base font-bold">Wholesale pricing</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
@@ -288,15 +287,14 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Platinum Plan</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $25
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
+                  $99
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <div className="text-xs text-muted-foreground">billed annually $300/yr</div>
                 <CardDescription className="font-bold">4+ medications</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">6-month & 1-year supply access</p>
+                  <p className="text-sm font-bold text-primary">50% off order fee • Up to 1-year supply access</p>
                 </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
@@ -324,7 +322,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual commitment • Gold & Platinum plans billed monthly</p>
+          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual membership • Billed once per year</p>
         </div>
       </section>
 
@@ -411,7 +409,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month, billed annually at $180) and Platinum ($25/month, billed annually at $300) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
+                Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($59/year for 6-month supplies) and Platinum ($99/year for up to 1-year supplies) plans unlock extended supply savings plus 50% off order fees. Even our Free Tier saves you 90% vs retail.
               </AccordionContent>
             </AccordionItem>
 

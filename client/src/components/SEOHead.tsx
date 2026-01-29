@@ -200,7 +200,7 @@ export const faqSchema = {
       "name": "How do I save money on my medications?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month, billed annually at $180) and Platinum ($25/month, billed annually at $300) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail."
+        "text": "Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($59/year for 6-month supplies) and Platinum ($99/year for up to 1-year supplies) plans unlock extended supply savings plus 50% off order fees. Even our Free Tier saves you 90% vs retail."
       }
     },
     {
@@ -373,7 +373,7 @@ export const howToSaveMoneySchema = {
       "@type": "HowToStep",
       "position": 3,
       "name": "Choose Your Membership Tier",
-      "text": "Select Free ($0/month), Gold ($15/month, billed annually at $180, for 6-month supplies), or Platinum ($25/month, billed annually at $300, for year supplies). All tiers save you 90% vs retail pharmacy.",
+      "text": "Select Free ($0/month), Gold ($59/year for 6-month supplies with 50% off order fees), or Platinum ($99/year for up to 1-year supplies with 50% off order fees). All tiers save you 90% vs retail pharmacy.",
       "url": "https://pillardrugclub.com/register"
     },
     {
