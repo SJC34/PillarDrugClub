@@ -24,6 +24,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
   const [isLoading, setIsLoading] = useState(false);
 
   const planPrice = selectedPlan === 'basic' ? 15 : 25;
+  const planAnnual = selectedPlan === 'basic' ? 180 : 300;
   const planName = selectedPlan === 'basic' ? 'Foundation Plan (1-3 meds)' : 'Keystone Plan (4+ meds)';
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,7 +79,12 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
         disabled={!stripe || isLoading}
         data-testid="button-subscribe"
       >
-        {isLoading ? "Processing..." : `Subscribe ${planName} for $${planPrice}/month`}
+        {isLoading ? "Processing..." : (
+          <div className="flex flex-col items-center">
+            <span>Subscribe {planName} for ${planPrice}/month</span>
+            <span className="text-xs opacity-75">billed annually ${planAnnual}/yr</span>
+          </div>
+        )}
       </Button>
     </form>
   );
@@ -257,6 +263,7 @@ export default function SubscriptionPage() {
                 <div className="text-2xl font-bold text-primary">
                   $15<span className="text-base text-muted-foreground">/month</span>
                 </div>
+                <div className="text-xs text-muted-foreground">billed annually $180/yr</div>
                 <CardDescription>1-3 medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
                   12-month commitment required
@@ -279,6 +286,7 @@ export default function SubscriptionPage() {
                 <div className="text-2xl font-bold text-primary">
                   $25<span className="text-base text-muted-foreground">/month</span>
                 </div>
+                <div className="text-xs text-muted-foreground">billed annually $300/yr</div>
                 <CardDescription>4+ medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
                   12-month commitment required

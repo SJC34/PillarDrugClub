@@ -244,6 +244,7 @@ export default function HomePage() {
                   $15
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
                 </div>
+                <div className="text-xs text-muted-foreground">billed annually $180/yr</div>
                 <CardDescription className="font-bold">1-3 medications</CardDescription>
               </CardHeader>
               <CardContent>
@@ -290,6 +291,7 @@ export default function HomePage() {
                   $25
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/month</span>
                 </div>
+                <div className="text-xs text-muted-foreground">billed annually $300/yr</div>
                 <CardDescription className="font-bold">4+ medications</CardDescription>
               </CardHeader>
               <CardContent>
@@ -409,7 +411,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month) and Platinum ($25/month) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
+                Get year-supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($15/month, billed annually at $180) and Platinum ($25/month, billed annually at $300) plans unlock year-supply savings. Even our Free Tier saves you 90% vs retail.
               </AccordionContent>
             </AccordionItem>
 

@@ -511,7 +511,7 @@ export default function RegisterPage() {
           <div className="w-full max-w-md">
             <div className="text-center mb-6 md:mb-8">
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
-              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $15/month</p>
+              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $15/month (billed annually)</p>
             </div>
 
           <Card className="border-secondary/20">
@@ -649,7 +649,8 @@ export default function RegisterPage() {
                     <img src={goldPillarBadge} alt="Gold" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Gold</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary mb-2">$15<span className="text-sm text-muted-foreground">/mo</span></div>
+                  <div className="text-2xl font-bold text-primary">$15<span className="text-sm text-muted-foreground">/month</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">billed annually $180/yr</div>
                   <div className="text-xs text-muted-foreground mb-2">1-3 medications</div>
                   <div className="text-xs">6-mo & 1-yr supplies</div>
                 </button>
@@ -670,7 +671,8 @@ export default function RegisterPage() {
                     <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Platinum</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary mb-2">$25<span className="text-sm text-muted-foreground">/mo</span></div>
+                  <div className="text-2xl font-bold text-primary">$25<span className="text-sm text-muted-foreground">/month</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">billed annually $300/yr</div>
                   <div className="text-xs text-muted-foreground mb-2">4+ medications</div>
                   <div className="text-xs">6-mo & 1-yr supplies</div>
                 </button>
