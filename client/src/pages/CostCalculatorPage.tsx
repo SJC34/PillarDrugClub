@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Search, DollarSign, TrendingDown, Calendar, Pill, Plus, X } from "lucide-react";
+import { Calculator, Search, DollarSign, TrendingDown, Calendar, Pill, Plus, X, Star, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 import { SEOHead, createBreadcrumbSchema } from "@/components/SEOHead";
 
@@ -36,9 +36,63 @@ interface CalculationResult {
   savingsPercent: number;
 }
 
+interface PlanCost {
+  name: string;
+  tierKey: string;
+  annualFee: number;
+  fulfillmentFee: number;
+  maxSupplyDays: number;
+  ordersPerYear: number;
+  totalFulfillmentCost: number;
+  totalAnnualCost: number;
+  isRecommended: boolean;
+  supplyNote: string;
+}
+
+function calculatePlanCosts(desiredSupplyDays: number): PlanCost[] {
+  const plans = [
+    { name: "Foundation (Free)", tierKey: "free", annualFee: 0, fulfillmentFee: 30, maxSupplyDays: 90 },
+    { name: "Gold – 6 Month", tierKey: "gold-6", annualFee: 59, fulfillmentFee: 10, maxSupplyDays: 180 },
+    { name: "Gold – 12 Month", tierKey: "gold-12", annualFee: 99, fulfillmentFee: 10, maxSupplyDays: 365 },
+  ];
+
+  const results: PlanCost[] = plans.map(plan => {
+    const effectiveSupply = Math.min(desiredSupplyDays, plan.maxSupplyDays);
+    const ordersPerYear = Math.ceil(365 / effectiveSupply);
+    const totalFulfillmentCost = ordersPerYear * plan.fulfillmentFee;
+    const totalAnnualCost = plan.annualFee + totalFulfillmentCost;
+    
+    const supplyNote = desiredSupplyDays > plan.maxSupplyDays 
+      ? `Limited to ${plan.maxSupplyDays}-day supply (${ordersPerYear} orders/year)`
+      : `${effectiveSupply}-day supply (${ordersPerYear} order${ordersPerYear > 1 ? 's' : ''}/year)`;
+
+    return {
+      name: plan.name,
+      tierKey: plan.tierKey,
+      annualFee: plan.annualFee,
+      fulfillmentFee: plan.fulfillmentFee,
+      maxSupplyDays: plan.maxSupplyDays,
+      ordersPerYear,
+      totalFulfillmentCost,
+      totalAnnualCost,
+      isRecommended: false,
+      supplyNote,
+    };
+  });
+
+  const minCost = Math.min(...results.map(r => r.totalAnnualCost));
+  results.forEach(r => {
+    r.isRecommended = r.totalAnnualCost === minCost;
+  });
+
+  return results;
+}
+
 export default function CostCalculatorPage() {
   const [selectedMedications, setSelectedMedications] = useState<Medication[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [planDesiredSupply, setPlanDesiredSupply] = useState<string>("90");
+  const [planResults, setPlanResults] = useState<PlanCost[] | null>(null);
   const [calculations, setCalculations] = useState<CalculationResult[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [daysSupplies, setDaysSupplies] = useState<{ [key: string]: number }>({});
@@ -146,6 +200,137 @@ export default function CostCalculatorPage() {
             See how much you can save compared to retail pharmacy prices.
           </p>
         </div>
+
+        {/* Plan Recommendation Calculator */}
+        <Card className="mb-6 md:mb-8 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Find Your Best Plan
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Select how often you'd like to receive your medications and we'll recommend the most cost-effective plan. 
+              All your medications ship together in one order, so the fulfillment fee stays the same no matter how many you have.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">Desired Supply Duration</label>
+                <Select
+                  value={planDesiredSupply}
+                  onValueChange={setPlanDesiredSupply}
+                >
+                  <SelectTrigger data-testid="select-supply-duration">
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="30">30 days (1 month)</SelectItem>
+                    <SelectItem value="60">60 days (2 months)</SelectItem>
+                    <SelectItem value="90">90 days (3 months)</SelectItem>
+                    <SelectItem value="180">180 days (6 months)</SelectItem>
+                    <SelectItem value="365">365 days (1 year)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  className="w-full"
+                  onClick={() => setPlanResults(calculatePlanCosts(Number(planDesiredSupply)))}
+                  data-testid="button-calculate-plan"
+                >
+                  <Calculator className="h-4 w-4 mr-2" />
+                  Calculate Best Plan
+                </Button>
+              </div>
+            </div>
+
+            {planResults && (
+              <div className="space-y-4">
+                <Separator />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {planResults.map((plan) => (
+                    <Card 
+                      key={plan.tierKey} 
+                      className={`relative ${plan.isRecommended ? 'border-primary border-2 shadow-lg' : ''}`}
+                    >
+                      {plan.isRecommended && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                          <Badge className="bg-primary text-primary-foreground px-3">
+                            <Star className="h-3 w-3 mr-1" />
+                            BEST VALUE
+                          </Badge>
+                        </div>
+                      )}
+                      <CardContent className="pt-6">
+                        <div className="text-center mb-4">
+                          <h3 className="font-semibold text-lg">{plan.name}</h3>
+                          <div className="text-3xl font-bold text-primary mt-2">
+                            ${plan.totalAnnualCost}
+                            <span className="text-sm font-normal text-muted-foreground">/year</span>
+                          </div>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Annual membership:</span>
+                            <span className="font-medium">${plan.annualFee}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Fulfillment fee:</span>
+                            <span className="font-medium">${plan.fulfillmentFee}/order</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Orders per year:</span>
+                            <span className="font-medium">{plan.ordersPerYear}</span>
+                          </div>
+                          <Separator className="my-2" />
+                          <div className="flex justify-between font-medium">
+                            <span>Fulfillment costs:</span>
+                            <span>${plan.totalFulfillmentCost}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">{plan.supplyNote}</p>
+                        </div>
+                        {plan.isRecommended && (
+                          <div className="mt-4">
+                            <Link href="/register">
+                              <Button className="w-full" size="sm" data-testid="button-get-started">
+                                Get Started
+                              </Button>
+                            </Link>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                {/* Savings comparison */}
+                {planResults.length > 1 && (
+                  <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4">
+                    <div className="flex items-start gap-3">
+                      <TrendingDown className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-green-800 dark:text-green-300">
+                          {planResults.find(p => p.isRecommended)?.name} saves you the most!
+                        </p>
+                        <p className="text-sm text-green-700 dark:text-green-400">
+                          {(() => {
+                            const recommended = planResults.find(p => p.isRecommended);
+                            const others = planResults.filter(p => !p.isRecommended);
+                            if (!recommended || others.length === 0) return null;
+                            const maxOther = Math.max(...others.map(o => o.totalAnnualCost));
+                            const savings = maxOther - recommended.totalAnnualCost;
+                            return savings > 0 ? `Save up to $${savings}/year compared to other plans` : 'Most cost-effective for your needs';
+                          })()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Add Medication Section */}
         <Card className="mb-6 md:mb-8">
