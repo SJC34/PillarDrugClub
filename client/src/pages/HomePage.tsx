@@ -207,9 +207,6 @@ export default function HomePage() {
                 <CardDescription className="font-bold">Best for most people on stable medications</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">$10 fulfillment per shipment</p>
-                </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
@@ -251,9 +248,6 @@ export default function HomePage() {
                 <CardDescription className="font-bold">Best for maximum convenience and zero refills</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <p className="text-sm font-bold text-primary">$10 fulfillment per shipment</p>
-                </div>
                 <ul className="space-y-3 mb-6 text-left">
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
