@@ -1,7 +1,7 @@
 # Pillar Drug Club - Wholesale Prescription Pharmacy Platform
 
 ## Overview
-Pillar Drug Club is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers three membership tiers: Free, Gold, and Platinum, supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
+Pillar Drug Club is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers two membership tiers: Gold – 6 Month ($59/year) and Platinum ($99/year), supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -36,12 +36,18 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
   - **Side Effect Analyzer**: Aggregates adverse reactions across medications with likelihood scoring (high >10%, moderate 1-10%, low <1%). Groups effects by frequency with visual indicators
   - **Drug Interaction Checker**: Pairwise analysis with severity classification (major/moderate/minor). Detects contraindications and dosage adjustments
   - **OpenFDA Integration**: Free API with 7-day in-memory cache (memoize), 30-day database cache. Enriches 1,857 medications with drug labels from disk cache
-  - **Tier Gating**: Free members see upgrade CTAs, Gold/Platinum access full analysis features
+  - **Tier Gating**: Clinical safety tools available to Gold/Platinum members
   - **Performance**: 3-second startup with skip logic (medications persist in database). Cold start (empty DB): ~10-15 minutes for FDA enrichment (acceptable for MVP, optimization planned)
 - **Refund Policy System**: Comprehensive, transparent refund and cancellation policy for annual memberships, available as web content and downloadable PDF. Annual memberships are non-refundable once activated.
 - **Membership Pricing** (January 2026): Annual billing model with two tiers:
-  - **Gold – 6 Month**: $59/year, $10 fulfillment per shipment, up to 6-month supply. Most popular option for stable medications.
-  - **Platinum**: $99/year, $10 fulfillment per shipment, up to 12-month supply. Maximum convenience with zero refills.
+  - **Gold – 6 Month**: $59/year, $10 dispensing fee per medication per fill, up to 6-month supply. Most popular option for stable medications.
+  - **Platinum**: $99/year, $10 dispensing fee per medication per fill, up to 12-month supply. Maximum convenience with zero refills.
+- **Plan Cost Calculator** (January 2026): Interactive calculator on /cost-calculator page helps users find the most cost-effective plan. Features include:
+  - **Number of Medications Input**: Calculates dispensing costs based on $10 per medication per fill
+  - **Supply Duration Selection**: 30/60/90/180/365 day options with automatic order frequency calculation
+  - **Variable Shipping Cost**: User-configurable shipping cost per order
+  - **Plan Filtering**: Gold plan is hidden when 365-day supply is selected (only supports up to 6 months)
+  - **Calculation Formula**: Total = Membership Fee + (Dispensing × Meds × Orders/Year) + (Shipping × Orders/Year)
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including Executive Dashboard, User Management (deactivate, soft delete, suspend, delete, recover), Financial Dashboard, Communication Center, Reports & Analytics, and Medication Pricing Management. Admin users can toggle between Admin Dashboard and User Dashboard via the header menu for seamless role switching.
 - **Hybrid Blog System ("The Pillar Post 🗞️")**: A dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG). Features include an admin interface for content generation, AI-powered SEO keyword generator that analyzes blog titles to suggest 8-12 optimized keywords, compliance review workflow, and a GoodRx-style visual redesign with featured image uploads (client-side resizing, compression, base64 storage).
 - **Sora AI Video Generation System** (November 2025): Dual-track video generation infrastructure for YouTube content marketing with immediate production capability and Q1 2026 API readiness. Features include:

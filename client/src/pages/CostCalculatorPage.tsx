@@ -40,49 +40,75 @@ interface PlanCost {
   name: string;
   tierKey: string;
   annualFee: number;
-  fulfillmentFee: number;
+  dispensingFeePerMed: number;
   maxSupplyDays: number;
   ordersPerYear: number;
-  totalFulfillmentCost: number;
+  totalDispensingCost: number;
+  totalShippingCost: number;
   totalAnnualCost: number;
   isRecommended: boolean;
   supplyNote: string;
+  numMedications: number;
+  shippingPerOrder: number;
 }
 
-function calculatePlanCosts(desiredSupplyDays: number): PlanCost[] {
+interface CalculatorInputs {
+  desiredSupplyDays: number;
+  numMedications: number;
+  shippingPerOrder: number;
+}
+
+function calculatePlanCosts(inputs: CalculatorInputs): PlanCost[] {
+  const { desiredSupplyDays, numMedications, shippingPerOrder } = inputs;
+  
   const plans = [
-    { name: "Gold – 6 Month", tierKey: "gold", annualFee: 59, fulfillmentFee: 10, maxSupplyDays: 180 },
-    { name: "Platinum", tierKey: "platinum", annualFee: 99, fulfillmentFee: 10, maxSupplyDays: 365 },
+    { name: "Gold – 6 Month", tierKey: "gold", annualFee: 59, dispensingFeePerMed: 10, maxSupplyDays: 180 },
+    { name: "Platinum", tierKey: "platinum", annualFee: 99, dispensingFeePerMed: 10, maxSupplyDays: 365 },
   ];
 
-  const results: PlanCost[] = plans.map(plan => {
+  // Filter out Gold if user wants 1 year supply (Gold doesn't support it)
+  const eligiblePlans = desiredSupplyDays > 180 
+    ? plans.filter(p => p.tierKey !== 'gold')
+    : plans;
+
+  const results: PlanCost[] = eligiblePlans.map(plan => {
     const effectiveSupply = Math.min(desiredSupplyDays, plan.maxSupplyDays);
-    const ordersPerYear = Math.ceil(365 / effectiveSupply);
-    const totalFulfillmentCost = ordersPerYear * plan.fulfillmentFee;
-    const totalAnnualCost = plan.annualFee + totalFulfillmentCost;
+    // Convert days to months and calculate orders per year
+    // 30 days = 1 month, 60 = 2, 90 = 3, 180 = 6, 365 = 12
+    const supplyMonths = effectiveSupply === 365 ? 12 : Math.round(effectiveSupply / 30);
+    const ordersPerYear = Math.ceil(12 / supplyMonths);
     
-    const supplyNote = desiredSupplyDays > plan.maxSupplyDays 
-      ? `Limited to ${plan.maxSupplyDays}-day supply (${ordersPerYear} orders/year)`
-      : `${effectiveSupply}-day supply (${ordersPerYear} order${ordersPerYear > 1 ? 's' : ''}/year)`;
+    // Dispensing fee is per medication per fill
+    const dispensingPerOrder = plan.dispensingFeePerMed * numMedications;
+    const totalDispensingCost = ordersPerYear * dispensingPerOrder;
+    const totalShippingCost = ordersPerYear * shippingPerOrder;
+    const totalAnnualCost = plan.annualFee + totalDispensingCost + totalShippingCost;
+    
+    const supplyNote = `${supplyMonths}-month supply (${ordersPerYear} order${ordersPerYear > 1 ? 's' : ''}/year)`;
 
     return {
       name: plan.name,
       tierKey: plan.tierKey,
       annualFee: plan.annualFee,
-      fulfillmentFee: plan.fulfillmentFee,
+      dispensingFeePerMed: plan.dispensingFeePerMed,
       maxSupplyDays: plan.maxSupplyDays,
       ordersPerYear,
-      totalFulfillmentCost,
+      totalDispensingCost,
+      totalShippingCost,
       totalAnnualCost,
       isRecommended: false,
       supplyNote,
+      numMedications,
+      shippingPerOrder,
     };
   });
 
-  const minCost = Math.min(...results.map(r => r.totalAnnualCost));
-  results.forEach(r => {
-    r.isRecommended = r.totalAnnualCost === minCost;
-  });
+  if (results.length > 0) {
+    const minCost = Math.min(...results.map(r => r.totalAnnualCost));
+    results.forEach(r => {
+      r.isRecommended = r.totalAnnualCost === minCost;
+    });
+  }
 
   return results;
 }
@@ -91,6 +117,8 @@ export default function CostCalculatorPage() {
   const [selectedMedications, setSelectedMedications] = useState<Medication[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [planDesiredSupply, setPlanDesiredSupply] = useState<string>("90");
+  const [numMedications, setNumMedications] = useState<string>("1");
+  const [shippingCost, setShippingCost] = useState<string>("5");
   const [planResults, setPlanResults] = useState<PlanCost[] | null>(null);
   const [calculations, setCalculations] = useState<CalculationResult[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
@@ -208,12 +236,25 @@ export default function CostCalculatorPage() {
               Find Your Best Plan
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Select how often you'd like to receive your medications and we'll recommend the most cost-effective plan. 
-              All your medications ship together in one order, so the fulfillment fee stays the same no matter how many you have.
+              Enter your prescription details to find the most cost-effective plan. The dispensing fee is $10 per medication per fill, 
+              plus shipping costs. Note: Gold plan only supports up to 6-month supply.
             </p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">Number of Medications</label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={numMedications}
+                  onChange={(e) => setNumMedications(e.target.value)}
+                  data-testid="input-num-medications"
+                  className="h-10"
+                />
+                <p className="text-xs text-muted-foreground mt-1">How many different medications?</p>
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Desired Supply Duration</label>
                 <Select
@@ -231,11 +272,34 @@ export default function CostCalculatorPage() {
                     <SelectItem value="365">365 days (1 year)</SelectItem>
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {Number(planDesiredSupply) > 180 && <span className="text-amber-600 dark:text-amber-400">Gold limited to 6 months</span>}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Shipping Cost per Order</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={shippingCost}
+                    onChange={(e) => setShippingCost(e.target.value)}
+                    data-testid="input-shipping-cost"
+                    className="h-10 pl-8"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Variable based on location</p>
               </div>
               <div className="flex items-end">
                 <Button 
                   className="w-full"
-                  onClick={() => setPlanResults(calculatePlanCosts(Number(planDesiredSupply)))}
+                  onClick={() => setPlanResults(calculatePlanCosts({
+                    desiredSupplyDays: Number(planDesiredSupply),
+                    numMedications: Math.max(1, Number(numMedications) || 1),
+                    shippingPerOrder: Number(shippingCost) || 0
+                  }))}
                   data-testid="button-calculate-plan"
                 >
                   <Calculator className="h-4 w-4 mr-2" />
@@ -247,7 +311,14 @@ export default function CostCalculatorPage() {
             {planResults && (
               <div className="space-y-4">
                 <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                {planResults.length === 1 && Number(planDesiredSupply) > 180 && (
+                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 max-w-2xl mx-auto">
+                    <p className="text-sm text-amber-800 dark:text-amber-300">
+                      <strong>Note:</strong> Gold – 6 Month plan is not available for 1-year supply. Only Platinum supports 12-month prescriptions.
+                    </p>
+                  </div>
+                )}
+                <div className={`grid gap-4 max-w-2xl mx-auto ${planResults.length === 1 ? 'grid-cols-1 max-w-sm' : 'grid-cols-1 md:grid-cols-2'}`}>
                   {planResults.map((plan) => (
                     <Card 
                       key={plan.tierKey} 
@@ -265,7 +336,7 @@ export default function CostCalculatorPage() {
                         <div className="text-center mb-4">
                           <h3 className="font-semibold text-lg">{plan.name}</h3>
                           <div className="text-3xl font-bold text-primary mt-2">
-                            ${plan.totalAnnualCost}
+                            ${plan.totalAnnualCost.toFixed(2)}
                             <span className="text-sm font-normal text-muted-foreground">/year</span>
                           </div>
                         </div>
@@ -275,17 +346,29 @@ export default function CostCalculatorPage() {
                             <span className="font-medium">${plan.annualFee}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Fulfillment fee:</span>
-                            <span className="font-medium">${plan.fulfillmentFee}/order</span>
+                            <span className="text-muted-foreground">Dispensing fee:</span>
+                            <span className="font-medium">${plan.dispensingFeePerMed} × {plan.numMedications} meds/fill</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Shipping per order:</span>
+                            <span className="font-medium">${plan.shippingPerOrder.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Orders per year:</span>
                             <span className="font-medium">{plan.ordersPerYear}</span>
                           </div>
                           <Separator className="my-2" />
-                          <div className="flex justify-between font-medium">
-                            <span>Fulfillment costs:</span>
-                            <span>${plan.totalFulfillmentCost}</span>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground">Dispensing costs:</span>
+                            <span>${plan.totalDispensingCost.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground">Shipping costs:</span>
+                            <span>${plan.totalShippingCost.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between font-medium pt-1">
+                            <span>Total annual cost:</span>
+                            <span>${plan.totalAnnualCost.toFixed(2)}</span>
                           </div>
                           <p className="text-xs text-muted-foreground mt-2">{plan.supplyNote}</p>
                         </div>
