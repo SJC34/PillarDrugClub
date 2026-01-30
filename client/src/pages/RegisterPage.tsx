@@ -21,7 +21,6 @@ import { DoctorSearch } from "@/components/DoctorSearch";
 import { MedicationSearch } from "@/components/MedicationSearch";
 import { handleDateInputChange } from "@/lib/dateFormatter";
 import { SEOHead, pharmacySchema, createBreadcrumbSchema, getBaseUrl } from "@/components/SEOHead";
-import freePillarBadge from "@assets/image_1761455037188.png";
 import goldPillarBadge from "@assets/image_1761454767191.png";
 import platinumPillarBadge from "@assets/image_1761453800697.png";
 
@@ -133,7 +132,7 @@ export default function RegisterPage() {
   const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
   const [referralReferrerName, setReferralReferrerName] = useState<string>("");
   const [isValidatingReferral, setIsValidatingReferral] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<"free" | "gold" | "platinum">("free");
+  const [selectedTier, setSelectedTier] = useState<"gold" | "platinum">("gold");
   const { toast } = useToast();
 
   // Parse step from URL (for OAuth redirects) - run on first render only
@@ -160,7 +159,7 @@ export default function RegisterPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tier = params.get('tier');
-    if (tier === 'gold' || tier === 'platinum' || tier === 'free') {
+    if (tier === 'gold' || tier === 'platinum') {
       setSelectedTier(tier);
     }
   }, []);
@@ -427,34 +426,13 @@ export default function RegisterPage() {
         }
       }
 
-      // If free tier, skip payment and complete registration
-      if (selectedTier === "free") {
-        // Update user tier in database
-        await apiRequest("PUT", `/api/users/${registeredUser.id}`, {
-          subscriptionTier: "free",
-          subscriptionStatus: "active"
-        });
-
-        toast({
-          title: "Registration Complete!",
-          description: "Welcome to Pillar Drug Club! You can upgrade anytime to access year-supply pricing.",
-        });
-        setLocation("/dashboard");
-        return;
-      }
-
       // Check if Stripe is configured for paid tiers
       if (!STRIPE_PUBLIC_KEY) {
         toast({
           title: "Payment Not Available",
-          description: "Stripe is not configured. Defaulting to Free Tier.",
+          description: "Stripe is not configured. Please contact support.",
           variant: "destructive",
         });
-        await apiRequest("PUT", `/api/users/${registeredUser.id}`, {
-          subscriptionTier: "free",
-          subscriptionStatus: "active"
-        });
-        setLocation("/dashboard");
         return;
       }
 
@@ -503,7 +481,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -596,7 +574,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -616,25 +594,7 @@ export default function RegisterPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setSelectedTier("free")}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
-                    selectedTier === "free"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover-elevate"
-                  }`}
-                  data-testid="button-select-free"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <img src={freePillarBadge} alt="Foundation" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Foundation</div>
-                  </div>
-                  <div className="text-2xl font-bold mb-2">$0<span className="text-sm text-muted-foreground">/year</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$30 fulfillment per order</div>
-                  <div className="text-xs">Up to 90-day supply</div>
-                </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setSelectedTier("gold")}
@@ -667,8 +627,8 @@ export default function RegisterPage() {
                   data-testid="button-select-platinum"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <img src={goldPillarBadge} alt="Gold – 12 Month" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Gold – 12 Month</div>
+                    <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
+                    <div className="font-bold text-lg">Platinum</div>
                   </div>
                   <div className="text-2xl font-bold text-primary">$99<span className="text-sm text-muted-foreground">/year</span></div>
                   <div className="text-xs text-muted-foreground mb-2">$10 fulfillment per shipment</div>
@@ -959,7 +919,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1156,7 +1116,7 @@ export default function RegisterPage() {
       <>
         <SEOHead
           title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Foundation (Free), Gold – 6 Month ($59/yr), or Gold – 12 Month ($99/yr). Simple, transparent pricing. No insurance needed."
+          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1216,7 +1176,7 @@ export default function RegisterPage() {
                     </div>
                     <div className="text-sm md:text-base text-muted-foreground">per year</div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                      {selectedTier === "gold" ? "Gold – 6 Month • $10 fulfillment" : "Gold – 12 Month • $10 fulfillment"}
+                      {selectedTier === "gold" ? "Gold – 6 Month • $10 fulfillment" : "Platinum • $10 fulfillment"}
                     </div>
                     <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
                       {selectedTier === "gold" ? "Up to 6-month supply" : "Up to 12-month supply"}

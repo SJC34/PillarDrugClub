@@ -24,7 +24,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
   const [isLoading, setIsLoading] = useState(false);
 
   const planPrice = selectedPlan === 'basic' ? 59 : 99;
-  const planName = selectedPlan === 'basic' ? 'Gold – 6 Month' : 'Gold – 12 Month';
+  const planName = selectedPlan === 'basic' ? 'Gold – 6 Month' : 'Platinum';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -280,7 +280,7 @@ export default function SubscriptionPage() {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-lg">Gold – 12 Month</CardTitle>
+                <CardTitle className="text-lg">Platinum</CardTitle>
                 <div className="text-2xl font-bold text-primary">
                   $99<span className="text-base text-muted-foreground">/year</span>
                 </div>
@@ -358,7 +358,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div className="text-gray-600">per year</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {selectedPlan === 'basic' ? 'Gold – 6 Month • $10 fulfillment' : 'Gold – 12 Month • $10 fulfillment'}
+                    {selectedPlan === 'basic' ? 'Gold – 6 Month • $10 fulfillment' : 'Platinum • $10 fulfillment'}
                   </div>
                 </div>
               </div>

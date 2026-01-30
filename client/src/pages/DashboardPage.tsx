@@ -28,7 +28,6 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { PrescriptionRequest } from "@shared/pharmacy-schema";
 import { useAuth } from "@/hooks/useAuth";
 import { AllergyAutocomplete } from "@/components/AllergyAutocomplete";
-import freePillarBadge from "@assets/image_1761455037188.png";
 import goldPillarBadge from "@assets/image_1761454767191.png";
 import platinumPillarBadge from "@assets/image_1761453800697.png";
 
@@ -395,21 +394,18 @@ export default function DashboardPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                {user?.subscriptionTier === "free" && (
-                  <img src={freePillarBadge} alt="Foundation" className="w-10 h-10 object-contain" />
-                )}
                 {user?.subscriptionTier === "gold" && (
                   <img src={goldPillarBadge} alt="Gold" className="w-10 h-10 object-contain" />
                 )}
                 {user?.subscriptionTier === "platinum" && (
-                  <img src={goldPillarBadge} alt="Gold" className="w-10 h-10 object-contain" />
+                  <img src={platinumPillarBadge} alt="Platinum" className="w-10 h-10 object-contain" />
                 )}
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
-                    ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "59" : "99"}
+                    ${user?.subscriptionTier === "gold" ? "59" : "99"}
                   </p>
                   <p className="text-sm text-gray-600">
-                    {user?.subscriptionTier === "free" ? "Foundation (Free)" : user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Gold – 12 Month"}
+                    {user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Platinum"}
                   </p>
                 </div>
               </div>
@@ -515,94 +511,31 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  {user?.subscriptionTier === "free" && (
-                    <img src={freePillarBadge} alt="Foundation" className="w-10 h-10 object-contain" />
-                  )}
                   {user?.subscriptionTier === "gold" && (
                     <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-10 h-10 object-contain" />
                   )}
                   {user?.subscriptionTier === "platinum" && (
-                    <img src={goldPillarBadge} alt="Gold – 12 Month" className="w-10 h-10 object-contain" />
+                    <img src={platinumPillarBadge} alt="Platinum" className="w-10 h-10 object-contain" />
                   )}
                   Current Subscription
-                  <Badge variant={user?.subscriptionTier === "free" ? "outline" : "default"}>
-                    {user?.subscriptionTier === "free" ? "Foundation (Free)" : 
-                     user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Gold – 12 Month"}
+                  <Badge variant="default">
+                    {user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Platinum"}
                   </Badge>
                 </CardTitle>
                 <CardDescription>
-                  {user?.subscriptionTier === "free" 
-                    ? "Upgrade to Gold for extended supply options" 
-                    : user?.subscriptionTier === "gold" ? "Up to 6-month supply access" : "Up to 12-month supply access"}
+                  {user?.subscriptionTier === "gold" ? "Up to 6-month supply access" : "Up to 12-month supply access"}
                 </CardDescription>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-primary">
-                  ${user?.subscriptionTier === "free" ? "0" : user?.subscriptionTier === "gold" ? "59" : "99"}
+                  ${user?.subscriptionTier === "gold" ? "59" : "99"}
                   <span className="text-sm text-muted-foreground">/year</span>
                 </div>
-                {user?.subscriptionTier === "free" && (
-                  <p className="text-xs text-muted-foreground mt-1">$30 fulfillment per order</p>
-                )}
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            {user?.subscriptionTier === "free" ? (
-              <>
-                <div className="mb-6">
-                  <h4 className="font-semibold mb-3">Foundation Benefits:</h4>
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>Up to 90-day medication supplies</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>Wholesale pricing on all medications</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>Free home delivery</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>No membership required</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border border-primary/20">
-                  <h4 className="font-semibold mb-2">Upgrade to unlock:</h4>
-                  <ul className="space-y-1.5 mb-4">
-                    <li className="flex items-start gap-2 text-sm">
-                      <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
-                      <span>6-month or 12-month supply options</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
-                      <span>Maximum wholesale savings</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm">
-                      <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
-                      <span>Only $10 fulfillment per shipment</span>
-                    </li>
-                  </ul>
-                  <div className="flex flex-col gap-3">
-                    <Link href="/settings?tab=subscription">
-                      <Button className="w-full" data-testid="button-upgrade-gold">
-                        Upgrade to Gold – 6 Month ($59/year)
-                      </Button>
-                    </Link>
-                    <Link href="/settings?tab=subscription">
-                      <Button variant="outline" className="w-full" data-testid="button-upgrade-platinum">
-                        Upgrade to Gold – 12 Month ($99/year)
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
+            <>
                 <div className="mb-4">
                   <h4 className="font-semibold mb-3">Your Plan Benefits:</h4>
                   <ul className="space-y-2">
@@ -634,13 +567,12 @@ export default function DashboardPage() {
                   {user?.subscriptionTier === "gold" && (
                     <Link href="/settings?tab=subscription" className="flex-1">
                       <Button className="w-full" data-testid="button-upgrade-to-platinum">
-                        Upgrade to Gold – 12 Month
+                        Upgrade to Platinum
                       </Button>
                     </Link>
                   )}
                 </div>
               </>
-            )}
           </CardContent>
         </Card>
 

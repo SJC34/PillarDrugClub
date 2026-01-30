@@ -396,7 +396,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                   <div>
-                    <p className="font-semibold text-foreground">Gold – 12 Month ($99/yr)</p>
+                    <p className="font-semibold text-foreground">Platinum ($99/yr)</p>
                     <p className="text-sm text-muted-foreground">Up to 12-month supply</p>
                   </div>
                   <p className="text-2xl font-bold text-purple-600" data-testid="metric-plus-users">

@@ -51,9 +51,8 @@ interface PlanCost {
 
 function calculatePlanCosts(desiredSupplyDays: number): PlanCost[] {
   const plans = [
-    { name: "Foundation (Free)", tierKey: "free", annualFee: 0, fulfillmentFee: 30, maxSupplyDays: 90 },
-    { name: "Gold – 6 Month", tierKey: "gold-6", annualFee: 59, fulfillmentFee: 10, maxSupplyDays: 180 },
-    { name: "Gold – 12 Month", tierKey: "gold-12", annualFee: 99, fulfillmentFee: 10, maxSupplyDays: 365 },
+    { name: "Gold – 6 Month", tierKey: "gold", annualFee: 59, fulfillmentFee: 10, maxSupplyDays: 180 },
+    { name: "Platinum", tierKey: "platinum", annualFee: 99, fulfillmentFee: 10, maxSupplyDays: 365 },
   ];
 
   const results: PlanCost[] = plans.map(plan => {
@@ -248,7 +247,7 @@ export default function CostCalculatorPage() {
             {planResults && (
               <div className="space-y-4">
                 <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
                   {planResults.map((plan) => (
                     <Card 
                       key={plan.tierKey} 
