@@ -62,7 +62,7 @@ function calculatePlanCosts(inputs: CalculatorInputs): PlanCost[] {
   const { desiredSupplyDays, numMedications, shippingPerOrder } = inputs;
   
   const plans = [
-    { name: "Gold – 6 Month", tierKey: "gold", annualFee: 59, dispensingFeePerMed: 10, maxSupplyDays: 180 },
+    { name: "Gold", tierKey: "gold", annualFee: 59, dispensingFeePerMed: 10, maxSupplyDays: 180 },
     { name: "Platinum", tierKey: "platinum", annualFee: 99, dispensingFeePerMed: 10, maxSupplyDays: 365 },
   ];
 
@@ -317,7 +317,7 @@ export default function CostCalculatorPage() {
                 {planResults.length === 1 && Number(planDesiredSupply) > 180 && (
                   <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 max-w-2xl mx-auto">
                     <p className="text-sm text-amber-800 dark:text-amber-300">
-                      <strong>Note:</strong> Gold – 6 Month plan is not available for 1-year supply. Only Platinum supports 12-month prescriptions.
+                      <strong>Note:</strong> Gold plan is not available for 1-year supply. Only Platinum supports 12-month prescriptions.
                     </p>
                   </div>
                 )}
