@@ -387,8 +387,8 @@ export default function AdminDashboardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
                   <div>
-                    <p className="font-semibold text-foreground">Gold – 6 Month ($59/yr)</p>
-                    <p className="text-sm text-muted-foreground">Up to 6-month supply</p>
+                    <p className="font-semibold text-foreground">Gold ($9/mo)</p>
+                    <p className="text-sm text-muted-foreground">$108/yr • Up to 6-month supply</p>
                   </div>
                   <p className="text-2xl font-bold text-blue-600" data-testid="metric-basic-users">
                     {metrics?.userMetrics.usersByTier.basic || 0}
@@ -396,8 +396,8 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                   <div>
-                    <p className="font-semibold text-foreground">Platinum ($99/yr)</p>
-                    <p className="text-sm text-muted-foreground">Up to 12-month supply</p>
+                    <p className="font-semibold text-foreground">Platinum ($15/mo)</p>
+                    <p className="text-sm text-muted-foreground">$180/yr • Up to 12-month supply</p>
                   </div>
                   <p className="text-2xl font-bold text-purple-600" data-testid="metric-plus-users">
                     {metrics?.userMetrics.usersByTier.plus || 0}

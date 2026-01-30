@@ -40,8 +40,8 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
   - **Performance**: 3-second startup with skip logic (medications persist in database). Cold start (empty DB): ~10-15 minutes for FDA enrichment (acceptable for MVP, optimization planned)
 - **Refund Policy System**: Comprehensive, transparent refund and cancellation policy for annual memberships, available as web content and downloadable PDF. Annual memberships are non-refundable once activated.
 - **Membership Pricing** (January 2026): Annual billing model with two tiers:
-  - **Gold – 6 Month**: $59/year, $10 dispensing fee per medication per fill, up to 6-month supply. Most popular option for stable medications.
-  - **Platinum**: $99/year, $10 dispensing fee per medication per fill, up to 12-month supply. Maximum convenience with zero refills.
+  - **Gold**: $9/month ($108/year billed annually), $10 dispensing fee per medication per fill, up to 6-month supply. Most popular option for stable medications.
+  - **Platinum**: $15/month ($180/year billed annually), $10 dispensing fee per medication per fill, up to 12-month supply. Maximum convenience with zero refills.
 - **Plan Cost Calculator** (January 2026): Interactive calculator on /cost-calculator page helps users find the most cost-effective plan. Features include:
   - **Number of Medications Input**: Calculates dispensing costs based on $10 per medication per fill
   - **Supply Duration Selection**: 30/60/90/180/365 day options with automatic order frequency calculation

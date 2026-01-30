@@ -260,8 +260,9 @@ export default function SubscriptionPage() {
               <CardHeader>
                 <CardTitle className="text-lg">Gold – 6 Month</CardTitle>
                 <div className="text-2xl font-bold text-primary">
-                  $59<span className="text-base text-muted-foreground">/year</span>
+                  $9<span className="text-base text-muted-foreground">/mo</span>
                 </div>
+                <div className="text-xs text-muted-foreground">$108/year billed annually</div>
                 <CardDescription>Best for most people on stable medications</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
                   $10 fulfillment per shipment • Up to 6-month supply
@@ -282,8 +283,9 @@ export default function SubscriptionPage() {
               <CardHeader>
                 <CardTitle className="text-lg">Platinum</CardTitle>
                 <div className="text-2xl font-bold text-primary">
-                  $99<span className="text-base text-muted-foreground">/year</span>
+                  $15<span className="text-base text-muted-foreground">/mo</span>
                 </div>
+                <div className="text-xs text-muted-foreground">$180/year billed annually</div>
                 <CardDescription>Best for maximum convenience and zero refills</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
                   $10 fulfillment per shipment • Up to 12-month supply

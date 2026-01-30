@@ -200,9 +200,10 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Gold – 6 Month</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $59
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
+                  $9
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/mo</span>
                 </div>
+                <div className="text-sm text-muted-foreground">$108/year billed annually</div>
                 <CardDescription className="font-bold">Best for most people on stable medications</CardDescription>
               </CardHeader>
               <CardContent>
@@ -243,9 +244,10 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl md:text-2xl font-bold">Platinum</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $99
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
+                  $15
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/mo</span>
                 </div>
+                <div className="text-sm text-muted-foreground">$180/year billed annually</div>
                 <CardDescription className="font-bold">Best for maximum convenience and zero refills</CardDescription>
               </CardHeader>
               <CardContent>
@@ -365,7 +367,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold – 6 Month ($59/year) and Platinum ($99/year) plans unlock extended supply savings with just $10 fulfillment per shipment.
+                Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($9/mo) and Platinum ($15/mo) plans unlock extended supply savings with just $10 fulfillment per shipment.
               </AccordionContent>
             </AccordionItem>
 
@@ -374,7 +376,7 @@ export default function HomePage() {
                 What if I can't afford my prescriptions?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cant-afford">
-                Start with our Gold – 6 Month tier at just $59/year with $10 fulfillment per shipment. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 6-month supply. We also offer payment plans and assistance programs for those who qualify.
+                Start with our Gold tier at just $9/month with $10 fulfillment per shipment. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 6-month supply. We also offer payment plans and assistance programs for those who qualify.
               </AccordionContent>
             </AccordionItem>
 

@@ -62,8 +62,8 @@ function calculatePlanCosts(inputs: CalculatorInputs): PlanCost[] {
   const { desiredSupplyDays, numMedications, shippingPerOrder } = inputs;
   
   const plans = [
-    { name: "Gold", tierKey: "gold", annualFee: 59, dispensingFeePerMed: 10, maxSupplyDays: 180 },
-    { name: "Platinum", tierKey: "platinum", annualFee: 99, dispensingFeePerMed: 10, maxSupplyDays: 365 },
+    { name: "Gold", tierKey: "gold", annualFee: 108, dispensingFeePerMed: 10, maxSupplyDays: 180 },
+    { name: "Platinum", tierKey: "platinum", annualFee: 180, dispensingFeePerMed: 10, maxSupplyDays: 365 },
   ];
 
   // Filter out Gold if user wants 1 year supply (Gold doesn't support it)

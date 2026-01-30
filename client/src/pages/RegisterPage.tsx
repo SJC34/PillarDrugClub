@@ -480,8 +480,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | Prescriptions from $9/Month"
+          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -489,7 +489,7 @@ export default function RegisterPage() {
           <div className="w-full max-w-md">
             <div className="text-center mb-6 md:mb-8">
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
-              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $59/year</p>
+              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $9/month</p>
             </div>
 
           <Card className="border-secondary/20">
@@ -573,8 +573,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | Prescriptions from $9/Month"
+          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -612,8 +612,8 @@ export default function RegisterPage() {
                     <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Gold – 6 Month</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary">$59<span className="text-sm text-muted-foreground">/year</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$10 fulfillment per shipment</div>
+                  <div className="text-2xl font-bold text-primary">$9<span className="text-sm text-muted-foreground">/mo</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">$108/year billed annually + $10 fulfillment per shipment</div>
                   <div className="text-xs">Up to 6-month supply</div>
                 </button>
                 <button
@@ -630,8 +630,8 @@ export default function RegisterPage() {
                     <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
                     <div className="font-bold text-lg">Platinum</div>
                   </div>
-                  <div className="text-2xl font-bold text-primary">$99<span className="text-sm text-muted-foreground">/year</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$10 fulfillment per shipment</div>
+                  <div className="text-2xl font-bold text-primary">$15<span className="text-sm text-muted-foreground">/mo</span></div>
+                  <div className="text-xs text-muted-foreground mb-2">$180/year billed annually + $10 fulfillment per shipment</div>
                   <div className="text-xs">Up to 12-month supply</div>
                 </button>
               </div>
@@ -918,8 +918,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | Prescriptions from $9/Month"
+          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1115,8 +1115,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $59/Year"
-          description="Join thousands saving on prescriptions. Choose Gold – 6 Month ($59/yr) or Platinum ($99/yr). Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | Prescriptions from $9/Month"
+          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />

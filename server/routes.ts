@@ -536,14 +536,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       // Determine price based on plan (annual billing)
       const planConfig: Record<'basic' | 'plus', { amount: number; name: string; description: string }> = {
         basic: {
-          amount: 5900, // $59.00 in cents (annual)
+          amount: 10800, // $108.00 in cents (annual - $9/month)
           name: 'Pillar Drug Club Gold Plan',
-          description: 'Annual membership for 1-3 medications - 50% off order fees, 6-month supply access'
+          description: 'Annual membership ($9/mo billed annually) - 6-month supply access'
         },
         plus: {
-          amount: 9900, // $99.00 in cents (annual)
+          amount: 18000, // $180.00 in cents (annual - $15/month)
           name: 'Pillar Drug Club Platinum Plan',
-          description: 'Annual membership for 4+ medications - 50% off order fees, up to 1-year supply access'
+          description: 'Annual membership ($15/mo billed annually) - up to 1-year supply access'
         }
       };
 
