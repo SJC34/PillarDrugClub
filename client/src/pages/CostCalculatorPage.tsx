@@ -118,7 +118,7 @@ export default function CostCalculatorPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [planDesiredSupply, setPlanDesiredSupply] = useState<string>("90");
   const [numMedications, setNumMedications] = useState<string>("1");
-  const [shippingCost, setShippingCost] = useState<string>("5");
+  const [shippingCost, setShippingCost] = useState<string>("5.25");
   const [planResults, setPlanResults] = useState<PlanCost[] | null>(null);
   const [calculations, setCalculations] = useState<CalculationResult[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
@@ -278,19 +278,22 @@ export default function CostCalculatorPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Shipping Cost per Order</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={shippingCost}
-                    onChange={(e) => setShippingCost(e.target.value)}
-                    data-testid="input-shipping-cost"
-                    className="h-10 pl-8"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Variable based on location</p>
+                <Select
+                  value={shippingCost}
+                  onValueChange={setShippingCost}
+                >
+                  <SelectTrigger data-testid="select-shipping-cost">
+                    <SelectValue placeholder="Select shipping" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Free (Local Pickup)</SelectItem>
+                    <SelectItem value="5.25">USPS Ground Advantage - $5.25</SelectItem>
+                    <SelectItem value="8.70">USPS Priority Mail - $8.70</SelectItem>
+                    <SelectItem value="9.95">USPS Priority Mail (2-Day) - $9.95</SelectItem>
+                    <SelectItem value="28.75">USPS Priority Mail Express - $28.75</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">USPS standard rates</p>
               </div>
               <div className="flex items-end">
                 <Button 
