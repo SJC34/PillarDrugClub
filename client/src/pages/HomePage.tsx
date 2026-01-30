@@ -265,6 +265,10 @@ export default function HomePage() {
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
                     <span className="text-sm md:text-base font-bold">Home delivery</span>
                   </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base font-bold">Priority processing</span>
+                  </li>
                 </ul>
                 <Link href="/register?tier=platinum">
                   <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-platinum">
