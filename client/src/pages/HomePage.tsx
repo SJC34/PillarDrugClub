@@ -91,8 +91,17 @@ export default function HomePage() {
         schema={combinedSchema}
       />
 
+      {/* Hero Tagline */}
+      <section className="pt-12 md:pt-20 pb-4 px-6 md:px-12 text-center">
+        <h1 className="text-2xl md:text-4xl font-semibold text-muted-foreground" data-testid="text-hero-tagline">
+          Your Trusted Pharmacy Autopilot
+          <br />
+          <span className="text-primary font-bold">For Low as a Penny per Pill</span>
+        </h1>
+      </section>
+
       {/* Stats Section */}
-      <section className="py-16 md:py-24 px-6 md:px-12">
+      <section className="py-12 md:py-20 px-6 md:px-12">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, idx) => (
             <div key={idx} className="text-center" data-testid={`stat-item-${idx}`}>
