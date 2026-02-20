@@ -1,38 +1,50 @@
-import { useState, useEffect } from "react";
-import { Link } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { 
-  DollarSign, 
-  Shield, 
-  Home, 
-  Calculator,
-  Pill,
-  Check,
-  ArrowRight
-} from "lucide-react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
-import { BlogCarousel } from "@/components/BlogCarousel";
-import { SignupModal } from "@/components/ComingSoonModal";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useMutation } from "@tanstack/react-query";
+import { Loader2, ArrowRight } from "lucide-react";
 import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
-import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
-import joinVideo from "@assets/join-pillar-video.mp4";
-import goldPillarBadge from "@assets/image_1761454767191.png";
+import pdcLogo from "@assets/image_1771566531369.jpeg";
 
 export default function HomePage() {
-  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const hasSignedUp = localStorage.getItem("pillar_signup_completed");
-    if (!hasSignedUp) {
-      const timer = setTimeout(() => {
-        setShowSignupModal(true);
-      }, 2000);
-      return () => clearTimeout(timer);
+  const signupMutation = useMutation({
+    mutationFn: async (data: { name: string; email: string; phone: string }) => {
+      return apiRequest("POST", "/api/email-signup", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "You're on the list!",
+        description: "We'll reach out before launch.",
+      });
+      setEmail("");
+      localStorage.setItem("pillar_signup_completed", "true");
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Oops!",
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast({
+        variant: "destructive",
+        title: "Email required",
+        description: "Please enter your email address.",
+      });
+      return;
     }
-  }, []);
+    signupMutation.mutate({ name: "", email, phone: "" });
+  };
 
   const combinedSchema = {
     "@context": "https://schema.org",
@@ -44,368 +56,145 @@ export default function HomePage() {
       howToSaveMoneySchema
     ]
   };
-  const benefits = [
-    "Save 90% on prescriptions - medications as low as $0.01 per tablet",
-    "No insurance needed - our prices often beat insurance copays",
-    "Free delivery to your door - all 50 states, no extra fees", 
-    "See exact costs upfront - no surprises, no hidden charges",
-    "Same quality medications - just without the pharmacy markup"
+
+  const stats = [
+    { value: "29%", description: "of insured adults skipped a prescription due to cost last year" },
+    { value: "$456", description: "average annual OOP spend for uninsured adults" },
+    { value: "59M", description: "gig workers in the U.S. without stable prescription benefits" },
+    { value: "18%", description: "drop in adherence when copay exceeds $50/month" },
   ];
 
-  const features = [
+  const problems = [
     {
-      icon: Calculator,
-      title: "See Exact Costs Before You Order",
-      description: "Use our free calculator to see how much YOU'LL save on YOUR medications - no guessing, no surprises"
+      number: "01",
+      title: "GoodRx isn't reliable",
+      description: "The price you see doesn't always match the price at the counter. Pharmacies can reject coupons. Prices vary by location. You have to check every single time.",
     },
     {
-      icon: Pill,
-      title: "3,000+ Medications for Common Conditions",
-      description: "Diabetes, high blood pressure, cholesterol, thyroid, depression and more - find your medication at a price you can afford"
+      number: "02",
+      title: "Refills are manual work",
+      description: "Phone trees. Hold music. Expired prescriptions. Running out before you remember to reorder. The whole system punishes you for not managing it perfectly.",
     },
     {
-      icon: Home,
-      title: "Free Delivery to Your Home",
-      description: "No more pharmacy trips or long waits - your medications shipped directly to your door at no extra cost"
+      number: "03",
+      title: "You never know what you'll pay",
+      description: "Whether you're uninsured, between jobs, or freelancing — your prescription costs are a variable you can't plan around. That uncertainty compounds.",
     },
-    {
-      icon: Shield,
-      title: "Works Without Insurance",
-      description: "Have insurance? Don't need it. No insurance? No problem. Our prices often beat insurance copays anyway."
-    }
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <SEOHead
-        title="Save 90% on Prescriptions | Get Meds Without Insurance - Pharmacy Autopilot"
+        title="Save 90% on Prescriptions | Get Meds Without Insurance - Pillar Drug Club"
         description="Can't afford your prescriptions? Get medications for as low as $0.01 per tablet. No insurance needed. Free delivery. Save hundreds on diabetes, blood pressure, cholesterol & more."
         canonical={getBaseUrl()}
         schema={combinedSchema}
       />
 
-      {/* Hero Section */}
-      <section className="pt-6 md:pt-12 pb-12 md:pb-20 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          {/* Question above carousel */}
-          <p className="text-lg font-bold text-secondary mb-4 text-center tracking-tight">Paying too much for your prescriptions?</p>
-          
-          {/* Carousel with pharmacy image and video */}
-          <div className="mb-8 max-w-2xl mx-auto">
-            <Carousel
-              opts={{ loop: true }}
-              plugins={[
-                Autoplay({
-                  delay: 5000,
-                  stopOnInteraction: false,
-                  stopOnMouseEnter: true,
-                })
-              ]}
-              className="w-full"
-            >
-              <CarouselContent>
-                {/* Slide 1 - "Avoid This" video with text overlay */}
-                <CarouselItem>
-                  <div className="relative overflow-hidden">
-                    <video 
-                      src={avoidVideo} 
-                      autoPlay={true}
-                      loop={true}
-                      muted={true}
-                      playsInline={true}
-                      className="w-full rounded-lg shadow-lg h-[265px] md:h-[400px]"
-                      style={{ objectFit: 'cover' }}
-                      data-testid="video-avoid-this"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
-                      <div className="bg-black/50 rounded-lg backdrop-blur-sm px-3 py-2">
-                        <div className="flex flex-col text-center min-w-[90px] justify-center">
-                          <span className="text-2xl md:text-3xl font-black text-white leading-tight tracking-wide" data-testid="text-avoid">Avoid</span>
-                          <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wider" data-testid="text-this">This</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CarouselItem>
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 md:px-12 py-4 border-b border-border/40">
+        <img src={pdcLogo} alt="Pillar Drug Club" className="h-10 md:h-12 object-contain" data-testid="img-logo-nav" />
+        <a href="#waitlist">
+          <Button
+            variant="outline"
+            className="font-bold text-sm"
+            data-testid="button-nav-join"
+          >
+            JOIN WAITLIST
+          </Button>
+        </a>
+      </nav>
 
-                {/* Slide 2 - "Join" video with text overlay */}
-                <CarouselItem>
-                  <div className="relative overflow-hidden">
-                    <video 
-                      src={joinVideo} 
-                      autoPlay={true}
-                      loop={true}
-                      muted={true}
-                      playsInline={true}
-                      className="w-full rounded-lg shadow-lg h-[265px] md:h-[400px]"
-                      style={{ objectFit: 'cover', objectPosition: '40% 40%' }}
-                      data-testid="video-join-pillar"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-end pr-[15%]">
-                      <Link href="/register">
-                        <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-3 py-2">
-                          <div className="flex flex-col text-center min-w-[90px] justify-center">
-                            <span className="text-2xl md:text-3xl font-black text-white leading-tight tracking-wide" data-testid="text-join">Join</span>
-                            <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wide" data-testid="text-pillar">Now!</span>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                </CarouselItem>
-              </CarouselContent>
-            </Carousel>
-          </div>
-          
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Get Your Meds for Pennies
-            <span className="text-primary block">Tablets As Low As $0.01</span>
-          </h1>
-          <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
-            Stop overpaying at traditional pharmacies. No insurance needed.
-            <br />
-            Save 90% on diabetes, blood pressure, cholesterol & more—delivered free to your door.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link href="/register">
-              <Button size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4 focus-visible:outline-none" data-testid="button-join-hero">
-                Start Saving Today
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/cost-calculator">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto text-lg font-bold px-8 py-4 focus-visible:outline-none" data-testid="button-try-calculator">
-                Try Cost Calculator
-              </Button>
-            </Link>
-          </div>
+      {/* Stats Section */}
+      <section className="py-16 md:py-24 px-6 md:px-12">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+          {stats.map((stat, idx) => (
+            <div key={idx} className="text-center" data-testid={`stat-item-${idx}`}>
+              <div className="text-4xl md:text-5xl font-black text-primary mb-2">{stat.value}</div>
+              <p className="text-sm md:text-base text-muted-foreground leading-snug">{stat.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">One Simple Membership</h2>
-          <p className="text-base md:text-lg text-muted-foreground mb-8 font-bold max-w-3xl mx-auto">
-            Everything you need to save on prescriptions — one plan, one price, no confusion
-          </p>
-          <div className="max-w-lg mx-auto">
-            <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10 relative">
-              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
-                BEST VALUE
+      {/* The Problem Section */}
+      <section className="py-16 md:py-24 px-6 md:px-12 bg-muted/30">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-4" data-testid="text-problem-label">THE PROBLEM</p>
+          <h2 className="text-3xl md:text-5xl font-black text-foreground mb-16 leading-tight" data-testid="text-problem-headline">
+            The pharmacy system is<br />built to confuse you.
+          </h2>
+
+          <div className="space-y-12">
+            {problems.map((problem) => (
+              <div key={problem.number} className="flex gap-6" data-testid={`problem-item-${problem.number}`}>
+                <div className="flex-shrink-0">
+                  <span className="text-4xl md:text-5xl font-black text-primary/20">{problem.number}</span>
+                </div>
+                <div>
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2">{problem.title}</h3>
+                  <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{problem.description}</p>
+                </div>
               </div>
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-3">
-                  <img src={goldPillarBadge} alt="Pharmacy Autopilot Membership" className="w-16 h-16 object-contain" />
-                </div>
-                <CardTitle className="text-xl md:text-2xl font-bold" data-testid="text-membership-name">Pharmacy Autopilot</CardTitle>
-                <div className="text-3xl md:text-4xl font-bold text-primary" data-testid="text-membership-price">
-                  $99
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
-                </div>
-                <CardDescription className="font-bold">Save hundreds on your prescriptions every year</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6 text-left">
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Up to 12-month supply</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Wholesale pricing on 3,000+ medications</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Home delivery at carrier rates</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">$10 dispensing fee per medication per fill</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Clinical safety tools included</span>
-                  </li>
-                </ul>
-                <Link href="/register">
-                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-membership">
-                    Join Pharmacy Autopilot
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual membership • Billed once per year • $99/year</p>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-12 md:py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-8 md:mb-12">
-            Everything You Need to Save on Prescriptions
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {features.map((feature, idx) => {
-              const Icon = feature.icon;
-              const isCalculator = feature.title.includes("Cost Calculator");
-              
-              const cardContent = (
-                <Card className={`text-center p-4 md:p-6 border-secondary/20 transition-colors ${isCalculator ? 'hover:border-primary/60 hover-elevate cursor-pointer' : 'hover:border-secondary/40'}`}>
-                  <CardHeader className="pb-4">
-                    <div className="mx-auto w-12 h-12 bg-gradient-to-br from-primary/10 to-secondary/15 rounded-lg flex items-center justify-center mb-4 border border-secondary/20">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle className="text-lg md:text-xl font-bold">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <CardDescription className="text-sm md:text-base font-bold">{feature.description}</CardDescription>
-                  </CardContent>
-                </Card>
-              );
-              
-              return (
-                <div key={idx}>
-                  {isCalculator ? (
-                    <Link href="/cost-calculator" data-testid="link-cost-calculator-feature">
-                      {cardContent}
-                    </Link>
-                  ) : (
-                    cardContent
-                  )}
-                </div>
-              );
-            })}
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-12 md:py-16 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-4">
-            Common Questions About Saving on Prescriptions
+      {/* CTA / Waitlist Section */}
+      <section id="waitlist" className="py-20 md:py-32 px-6 md:px-12">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-2xl md:text-4xl font-black text-foreground mb-3 leading-tight" data-testid="text-cta-headline">
+            Stop guessing. Start automating.
           </h2>
-          <p className="text-center text-muted-foreground mb-8 md:mb-12 font-bold max-w-2xl mx-auto">
-            Get answers to the questions patients ask most about affording their medications.
+          <p className="text-base md:text-lg text-muted-foreground mb-10" data-testid="text-cta-subline">
+            Join the waitlist. We're onboarding the first 100 members personally.
           </p>
-          <Accordion type="single" collapsible className="w-full" data-testid="faq-accordion">
-            <AccordionItem value="item-1" data-testid="faq-item-expensive">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-expensive">
-                Why is my prescription so expensive?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-expensive">
-                Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pharmacy Autopilot buys directly from wholesalers and passes the true cost to you - as low as $0.01 per tablet. We cut out the middlemen so you stop overpaying.
-              </AccordionContent>
-            </AccordionItem>
 
-            <AccordionItem value="item-2" data-testid="faq-item-no-insurance">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-no-insurance">
-                Can I get prescriptions without insurance?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-no-insurance">
-                Yes! No insurance needed. Pharmacy Autopilot offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-3" data-testid="faq-item-cost">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-cost">
-                How much will my prescription cost?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cost">
-                Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as $0.01 per tablet. No hidden fees - what you see is what you pay.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-4" data-testid="faq-item-save-money">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-save-money">
-                How do I save money on my medications?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get extended supply prescriptions (up to 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our $99/year membership unlocks extended supply savings with just $10 dispensing per medication per fill.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-5" data-testid="faq-item-cant-afford">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-cant-afford">
-                What if I can't afford my prescriptions?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cant-afford">
-                Start with our $99/year membership. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 12-month supply. We also offer payment plans and assistance programs for those who qualify.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-6" data-testid="faq-item-delivery">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-delivery">
-                Do you deliver to my home?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-delivery">
-                Yes, free delivery nationwide to all 50 states. Your medications are shipped directly to your door with tracking. No pharmacy trips, no waiting in line.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-7" data-testid="faq-item-medications">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-medications">
-                What medications do you carry?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-medications">
-                We have 3000+ medications for diabetes, high blood pressure, cholesterol, thyroid, depression, and more. Search our catalog to find your specific medication and see the exact cost before you order.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-8" data-testid="faq-item-safe">
-              <AccordionTrigger className="text-left font-bold" data-testid="faq-trigger-safe">
-                Is this safe and legitimate?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-safe">
-                Yes! We're a licensed pharmacy operating in all 50 states. All medications come from FDA-approved manufacturers through licensed U.S. wholesalers. Same quality medications, just without the markup.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
-      </section>
-
-      {/* Blog Carousel */}
-      <BlogCarousel />
-
-      {/* CTA Section */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 bg-primary text-primary-foreground">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Saving?</h2>
-          <p className="text-lg md:text-xl font-bold mb-8 opacity-90">
-            Join thousands of patients who have already saved money on their prescriptions.
-          </p>
-          <Link href="/register">
-            <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg font-bold px-8 py-4 focus-visible:outline-none" data-testid="button-join-cta">
-              Join Pharmacy Autopilot
-              <ArrowRight className="ml-2 h-5 w-5" />
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-4" data-testid="form-waitlist">
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={signupMutation.isPending}
+              className="h-12 text-base flex-1"
+              data-testid="input-email-waitlist"
+              required
+            />
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 font-bold px-8"
+              disabled={signupMutation.isPending}
+              data-testid="button-submit-waitlist"
+              style={{ backgroundColor: '#2aa8a8' }}
+            >
+              {signupMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  JOIN WAITLIST
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
-          </Link>
+          </form>
+          <p className="text-xs text-muted-foreground" data-testid="text-no-spam">
+            No spam. No commitment. We'll reach out before launch.
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-muted py-8 md:py-12 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Pill className="h-6 w-6 text-primary" />
-            <span className="text-lg md:text-xl font-bold text-foreground">Pharmacy Autopilot</span>
-          </div>
-          <p className="text-muted-foreground font-bold mb-4 text-sm md:text-base">
-            Transparent wholesale prescription pricing for everyone.
+      <footer className="border-t border-border/40 py-8 px-6 md:px-12">
+        <div className="max-w-5xl mx-auto text-center">
+          <img src={pdcLogo} alt="Pillar Drug Club" className="h-8 md:h-10 object-contain mx-auto mb-4" data-testid="img-logo-footer" />
+          <p className="text-xs text-muted-foreground">
+            &copy; 2026 Pillar Drug Club &middot; Seattle, WA &middot; Not a licensed pharmacy. Powered by HealthWarehouse.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm font-bold text-muted-foreground">
-            <a href="/refund-policy" className="hover:text-foreground transition-colors" data-testid="link-footer-refund-policy">Refund Policy</a>
-            <a href="/privacy-policy" className="hover:text-foreground transition-colors" data-testid="link-footer-privacy-policy">Privacy Policy</a>
-            <a href="/terms-of-service" className="hover:text-foreground transition-colors" data-testid="link-footer-terms">Terms of Service</a>
-            <a href="mailto:support@pharmacyautopilot.com" className="hover:text-foreground transition-colors" data-testid="link-footer-contact">Contact</a>
-          </div>
         </div>
       </footer>
-
-      <SignupModal open={showSignupModal} onOpenChange={setShowSignupModal} />
     </div>
   );
 }
