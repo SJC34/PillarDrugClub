@@ -87,7 +87,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
         <div className="px-6 pt-8 pb-4">
           <div className="flex items-center justify-center gap-3 mb-4">
             <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
-            <h2 className="text-2xl md:text-3xl font-black whitespace-nowrap" style={{ color: '#0d4f4f' }}>Pillar Drug Club</h2>
+            <h2 className="text-3xl md:text-4xl font-black whitespace-nowrap" style={{ color: '#0d4f4f' }}>Pillar Drug Club</h2>
             <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
           </div>
           <DialogHeader className="space-y-2">
