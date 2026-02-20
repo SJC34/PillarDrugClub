@@ -1,0 +1,110 @@
+Action Plan
+
+• Eliminate “Coming Soon” popup | High
+The wait-list modal contradicts live “Get Started” buttons, creating doubt and drop-offs. Remove or suppress it for users who can subscribe now to streamline the path to payment.
+
+• Add social proof & pharmacy credentials | High
+Display a pharmacy license badge, customer reviews, and “4.9/1247 ratings” already in structured data to reassure visitors and lift conversion confidence at the decision point (plan cards and footer).
+
+• Fix color contrast & button labels | Medium
+Low-contrast teal text and unlabeled icon buttons fail accessibility standards, making CTAs harder to read and track. Updating colors and adding aria-labels improves usability and Racoons-tracked click clarity.
+
+• Compress & trim CSS/JS | Medium
+84 % unused CSS and 73 % unused JS delay First Interaction by ~6 s. Minifying and code-splitting will cut load times, reduce early bounces, and get more users to the hero CTA.
+
+• Enable pinch-zoom on mobile | Low
+The viewport tag blocks zoom, hurting elderly or low-vision users—key demographics for prescription savings. Allow zoom to widen reach and compliance without affecting layout.
+
+Overview
+
+The homepage quickly communicates the “as low as 1¢ per pill” value and presents clear membership plans, but mixed signals (wait-list popup vs. active signup), limited trust indicators, and slow first render sap subscription momentum. SEO fundamentals are strong—descriptive title, meta, headings, rich schema—but performance and accessibility gaps hold back both rankings and conversions.
+
+First Impression
+
+Strengths
+• Clean, medical-grade design with ample white space and bold savings headline.
+• Primary CTA “Start Saving Today” immediately visible on desktop and mobile.
+
+Weaknesses
+• Wait-list modal greys out the page on first load, clashing with “Get Started” nav button.
+• Hero video placeholder (“Avoid This”) may feel gimmicky instead of trustworthy.
+
+Recommended Fixes
+• Remove or time-delay the modal for visitors in live markets; keep only on pre-launch geos.
+• Replace “Avoid This” overlay with a credible pharmacy image or customer photo and caption.
+
+Messaging & Content
+
+Strengths
+• Clear promise: “Save 90%… No insurance needed.”
+• Plan section explains term lengths, pricing, and benefits concisely.
+• FAQ answers cost and legitimacy objections.
+
+Weaknesses
+• No proof of the stated 90 % savings or member count.
+• Shipping cost (“carrier rates”) and $10 fulfillment fee are buried, risking churn after signup.
+
+Recommended Fixes
+• Add a savings calculator example or comparison table near the hero to validate claims.
+• Include an asterisk + popover on plan cards summarizing any extra fees upfront.
+
+Calls to Action
+
+Strengths
+• Multiple CTAs (“Start Saving”, “Try Cost Calculator”, “Choose Plan”) guide users.
+• Sticky “Get Started” button in the header remains in view during scroll.
+
+Weaknesses
+• Unlabeled icon buttons (slider arrows, mobile menu) not screen-reader friendly.
+• Secondary CTA color matches non-action text, reducing visual priority.
+
+Recommended Fixes
+• Add descriptive aria-labels (“Next testimonial”, “Open menu”) to every icon button.
+• Use a contrasting accent (e.g., darker teal) for all clickable buttons for instant recognition.
+
+Conversion Elements (forms, trust signals)
+
+Strengths
+• Simple plan selection buttons—no lengthy form before price disclosure.
+• FAQ accordion reduces cognitive load on common concerns.
+
+Weaknesses
+• No testimonials, Trustpilot badge, or pharmacy license number visible.
+• Early-access form in the modal asks for phone number—extra friction for top-of-funnel.
+
+Recommended Fixes
+• Embed a mini testimonial carousel or star rating badge next to the plan selector.
+• Reduce the wait-list form to email only if kept; phone can be optional later.
+
+Design & Layout
+
+Strengths
+• Logical section flow: problem → solution → plans → proof → blog → final CTA.
+• Mobile layout keeps headline, image, and primary CTA within first scroll.
+
+Weaknesses
+• Teal on light grey text fails WCAG contrast; seniors may struggle to read.
+• Viewport meta blocks zoom, hurting accessibility.
+
+Recommended Fixes
+• Darken teal (#2bcac2 → #008c8a) or switch text to dark grey to reach 4.5:1 ratio.
+• Change viewport to maximum-scale=5 and remove user-scalable=no.
+
+SEO & Technical Performance
+
+Strengths
+• Keyword-rich title, meta description, and H1 mirror the subscription value prop.
+• Extensive JSON-LD: Pharmacy, FAQ, How-To—boosts rich-result eligibility.
+• No critical SEO audit failures reported.
+
+Weaknesses
+• 132 KB blocking CSS and Google Fonts request delay first paint by ~1.5 s.
+• Uncompressed HTML (7 KB) and missing source maps log console errors, harming crawl budget.
+• Duplicate structured data graphs could be consolidated to avoid bloating.
+
+Recommended Fixes
+• Inline critical CSS for above-the-fold, defer the rest; preload fonts or self-host to cut render delay.
+• Gzip or Brotli compress HTML responses; provide JS source maps for debugging without error spam.
+• Merge redundant Pharmacy and FAQ schema blocks into one to keep markup lean.
+
+By resolving the conflicting signup experience, bolstering trust cues, and tightening performance, the homepage will guide more visitors smoothly from curiosity to paid subscription—metrics Racoons .ai will capture via existing page-view and click tracking.
