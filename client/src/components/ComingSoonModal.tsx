@@ -80,7 +80,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-md max-h-[90vh] overflow-y-auto [&>button]:hidden p-0"
+        className="sm:max-w-xl max-h-[90vh] overflow-y-auto [&>button]:hidden p-0"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
@@ -90,10 +90,8 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
             <img src={pdcLogo} alt="Pillar Drug Club" className="h-20 md:h-24 object-contain" />
           </div>
           <DialogHeader className="space-y-0.5">
-            <DialogTitle className="text-center text-lg md:text-xl font-semibold text-muted-foreground">
-              Your Trusted Pharmacy Autopilot
-              <br />
-              <span className="text-primary font-bold">For Low as a Penny per Pill</span>
+            <DialogTitle className="text-center text-xl md:text-2xl font-semibold text-muted-foreground whitespace-nowrap">
+              Your Trusted Pharmacy Autopilot <span className="text-primary font-bold">For Low as a Penny per Pill</span>
             </DialogTitle>
             <DialogDescription className="text-center text-sm">
               Join our waitlist to unlock access.
