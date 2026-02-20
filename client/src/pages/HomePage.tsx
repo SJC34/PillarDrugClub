@@ -143,7 +143,6 @@ export default function HomePage() {
               className="h-12 font-bold px-8"
               disabled={signupMutation.isPending}
               data-testid="button-submit-hero"
-              style={{ backgroundColor: '#5ec5c5' }}
             >
               {signupMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -216,7 +215,6 @@ export default function HomePage() {
                 className="w-full h-12 font-bold tracking-wider"
                 disabled={signupMutation.isPending}
                 data-testid="button-reserve"
-                style={{ backgroundColor: '#5ec5c5' }}
               >
                 {signupMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
