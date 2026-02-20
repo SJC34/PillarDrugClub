@@ -160,7 +160,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
               className="w-full h-12 text-base font-bold"
               disabled={signupMutation.isPending}
               data-testid="button-submit-signup"
-              style={{ backgroundColor: '#0d4f4f' }}
+              style={{ backgroundColor: '#2aa8a8' }}
             >
               {signupMutation.isPending ? (
                 <>
