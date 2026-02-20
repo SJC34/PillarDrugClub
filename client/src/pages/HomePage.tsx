@@ -121,7 +121,7 @@ export default function HomePage() {
           <h1 className="text-4xl md:text-6xl font-black text-foreground leading-tight mb-6" data-testid="text-hero-headline">
             Your prescriptions.
             <br />
-            <span className="text-primary">On autopilot.</span>
+            <span className="text-primary">On autopilot. 🛩</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto" data-testid="text-hero-subline">
             Stop guessing what you'll pay at the pharmacy. Pillar Drug Club locks in pass-through pricing on generics with 6–12 month supplies — no insurance games, no surprises.
