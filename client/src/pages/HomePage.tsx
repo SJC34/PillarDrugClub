@@ -164,12 +164,11 @@ export default function HomePage() {
           <div className="bg-card border border-border rounded-xl p-8 md:p-10 shadow-lg" data-testid="membership-card">
             <p className="text-xs font-bold tracking-[0.25em] uppercase text-muted-foreground mb-6" data-testid="text-membership-label">ANNUAL MEMBERSHIP</p>
 
-            <div className="mb-1">
+            <div className="mb-2">
               <span className="text-6xl md:text-7xl font-black text-foreground" data-testid="text-price">$99</span>
               <span className="text-xl text-muted-foreground ml-2">/ year</span>
             </div>
-            <p className="text-xs text-muted-foreground mb-1" data-testid="text-founding-price">for first 100 members</p>
-            <p className="text-sm font-bold text-primary mb-8" data-testid="text-spots-left">Only 16 spots left</p>
+            <p className="text-sm font-bold mb-8 text-primary" data-testid="text-savings">Most members save $300–$600+ annually</p>
 
             <div className="space-y-0">
               {[
