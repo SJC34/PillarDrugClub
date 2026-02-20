@@ -87,7 +87,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
       >
         <div className="px-6 pt-8 pb-4">
           <div className="flex items-center justify-center mb-4">
-            <img src={pdcLogo} alt="Pillar Drug Club" className="h-14 md:h-16 object-contain" />
+            <img src={pdcLogo} alt="Pillar Drug Club" className="h-20 md:h-24 object-contain" />
           </div>
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-center text-lg md:text-xl font-semibold text-muted-foreground">
