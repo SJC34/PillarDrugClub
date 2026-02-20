@@ -20,6 +20,7 @@ import {
   Check,
 } from "lucide-react";
 import pillarImage from "@assets/image_1771565518024.png";
+import capsuleImage from "@assets/capsule-pill.png";
 
 interface SignupModalProps {
   open: boolean;
@@ -87,7 +88,10 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
         <div className="px-6 pt-8 pb-4">
           <div className="flex items-center justify-center gap-3 mb-4">
             <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
-            <h2 className="text-3xl md:text-4xl font-black whitespace-nowrap" style={{ color: '#0d4f4f' }}>Pillar Drug Club</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-3xl md:text-4xl font-black whitespace-nowrap text-foreground lowercase">pillar drug club</h2>
+              <img src={capsuleImage} alt="" className="h-8 md:h-10 object-contain" />
+            </div>
             <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
           </div>
           <DialogHeader className="space-y-2">
