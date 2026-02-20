@@ -162,14 +162,14 @@ export default function HomePage() {
       {/* Annual Membership Card */}
       <section className="py-12 md:py-20 px-6 md:px-12">
         <div className="max-w-lg mx-auto">
-          <div className="bg-[#1a2332] dark:bg-[#0f1720] rounded-xl p-8 md:p-10 text-white" data-testid="membership-card">
-            <p className="text-xs font-bold tracking-[0.25em] uppercase text-gray-400 mb-6" data-testid="text-membership-label">ANNUAL MEMBERSHIP</p>
+          <div className="bg-card border border-border rounded-xl p-8 md:p-10" data-testid="membership-card">
+            <p className="text-xs font-bold tracking-[0.25em] uppercase text-muted-foreground mb-6" data-testid="text-membership-label">ANNUAL MEMBERSHIP</p>
 
             <div className="mb-2">
-              <span className="text-6xl md:text-7xl font-black" data-testid="text-price">$99</span>
-              <span className="text-xl text-gray-400 ml-2">/ year</span>
+              <span className="text-6xl md:text-7xl font-black text-foreground" data-testid="text-price">$99</span>
+              <span className="text-xl text-muted-foreground ml-2">/ year</span>
             </div>
-            <p className="text-sm font-bold mb-8" style={{ color: '#d4a843' }} data-testid="text-savings">Most members save $300–$600+ annually</p>
+            <p className="text-sm font-bold mb-8 text-primary" data-testid="text-savings">Most members save $300–$600+ annually</p>
 
             <div className="space-y-0">
               {[
@@ -179,9 +179,9 @@ export default function HomePage() {
                 "Mail-order delivery included",
                 "No insurance required, ever",
               ].map((benefit, idx) => (
-                <div key={idx} className="flex items-start gap-3 py-4 border-t border-white/10" data-testid={`membership-benefit-${idx}`}>
-                  <Plus className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm md:text-base text-gray-200">{benefit}</span>
+                <div key={idx} className="flex items-start gap-3 py-4 border-t border-border" data-testid={`membership-benefit-${idx}`}>
+                  <Plus className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm md:text-base text-foreground">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -193,12 +193,12 @@ export default function HomePage() {
                 value={reserveEmail}
                 onChange={(e) => setReserveEmail(e.target.value)}
                 disabled={signupMutation.isPending}
-                className="h-12 text-base bg-[#243044] border-[#2d3d54] text-white placeholder:text-gray-500"
+                className="h-12 text-base"
                 data-testid="input-email-reserve"
                 required
               />
               <Select value={rxSource} onValueChange={setRxSource}>
-                <SelectTrigger className="h-12 text-base bg-[#243044] border-[#2d3d54] text-gray-400" data-testid="select-rx-source">
+                <SelectTrigger className="h-12 text-base" data-testid="select-rx-source">
                   <SelectValue placeholder="How do you currently get prescriptions?" />
                 </SelectTrigger>
                 <SelectContent>
@@ -213,10 +213,10 @@ export default function HomePage() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full h-12 font-bold tracking-wider text-black"
+                className="w-full h-12 font-bold tracking-wider"
                 disabled={signupMutation.isPending}
                 data-testid="button-reserve"
-                style={{ backgroundColor: '#d4a843' }}
+                style={{ backgroundColor: '#2aa8a8' }}
               >
                 {signupMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
