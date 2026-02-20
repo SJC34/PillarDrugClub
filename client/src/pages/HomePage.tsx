@@ -166,6 +166,7 @@ export default function HomePage() {
             <p className="text-xs font-bold tracking-[0.25em] uppercase text-muted-foreground mb-6" data-testid="text-membership-label">ANNUAL MEMBERSHIP</p>
 
             <div className="mb-2">
+              <span className="text-2xl md:text-3xl text-muted-foreground line-through mr-2">$149</span>
               <span className="text-6xl md:text-7xl font-black text-foreground" data-testid="text-price">$99</span>
               <span className="text-xl text-muted-foreground ml-2">/ year</span>
             </div>
