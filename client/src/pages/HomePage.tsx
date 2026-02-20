@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, Plus } from "lucide-react";
 import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
 import pdcLogo from "@assets/image_1771566531369.jpeg";
 
 export default function HomePage() {
   const [email, setEmail] = useState("");
+  const [reserveEmail, setReserveEmail] = useState("");
+  const [rxSource, setRxSource] = useState("");
   const { toast } = useToast();
 
   const signupMutation = useMutation({
@@ -44,6 +53,21 @@ export default function HomePage() {
       return;
     }
     signupMutation.mutate({ name: "", email, phone: "" });
+  };
+
+  const handleReserve = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reserveEmail) {
+      toast({
+        variant: "destructive",
+        title: "Email required",
+        description: "Please enter your email address.",
+      });
+      return;
+    }
+    signupMutation.mutate({ name: rxSource ? `rx_source:${rxSource}` : "", email: reserveEmail, phone: "" });
+    setReserveEmail("");
+    setRxSource("");
   };
 
   const combinedSchema = {
@@ -132,6 +156,76 @@ export default function HomePage() {
             </Button>
           </form>
           <p className="text-xs text-muted-foreground">No spam. No commitment. We'll reach out before launch.</p>
+        </div>
+      </section>
+
+      {/* Annual Membership Card */}
+      <section className="py-12 md:py-20 px-6 md:px-12">
+        <div className="max-w-lg mx-auto">
+          <div className="bg-[#1a2332] dark:bg-[#0f1720] rounded-xl p-8 md:p-10 text-white" data-testid="membership-card">
+            <p className="text-xs font-bold tracking-[0.25em] uppercase text-gray-400 mb-6" data-testid="text-membership-label">ANNUAL MEMBERSHIP</p>
+
+            <div className="mb-2">
+              <span className="text-6xl md:text-7xl font-black" data-testid="text-price">$99</span>
+              <span className="text-xl text-gray-400 ml-2">/ year</span>
+            </div>
+            <p className="text-sm font-bold mb-8" style={{ color: '#d4a843' }} data-testid="text-savings">Most members save $300–$600+ annually</p>
+
+            <div className="space-y-0">
+              {[
+                "Pass-through generic pricing — no markup",
+                "Automated refills — no manual calls",
+                "Price locked at cost, not retail",
+                "Mail-order delivery included",
+                "No insurance required, ever",
+              ].map((benefit, idx) => (
+                <div key={idx} className="flex items-start gap-3 py-4 border-t border-white/10" data-testid={`membership-benefit-${idx}`}>
+                  <Plus className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm md:text-base text-gray-200">{benefit}</span>
+                </div>
+              ))}
+            </div>
+
+            <form onSubmit={handleReserve} className="mt-8 space-y-3" data-testid="form-reserve">
+              <Input
+                type="email"
+                placeholder="Your email address"
+                value={reserveEmail}
+                onChange={(e) => setReserveEmail(e.target.value)}
+                disabled={signupMutation.isPending}
+                className="h-12 text-base bg-[#243044] border-[#2d3d54] text-white placeholder:text-gray-500"
+                data-testid="input-email-reserve"
+                required
+              />
+              <Select value={rxSource} onValueChange={setRxSource}>
+                <SelectTrigger className="h-12 text-base bg-[#243044] border-[#2d3d54] text-gray-400" data-testid="select-rx-source">
+                  <SelectValue placeholder="How do you currently get prescriptions?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="retail_pharmacy">Retail pharmacy (CVS, Walgreens, etc.)</SelectItem>
+                  <SelectItem value="mail_order">Mail-order pharmacy</SelectItem>
+                  <SelectItem value="goodrx">GoodRx or discount card</SelectItem>
+                  <SelectItem value="insurance">Through insurance</SelectItem>
+                  <SelectItem value="no_prescriptions">I don't currently take prescriptions</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full h-12 font-bold tracking-wider text-black"
+                disabled={signupMutation.isPending}
+                data-testid="button-reserve"
+                style={{ backgroundColor: '#d4a843' }}
+              >
+                {signupMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "RESERVE MY SPOT"
+                )}
+              </Button>
+            </form>
+          </div>
         </div>
       </section>
 
