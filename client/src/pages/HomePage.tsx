@@ -173,7 +173,7 @@ export default function HomePage() {
             <div className="space-y-0">
               {[
                 "Pass-through generic pricing — no markup",
-                "Automated refills — no manual calls",
+                "6–12 month supplies — fewer orders",
                 "Price locked at cost, not retail",
                 "Mail-order delivery included",
                 "No insurance required, ever",
