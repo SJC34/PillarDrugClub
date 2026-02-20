@@ -200,7 +200,7 @@ export async function generateMultiChannelContent(
     generateVideoScript = true,
     targetAudience = "general",
     contentGoal = "education",
-    cta = "pillardrugclub.com/join",
+    cta = "pharmacyautopilot.com/join",
     generationMode = "simple",
     templatePreset
   } = options;
@@ -246,7 +246,7 @@ export async function generateMultiChannelContent(
   if (isProfessionalMode && stylePacks) {
     // Professional mode: Use Creator Style Engine
     console.log(`📝 Using Creator Style Engine with style packs:`, stylePacks);
-    systemPrompt = "You are the Creator Style Engine - an expert multi-channel content generator for Pillar Drug Club. You adapt content structure, pacing, and tone to match selected Creator Style Packs while maintaining medical accuracy and healthcare best practices.";
+    systemPrompt = "You are the Creator Style Engine - an expert multi-channel content generator for Pharmacy Autopilot. You adapt content structure, pacing, and tone to match selected Creator Style Packs while maintaining medical accuracy and healthcare best practices.";
     userPrompt = buildCreatorStyleEnginePrompt(
       topic,
       tone,
@@ -268,7 +268,7 @@ export async function generateMultiChannelContent(
     // Simple mode: Use default content strategist prompt
     console.log(`📝 Using simple mode content generation`);
     systemPrompt = "You are an expert multi-channel content strategist specializing in pharmacy and healthcare. You create platform-optimized content that drives engagement and conversions. You ALWAYS return complete JSON with all requested sections - never omit content.";
-    userPrompt = `You are a content strategist for Pillar Drug Club - a prescription pharmacy platform offering wholesale medication prices without insurance hassles.
+    userPrompt = `You are a content strategist for Pharmacy Autopilot - a prescription pharmacy platform offering wholesale medication prices without insurance hassles.
 
 TOPIC: "${topic}"
 

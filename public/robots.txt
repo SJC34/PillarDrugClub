@@ -1,4 +1,4 @@
-# Pillar Drug Club - Robots.txt
+# Pharmacy Autopilot - Robots.txt
 # Updated: November 2025
 
 User-agent: *
@@ -20,7 +20,7 @@ Disallow: /subscribe
 Disallow: /subscription
 
 # Sitemap location
-Sitemap: https://pillardrugclub.com/sitemap.xml
+Sitemap: https://pharmacyautopilot.com/sitemap.xml
 
 # Crawl-delay for good citizenship
 Crawl-delay: 1

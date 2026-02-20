@@ -108,10 +108,10 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
           <DialogTitle className="text-center text-3xl md:text-4xl font-black">
             Prescription Medications
             <br />
-            <span className="text-primary">As Low As 1¢ Per Tablet</span>
+            <span className="text-primary">Tablets As Low As $0.01</span>
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            Sign up below to unlock access. Join Pillar Drug Club for just $99/year 
+            Sign up below to unlock access. Join Pharmacy Autopilot for just $99/year 
             and get direct access to affordable, year-supply prescriptions.
           </DialogDescription>
         </DialogHeader>

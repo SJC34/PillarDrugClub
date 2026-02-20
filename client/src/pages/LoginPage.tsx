@@ -92,7 +92,7 @@ export default function LoginPage() {
       
       toast({
         title: "Login Successful",
-        description: "Welcome back to Pillar Drug Club!"
+        description: "Welcome back to Pharmacy Autopilot!"
       });
       
       // Trigger redirect in useEffect after user state is updated

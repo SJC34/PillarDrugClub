@@ -62,7 +62,7 @@ function calculatePlanCosts(inputs: CalculatorInputs): PlanCost[] {
   const { desiredSupplyDays, numMedications, shippingPerOrder } = inputs;
   
   const plans = [
-    { name: "Pillar Drug Club", tierKey: "member", annualFee: 99, dispensingFeePerMed: 10, maxSupplyDays: 365 },
+    { name: "Pharmacy Autopilot", tierKey: "member", annualFee: 99, dispensingFeePerMed: 10, maxSupplyDays: 365 },
   ];
 
   const results: PlanCost[] = plans.map(plan => {
@@ -195,16 +195,16 @@ export default function CostCalculatorPage() {
   const totalRetailYearlyCost = calculations.reduce((sum, calc) => sum + (calc.medication.price * (calc.tabletsPerDay * 365)), 0);
 
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", url: "https://pillardrugclub.com" },
-    { name: "Cost Calculator", url: "https://pillardrugclub.com/cost-calculator" }
+    { name: "Home", url: "https://pharmacyautopilot.com" },
+    { name: "Cost Calculator", url: "https://pharmacyautopilot.com/cost-calculator" }
   ]);
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
       <SEOHead
-        title="Prescription Cost Calculator - See How Much You'll Save | Pillar Drug Club"
+        title="Prescription Cost Calculator - See How Much You'll Save | Pharmacy Autopilot"
         description="Calculate your exact prescription costs and savings. See how much you'll pay for your medications vs retail prices. Free calculator shows your savings instantly."
-        canonical="https://pillardrugclub.com/cost-calculator"
+        canonical="https://pharmacyautopilot.com/cost-calculator"
         schema={breadcrumbSchema}
       />
       <div className="max-w-6xl mx-auto">
@@ -644,7 +644,7 @@ export default function CostCalculatorPage() {
                 Ready to start saving?
               </h3>
               <p className="text-sm md:text-base text-muted-foreground mb-4">
-                Get these wholesale prices by becoming a Pillar Drug Club member
+                Get these wholesale prices by becoming a Pharmacy Autopilot member
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <Link href="/medications">

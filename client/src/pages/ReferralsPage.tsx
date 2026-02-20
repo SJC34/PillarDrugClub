@@ -88,7 +88,7 @@ export default function ReferralsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Referral Program</h1>
         <p className="text-muted-foreground">
-          Share Pillar Drug Club with friends and family. Both of you get <strong>1 month free</strong> when they sign up!
+          Share Pharmacy Autopilot with friends and family. Both of you get <strong>1 month free</strong> when they sign up!
         </p>
       </div>
 
@@ -223,7 +223,7 @@ export default function ReferralsPage() {
                 size="sm"
                 onClick={() => {
                   window.open(
-                    `mailto:?subject=Join%20Pillar%20Drug%20Club&body=I%20wanted%20to%20share%20Pillar%20Drug%20Club%20with%20you!%20Get%20affordable%20medications%20at%20wholesale%20prices.%20Use%20my%20referral%20code:%20${referralCode?.code}%0A%0A${referralLink}`,
+                    `mailto:?subject=Join%20Pharmacy%20Autopilot&body=I%20wanted%20to%20share%20Pharmacy%20Autopilot%20with%20you!%20Get%20affordable%20medications%20at%20wholesale%20prices.%20Use%20my%20referral%20code:%20${referralCode?.code}%0A%0A${referralLink}`,
                     "_blank"
                   );
                 }}
@@ -266,7 +266,7 @@ export default function ReferralsPage() {
         <CardHeader>
           <CardTitle>Referral History</CardTitle>
           <CardDescription>
-            People you've referred to Pillar Drug Club
+            People you've referred to Pharmacy Autopilot
           </CardDescription>
         </CardHeader>
         <CardContent>

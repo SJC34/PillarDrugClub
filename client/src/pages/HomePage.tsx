@@ -45,7 +45,7 @@ export default function HomePage() {
     ]
   };
   const benefits = [
-    "Save 90% on prescriptions - medications as low as 1¢ per pill",
+    "Save 90% on prescriptions - medications as low as $0.01 per tablet",
     "No insurance needed - our prices often beat insurance copays",
     "Free delivery to your door - all 50 states, no extra fees", 
     "See exact costs upfront - no surprises, no hidden charges",
@@ -78,8 +78,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <SEOHead
-        title="Save 90% on Prescriptions | Get Meds Without Insurance - Pillar Drug Club"
-        description="Can't afford your prescriptions? Get medications for as low as 1¢ per pill. No insurance needed. Free delivery. Save hundreds on diabetes, blood pressure, cholesterol & more."
+        title="Save 90% on Prescriptions | Get Meds Without Insurance - Pharmacy Autopilot"
+        description="Can't afford your prescriptions? Get medications for as low as $0.01 per tablet. No insurance needed. Free delivery. Save hundreds on diabetes, blood pressure, cholesterol & more."
         canonical={getBaseUrl()}
         schema={combinedSchema}
       />
@@ -128,7 +128,7 @@ export default function HomePage() {
                   </div>
                 </CarouselItem>
 
-                {/* Slide 2 - "Join Pillar!" video with text overlay */}
+                {/* Slide 2 - "Join" video with text overlay */}
                 <CarouselItem>
                   <div className="relative overflow-hidden">
                     <video 
@@ -146,7 +146,7 @@ export default function HomePage() {
                         <div className="bg-black/50 rounded-lg backdrop-blur-sm cursor-pointer hover-elevate px-3 py-2">
                           <div className="flex flex-col text-center min-w-[90px] justify-center">
                             <span className="text-2xl md:text-3xl font-black text-white leading-tight tracking-wide" data-testid="text-join">Join</span>
-                            <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wide" data-testid="text-pillar">Pillar!</span>
+                            <span className="text-2xl md:text-3xl font-black text-primary leading-tight tracking-wide" data-testid="text-pillar">Now!</span>
                           </div>
                         </div>
                       </Link>
@@ -159,7 +159,7 @@ export default function HomePage() {
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6">
             Get Your Meds for Pennies
-            <span className="text-primary block">As Low As 1¢ Per Pill</span>
+            <span className="text-primary block">Tablets As Low As $0.01</span>
           </h1>
           <p className="text-lg md:text-xl font-bold text-muted-foreground max-w-3xl mx-auto mb-8">
             Stop overpaying at traditional pharmacies. No insurance needed.
@@ -196,9 +196,9 @@ export default function HomePage() {
               </div>
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-3">
-                  <img src={goldPillarBadge} alt="Pillar Drug Club Membership" className="w-16 h-16 object-contain" />
+                  <img src={goldPillarBadge} alt="Pharmacy Autopilot Membership" className="w-16 h-16 object-contain" />
                 </div>
-                <CardTitle className="text-xl md:text-2xl font-bold" data-testid="text-membership-name">Pillar Drug Club</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold" data-testid="text-membership-name">Pharmacy Autopilot</CardTitle>
                 <div className="text-3xl md:text-4xl font-bold text-primary" data-testid="text-membership-price">
                   $99
                   <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
@@ -230,7 +230,7 @@ export default function HomePage() {
                 </ul>
                 <Link href="/register">
                   <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-membership">
-                    Join Pillar Drug Club
+                    Join Pharmacy Autopilot
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -297,7 +297,7 @@ export default function HomePage() {
                 Why is my prescription so expensive?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-expensive">
-                Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pillar Drug Club buys directly from wholesalers and passes the true cost to you - as low as 1¢ per pill. We cut out the middlemen so you stop overpaying.
+                Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pharmacy Autopilot buys directly from wholesalers and passes the true cost to you - as low as $0.01 per tablet. We cut out the middlemen so you stop overpaying.
               </AccordionContent>
             </AccordionItem>
 
@@ -306,7 +306,7 @@ export default function HomePage() {
                 Can I get prescriptions without insurance?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-no-insurance">
-                Yes! No insurance needed. Pillar Drug Club offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not.
+                Yes! No insurance needed. Pharmacy Autopilot offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not.
               </AccordionContent>
             </AccordionItem>
 
@@ -315,7 +315,7 @@ export default function HomePage() {
                 How much will my prescription cost?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cost">
-                Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as 1¢ per tablet. No hidden fees - what you see is what you pay.
+                Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as $0.01 per tablet. No hidden fees - what you see is what you pay.
               </AccordionContent>
             </AccordionItem>
 
@@ -379,7 +379,7 @@ export default function HomePage() {
           </p>
           <Link href="/register">
             <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg font-bold px-8 py-4 focus-visible:outline-none" data-testid="button-join-cta">
-              Join Pillar Drug Club
+              Join Pharmacy Autopilot
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -391,7 +391,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <Pill className="h-6 w-6 text-primary" />
-            <span className="text-lg md:text-xl font-bold text-foreground">Pillar Drug Club</span>
+            <span className="text-lg md:text-xl font-bold text-foreground">Pharmacy Autopilot</span>
           </div>
           <p className="text-muted-foreground font-bold mb-4 text-sm md:text-base">
             Transparent wholesale prescription pricing for everyone.
@@ -400,7 +400,7 @@ export default function HomePage() {
             <a href="/refund-policy" className="hover:text-foreground transition-colors" data-testid="link-footer-refund-policy">Refund Policy</a>
             <a href="/privacy-policy" className="hover:text-foreground transition-colors" data-testid="link-footer-privacy-policy">Privacy Policy</a>
             <a href="/terms-of-service" className="hover:text-foreground transition-colors" data-testid="link-footer-terms">Terms of Service</a>
-            <a href="mailto:support@pillardrugclub.com" className="hover:text-foreground transition-colors" data-testid="link-footer-contact">Contact</a>
+            <a href="mailto:support@pharmacyautopilot.com" className="hover:text-foreground transition-colors" data-testid="link-footer-contact">Contact</a>
           </div>
         </div>
       </footer>

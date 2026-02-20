@@ -63,7 +63,7 @@ export default function PortalNav() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Pillar Drug Club
+            Pharmacy Autopilot
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Transparent wholesale prescription pricing with no insurance requirements. 

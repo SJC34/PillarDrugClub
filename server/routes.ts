@@ -55,7 +55,7 @@ function generateReferralCode(firstName?: string, lastName?: string): string {
     const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
     return `${initials}${randomPart}`;
   }
-  return `PILLAR${randomPart}`;
+  return `AUTOPILOT${randomPart}`;
 }
 
 // Middleware to check if user has Gold or Platinum tier
@@ -105,7 +105,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         step6: "Click 'Sign in with Google'"
       },
       important: [
-        "You CANNOT use pillardrugclub.com until you publish the app",
+        "You CANNOT use pharmacyautopilot.com until you publish the app",
         "For development, use the Replit dev URL shown above",
         "MUST open in Safari/Chrome - Google blocks embedded browsers"
       ]
@@ -117,7 +117,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   app.get('/sitemap.xml', async (req, res) => {
     try {
       const domain = process.env.CUSTOM_DOMAIN || 
-        (process.env.REPLIT_DOMAINS ? process.env.REPLIT_DOMAINS.split(",")[0] : "pillardrugclub.com");
+        (process.env.REPLIT_DOMAINS ? process.env.REPLIT_DOMAINS.split(",")[0] : "pharmacyautopilot.com");
       const baseUrl = `https://${domain}`;
       const today = new Date().toISOString().split('T')[0];
       
@@ -531,7 +531,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       // Single membership plan - $99/year
       const selectedPlan = {
         amount: 9900, // $99.00 in cents (annual)
-        name: 'Pillar Drug Club Membership',
+        name: 'Pharmacy Autopilot Membership',
         description: 'Annual membership ($99/year) - up to 12-month supply access'
       };
       
@@ -584,7 +584,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
               percent_off: 100,
               duration: 'repeating',
               duration_in_months: 1,
-              name: 'Pillar Referral Credit - 1 Month Free',
+              name: 'Pharmacy Autopilot Referral Credit - 1 Month Free',
             });
             console.log(`✅ Created Stripe coupon: ${existingCoupon.id}`);
           }
@@ -794,7 +794,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         amount: terminationFeeCents,
         currency: 'usd',
         customer: customerId,
-        description: `Early termination fee for Pillar Drug Club subscription (${remainingMonths} months remaining)`,
+        description: `Early termination fee for Pharmacy Autopilot subscription (${remainingMonths} months remaining)`,
         metadata: {
           userId: userId,
           type: 'termination_fee',
@@ -1534,7 +1534,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         
         // Send PDF to patient via email (only if sendEmail is true)
         if (validatedData.sendEmail && patientEmail && patientEmail.trim().length > 0) {
-          const patientEmailSubject = `Your Prescription Request Form - Pillar Drug Club`;
+          const patientEmailSubject = `Your Prescription Request Form - Pharmacy Autopilot`;
           const patientEmailBody = `
             <h2>Your Prescription Request Form</h2>
             <p>Dear ${validatedData.patientName},</p>
@@ -1545,7 +1545,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
               <li>Review the attached PDF form</li>
               <li>Forward this email with the form to your doctor</li>
               <li>Or upload the form to your doctor's secure portal</li>
-              <li>Your doctor will electronically submit the prescription to Pillar Drug Club</li>
+              <li>Your doctor will electronically submit the prescription to Pharmacy Autopilot</li>
             </ol>
             
             <h3>Requested Medication:</h3>
@@ -1556,7 +1556,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
             </ul>
             
             <p>If you have any questions, please contact us.</p>
-            <p>Best regards,<br/>Pillar Drug Club Team</p>
+            <p>Best regards,<br/>Pharmacy Autopilot Team</p>
           `;
           
           notificationPromises.push(
@@ -1587,7 +1587,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         console.log(`📱 SMS check: sendText=${validatedData.sendText}, phone="${patientPhone}", length=${patientPhone.trim().length}`);
         if (validatedData.sendText && patientPhone && patientPhone.trim().length > 0) {
           console.log(`📤 Attempting to send SMS to: ${patientPhone}`);
-          const patientSmsMessage = `Pillar Drug Club: Your prescription request form has been emailed to you. Please forward it to your doctor ${validatedData.doctorName} or upload to their secure portal.`;
+          const patientSmsMessage = `Pharmacy Autopilot: Your prescription request form has been emailed to you. Please forward it to your doctor ${validatedData.doctorName} or upload to their secure portal.`;
           notificationPromises.push(
             sendSMS(patientPhone, patientSmsMessage)
               .then(success => {
@@ -1740,7 +1740,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       console.log(`📲 Sending SMS to ${user.phoneNumber} with download link: ${downloadUrl}`);
       
       // Short, clear SMS message
-      const smsMessage = `Pillar Drug Club: ${request.medicationName} prescription form ready. Download here: ${downloadUrl}`;
+      const smsMessage = `Pharmacy Autopilot: ${request.medicationName} prescription form ready. Download here: ${downloadUrl}`;
       
       const success = await sendSMS(user.phoneNumber, smsMessage);
       
@@ -1783,7 +1783,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const pdfBuffer = await generateRefundPolicyPDF();
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="Pillar-Drug-Club-Refund-Policy.pdf"');
+      res.setHeader('Content-Disposition', 'attachment; filename="Pharmacy-Autopilot-Refund-Policy.pdf"');
       res.send(pdfBuffer);
       
       console.log("✅ Refund policy PDF generated and sent successfully");

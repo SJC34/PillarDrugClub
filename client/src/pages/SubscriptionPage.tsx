@@ -24,7 +24,7 @@ const SubscribeForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const planPrice = 99;
-  const planName = 'Pillar Drug Club Membership';
+  const planName = 'Pharmacy Autopilot Membership';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ const SubscribeForm = () => {
     } else {
       toast({
         title: "Subscription Successful",
-        description: "Welcome to Pillar Drug Club! You now have access to wholesale pricing.",
+        description: "Welcome to Pharmacy Autopilot! You now have access to wholesale pricing.",
       });
       setLocation("/dashboard");
     }
@@ -236,7 +236,7 @@ export default function SubscriptionPage() {
           <Link href="/">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">Pillar Drug Club</span>
+              <span className="text-2xl font-bold text-gray-900">Pharmacy Autopilot</span>
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Membership</h1>
@@ -255,7 +255,7 @@ export default function SubscriptionPage() {
                 MEMBERSHIP
               </div>
               <CardHeader>
-                <CardTitle className="text-lg">Pillar Drug Club Membership</CardTitle>
+                <CardTitle className="text-lg">Pharmacy Autopilot Membership</CardTitle>
                 <div className="text-2xl font-bold text-primary">
                   $99<span className="text-base text-muted-foreground">/year</span>
                 </div>
@@ -333,7 +333,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div className="text-gray-600">per year</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    Pillar Drug Club Membership
+                    Pharmacy Autopilot Membership
                   </div>
                 </div>
               </div>

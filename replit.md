@@ -1,11 +1,11 @@
-# Pillar Drug Club - Wholesale Prescription Pharmacy Platform
+# Pharmacy Autopilot - Wholesale Prescription Pharmacy Platform
 
 ## Overview
-Pillar Drug Club is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers a single membership at $99/year, supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
+Pharmacy Autopilot (formerly Pillar Drug Club) is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers — tablets as low as $0.01 per tablet. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers a single membership at $99/year, supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-Primary admin user: Seth Collins, Pharm.D. (seth@pillardrugclub.com)
+Primary admin user: Seth Collins, Pharm.D. (seth@pharmacyautopilot.com)
 
 ## System Architecture
 

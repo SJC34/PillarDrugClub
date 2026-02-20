@@ -85,9 +85,9 @@ export default function MedicationDetailsPage() {
   });
 
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: "Home", url: "https://pillardrugclub.com" },
-    { name: "Medications", url: "https://pillardrugclub.com/medications" },
-    { name: medication.name, url: `https://pillardrugclub.com/medications/${medication.id}` }
+    { name: "Home", url: "https://pharmacyautopilot.com" },
+    { name: "Medications", url: "https://pharmacyautopilot.com/medications" },
+    { name: medication.name, url: `https://pharmacyautopilot.com/medications/${medication.id}` }
   ]);
 
   const combinedSchema = {
@@ -98,9 +98,9 @@ export default function MedicationDetailsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <SEOHead
-        title={`${medication.name} - Save Up to ${Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}% | Pillar Drug Club`}
+        title={`${medication.name} - Save Up to ${Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}% | Pharmacy Autopilot`}
         description={`Get ${medication.genericName} for just $${medication.wholesalePrice.toFixed(2)} - save ${Math.round(((medication.price - medication.wholesalePrice) / medication.price) * 100)}% vs retail. ${medication.description}`}
-        canonical={`https://pillardrugclub.com/medications/${medication.id}`}
+        canonical={`https://pharmacyautopilot.com/medications/${medication.id}`}
         schema={combinedSchema}
       />
       <div className="max-w-4xl mx-auto">

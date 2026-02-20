@@ -96,7 +96,7 @@ const PaymentForm = ({ clientSecret, onSuccess }: { clientSecret: string; onSucc
     } else {
       toast({
         title: "Registration Complete!",
-        description: "Welcome to Pillar Drug Club! You now have access to wholesale pricing.",
+        description: "Welcome to Pharmacy Autopilot! You now have access to wholesale pricing.",
       });
       onSuccess();
     }
@@ -471,15 +471,15 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | $99/Year Membership"
-          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
+          title="Join Pharmacy Autopilot | $99/Year Membership"
+          description="Join Pharmacy Autopilot for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
         <div className="min-h-screen flex items-center justify-center px-4 py-8">
           <div className="w-full max-w-md">
             <div className="text-center mb-6 md:mb-8">
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pharmacy Autopilot</h1>
               <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing for just $99/year</p>
             </div>
 
@@ -564,8 +564,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | $99/Year Membership"
-          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
+          title="Join Pharmacy Autopilot | $99/Year Membership"
+          description="Join Pharmacy Autopilot for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -579,9 +579,9 @@ export default function RegisterPage() {
           <Card className="border-primary/20 mb-6 bg-gradient-to-br from-primary/5 to-transparent">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-2">
-                <img src={goldPillarBadge} alt="Pillar Drug Club" className="w-10 h-10 object-contain" />
+                <img src={goldPillarBadge} alt="Pharmacy Autopilot" className="w-10 h-10 object-contain" />
                 <div>
-                  <div className="font-bold text-lg">Pillar Drug Club Membership</div>
+                  <div className="font-bold text-lg">Pharmacy Autopilot Membership</div>
                   <div className="text-2xl font-bold text-primary">$99<span className="text-sm text-muted-foreground">/year</span></div>
                 </div>
               </div>
@@ -869,8 +869,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | $99/Year Membership"
-          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
+          title="Join Pharmacy Autopilot | $99/Year Membership"
+          description="Join Pharmacy Autopilot for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1066,8 +1066,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | $99/Year Membership"
-          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
+          title="Join Pharmacy Autopilot | $99/Year Membership"
+          description="Join Pharmacy Autopilot for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1077,7 +1077,7 @@ export default function RegisterPage() {
               <Link href="/">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <Pill className="h-8 w-8 text-teal-700 dark:text-teal-400" />
-                  <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
+                  <span className="text-xl md:text-2xl font-bold text-foreground">Pharmacy Autopilot</span>
                 </div>
               </Link>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Complete Your Registration</h1>
@@ -1127,7 +1127,7 @@ export default function RegisterPage() {
                     </div>
                     <div className="text-sm md:text-base text-muted-foreground">per year</div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                      Pillar Drug Club Membership
+                      Pharmacy Autopilot Membership
                     </div>
                     <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
                       Up to 12-month supply + $10 dispensing per fill

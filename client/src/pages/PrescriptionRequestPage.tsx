@@ -374,7 +374,7 @@ export default function PrescriptionRequestPage() {
                     <p className="text-sm font-medium text-foreground mt-2">Example: Levothyroxine 25mcg</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-semibold text-primary uppercase tracking-wide">Pillar Wholesale Price</p>
+                    <p className="text-xs font-semibold text-primary uppercase tracking-wide">Pharmacy Autopilot Wholesale Price</p>
                     <p className="text-lg font-bold text-primary">$7.30/year</p>
                     <p className="text-xs text-muted-foreground">#365 tablets, no refills<br/>One-time payment</p>
                     <div className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold mt-2">
@@ -541,7 +541,7 @@ export default function PrescriptionRequestPage() {
                         </Select>
                         {user?.subscriptionTier === "free" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Join Pillar Drug Club for up to 12-month supply access
+                            Join Pharmacy Autopilot for up to 12-month supply access
                           </p>
                         )}
                         {doctorForm.formState.errors.quantity && (
@@ -899,7 +899,7 @@ export default function PrescriptionRequestPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Your doctor will send the prescription directly to Pillar Drug Club</span>
+                  <span>Your doctor will send the prescription directly to Pharmacy Autopilot</span>
                 </div>
               </div>
             </div>

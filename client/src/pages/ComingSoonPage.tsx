@@ -30,7 +30,7 @@ export default function ComingSoonPage() {
     onSuccess: () => {
       toast({
         title: "You're on the list!",
-        description: "We'll notify you as soon as Pillar launches.",
+        description: "We'll notify you as soon as Pharmacy Autopilot launches.",
       });
       setName("");
       setEmail("");
@@ -100,10 +100,10 @@ export default function ComingSoonPage() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent leading-tight">
               Prescription Medications
               <br />
-              <span className="text-primary">As Low As 1¢ Per Tablet</span>
+              <span className="text-primary">Tablets As Low As $0.01</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Join the waitlist for Pillar Drug Club — your direct access to affordable, 
+              Join the waitlist for Pharmacy Autopilot — your direct access to affordable, 
               year-supply prescriptions without the insurance headaches.
             </p>
           </div>
@@ -191,7 +191,7 @@ export default function ComingSoonPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black mb-4 text-foreground">
-              Why Pillar?
+              Why Pharmacy Autopilot?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               We're revolutionizing prescription access by cutting out the middlemen
@@ -229,7 +229,7 @@ export default function ComingSoonPage() {
                 The Real Savings
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Compare traditional insurance copays vs. Pillar's wholesale pricing
+                Compare traditional insurance copays vs. Pharmacy Autopilot's wholesale pricing
               </p>
               
               <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -245,7 +245,7 @@ export default function ComingSoonPage() {
                 
                 <div className="bg-background/80 backdrop-blur rounded-lg p-6 border-2 border-primary">
                   <p className="text-sm font-semibold text-primary uppercase tracking-wide mb-2">
-                    Pillar Wholesale
+                    Pharmacy Autopilot Wholesale
                   </p>
                   <p className="text-4xl font-black text-primary mb-1">$7.30/year</p>
                   <p className="text-sm text-muted-foreground">
@@ -270,7 +270,7 @@ export default function ComingSoonPage() {
             Ready to Save on Prescriptions?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Be the first to know when Pillar launches. Join our waitlist today.
+            Be the first to know when Pharmacy Autopilot launches. Join our waitlist today.
           </p>
           
           <div className="max-w-md mx-auto">
@@ -339,7 +339,7 @@ export default function ComingSoonPage() {
       <footer className="py-8 border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 Pillar Drug Club. All rights reserved.
+            © 2025 Pharmacy Autopilot. All rights reserved.
           </p>
         </div>
       </footer>

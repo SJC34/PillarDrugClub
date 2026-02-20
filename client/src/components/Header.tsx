@@ -33,7 +33,7 @@ export default function Header() {
     { name: "MEDICATIONS", href: "/medications" },
     { name: "COST CALCULATOR", href: "/cost-calculator" },
     { name: "DASHBOARD", href: "/dashboard" },
-    { name: "PILLAR POST", href: "/blog" },
+    { name: "BLOG", href: "/blog" },
   ];
 
   return (
@@ -60,7 +60,7 @@ export default function Header() {
 
             {/* Brand name with pill symbol */}
             <Link href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
-              pillar drug club
+              pharmacy autopilot
               <Pill className="h-5 w-5 text-secondary" />
             </Link>
           </div>
@@ -190,7 +190,7 @@ export default function Header() {
                 {/* Logo Header */}
                 <div className="px-6 pb-4 bg-white dark:bg-gray-950">
                   <Link href="/" className="text-xl font-black flex items-center gap-2 text-gray-900 dark:text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                    pillar drug club
+                    pharmacy autopilot
                     <Pill className="h-5 w-5 text-primary" />
                   </Link>
                 </div>

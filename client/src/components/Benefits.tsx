@@ -35,7 +35,7 @@ export default function Benefits() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-20">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl mb-6">
-            How Pillar Drug Club Works
+            How Pharmacy Autopilot Works
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             We've eliminated the middlemen and markups to bring you prescription 

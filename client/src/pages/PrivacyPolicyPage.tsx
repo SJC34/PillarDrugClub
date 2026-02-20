@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
             <h1 className="text-4xl font-bold font-display">Notice of Privacy Practices</h1>
           </div>
           <p className="text-center text-primary-foreground/90 max-w-3xl mx-auto">
-            HIPAA-Compliant Privacy Policy for Pillar Drug Club
+            HIPAA-Compliant Privacy Policy for Pharmacy Autopilot
           </p>
           <p className="text-center text-sm text-primary-foreground/80 mt-4">
             Effective Date: October 23, 2025 | Last Updated: October 23, 2025
@@ -42,7 +42,7 @@ export default function PrivacyPolicyPage() {
               THIS NOTICE DESCRIBES HOW MEDICAL INFORMATION ABOUT YOU MAY BE USED AND DISCLOSED AND HOW YOU CAN GET ACCESS TO THIS INFORMATION. PLEASE REVIEW IT CAREFULLY.
             </p>
             <p className="text-muted-foreground">
-              Pillar Drug Club is committed to protecting your health information. This Notice of Privacy Practices describes our legal duties and privacy practices with respect to your protected health information (PHI) under the Health Insurance Portability and Accountability Act (HIPAA).
+              Pharmacy Autopilot is committed to protecting your health information. This Notice of Privacy Practices describes our legal duties and privacy practices with respect to your protected health information (PHI) under the Health Insurance Portability and Accountability Act (HIPAA).
             </p>
           </CardContent>
         </Card>
@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Pillar Drug Club is a HIPAA-covered entity operating as an online wholesale prescription pharmacy platform. We are required by federal and state law to:
+              Pharmacy Autopilot is a HIPAA-covered entity operating as an online wholesale prescription pharmacy platform. We are required by federal and state law to:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Maintain the privacy and security of your protected health information (PHI)</li>
@@ -219,7 +219,7 @@ export default function PrivacyPolicyPage() {
               <div>
                 <h4 className="font-semibold text-base mb-2">Right to Access and Obtain Copies</h4>
                 <p className="text-muted-foreground mb-2">
-                  You have the right to inspect and obtain copies of your PHI maintained by Pillar Drug Club. To request access:
+                  You have the right to inspect and obtain copies of your PHI maintained by Pharmacy Autopilot. To request access:
                 </p>
                 <ul className="list-disc list-inside space-y-1 ml-4 text-muted-foreground">
                   <li>Submit a written request to our Privacy Officer</li>
@@ -290,7 +290,7 @@ export default function PrivacyPolicyPage() {
                   If you believe your privacy rights have been violated, you may file a complaint:
                 </p>
                 <ul className="list-disc list-inside space-y-1 ml-4 text-muted-foreground">
-                  <li>With Pillar Drug Club's Privacy Officer (contact information below)</li>
+                  <li>With Pharmacy Autopilot's Privacy Officer (contact information below)</li>
                   <li>With the U.S. Department of Health and Human Services Office for Civil Rights</li>
                   <li>You will not be penalized or retaliated against for filing a complaint</li>
                 </ul>
@@ -306,7 +306,7 @@ export default function PrivacyPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Pillar Drug Club is required by law to:
+              Pharmacy Autopilot is required by law to:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Maintain the privacy and security of your protected health information</li>
@@ -396,7 +396,7 @@ export default function PrivacyPolicyPage() {
               <li>Include the effective date on the revised Notice</li>
             </ul>
             <p className="mt-4">
-              You may obtain a copy of the current Notice at any time from our website at <Link href="/privacy-policy" className="text-primary hover:underline">pillardrugclub.com/privacy-policy</Link> or by contacting our Privacy Officer.
+              You may obtain a copy of the current Notice at any time from our website at <Link href="/privacy-policy" className="text-primary hover:underline">pharmacyautopilot.com/privacy-policy</Link> or by contacting our Privacy Officer.
             </p>
           </CardContent>
         </Card>
@@ -413,10 +413,10 @@ export default function PrivacyPolicyPage() {
             
             <div className="bg-muted p-6 rounded-lg space-y-2">
               <p><strong>Privacy Officer</strong></p>
-              <p>Pillar Drug Club</p>
-              <p>Email: <a href="mailto:privacy@pillardrugclub.com" className="text-primary hover:underline">privacy@pillardrugclub.com</a></p>
-              <p>Phone: <a href="tel:1-800-PILLAR1" className="text-primary hover:underline">1-800-PILLAR1 (1-800-745-5271)</a></p>
-              <p>Address: Pillar Drug Club Privacy Office, [Address to be provided]</p>
+              <p>Pharmacy Autopilot</p>
+              <p>Email: <a href="mailto:privacy@pharmacyautopilot.com" className="text-primary hover:underline">privacy@pharmacyautopilot.com</a></p>
+              <p>Phone: <a href="tel:1-800-PHARMACY" className="text-primary hover:underline">1-800-PHARMACY (1-800-727-4279)</a></p>
+              <p>Address: Pharmacy Autopilot Privacy Office, [Address to be provided]</p>
             </div>
 
             <div className="mt-6">

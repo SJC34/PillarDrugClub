@@ -32,7 +32,7 @@ export function getSession() {
     throw new Error(
       'SECURITY ERROR: Production environment requires CUSTOM_DOMAIN environment variable. ' +
       'This ensures secure cookies (HTTPS) are properly configured. ' +
-      'Set CUSTOM_DOMAIN=pillardrugclub.com in your production environment.'
+      'Set CUSTOM_DOMAIN=pharmacyautopilot.com in your production environment.'
     );
   }
   

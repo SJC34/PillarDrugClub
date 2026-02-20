@@ -35,7 +35,7 @@ export default function RefundPolicyPage() {
               Overview
             </CardTitle>
             <CardDescription>
-              Pillar Drug Club is a wholesale prescription pharmacy service operating under strict federal and state pharmacy regulations.
+              Pharmacy Autopilot is a wholesale prescription pharmacy service operating under strict federal and state pharmacy regulations.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -140,7 +140,7 @@ export default function RefundPolicyPage() {
             <p className="text-foreground leading-relaxed">To cancel your membership:</p>
 
             <ol className="space-y-2 pl-6 list-decimal text-foreground">
-              <li>Log into your account at pillardrugclub.com</li>
+              <li>Log into your account at pharmacyautopilot.com</li>
               <li>Navigate to Account Settings → Cancel Membership</li>
               <li>Review your membership status</li>
               <li>Confirm cancellation request</li>
@@ -200,8 +200,8 @@ export default function RefundPolicyPage() {
           <CardContent className="space-y-2">
             <p className="text-foreground">For questions about this refund policy or to request cancellation:</p>
             <div className="space-y-1 text-muted-foreground">
-              <p><strong>Email:</strong> support@pillardrugclub.com</p>
-              <p><strong>Website:</strong> www.pillardrugclub.com/refund-policy</p>
+              <p><strong>Email:</strong> support@pharmacyautopilot.com</p>
+              <p><strong>Website:</strong> www.pharmacyautopilot.com/refund-policy</p>
               <p><strong>Response Time:</strong> Within 2 business days</p>
             </div>
           </CardContent>
@@ -217,7 +217,7 @@ export default function RefundPolicyPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-foreground text-sm leading-relaxed">
-              By subscribing to Pillar Drug Club, you acknowledge that you have read, understood, and agree to this Refund & Cancellation Policy. You understand that:
+              By subscribing to Pharmacy Autopilot, you acknowledge that you have read, understood, and agree to this Refund & Cancellation Policy. You understand that:
             </p>
             <ul className="space-y-1 pl-6 list-disc text-foreground text-sm">
               <li>All prescription medication sales are final under pharmacy regulations</li>

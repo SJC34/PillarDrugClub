@@ -35,7 +35,7 @@ export default function Footer() {
             <div className="mb-6">
               <img 
                 src={logoImage} 
-                alt="Pillar Drug Club" 
+                alt="Pharmacy Autopilot" 
                 className="h-12 w-auto"
               />
             </div>
@@ -68,7 +68,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 pt-8 border-t text-center text-muted-foreground">
-          <p className="mb-2">&copy; {currentYear} Pillar. All rights reserved.</p>
+          <p className="mb-2">&copy; {currentYear} Pharmacy Autopilot. All rights reserved.</p>
           <p className="text-sm">
             Licensed physicians • FDA-approved medications • Secure delivery • HIPAA compliant
           </p>

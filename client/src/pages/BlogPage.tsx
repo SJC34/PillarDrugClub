@@ -72,13 +72,13 @@ export default function BlogPage() {
   const baseUrl = getBaseUrl();
   const breadcrumbSchema = createBreadcrumbSchema([
     { name: "Home", url: baseUrl },
-    { name: "The Pillar Post", url: `${baseUrl}/blog` }
+    { name: "The Autopilot Post", url: `${baseUrl}/blog` }
   ]);
 
   const blogSchema = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    "name": "The Pillar Post - Prescription Savings & Healthcare Tips",
+    "name": "The Autopilot Post - Prescription Savings & Healthcare Tips",
     "description": "Expert advice on saving money on prescriptions, healthcare tips, medication guides, and pharmacy news from licensed pharmacists.",
     "url": `${baseUrl}/blog`,
     "publisher": organizationSchema
@@ -92,7 +92,7 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="The Pillar Post - Prescription Savings Tips & Healthcare Advice"
+        title="The Autopilot Post - Prescription Savings Tips & Healthcare Advice"
         description="Expert healthcare advice from licensed pharmacists. Learn how to save money on prescriptions, manage chronic conditions, and navigate healthcare costs without insurance."
         canonical={`${baseUrl}/blog`}
         schema={combinedSchema}

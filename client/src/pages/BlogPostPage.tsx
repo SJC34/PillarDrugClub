@@ -81,7 +81,7 @@ export default function BlogPostPage() {
     );
   }
 
-  const canonicalUrl = `https://pillardrugclub.com/blog/${post.slug}`;
+  const canonicalUrl = `https://pharmacyautopilot.com/blog/${post.slug}`;
   const seoTitle = post.seoTitle || post.title;
   const seoDescription = post.seoDescription || post.excerpt || "";
 
@@ -98,10 +98,10 @@ export default function BlogPostPage() {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Pillar Drug Club",
+      "name": "Pharmacy Autopilot",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://pillardrugclub.com/logo.png"
+        "url": "https://pharmacyautopilot.com/logo.png"
       }
     },
     "datePublished": post.publishedAt || post.createdAt,
@@ -116,7 +116,7 @@ export default function BlogPostPage() {
   return (
     <>
       <Helmet>
-        <title>{seoTitle} | Pillar Drug Club</title>
+        <title>{seoTitle} | Pharmacy Autopilot</title>
         <meta name="description" content={seoDescription} />
         {post.seoKeywords.length > 0 && <meta name="keywords" content={post.seoKeywords.join(", ")} />}
         <link rel="canonical" href={canonicalUrl} />
@@ -126,7 +126,7 @@ export default function BlogPostPage() {
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:title" content={seoTitle} />
         <meta property="og:description" content={seoDescription} />
-        <meta property="og:site_name" content="Pillar Drug Club" />
+        <meta property="og:site_name" content="Pharmacy Autopilot" />
         <meta property="article:published_time" content={post.publishedAt || post.createdAt} />
         <meta property="article:author" content={post.authorName} />
         <meta property="article:section" content={categoryLabels[post.category] || post.category} />
@@ -216,7 +216,7 @@ export default function BlogPostPage() {
               Ready to Save on Prescriptions?
             </h3>
             <p className="text-muted-foreground mb-4">
-              Join Pillar Drug Club and get wholesale pricing on your medications.
+              Join Pharmacy Autopilot and get wholesale pricing on your medications.
             </p>
             <Link href="/subscribe">
               <Button data-testid="button-cta-subscribe">

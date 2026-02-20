@@ -100,7 +100,7 @@ export async function generateBlogPost(options: BlogGenerationOptions) {
     ? `\n\nWRITING STYLE:\n${selectedStyle.prompt}\n`
     : "";
 
-  const prompt = `You are a professional healthcare content writer for Pillar Drug Club, a prescription medication platform offering wholesale pricing directly to consumers.
+  const prompt = `You are a professional healthcare content writer for Pharmacy Autopilot, a prescription medication platform offering wholesale pricing directly to consumers.
 
 Write a comprehensive, SEO-optimized blog post on the following topic: "${topic}"
 
@@ -118,7 +118,7 @@ Requirements:
 5. Include actionable takeaways or tips
 6. Ensure medical accuracy and cite credible sources when making claims
 7. Naturally incorporate SEO keywords without keyword stuffing
-8. End with a brief conclusion that ties back to Pillar Drug Club's mission of affordable healthcare
+8. End with a brief conclusion that ties back to Pharmacy Autopilot's mission of affordable healthcare
 
 Format the response as a JSON object with:
 {
@@ -240,7 +240,7 @@ Return ONLY a JSON array of keywords, like: ["keyword1", "keyword2", "keyword3"]
 }
 
 export async function improveBlogPost(content: string, instructions: string) {
-  const prompt = `You are editing a blog post for Pillar Drug Club. Here's the current content:
+  const prompt = `You are editing a blog post for Pharmacy Autopilot. Here's the current content:
 
 ${content}
 

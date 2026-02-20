@@ -398,7 +398,7 @@ export default function AdminCommunicationsPage() {
                       <div>
                         <h4 className="font-semibold">Welcome Email</h4>
                         <p className="text-sm text-muted-foreground">
-                          Welcome new members to Pillar Drug Club
+                          Welcome new members to Pharmacy Autopilot
                         </p>
                       </div>
                     </div>

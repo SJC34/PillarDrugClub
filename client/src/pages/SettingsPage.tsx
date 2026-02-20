@@ -119,7 +119,7 @@ export default function SettingsPage() {
           </Link>
           <div className="flex items-center gap-2 mb-4">
             <Pill className="h-8 w-8 text-primary" />
-            <span className="text-xl md:text-2xl font-bold text-foreground">pillar drug club</span>
+            <span className="text-xl md:text-2xl font-bold text-foreground">Pharmacy Autopilot</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Account Settings</h1>
           <p className="text-sm md:text-base text-muted-foreground">
@@ -309,14 +309,14 @@ export default function SettingsPage() {
                   Subscription Management
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
-                  Manage your Pillar Drug Club membership
+                  Manage your Pharmacy Autopilot membership
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 border rounded-md">
                   <div className="space-y-1">
                     <p className="font-semibold text-foreground">
-                      Pillar Drug Club Membership
+                      Pharmacy Autopilot Membership
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Wholesale prescription pricing

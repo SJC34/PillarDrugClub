@@ -8,7 +8,7 @@ interface Competitor {
 
 export default function CompetitiveAnalysis() {
   const competitors: Competitor[] = [
-    { name: "Pillar Drug Club", cost: 236, color: "bg-primary" },
+    { name: "Pharmacy Autopilot", cost: 236, color: "bg-primary" },
     { name: "Mark Cuban Cost Plus", cost: 261, color: "bg-chart-3" },
     { name: "Blueberry Pharmacy", cost: 242, color: "bg-chart-4" },
     { name: "ScriptCo", cost: 316, color: "bg-destructive" }

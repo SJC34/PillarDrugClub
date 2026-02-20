@@ -86,8 +86,8 @@ export default function MedicationsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <SEOHead
-        title="Cheap Prescription Medications Without Insurance | 3000+ Drugs - Pillar Drug Club"
-        description="Browse 3000+ prescription medications at wholesale prices. Diabetes meds, blood pressure pills, cholesterol drugs as low as 1¢ per pill. No insurance needed. Free delivery nationwide."
+        title="Cheap Prescription Medications Without Insurance | 3000+ Drugs - Pharmacy Autopilot"
+        description="Browse 3000+ prescription medications at wholesale prices. Diabetes meds, blood pressure pills, cholesterol drugs as low as $0.01 per tablet. No insurance needed. Free delivery nationwide."
         canonical={`${baseUrl}/medications`}
         schema={combinedSchema}
       />

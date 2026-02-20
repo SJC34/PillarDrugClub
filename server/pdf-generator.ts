@@ -40,7 +40,7 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     doc.fontSize(24)
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text('PILLAR DRUG CLUB', { align: 'center' });
+       .text('PHARMACY AUTOPILOT', { align: 'center' });
     
     doc.moveDown(0.3);
     doc.fontSize(14)
@@ -183,7 +183,7 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     doc.fontSize(9)
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text('Pillar Wholesale: ', rightColX + 10, twoColumnY + 56, { continued: true })
+       .text('Pharmacy Autopilot Wholesale: ', rightColX + 10, twoColumnY + 56, { continued: true })
        .font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
        .text('$7.30/year', { width: colWidth - 20 });
@@ -335,7 +335,7 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
     
     doc.fontSize(8)
        .fillColor(BRAND_PRIMARY)
-       .text('PILLAR DRUG CLUB', 60, 745, { align: 'center' })
+       .text('PHARMACY AUTOPILOT', 60, 745, { align: 'center' })
        .fontSize(7)
        .fillColor(BRAND_MUTED)
        .text('Wholesale Prescription Pharmacy', 60, 756, { align: 'center' });
@@ -347,7 +347,7 @@ export async function generatePrescriptionRequestPDF(data: PrescriptionRequestDa
 export function generateMessageTemplate(data: PrescriptionRequestData): string {
   return `Dear Dr. ${data.doctorName.split(' ').pop()},
 
-I am a member of Pillar Drug Club, a wholesale prescription pharmacy service. I would like to request that you send my prescription to my pharmacy.
+I am a member of Pharmacy Autopilot, a wholesale prescription pharmacy service. I would like to request that you send my prescription to my pharmacy.
 
 Patient Information:
 - Name: ${data.patientName}
@@ -405,7 +405,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
     doc.fontSize(28)
        .font('Helvetica-Bold')
        .fillColor(BRAND_PRIMARY)
-       .text('PILLAR DRUG CLUB', { align: 'center' });
+       .text('PHARMACY AUTOPILOT', { align: 'center' });
     
     doc.moveDown(0.3);
     doc.fontSize(16)
@@ -424,7 +424,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
     doc.fontSize(10)
        .font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
-       .text('Pillar Drug Club is a wholesale prescription pharmacy service operating under strict federal and state pharmacy regulations. This policy outlines our refund and cancellation terms, which are designed to comply with pharmaceutical industry requirements while maintaining transparency with our members.', {
+       .text('Pharmacy Autopilot is a wholesale prescription pharmacy service operating under strict federal and state pharmacy regulations. This policy outlines our refund and cancellation terms, which are designed to comply with pharmaceutical industry requirements while maintaining transparency with our members.', {
          align: 'left',
          lineGap: 4
        });
@@ -508,7 +508,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
     doc.moveDown(0.5);
     doc.font('Helvetica-Bold')
        .fillColor(BRAND_FOREGROUND)
-       .text('• Pillar Drug Club Membership ($99/year):', 85, doc.y, { continued: true })
+       .text('• Pharmacy Autopilot Membership ($99/year):', 85, doc.y, { continued: true })
        .font('Helvetica')
        .text(' No refunds after activation', { width: 452 });
 
@@ -537,7 +537,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
 
     doc.text('To cancel your membership:', 60, doc.y, { lineGap: 4 });
     doc.moveDown(0.5);
-    doc.text('1. Log into your account at pillardrugclub.com', 75, doc.y, { width: 477 });
+    doc.text('1. Log into your account at pharmacyautopilot.com', 75, doc.y, { width: 477 });
     doc.text('2. Navigate to Account Settings > Cancel Membership', 75, doc.y, { width: 477 });
     doc.text('3. Review your commitment status and applicable termination fees', 75, doc.y, { width: 477 });
     doc.text('4. Confirm cancellation request', 75, doc.y, { width: 477 });
@@ -607,8 +607,8 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
        .text('For questions about this refund policy or to request cancellation:', 75, doc.y, { width: 462, lineGap: 4 });
 
     doc.moveDown(0.5);
-    doc.text('Email: support@pillardrugclub.com', 75, doc.y, { width: 462 });
-    doc.text('Website: www.pillardrugclub.com/refund-policy', 75, doc.y, { width: 462 });
+    doc.text('Email: support@pharmacyautopilot.com', 75, doc.y, { width: 462 });
+    doc.text('Website: www.pharmacyautopilot.com/refund-policy', 75, doc.y, { width: 462 });
     doc.text('Response Time: Within 2 business days', 75, doc.y, { width: 462 });
 
     // Check if we need a new page for disclaimer
@@ -632,7 +632,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
     doc.fontSize(9)
        .font('Helvetica')
        .fillColor(BRAND_FOREGROUND)
-       .text('By subscribing to Pillar Drug Club, you acknowledge that you have read, understood, and agree to this Refund & Cancellation Policy. You understand that:', 75, doc.y, { width: 462, lineGap: 3 });
+       .text('By subscribing to Pharmacy Autopilot, you acknowledge that you have read, understood, and agree to this Refund & Cancellation Policy. You understand that:', 75, doc.y, { width: 462, lineGap: 3 });
 
     doc.moveDown(0.3);
     doc.text('• All prescription medication sales are final under pharmacy regulations', 80, doc.y, { width: 457 });
@@ -648,7 +648,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
     
     doc.fontSize(9)
        .fillColor(BRAND_PRIMARY)
-       .text('PILLAR DRUG CLUB', 60, 745, { align: 'center' })
+       .text('PHARMACY AUTOPILOT', 60, 745, { align: 'center' })
        .fontSize(7)
        .fillColor(BRAND_MUTED)
        .text('Wholesale Prescription Pharmacy • Licensed in All 50 States', 60, 756, { align: 'center' });

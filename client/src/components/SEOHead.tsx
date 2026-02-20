@@ -11,7 +11,7 @@ export function getBaseUrl(): string {
   if (typeof window !== 'undefined') {
     return window.location.origin;
   }
-  return 'https://pillardrugclub.com';
+  return 'https://pharmacyautopilot.com';
 }
 
 let schemaIdCounter = 0;
@@ -86,9 +86,9 @@ export function SEOHead({
 export const pharmacySchema = {
   "@context": "https://schema.org",
   "@type": "Pharmacy",
-  "name": "Pillar Drug Club",
-  "description": "Get affordable prescription medications as low as 1¢ per pill without insurance. Save 90% on diabetes meds, blood pressure medications, cholesterol drugs & more. Wholesale pricing beats Amazon Pharmacy, GoodRx, and Cost Plus Drugs. Free home delivery nationwide.",
-  "url": "https://pillardrugclub.com",
+  "name": "Pharmacy Autopilot",
+  "description": "Get affordable prescription medications as low as $0.01 per tablet without insurance. Save 90% on diabetes meds, blood pressure medications, cholesterol drugs & more. Wholesale pricing beats Amazon Pharmacy, GoodRx, and Cost Plus Drugs. Free home delivery nationwide.",
+  "url": "https://pharmacyautopilot.com",
   "priceRange": "$",
   "address": {
     "@type": "PostalAddress",
@@ -98,7 +98,7 @@ export const pharmacySchema = {
     "postalCode": "98106",
     "addressCountry": "US"
   },
-  "email": "support@pillardrugclub.com",
+  "email": "support@pharmacyautopilot.com",
   "telephone": "+1-800-555-0123",
   "availableService": [
     {
@@ -139,13 +139,13 @@ export const pharmacySchema = {
 export const medicalWebPageSchema = {
   "@context": "https://schema.org",
   "@type": "MedicalWebPage",
-  "name": "Pillar Drug Club - Save Money on Prescriptions",
-  "description": "Stop overpaying for prescriptions. Get medications as low as 1¢ per pill without insurance. Free delivery.",
-  "url": "https://pillardrugclub.com",
+  "name": "Pharmacy Autopilot - Save Money on Prescriptions",
+  "description": "Stop overpaying for prescriptions. Get medications as low as $0.01 per tablet without insurance. Free delivery.",
+  "url": "https://pharmacyautopilot.com",
   "specialty": "Pharmacy",
   "about": {
     "@type": "MedicalBusiness",
-    "name": "Pillar Drug Club",
+    "name": "Pharmacy Autopilot",
     "description": "Affordable prescription pharmacy helping people save money on medications",
     "address": {
       "@type": "PostalAddress",
@@ -176,7 +176,7 @@ export const faqSchema = {
       "name": "Why is my prescription so expensive?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pillar Drug Club buys directly from wholesalers and passes the true cost to you - as low as 1¢ per pill. We cut out the middlemen so you stop overpaying."
+        "text": "Traditional pharmacies mark up medications by 300-500% due to insurance middlemen (PBMs). Pharmacy Autopilot buys directly from wholesalers and passes the true cost to you - as low as $0.01 per tablet. We cut out the middlemen so you stop overpaying."
       }
     },
     {
@@ -184,7 +184,7 @@ export const faqSchema = {
       "name": "Can I get prescriptions without insurance?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes! No insurance needed. Pillar Drug Club offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not."
+        "text": "Yes! No insurance needed. Pharmacy Autopilot offers direct wholesale pricing to anyone. Our prices are often cheaper than insurance copays, so you save money whether you have insurance or not."
       }
     },
     {
@@ -192,7 +192,7 @@ export const faqSchema = {
       "name": "How much will my prescription cost?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as 1¢ per tablet. No hidden fees - what you see is what you pay."
+        "text": "Use our free Cost Calculator to see exact prices for your medications. Most generic medications cost just pennies per pill. For example, common blood pressure meds are as low as $0.01 per tablet. No hidden fees - what you see is what you pay."
       }
     },
     {
@@ -241,10 +241,10 @@ export const faqSchema = {
 export const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Pillar Drug Club",
-  "url": "https://pillardrugclub.com",
-  "logo": "https://pillardrugclub.com/logo.png",
-  "description": "Helping Americans save money on prescriptions with affordable medications as low as 1¢ per pill. No insurance needed.",
+  "name": "Pharmacy Autopilot",
+  "url": "https://pharmacyautopilot.com",
+  "logo": "https://pharmacyautopilot.com/logo.png",
+  "description": "Helping Americans save money on prescriptions with affordable medications as low as $0.01 per tablet. No insurance needed.",
   "foundingDate": "2024",
   "address": {
     "@type": "PostalAddress",
@@ -258,7 +258,7 @@ export const organizationSchema = {
     "@type": "ContactPoint",
     "contactType": "Customer Service",
     "telephone": "+1-800-555-0123",
-    "email": "support@pillardrugclub.com",
+    "email": "support@pharmacyautopilot.com",
     "availableLanguage": "English"
   }
 };
@@ -307,7 +307,7 @@ export function createDrugSchema(props: DrugSchemaProps) {
       "availability": "https://schema.org/InStock",
       "seller": {
         "@type": "Pharmacy",
-        "name": "Pillar Drug Club"
+        "name": "Pharmacy Autopilot"
       },
       "priceValidUntil": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     },
@@ -315,7 +315,7 @@ export function createDrugSchema(props: DrugSchemaProps) {
       "@type": "OrderAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://pillardrugclub.com/register",
+        "urlTemplate": "https://pharmacyautopilot.com/register",
         "actionPlatform": [
           "http://schema.org/DesktopWebPlatform",
           "http://schema.org/MobileWebPlatform"
@@ -360,35 +360,35 @@ export const howToSaveMoneySchema = {
       "position": 1,
       "name": "Search for Your Medication",
       "text": "Use our medication search tool to find your prescription. We have 3000+ medications including metformin, lisinopril, atorvastatin, and more.",
-      "url": "https://pillardrugclub.com/medications"
+      "url": "https://pharmacyautopilot.com/medications"
     },
     {
       "@type": "HowToStep",
       "position": 2,
       "name": "Compare Wholesale Pricing",
-      "text": "See the exact wholesale cost for your medication. Most generic drugs cost pennies per pill - as low as 1¢. No insurance needed, no hidden fees.",
-      "url": "https://pillardrugclub.com/cost-calculator"
+      "text": "See the exact wholesale cost for your medication. Most generic drugs cost pennies per pill - as low as $0.01 per tablet. No insurance needed, no hidden fees.",
+      "url": "https://pharmacyautopilot.com/cost-calculator"
     },
     {
       "@type": "HowToStep",
       "position": 3,
       "name": "Choose Your Membership Tier",
       "text": "Sign up for $99/year membership with $10 dispensing per medication per fill. Your membership gives you access to wholesale pricing and up to 12-month supply.",
-      "url": "https://pillardrugclub.com/register"
+      "url": "https://pharmacyautopilot.com/register"
     },
     {
       "@type": "HowToStep",
       "position": 4,
       "name": "Transfer or Upload Your Prescription",
       "text": "We'll transfer from your current pharmacy or you can upload a new prescription from your doctor. We handle all the paperwork.",
-      "url": "https://pillardrugclub.com/prescription-request"
+      "url": "https://pharmacyautopilot.com/prescription-request"
     },
     {
       "@type": "HowToStep",
       "position": 5,
       "name": "Get Free Home Delivery",
       "text": "Your medications ship directly to your door at no extra cost. Tracking included. Available in all 50 states.",
-      "url": "https://pillardrugclub.com"
+      "url": "https://pharmacyautopilot.com"
     }
   ]
 };
@@ -396,10 +396,10 @@ export const howToSaveMoneySchema = {
 export const videoSchema = {
   "@context": "https://schema.org",
   "@type": "VideoObject",
-  "name": "Stop Overpaying for Prescriptions - Pillar Drug Club",
-  "description": "See how Americans are saving 90% on medications by joining Pillar Drug Club. Get prescriptions as low as 1¢ per pill without insurance.",
-  "thumbnailUrl": "https://pillardrugclub.com/video-thumbnail.jpg",
+  "name": "Stop Overpaying for Prescriptions - Pharmacy Autopilot",
+  "description": "See how Americans are saving 90% on medications by joining Pharmacy Autopilot. Get prescriptions as low as $0.01 per tablet without insurance.",
+  "thumbnailUrl": "https://pharmacyautopilot.com/video-thumbnail.jpg",
   "uploadDate": "2024-01-01T00:00:00Z",
-  "contentUrl": "https://pillardrugclub.com",
+  "contentUrl": "https://pharmacyautopilot.com",
   "duration": "PT2M30S"
 };

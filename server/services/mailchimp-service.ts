@@ -102,8 +102,8 @@ export async function createCampaign(options: {
         subject_line: options.subject,
         preview_text: options.previewText,
         title: options.subject,
-        from_name: options.fromName || "Pillar Drug Club",
-        reply_to: options.replyTo || "seth@pillardrugclub.com",
+        from_name: options.fromName || "Pharmacy Autopilot",
+        reply_to: options.replyTo || "support@pharmacyautopilot.com",
       }
     }) as any;
 

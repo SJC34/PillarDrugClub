@@ -57,7 +57,7 @@ export default function PricingComparison() {
                     </div>
                     
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">Pillar price</p>
+                      <p className="text-sm text-muted-foreground mb-1">Our price</p>
                       <p className="text-3xl font-semibold text-primary" data-testid={`text-our-price-${index}`}>
                         ${med.ourPrice.toFixed(2)}
                       </p>

@@ -387,7 +387,7 @@ export default function AdminDashboardPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg">
                   <div>
-                    <p className="font-semibold text-foreground">Pillar Drug Club Membership ($99/yr)</p>
+                    <p className="font-semibold text-foreground">Pharmacy Autopilot Membership ($99/yr)</p>
                     <p className="text-sm text-muted-foreground">Up to 12-month supply</p>
                   </div>
                   <p className="text-2xl font-bold text-primary" data-testid="metric-total-members">

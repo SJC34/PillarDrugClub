@@ -326,8 +326,8 @@ export class MemStorage implements IStorage {
     const hashedAdminPassword = await bcrypt.hash("Spaceworm#25", 10);
     const adminUser: User = {
       id: adminId,
-      username: "seth@pillardrugclub.com",
-      email: "seth@pillardrugclub.com",
+      username: "seth@pharmacyautopilot.com",
+      email: "seth@pharmacyautopilot.com",
       password: hashedAdminPassword,
       firstName: "Seth",
       lastName: "Admin",
@@ -351,7 +351,7 @@ export class MemStorage implements IStorage {
       updatedAt: now
     };
     this.users.set(adminId, adminUser);
-    console.log('✅ Admin user created: seth@pillardrugclub.com');
+    console.log('✅ Admin user created: seth@pharmacyautopilot.com');
 
     // Create SJC Pharmacy test user with hashed password
     const sjcId = randomUUID();
@@ -1893,12 +1893,12 @@ export class DbStorage extends MemStorage {
   private async seedTestUsers(): Promise<void> {
     try {
       // Create admin user if doesn't exist
-      const existingAdmin = await this.getUserByEmail("seth@pillardrugclub.com");
+      const existingAdmin = await this.getUserByEmail("seth@pharmacyautopilot.com");
       if (!existingAdmin) {
         const hashedAdminPassword = await bcrypt.hash("Spaceworm#25", 10);
         await db.insert(users).values({
-          username: "seth@pillardrugclub.com",
-          email: "seth@pillardrugclub.com",
+          username: "seth@pharmacyautopilot.com",
+          email: "seth@pharmacyautopilot.com",
           password: hashedAdminPassword,
           firstName: "Seth",
           lastName: "Admin",
@@ -1907,7 +1907,7 @@ export class DbStorage extends MemStorage {
           isActive: "true",
           smsConsent: "false",
         });
-        console.log('✅ Admin user created: seth@pillardrugclub.com');
+        console.log('✅ Admin user created: seth@pharmacyautopilot.com');
       }
 
       // Create SJC Pharmacy test user if doesn't exist

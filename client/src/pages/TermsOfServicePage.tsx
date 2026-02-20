@@ -18,7 +18,7 @@ export default function TermsOfServicePage() {
             <h1 className="text-4xl font-bold font-display">Terms of Service</h1>
           </div>
           <p className="text-center text-primary-foreground/90 max-w-3xl mx-auto">
-            Legal Agreement for Pillar Drug Club Services
+            Legal Agreement for Pharmacy Autopilot Services
           </p>
           <p className="text-center text-sm text-primary-foreground/80 mt-4">
             Effective Date: October 23, 2025 | Last Updated: October 23, 2025
@@ -39,10 +39,10 @@ export default function TermsOfServicePage() {
         <Card className="mb-8 border-primary/20">
           <CardContent className="pt-6">
             <p className="text-lg font-semibold text-foreground mb-4">
-              PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE USING PILLAR DRUG CLUB'S SERVICES.
+              PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE USING PHARMACY AUTOPILOT'S SERVICES.
             </p>
             <p className="text-muted-foreground">
-              These Terms of Service ("Terms") constitute a legally binding agreement between you ("Member," "you," or "your") and Pillar Drug Club ("Pillar," "we," "us," or "our") governing your use of our wholesale prescription pharmacy platform and related services. By accessing or using our website, mobile application, or services, you agree to be bound by these Terms and our Privacy Policy.
+              These Terms of Service ("Terms") constitute a legally binding agreement between you ("Member," "you," or "your") and Pharmacy Autopilot ("Company," "we," "us," or "our") governing your use of our wholesale prescription pharmacy platform and related services. By accessing or using our website, mobile application, or services, you agree to be bound by these Terms and our Privacy Policy.
             </p>
           </CardContent>
         </Card>
@@ -54,7 +54,7 @@ export default function TermsOfServicePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              By creating an account, subscribing to a membership plan, or using any of Pillar Drug Club's services, you acknowledge that you have read, understood, and agree to be bound by these Terms, our Privacy Policy, and our Refund Policy.
+              By creating an account, subscribing to a membership plan, or using any of Pharmacy Autopilot's services, you acknowledge that you have read, understood, and agree to be bound by these Terms, our Privacy Policy, and our Refund Policy.
             </p>
             <p className="font-semibold">
               IF YOU DO NOT AGREE TO THESE TERMS, DO NOT USE OUR SERVICES.
@@ -72,7 +72,7 @@ export default function TermsOfServicePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              To use Pillar Drug Club services, you must:
+              To use Pharmacy Autopilot services, you must:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Be at least 18 years of age</li>
@@ -95,9 +95,9 @@ export default function TermsOfServicePage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="font-semibold text-lg mb-3">What Pillar Drug Club Provides</h3>
+              <h3 className="font-semibold text-lg mb-3">What Pharmacy Autopilot Provides</h3>
               <p className="mb-3">
-                Pillar Drug Club is a membership-based wholesale prescription pharmacy platform offering:
+                Pharmacy Autopilot is a membership-based wholesale prescription pharmacy platform offering:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
                 <li>Wholesale pricing on prescription medications for chronic conditions</li>
@@ -110,7 +110,7 @@ export default function TermsOfServicePage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3">What Pillar Drug Club Is NOT</h3>
+              <h3 className="font-semibold text-lg mb-3">What Pharmacy Autopilot Is NOT</h3>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
                 <li>We are NOT health insurance and do not replace health insurance</li>
                 <li>We are NOT a telemedicine service and do not provide medical diagnoses or prescriptions</li>
@@ -123,11 +123,11 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-lg mb-3">Membership Plans</h3>
               <p className="mb-3">
-                Pillar Drug Club offers one simple membership:
+                Pharmacy Autopilot offers one simple membership:
               </p>
               <div className="space-y-3">
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="font-semibold">Pillar Drug Club Membership - $99/year</p>
+                  <p className="font-semibold">Pharmacy Autopilot Membership - $99/year</p>
                   <p className="text-muted-foreground">Up to 12-month supply with $10 dispensing fee per medication per fill. Home delivery at carrier rates.</p>
                 </div>
               </div>
@@ -195,14 +195,14 @@ export default function TermsOfServicePage() {
                 All memberships are billed annually:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
-                <li>Pillar Drug Club Membership: $99/year billed annually with $10 dispensing fee per medication per fill</li>
+                <li>Pharmacy Autopilot Membership: $99/year billed annually with $10 dispensing fee per medication per fill</li>
               </ul>
             </div>
 
             <div>
               <h3 className="font-semibold text-lg mb-3">Annual Billing</h3>
               <p className="text-muted-foreground mb-2">
-                By subscribing, you authorize Pillar Drug Club to charge your payment method:
+                By subscribing, you authorize Pharmacy Autopilot to charge your payment method:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
                 <li>Annually on your subscription start date</li>
@@ -330,7 +330,7 @@ export default function TermsOfServicePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Our complete Refund and Cancellation Policy is available at <Link href="/refund-policy" className="text-primary hover:underline">pillardrugclub.com/refund-policy</Link>. Key points include:
+              Our complete Refund and Cancellation Policy is available at <Link href="/refund-policy" className="text-primary hover:underline">pharmacyautopilot.com/refund-policy</Link>. Key points include:
             </p>
 
             <div>
@@ -360,7 +360,7 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-base mb-2">How to Cancel</h3>
               <p className="text-muted-foreground">
-                To cancel your membership, contact our customer service at <a href="mailto:support@pillardrugclub.com" className="text-primary hover:underline">support@pillardrugclub.com</a> or call 1-800-PILLAR1.
+                To cancel your membership, contact our customer service at <a href="mailto:support@pharmacyautopilot.com" className="text-primary hover:underline">support@pharmacyautopilot.com</a> or call 1-800-PHARMACY.
               </p>
             </div>
           </CardContent>
@@ -377,7 +377,7 @@ export default function TermsOfServicePage() {
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>The Health Insurance Portability and Accountability Act (HIPAA)</li>
-              <li>Our HIPAA Notice of Privacy Practices (available at <Link href="/privacy-policy" className="text-primary hover:underline">pillardrugclub.com/privacy-policy</Link>)</li>
+              <li>Our HIPAA Notice of Privacy Practices (available at <Link href="/privacy-policy" className="text-primary hover:underline">pharmacyautopilot.com/privacy-policy</Link>)</li>
               <li>Applicable state privacy laws</li>
             </ul>
             <p>
@@ -393,7 +393,7 @@ export default function TermsOfServicePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              All content on Pillar Drug Club's website, mobile application, and services, including but not limited to text, graphics, logos, images, software, and trademarks, is the property of Pillar Drug Club or its licensors and is protected by copyright, trademark, and other intellectual property laws.
+              All content on Pharmacy Autopilot's website, mobile application, and services, including but not limited to text, graphics, logos, images, software, and trademarks, is the property of Pharmacy Autopilot or its licensors and is protected by copyright, trademark, and other intellectual property laws.
             </p>
             <p className="font-semibold">
               You may not:
@@ -449,7 +449,7 @@ export default function TermsOfServicePage() {
                 <div>
                   <p className="font-semibold">NOT MEDICAL ADVICE</p>
                   <p className="text-muted-foreground">
-                    Pillar Drug Club does not provide medical advice, diagnosis, or treatment. Information on our platform is for informational purposes only and does not replace consultation with a licensed healthcare provider.
+                    Pharmacy Autopilot does not provide medical advice, diagnosis, or treatment. Information on our platform is for informational purposes only and does not replace consultation with a licensed healthcare provider.
                   </p>
                 </div>
 
@@ -527,7 +527,7 @@ export default function TermsOfServicePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              You agree to indemnify, defend, and hold harmless Pillar Drug Club, its officers, directors, employees, agents, licensors, and suppliers from and against all claims, losses, expenses, damages, and costs, including reasonable attorneys' fees, arising out of or relating to:
+              You agree to indemnify, defend, and hold harmless Pharmacy Autopilot, its officers, directors, employees, agents, licensors, and suppliers from and against all claims, losses, expenses, damages, and costs, including reasonable attorneys' fees, arising out of or relating to:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
               <li>Your violation of these Terms</li>
@@ -549,7 +549,7 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-base mb-2">Informal Resolution</h3>
               <p className="text-muted-foreground">
-                Before filing any formal dispute, you agree to contact us at <a href="mailto:support@pillardrugclub.com" className="text-primary hover:underline">support@pillardrugclub.com</a> to attempt to resolve the matter informally.
+                Before filing any formal dispute, you agree to contact us at <a href="mailto:support@pharmacyautopilot.com" className="text-primary hover:underline">support@pharmacyautopilot.com</a> to attempt to resolve the matter informally.
               </p>
             </div>
 
@@ -599,7 +599,7 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-base mb-2">Entire Agreement</h3>
               <p className="text-muted-foreground">
-                These Terms, together with our Privacy Policy and Refund Policy, constitute the entire agreement between you and Pillar Drug Club.
+                These Terms, together with our Privacy Policy and Refund Policy, constitute the entire agreement between you and Pharmacy Autopilot.
               </p>
             </div>
 
@@ -658,11 +658,11 @@ export default function TermsOfServicePage() {
             </p>
             
             <div className="bg-muted p-6 rounded-lg space-y-2">
-              <p><strong>Pillar Drug Club</strong></p>
-              <p>Email: <a href="mailto:support@pillardrugclub.com" className="text-primary hover:underline">support@pillardrugclub.com</a></p>
-              <p>Legal Email: <a href="mailto:legal@pillardrugclub.com" className="text-primary hover:underline">legal@pillardrugclub.com</a></p>
-              <p>Phone: <a href="tel:1-800-PILLAR1" className="text-primary hover:underline">1-800-PILLAR1 (1-800-745-5271)</a></p>
-              <p>Address: Pillar Drug Club Legal Department, [Address to be provided]</p>
+              <p><strong>Pharmacy Autopilot</strong></p>
+              <p>Email: <a href="mailto:support@pharmacyautopilot.com" className="text-primary hover:underline">support@pharmacyautopilot.com</a></p>
+              <p>Legal Email: <a href="mailto:legal@pharmacyautopilot.com" className="text-primary hover:underline">legal@pharmacyautopilot.com</a></p>
+              <p>Phone: <a href="tel:1-800-PHARMACY" className="text-primary hover:underline">1-800-PHARMACY (1-800-727-4279)</a></p>
+              <p>Address: Pharmacy Autopilot Legal Department, [Address to be provided]</p>
             </div>
           </CardContent>
         </Card>
@@ -671,7 +671,7 @@ export default function TermsOfServicePage() {
         <Card className="border-primary/20">
           <CardContent className="pt-6">
             <p className="text-sm text-muted-foreground italic">
-              BY CREATING AN ACCOUNT OR USING PILLAR DRUG CLUB'S SERVICES, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF SERVICE.
+              BY CREATING AN ACCOUNT OR USING PHARMACY AUTOPILOT'S SERVICES, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF SERVICE.
             </p>
             <p className="text-sm text-muted-foreground mt-4">
               <strong>Effective Date:</strong> October 23, 2025<br />

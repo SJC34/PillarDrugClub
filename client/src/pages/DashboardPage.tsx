@@ -311,7 +311,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3">
               <Pill className="h-8 w-8 text-blue-600" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Pillar Drug Club</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Pharmacy Autopilot</h1>
                 <p className="text-sm text-gray-600">Member Dashboard</p>
               </div>
             </div>
@@ -393,13 +393,13 @@ export default function DashboardPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                <img src={platinumPillarBadge} alt="Pillar Drug Club" className="w-10 h-10 object-contain" />
+                <img src={platinumPillarBadge} alt="Pharmacy Autopilot" className="w-10 h-10 object-contain" />
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
                     $99
                   </p>
                   <p className="text-sm text-gray-600">
-                    Pillar Drug Club Member
+                    Pharmacy Autopilot Member
                   </p>
                 </div>
               </div>
@@ -505,10 +505,10 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <img src={platinumPillarBadge} alt="Pillar Drug Club" className="w-10 h-10 object-contain" />
+                  <img src={platinumPillarBadge} alt="Pharmacy Autopilot" className="w-10 h-10 object-contain" />
                   Current Subscription
                   <Badge variant="default">
-                    Pillar Drug Club Member
+                    Pharmacy Autopilot Member
                   </Badge>
                 </CardTitle>
                 <CardDescription>

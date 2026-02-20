@@ -1,4 +1,4 @@
-# Robots.txt for Pillar Drug Club
+# Robots.txt for Pharmacy Autopilot
 # Allow all search engines to crawl the site
 
 User-agent: *
@@ -26,4 +26,4 @@ Disallow: /refills
 Disallow: /api/*
 
 # Sitemap location
-Sitemap: https://pillardrugclub.com/sitemap.xml
+Sitemap: https://pharmacyautopilot.com/sitemap.xml
