@@ -124,7 +124,7 @@ export default function HomePage() {
             <span className="text-primary">On autopilot.</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto" data-testid="text-hero-subline">
-            Stop guessing what you'll pay at the pharmacy. Pillar Drug Club locks in pass-through pricing on generics with 6–12 month supplies — no PBM games, no surprises.
+            Stop guessing what you'll pay at the pharmacy. Pillar Drug Club locks in pass-through pricing on generics with 6–12 month supplies — no insurance games, no surprises.
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-3" data-testid="form-hero-waitlist">
             <Input
