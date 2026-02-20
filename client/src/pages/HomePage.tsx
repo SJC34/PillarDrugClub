@@ -225,7 +225,7 @@ export default function HomePage() {
                 )}
               </Button>
             </form>
-            <p className="text-xs text-foreground mt-2 text-center">for first 100 members</p>
+            <p className="text-xs text-foreground mt-2 text-center">Lock in $99/yr for first 100 members</p>
             <p className="text-sm font-bold text-primary text-center">Only 16 spots left!</p>
           </div>
         </div>
