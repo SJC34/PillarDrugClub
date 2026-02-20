@@ -21,7 +21,7 @@ import {
   ArrowRight,
   User,
   Phone,
-  X
+  Lock
 } from "lucide-react";
 
 interface SignupModalProps {
@@ -47,6 +47,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
       setName("");
       setEmail("");
       setPhone("");
+      localStorage.setItem("pillar_signup_completed", "true");
       setTimeout(() => onOpenChange(false), 1500);
     },
     onError: (error: any) => {
@@ -90,22 +91,17 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
   ];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-4 top-4 rounded-full"
-          onClick={() => onOpenChange(false)}
-          aria-label="Close signup modal"
-          data-testid="button-close-modal"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+    <Dialog open={open} onOpenChange={() => {}}>
+      <DialogContent
+        className="sm:max-w-2xl max-h-[90vh] overflow-y-auto [&>button]:hidden"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <DollarSign className="h-4 w-4 text-primary" />
+              <Lock className="h-4 w-4 text-primary" />
               <span className="text-sm font-semibold text-primary">Only $99/year</span>
             </div>
           </div>
@@ -115,8 +111,8 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
             <span className="text-primary">As Low As 1¢ Per Tablet</span>
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            Join Pillar Drug Club for just $99/year and get direct access to affordable, 
-            year-supply prescriptions without the insurance headaches.
+            Sign up below to unlock access. Join Pillar Drug Club for just $99/year 
+            and get direct access to affordable, year-supply prescriptions.
           </DialogDescription>
         </DialogHeader>
 
@@ -125,7 +121,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Mail className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-bold text-foreground">Get Started Today</h3>
+                <h3 className="text-lg font-bold text-foreground">Sign Up to Continue</h3>
               </div>
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div className="relative">

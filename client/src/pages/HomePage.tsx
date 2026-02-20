@@ -25,11 +25,10 @@ export default function HomePage() {
   const [showSignupModal, setShowSignupModal] = useState(false);
 
   useEffect(() => {
-    const hasSeenModal = localStorage.getItem("pillar_signup_modal_seen");
-    if (!hasSeenModal) {
+    const hasSignedUp = localStorage.getItem("pillar_signup_completed");
+    if (!hasSignedUp) {
       const timer = setTimeout(() => {
         setShowSignupModal(true);
-        localStorage.setItem("pillar_signup_modal_seen", "true");
       }, 2000);
       return () => clearTimeout(timer);
     }
