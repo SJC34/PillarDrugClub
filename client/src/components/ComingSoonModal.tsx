@@ -98,11 +98,11 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">Pillar Drug Club</p>
-          <DialogTitle className="text-center text-3xl md:text-4xl font-black">
+          <p className="text-center text-4xl md:text-5xl font-black mb-3">Pillar Drug Club</p>
+          <DialogTitle className="text-center text-xl md:text-2xl font-semibold text-muted-foreground">
             Your Trusted Pharmacy Autopilot
             <br />
-            <span className="text-primary">For Low as a Penny per Pill</span>
+            <span className="text-primary font-bold">For Low as a Penny per Pill</span>
           </DialogTitle>
           <DialogDescription className="text-center text-base">
             Join our waitlist to unlock access.
