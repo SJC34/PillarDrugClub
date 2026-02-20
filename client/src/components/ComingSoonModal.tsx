@@ -21,7 +21,6 @@ import {
   ArrowRight,
   User,
   Phone,
-  Lock
 } from "lucide-react";
 
 interface SignupModalProps {
@@ -99,20 +98,14 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <div className="flex items-center justify-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <Lock className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-primary">Only $99/year</span>
-            </div>
-          </div>
+          <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">Pillar Drug Club</p>
           <DialogTitle className="text-center text-3xl md:text-4xl font-black">
             Your Trusted Pharmacy Autopilot
             <br />
             <span className="text-primary">For Low as a Penny per Pill</span>
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            Sign up below to unlock access. Join Pharmacy Autopilot for just $99/year 
-            and get direct access to affordable, year-supply prescriptions.
+            Join our waitlist to unlock access.
           </DialogDescription>
         </DialogHeader>
 
