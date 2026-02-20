@@ -172,7 +172,7 @@ export default function AdminFinancialPage() {
                 <p className="text-xs text-muted-foreground">Per transaction</p>
               </div>
               <div className="p-3 bg-teal-100 rounded-lg">
-                <DollarSign className="h-6 w-6 text-teal-600" />
+                <DollarSign className="h-6 w-6 text-teal-700 dark:text-teal-400" />
               </div>
             </div>
           </CardContent>

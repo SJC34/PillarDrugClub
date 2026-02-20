@@ -622,7 +622,7 @@ export default function AdminUsersPage() {
                       <Card>
                         <CardContent className="p-4">
                           <div className="flex items-center gap-2">
-                            <DollarSign className="h-5 w-5 text-teal-600" />
+                            <DollarSign className="h-5 w-5 text-teal-700 dark:text-teal-400" />
                             <div>
                               <p className="text-2xl font-bold">${parseFloat(userDetail.stats.totalSpent || "0").toFixed(2)}</p>
                               <p className="text-xs text-muted-foreground">Total Spent</p>

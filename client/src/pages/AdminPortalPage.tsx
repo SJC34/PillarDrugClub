@@ -115,7 +115,7 @@ export default function AdminPortalPage() {
             <CardContent className="p-4 md:p-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-teal-100 rounded-lg">
-                  <FileText className="h-5 w-5 text-teal-600" />
+                  <FileText className="h-5 w-5 text-teal-700 dark:text-teal-400" />
                 </div>
                 <div>
                   <p className="text-xl md:text-2xl font-bold text-foreground" data-testid="stat-total-requests">{requests.length}</p>

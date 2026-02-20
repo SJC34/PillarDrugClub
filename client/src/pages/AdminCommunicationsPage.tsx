@@ -164,7 +164,7 @@ export default function AdminCommunicationsPage() {
                 </p>
               </div>
               <div className="p-3 bg-teal-100 rounded-lg">
-                <CheckCircle2 className="h-6 w-6 text-teal-600" />
+                <CheckCircle2 className="h-6 w-6 text-teal-700 dark:text-teal-400" />
               </div>
             </div>
           </CardContent>

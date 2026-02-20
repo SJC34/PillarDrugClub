@@ -546,7 +546,7 @@ export default function RegisterPage() {
                 <div className="text-xs md:text-sm text-muted-foreground">
                   Already have an account?{" "}
                   <Link href="/login">
-                    <Button variant="ghost" className="p-0 h-auto font-semibold text-teal-600">
+                    <Button variant="ghost" className="p-0 h-auto font-semibold text-teal-700 dark:text-teal-400">
                       Sign in
                     </Button>
                   </Link>
@@ -1125,7 +1125,7 @@ export default function RegisterPage() {
             <div className="text-center mb-6 md:mb-8">
               <Link href="/">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Pill className="h-8 w-8 text-teal-600" />
+                  <Pill className="h-8 w-8 text-teal-700 dark:text-teal-400" />
                   <span className="text-xl md:text-2xl font-bold text-foreground">Pillar Drug Club</span>
                 </div>
               </Link>
@@ -1161,7 +1161,7 @@ export default function RegisterPage() {
             <Card className="border-secondary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-display">
-                  <CreditCard className="h-5 w-5 text-teal-600" />
+                  <CreditCard className="h-5 w-5 text-teal-700 dark:text-teal-400" />
                   Payment Information
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
@@ -1171,7 +1171,7 @@ export default function RegisterPage() {
               <CardContent>
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl md:text-3xl font-bold text-teal-600">
+                    <div className="text-2xl md:text-3xl font-bold text-teal-700 dark:text-teal-400">
                       ${selectedTier === "gold" ? "59" : "99"}
                     </div>
                     <div className="text-sm md:text-base text-muted-foreground">per year</div>

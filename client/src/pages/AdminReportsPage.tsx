@@ -153,7 +153,7 @@ export default function AdminReportsPage() {
                 <p className="text-xs text-green-600">Monthly average</p>
               </div>
               <div className="p-3 bg-teal-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-teal-600" />
+                <TrendingUp className="h-6 w-6 text-teal-700 dark:text-teal-400" />
               </div>
             </div>
           </CardContent>

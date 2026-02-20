@@ -176,7 +176,7 @@ export default function AdminDashboardPage() {
                     <p className="text-xs text-muted-foreground">From orders</p>
                   </div>
                   <div className="p-3 bg-teal-100 rounded-lg">
-                    <DollarSign className="h-6 w-6 text-teal-600" />
+                    <DollarSign className="h-6 w-6 text-teal-700 dark:text-teal-400" />
                   </div>
                 </div>
               </CardContent>
@@ -312,7 +312,7 @@ export default function AdminDashboardPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-teal-100 rounded-lg">
-                      <Upload className="h-6 w-6 text-teal-600" />
+                      <Upload className="h-6 w-6 text-teal-700 dark:text-teal-400" />
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">Medication Pricing</p>

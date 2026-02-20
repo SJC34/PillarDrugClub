@@ -49,6 +49,7 @@ export default function Header() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               data-testid="button-mobile-menu"
               className="relative z-[102] md:hidden"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -85,6 +86,7 @@ export default function Header() {
               size="icon"
               onClick={toggleTheme}
               data-testid="button-theme-toggle"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />

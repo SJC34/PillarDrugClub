@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,6 @@ import {
 } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { ComingSoonModal } from "@/components/ComingSoonModal";
 import { BlogCarousel } from "@/components/BlogCarousel";
 import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
@@ -23,15 +21,6 @@ import goldPillarBadge from "@assets/image_1761454767191.png";
 import platinumPillarBadge from "@assets/image_1761453800697.png";
 
 export default function HomePage() {
-  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
-
-  useEffect(() => {
-    const hasSeenModal = localStorage.getItem("hasSeenComingSoonModal");
-    if (!hasSeenModal) {
-      setShowComingSoonModal(true);
-      localStorage.setItem("hasSeenComingSoonModal", "true");
-    }
-  }, []);
 
   const combinedSchema = {
     "@context": "https://schema.org",
@@ -446,11 +435,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Coming Soon Modal */}
-      <ComingSoonModal 
-        open={showComingSoonModal} 
-        onOpenChange={setShowComingSoonModal}
-      />
     </div>
   );
 }
