@@ -220,10 +220,12 @@ export default function HomePage() {
                 {signupMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "RESERVE MY SPOT!"
+                  "RESERVE MY SPOT"
                 )}
               </Button>
             </form>
+            <p className="text-xs text-foreground mt-2">for first 100 members</p>
+            <p className="text-sm font-bold text-primary">Only 16 spots left!</p>
           </div>
         </div>
       </section>
