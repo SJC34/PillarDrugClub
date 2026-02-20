@@ -290,7 +290,6 @@ export default function HomePage() {
               className="h-12 font-bold px-8"
               disabled={signupMutation.isPending}
               data-testid="button-submit-waitlist"
-              style={{ backgroundColor: '#2aa8a8' }}
             >
               {signupMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
