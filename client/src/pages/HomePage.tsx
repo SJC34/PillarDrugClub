@@ -91,13 +91,48 @@ export default function HomePage() {
         schema={combinedSchema}
       />
 
-      {/* Hero Tagline */}
-      <section className="pt-12 md:pt-20 pb-4 px-6 md:px-12 text-center">
-        <h1 className="text-2xl md:text-4xl font-semibold text-muted-foreground" data-testid="text-hero-tagline">
-          Your Trusted Pharmacy Autopilot
-          <br />
-          <span className="text-primary font-bold">For Low as a Penny per Pill</span>
-        </h1>
+      {/* Hero Section */}
+      <section className="pt-16 md:pt-24 pb-8 px-6 md:px-12 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-black text-foreground leading-tight mb-6" data-testid="text-hero-headline">
+            Your prescriptions.
+            <br />
+            <span className="text-primary">On autopilot.</span>
+          </h1>
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto" data-testid="text-hero-subline">
+            Stop guessing what you'll pay at the pharmacy. Pillar Drug Club locks in pass-through pricing on generics with automated refills — no PBM games, no surprises.
+          </p>
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-3" data-testid="form-hero-waitlist">
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={signupMutation.isPending}
+              className="h-12 text-base flex-1"
+              data-testid="input-email-hero"
+              required
+            />
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 font-bold px-8"
+              disabled={signupMutation.isPending}
+              data-testid="button-submit-hero"
+              style={{ backgroundColor: '#2aa8a8' }}
+            >
+              {signupMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  JOIN THE WAITLIST
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </form>
+          <p className="text-xs text-muted-foreground">No spam. No commitment. We'll reach out before launch.</p>
+        </div>
       </section>
 
       {/* Stats Section */}

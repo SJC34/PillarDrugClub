@@ -413,9 +413,9 @@ export const insertEmailSignupSchema = createInsertSchema(emailSignups).omit({
   id: true,
   createdAt: true,
 }).extend({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  name: z.string().optional().default(""),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().regex(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, "Please enter a valid phone number"),
+  phone: z.string().optional().default(""),
 });
 
 export type InsertEmailSignup = z.infer<typeof insertEmailSignupSchema>;
