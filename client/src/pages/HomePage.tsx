@@ -154,7 +154,8 @@ export default function HomePage() {
               )}
             </Button>
           </form>
-          <p className="text-xs text-muted-foreground">No spam. No commitment. We'll reach out before launch.</p>
+          <p className="text-xs text-foreground">for first 100 members</p>
+          <p className="text-sm font-bold text-primary">Only 16 spots left</p>
         </div>
       </section>
 
