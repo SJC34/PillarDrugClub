@@ -106,9 +106,9 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
             </div>
           </div>
           <DialogTitle className="text-center text-3xl md:text-4xl font-black">
-            Prescription Medications
+            Your Trusted Pharmacy Autopilot
             <br />
-            <span className="text-primary">Tablets As Low As $0.01</span>
+            <span className="text-primary">For Low as a Penny per Pill</span>
           </DialogTitle>
           <DialogDescription className="text-center text-base">
             Sign up below to unlock access. Join Pharmacy Autopilot for just $99/year 
