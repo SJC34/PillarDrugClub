@@ -99,21 +99,19 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <div className="rounded-xl p-6 -mx-2" style={{ backgroundColor: '#0d4f4f' }}>
-            <div className="flex items-center justify-center gap-4 mb-3">
-              <img src={pillarImage} alt="" className="h-16 md:h-20 object-contain" />
-              <p className="text-center text-4xl md:text-5xl font-black text-white">Pillar Drug Club</p>
-              <img src={pillarImage} alt="" className="h-16 md:h-20 object-contain" />
-            </div>
-            <DialogTitle className="text-center text-xl md:text-2xl font-semibold text-white/80">
-              Your Trusted Pharmacy Autopilot
-              <br />
-              <span className="text-teal-300 font-bold">For Low as a Penny per Pill</span>
-            </DialogTitle>
-            <DialogDescription className="text-center text-base text-white/70 mt-2">
-              Join our waitlist to unlock access.
-            </DialogDescription>
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <img src={pillarImage} alt="" className="h-16 md:h-20 object-contain" />
+            <p className="text-center text-4xl md:text-5xl font-black" style={{ color: '#0d4f4f' }}>Pillar Drug Club</p>
+            <img src={pillarImage} alt="" className="h-16 md:h-20 object-contain" />
           </div>
+          <DialogTitle className="text-center text-xl md:text-2xl font-semibold text-muted-foreground">
+            Your Trusted Pharmacy Autopilot
+            <br />
+            <span className="text-primary font-bold">For Low as a Penny per Pill</span>
+          </DialogTitle>
+          <DialogDescription className="text-center text-base">
+            Join our waitlist to unlock access.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
