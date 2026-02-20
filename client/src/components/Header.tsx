@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon, Pill, User, LogOut, Settings, ShieldCheck, LayoutDashboard } from "lucide-react";
+import { Menu, X, Sun, Moon, User, LogOut, Settings, ShieldCheck, LayoutDashboard } from "lucide-react";
+import pdcLogo from "@assets/image_1771566531369.jpeg";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -59,9 +60,8 @@ export default function Header() {
             </Button>
 
             {/* Brand name with pill symbol */}
-            <Link href="/" className="text-xl font-black text-foreground flex items-center gap-2 hover:text-primary transition-colors" data-testid="text-logo">
-              pharmacy autopilot
-              <Pill className="h-5 w-5 text-secondary" />
+            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity" data-testid="text-logo">
+              <img src={pdcLogo} alt="Pillar Drug Club" className="h-10 object-contain" />
             </Link>
           </div>
             
@@ -189,9 +189,8 @@ export default function Header() {
               <div className="flex flex-col h-full py-8 bg-white dark:bg-gray-950">
                 {/* Logo Header */}
                 <div className="px-6 pb-4 bg-white dark:bg-gray-950">
-                  <Link href="/" className="text-xl font-black flex items-center gap-2 text-gray-900 dark:text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                    pharmacy autopilot
-                    <Pill className="h-5 w-5 text-primary" />
+                  <Link href="/" className="flex items-center hover:opacity-80 transition-opacity" onClick={() => setIsMenuOpen(false)}>
+                    <img src={pdcLogo} alt="Pillar Drug Club" className="h-10 object-contain" />
                   </Link>
                 </div>
                 

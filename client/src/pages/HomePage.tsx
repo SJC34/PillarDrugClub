@@ -91,13 +91,8 @@ export default function HomePage() {
         schema={combinedSchema}
       />
 
-      {/* Header Logo */}
-      <div className="flex items-center justify-center pt-8 pb-4 px-6">
-        <img src={pdcLogo} alt="Pillar Drug Club" className="h-16 md:h-20 object-contain" data-testid="img-logo-header" />
-      </div>
-
       {/* Stats Section */}
-      <section className="py-12 md:py-20 px-6 md:px-12">
+      <section className="py-16 md:py-24 px-6 md:px-12">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, idx) => (
             <div key={idx} className="text-center" data-testid={`stat-item-${idx}`}>
