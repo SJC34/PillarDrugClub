@@ -61,7 +61,7 @@ export default function Header() {
 
             {/* Brand name with pill symbol */}
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity" data-testid="text-logo">
-              <img src={pdcLogo} alt="Pillar Drug Club" className="h-12 object-contain" />
+              <img src={pdcLogo} alt="Pillar Drug Club" className="h-16 object-contain" />
             </Link>
           </div>
             
@@ -190,7 +190,7 @@ export default function Header() {
                 {/* Logo Header */}
                 <div className="px-6 pb-4 bg-white dark:bg-gray-950">
                   <Link href="/" className="flex items-center hover:opacity-80 transition-opacity" onClick={() => setIsMenuOpen(false)}>
-                    <img src={pdcLogo} alt="Pillar Drug Club" className="h-12 object-contain" />
+                    <img src={pdcLogo} alt="Pillar Drug Club" className="h-16 object-contain" />
                   </Link>
                 </div>
                 
