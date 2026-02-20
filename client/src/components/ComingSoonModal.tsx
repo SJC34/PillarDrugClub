@@ -86,10 +86,8 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
         onInteractOutside={(e) => e.preventDefault()}
       >
         <div className="px-6 pt-8 pb-4">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
-            <img src={pdcLogo} alt="Pillar Drug Club" className="h-10 md:h-12 object-contain" />
-            <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
+          <div className="flex items-center justify-center mb-4">
+            <img src={pdcLogo} alt="Pillar Drug Club" className="h-14 md:h-16 object-contain" />
           </div>
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-center text-lg md:text-xl font-semibold text-muted-foreground">
