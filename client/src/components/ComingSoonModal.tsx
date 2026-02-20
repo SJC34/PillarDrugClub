@@ -86,10 +86,10 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
         onInteractOutside={(e) => e.preventDefault()}
       >
         <div className="px-6 pt-8 pb-4">
-          <div className="flex items-center justify-center mb-2">
+          <div className="flex items-center justify-center mb-0">
             <img src={pdcLogo} alt="Pillar Drug Club" className="h-20 md:h-24 object-contain" />
           </div>
-          <DialogHeader className="space-y-1">
+          <DialogHeader className="space-y-0.5">
             <DialogTitle className="text-center text-lg md:text-xl font-semibold text-muted-foreground">
               Your Trusted Pharmacy Autopilot
               <br />
