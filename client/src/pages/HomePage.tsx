@@ -162,7 +162,7 @@ export default function HomePage() {
       {/* Annual Membership Card */}
       <section className="py-12 md:py-20 px-6 md:px-12">
         <div className="max-w-lg mx-auto">
-          <div className="bg-card border border-border rounded-xl p-8 md:p-10" data-testid="membership-card">
+          <div className="bg-card border border-border rounded-xl p-8 md:p-10 shadow-lg" data-testid="membership-card">
             <p className="text-xs font-bold tracking-[0.25em] uppercase text-muted-foreground mb-6" data-testid="text-membership-label">ANNUAL MEMBERSHIP</p>
 
             <div className="mb-2">
