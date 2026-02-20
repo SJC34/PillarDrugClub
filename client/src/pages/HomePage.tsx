@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,13 +15,25 @@ import {
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { BlogCarousel } from "@/components/BlogCarousel";
+import { SignupModal } from "@/components/ComingSoonModal";
 import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
 import avoidVideo from "@assets/1f5aba0b-f324-4f2f-a6a2-9f1af26533a1-video_1759381788386.mp4";
 import joinVideo from "@assets/join-pillar-video.mp4";
 import goldPillarBadge from "@assets/image_1761454767191.png";
-import platinumPillarBadge from "@assets/image_1761453800697.png";
 
 export default function HomePage() {
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  useEffect(() => {
+    const hasSeenModal = localStorage.getItem("pillar_signup_modal_seen");
+    if (!hasSeenModal) {
+      const timer = setTimeout(() => {
+        setShowSignupModal(true);
+        localStorage.setItem("pillar_signup_modal_seen", "true");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const combinedSchema = {
     "@context": "https://schema.org",
@@ -173,68 +186,25 @@ export default function HomePage() {
       {/* Pricing Section */}
       <section className="py-12 md:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Choose Your Savings Plan</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">One Simple Membership</h2>
           <p className="text-base md:text-lg text-muted-foreground mb-8 font-bold max-w-3xl mx-auto">
-            Simple, transparent membership plans to fit your medication needs
+            Everything you need to save on prescriptions — one plan, one price, no confusion
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Gold – 6 Month (Most Popular) */}
+          <div className="max-w-lg mx-auto">
             <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10 relative">
               <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
-                MOST POPULAR
+                BEST VALUE
               </div>
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-3">
-                  <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-16 h-16 object-contain" />
+                  <img src={goldPillarBadge} alt="Pillar Drug Club Membership" className="w-16 h-16 object-contain" />
                 </div>
-                <CardTitle className="text-xl md:text-2xl font-bold">Gold – 6 Month</CardTitle>
-                <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $9
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/mo</span>
+                <CardTitle className="text-xl md:text-2xl font-bold" data-testid="text-membership-name">Pillar Drug Club</CardTitle>
+                <div className="text-3xl md:text-4xl font-bold text-primary" data-testid="text-membership-price">
+                  $99
+                  <span className="text-base md:text-lg text-muted-foreground font-bold">/year</span>
                 </div>
-                <div className="text-sm text-muted-foreground">$108/year billed annually</div>
-                <CardDescription className="font-bold">Best for most people on stable medications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6 text-left">
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Up to 6-month supply</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Wholesale pricing</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Shipping at carrier rates</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Home delivery</span>
-                  </li>
-                </ul>
-                <Link href="/register?tier=gold">
-                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-gold">
-                    Choose Gold – 6 Month
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Platinum */}
-            <Card className="border-secondary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-3">
-                  <img src={platinumPillarBadge} alt="Platinum" className="w-16 h-16 object-contain" />
-                </div>
-                <CardTitle className="text-xl md:text-2xl font-bold">Platinum</CardTitle>
-                <div className="text-3xl md:text-4xl font-bold text-primary">
-                  $15
-                  <span className="text-base md:text-lg text-muted-foreground font-bold">/mo</span>
-                </div>
-                <div className="text-sm text-muted-foreground">$180/year billed annually</div>
-                <CardDescription className="font-bold">Best for maximum convenience and zero refills</CardDescription>
+                <CardDescription className="font-bold">Save hundreds on your prescriptions every year</CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3 mb-6 text-left">
@@ -244,30 +214,31 @@ export default function HomePage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Wholesale pricing</span>
+                    <span className="text-sm md:text-base font-bold">Wholesale pricing on 3,000+ medications</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Shipping at carrier rates</span>
+                    <span className="text-sm md:text-base font-bold">Home delivery at carrier rates</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Home delivery</span>
+                    <span className="text-sm md:text-base font-bold">$10 dispensing fee per medication per fill</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base font-bold">Priority processing</span>
+                    <span className="text-sm md:text-base font-bold">Clinical safety tools included</span>
                   </li>
                 </ul>
-                <Link href="/register?tier=platinum">
-                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-platinum">
-                    Choose Platinum
+                <Link href="/register">
+                  <Button className="w-full font-bold focus-visible:outline-none" size="lg" data-testid="button-start-membership">
+                    Join Pillar Drug Club
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
               </CardContent>
             </Card>
           </div>
-          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual membership • Billed once per year</p>
+          <p className="text-sm text-muted-foreground mt-6 font-bold">Annual membership • Billed once per year • $99/year</p>
         </div>
       </section>
 
@@ -354,7 +325,7 @@ export default function HomePage() {
                 How do I save money on my medications?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-save-money">
-                Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold ($9/mo) and Platinum ($15/mo) plans unlock extended supply savings with just $10 fulfillment per shipment.
+                Get extended supply prescriptions (up to 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our $99/year membership unlocks extended supply savings with just $10 dispensing per medication per fill.
               </AccordionContent>
             </AccordionItem>
 
@@ -363,7 +334,7 @@ export default function HomePage() {
                 What if I can't afford my prescriptions?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-bold" data-testid="faq-content-cant-afford">
-                Start with our Gold tier at just $9/month with $10 fulfillment per shipment. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 6-month supply. We also offer payment plans and assistance programs for those who qualify.
+                Start with our $99/year membership. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 12-month supply. We also offer payment plans and assistance programs for those who qualify.
               </AccordionContent>
             </AccordionItem>
 
@@ -435,6 +406,7 @@ export default function HomePage() {
         </div>
       </footer>
 
+      <SignupModal open={showSignupModal} onOpenChange={setShowSignupModal} />
     </div>
   );
 }

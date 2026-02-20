@@ -541,7 +541,7 @@ export default function PrescriptionRequestPage() {
                         </Select>
                         {user?.subscriptionTier === "free" && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Upgrade to Gold for 6-month or 12-month supply access
+                            Join Pillar Drug Club for up to 12-month supply access
                           </p>
                         )}
                         {doctorForm.formState.errors.quantity && (

@@ -16,15 +16,15 @@ const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 // Only load Stripe if we have a valid public key (starts with pk_)
 const stripePromise = (STRIPE_PUBLIC_KEY && STRIPE_PUBLIC_KEY.startsWith('pk_')) ? loadStripe(STRIPE_PUBLIC_KEY) : null;
 
-const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => {
+const SubscribeForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const planPrice = selectedPlan === 'basic' ? 59 : 99;
-  const planName = selectedPlan === 'basic' ? 'Gold – 6 Month' : 'Platinum';
+  const planPrice = 99;
+  const planName = 'Pillar Drug Club Membership';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +87,7 @@ const SubscribeForm = ({ selectedPlan }: { selectedPlan: 'basic' | 'plus' }) => 
 export default function SubscriptionPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'plus'>('plus');
+  const selectedPlan = 'plus';
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
@@ -246,49 +246,22 @@ export default function SubscriptionPage() {
         {/* Plan Selection */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Select Your Plan</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+          <div className="max-w-md mx-auto">
             <Card 
-              className={`cursor-pointer transition-all hover-elevate relative ${selectedPlan === 'basic' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
-              onClick={() => setSelectedPlan('basic')}
-              data-testid="card-plan-basic"
+              className="border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10 relative"
+              data-testid="card-plan-membership"
             >
-              {selectedPlan === 'basic' && (
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
-                  MOST POPULAR
-                </div>
-              )}
+              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
+                MEMBERSHIP
+              </div>
               <CardHeader>
-                <CardTitle className="text-lg">Gold – 6 Month</CardTitle>
+                <CardTitle className="text-lg">Pillar Drug Club Membership</CardTitle>
                 <div className="text-2xl font-bold text-primary">
-                  $9<span className="text-base text-muted-foreground">/mo</span>
+                  $99<span className="text-base text-muted-foreground">/year</span>
                 </div>
-                <div className="text-xs text-muted-foreground">$108/year billed annually</div>
-                <CardDescription>Best for most people on stable medications</CardDescription>
+                <CardDescription>Access wholesale pricing with up to 12-month supply</CardDescription>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  $10 fulfillment per shipment • Up to 6-month supply
-                </div>
-              </CardHeader>
-            </Card>
-
-            <Card 
-              className={`cursor-pointer transition-all hover-elevate relative ${selectedPlan === 'plus' ? 'border-primary/50 bg-gradient-to-br from-primary/10 to-secondary/10' : 'border-secondary/30'}`}
-              onClick={() => setSelectedPlan('plus')}
-              data-testid="card-plan-plus"
-            >
-              {selectedPlan === 'plus' && (
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs font-bold">
-                  SELECTED
-                </div>
-              )}
-              <CardHeader>
-                <CardTitle className="text-lg">Platinum</CardTitle>
-                <div className="text-2xl font-bold text-primary">
-                  $15<span className="text-base text-muted-foreground">/mo</span>
-                </div>
-                <div className="text-xs text-muted-foreground">$180/year billed annually</div>
-                <CardDescription>Best for maximum convenience and zero refills</CardDescription>
-                <div className="mt-2 text-xs text-muted-foreground">
-                  $10 fulfillment per shipment • Up to 12-month supply
+                  $10 dispensing per medication per fill
                 </div>
               </CardHeader>
             </Card>
@@ -356,18 +329,18 @@ export default function SubscriptionPage() {
               <div className="mb-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className="text-3xl font-bold text-blue-600">
-                    ${selectedPlan === 'basic' ? '59' : '99'}
+                    $99
                   </div>
                   <div className="text-gray-600">per year</div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {selectedPlan === 'basic' ? 'Gold – 6 Month • $10 fulfillment' : 'Platinum • $10 fulfillment'}
+                    Pillar Drug Club Membership
                   </div>
                 </div>
               </div>
 
               {/* Make SURE to wrap the form in <Elements> which provides the stripe context. */}
               <Elements key={clientSecret} stripe={stripePromise} options={{ clientSecret }}>
-                <SubscribeForm selectedPlan={selectedPlan} />
+                <SubscribeForm />
               </Elements>
 
               <div className="mt-4 space-y-2">

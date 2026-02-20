@@ -1,7 +1,7 @@
 # Pillar Drug Club - Wholesale Prescription Pharmacy Platform
 
 ## Overview
-Pillar Drug Club is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers two membership tiers: Gold – 6 Month ($59/year) and Platinum ($99/year), supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
+Pillar Drug Club is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers a single membership at $99/year, supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -16,38 +16,35 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
 - **Frontend**: Utilizes TanStack Query for server state management and React Hook Form with Zod for form validation.
 - **Backend**: Express.js with TypeScript provides RESTful APIs, backed by a PostgreSQL database with Drizzle ORM.
 - **Authentication & Authorization**: Dual authentication via email/password and Google OAuth, using Passport.js for session management and a robust role-based access control system. **Persistent Login System with Session Keep-Alive** (November 2025): Production-ready offline-first authentication with localStorage-based session persistence that survives browser restarts, graceful handling of transient server errors (5xx) and 304 "Not Modified" responses without logout, race condition fixes ensuring navigation waits for React state updates, comprehensive debug logging for production monitoring, and automatic session keep-alive (15-minute refresh interval) to prevent 30-minute HIPAA timeout during long operations. Long-running endpoints (content generation) explicitly call `req.session.touch()` to maintain session validity. 401/403 errors trigger automatic logout with redirect to login page.
-- **Coming Soon Waitlist Modal**: A pre-launch waitlist collection system integrated into the HomePage for collecting user contact information with Zod validation and database persistence.
+- **Signup Modal**: A lead capture popup that appears on first visit to the HomePage, collecting user contact information (name, email, phone) with a clear CTA ("Sign Up Now"). Uses localStorage to show only once per visitor. Replaced the previous "Coming Soon" waitlist modal with direct signup language.
 - **SEO Optimization System** (November 2025): Production-ready SEO infrastructure targeting competitive healthcare keywords to outrank Amazon Pharmacy, GoodRx, and Cost Plus Drugs. Features include:
   - **Robots.txt & Sitemap**: Blocks admin routes, dynamic sitemap.xml includes 500+ medication pages and blog posts
   - **Schema.org Markup**: Enhanced pharmacy schema with competitive keywords, AggregateRating (4.9/5), HowTo schema for featured snippets, FAQ schema, Video schema, Breadcrumb schemas. Counter-based unique script IDs prevent collisions when multiple schemas load concurrently
   - **Meta Tag Optimization**: High-intent keywords on HomePage, MedicationsPage, BlogPage, and all 4 RegisterPage steps. SSR-safe `getBaseUrl()` helper for environment-aware canonical URLs
   - **Target Keywords**: "cheap prescriptions without insurance", "prescription drug club membership", "wholesale medication prices", "diabetes meds without insurance"
   - **Technical Implementation**: SEOHead component with unique counter-based script IDs (prevents schema collisions), SSR-compatible URL helpers, metadata persistence across multi-step flows
-- **Multi-Step Registration**: A 4-step onboarding process covering social authentication, tier selection, user details, prescription preferences, and Stripe membership payment.
-- **Payment Processing**: Integrated Stripe for subscription-based membership across three tiers.
+- **Multi-Step Registration**: A 4-step onboarding process covering social authentication, user details, prescription preferences, and Stripe membership payment ($99/year single plan).
+- **Payment Processing**: Integrated Stripe for subscription-based membership ($99/year annual billing).
 - **PDF Prescription System**: Generates branded PDF prescription request forms with SureScripts pharmacy lookup information, distributed via email and SMS using PDFKit, Resend, and Twilio.
 - **Account Settings & Member Dashboard**: Users can manage personal information and view a comprehensive dashboard with medication displays, PCP management, drug allergies, and subscription details.
 - **Medication Ordering Workflow**: Streamlined process for requesting prescriptions with tier-based supply length enforcement.
 - **Medication Search & Pricing**: CSV-based medication catalog for search and pricing, integrated with openFDA Drug Label API for annual pricing calculation.
 - **Medication Refill System**: Automated refill request workflow with status tracking and admin oversight.
 - **Personal Medication List**: User-managed list with OpenFDA integration for data enrichment and real-time drug-drug interaction checking.
-- **Clinical Safety Tools** (Gold/Platinum Only - November 2025): HIPAA-compliant medication management with FDA-powered safety analysis. Features include:
+- **Clinical Safety Tools** (Members Only - November 2025): HIPAA-compliant medication management with FDA-powered safety analysis. Features include:
   - **Medication Autocomplete**: Dual-source search supporting PDC catalog (1,857 medications) + manual entry for external pharmacies
   - **Side Effect Analyzer**: Aggregates adverse reactions across medications with likelihood scoring (high >10%, moderate 1-10%, low <1%). Groups effects by frequency with visual indicators
   - **Drug Interaction Checker**: Pairwise analysis with severity classification (major/moderate/minor). Detects contraindications and dosage adjustments
   - **OpenFDA Integration**: Free API with 7-day in-memory cache (memoize), 30-day database cache. Enriches 1,857 medications with drug labels from disk cache
-  - **Tier Gating**: Clinical safety tools available to Gold/Platinum members
+  - **Tier Gating**: Clinical safety tools available to paid members (gold/platinum tier in database)
   - **Performance**: 3-second startup with skip logic (medications persist in database). Cold start (empty DB): ~10-15 minutes for FDA enrichment (acceptable for MVP, optimization planned)
 - **Refund Policy System**: Comprehensive, transparent refund and cancellation policy for annual memberships, available as web content and downloadable PDF. Annual memberships are non-refundable once activated.
-- **Membership Pricing** (January 2026): Annual billing model with two tiers:
-  - **Gold**: $9/month ($108/year billed annually), $10 dispensing fee per medication per fill, up to 6-month supply. Most popular option for stable medications.
-  - **Platinum**: $15/month ($180/year billed annually), $10 dispensing fee per medication per fill, up to 12-month supply. Maximum convenience with zero refills.
-- **Plan Cost Calculator** (January 2026): Interactive calculator on /cost-calculator page helps users find the most cost-effective plan. Features include:
+- **Membership Pricing** (February 2026): Single annual membership at $99/year. $10 dispensing fee per medication per fill. Up to 12-month supply. All clinical safety tools included.
+- **Plan Cost Calculator** (February 2026): Interactive calculator on /cost-calculator page helps users see their total annual cost. Features include:
   - **Number of Medications Input**: Calculates dispensing costs based on $10 per medication per fill
   - **Supply Duration Selection**: 30/60/90/180/365 day options with automatic order frequency calculation
   - **Variable Shipping Cost**: User-configurable shipping cost per order
-  - **Plan Filtering**: Gold plan is hidden when 365-day supply is selected (only supports up to 6 months)
-  - **Calculation Formula**: Total = Membership Fee + (Dispensing × Meds × Orders/Year) + (Shipping × Orders/Year)
+  - **Calculation Formula**: Total = $99 Membership Fee + (Dispensing × Meds × Orders/Year) + (Shipping × Orders/Year)
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including Executive Dashboard, User Management (deactivate, soft delete, suspend, delete, recover), Financial Dashboard, Communication Center, Reports & Analytics, and Medication Pricing Management. Admin users can toggle between Admin Dashboard and User Dashboard via the header menu for seamless role switching.
 - **Hybrid Blog System ("The Pillar Post 🗞️")**: A dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG). Features include an admin interface for content generation, AI-powered SEO keyword generator that analyzes blog titles to suggest 8-12 optimized keywords, compliance review workflow, and a GoodRx-style visual redesign with featured image uploads (client-side resizing, compression, base64 storage).
 - **Sora AI Video Generation System** (November 2025): Dual-track video generation infrastructure for YouTube content marketing with immediate production capability and Q1 2026 API readiness. Features include:

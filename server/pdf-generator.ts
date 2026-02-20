@@ -508,13 +508,7 @@ export async function generateRefundPolicyPDF(): Promise<Buffer> {
     doc.moveDown(0.5);
     doc.font('Helvetica-Bold')
        .fillColor(BRAND_FOREGROUND)
-       .text('• Gold Plan ($9/mo, $108/year):', 85, doc.y, { continued: true })
-       .font('Helvetica')
-       .text(' No refunds after activation', { width: 452 });
-
-    doc.moveDown(0.3);
-    doc.font('Helvetica-Bold')
-       .text('• Platinum Plan ($15/mo, $180/year):', 85, doc.y, { continued: true })
+       .text('• Pillar Drug Club Membership ($99/year):', 85, doc.y, { continued: true })
        .font('Helvetica')
        .text(' No refunds after activation', { width: 452 });
 

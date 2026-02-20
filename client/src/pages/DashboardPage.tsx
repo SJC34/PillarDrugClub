@@ -28,7 +28,6 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { PrescriptionRequest } from "@shared/pharmacy-schema";
 import { useAuth } from "@/hooks/useAuth";
 import { AllergyAutocomplete } from "@/components/AllergyAutocomplete";
-import goldPillarBadge from "@assets/image_1761454767191.png";
 import platinumPillarBadge from "@assets/image_1761453800697.png";
 
 export default function DashboardPage() {
@@ -394,18 +393,13 @@ export default function DashboardPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                {user?.subscriptionTier === "gold" && (
-                  <img src={goldPillarBadge} alt="Gold" className="w-10 h-10 object-contain" />
-                )}
-                {user?.subscriptionTier === "platinum" && (
-                  <img src={platinumPillarBadge} alt="Platinum" className="w-10 h-10 object-contain" />
-                )}
+                <img src={platinumPillarBadge} alt="Pillar Drug Club" className="w-10 h-10 object-contain" />
                 <div>
                   <p className="text-2xl font-bold text-gray-900">
-                    ${user?.subscriptionTier === "gold" ? "59" : "99"}
+                    $99
                   </p>
                   <p className="text-sm text-gray-600">
-                    {user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Platinum"}
+                    Pillar Drug Club Member
                   </p>
                 </div>
               </div>
@@ -511,24 +505,19 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  {user?.subscriptionTier === "gold" && (
-                    <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-10 h-10 object-contain" />
-                  )}
-                  {user?.subscriptionTier === "platinum" && (
-                    <img src={platinumPillarBadge} alt="Platinum" className="w-10 h-10 object-contain" />
-                  )}
+                  <img src={platinumPillarBadge} alt="Pillar Drug Club" className="w-10 h-10 object-contain" />
                   Current Subscription
                   <Badge variant="default">
-                    {user?.subscriptionTier === "gold" ? "Gold – 6 Month" : "Platinum"}
+                    Pillar Drug Club Member
                   </Badge>
                 </CardTitle>
                 <CardDescription>
-                  {user?.subscriptionTier === "gold" ? "Up to 6-month supply access" : "Up to 12-month supply access"}
+                  Up to 12-month supply access
                 </CardDescription>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-primary">
-                  ${user?.subscriptionTier === "gold" ? "59" : "99"}
+                  $99
                   <span className="text-sm text-muted-foreground">/year</span>
                 </div>
               </div>
@@ -541,7 +530,7 @@ export default function DashboardPage() {
                   <ul className="space-y-2">
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
-                      <span>{user?.subscriptionTier === "gold" ? "Up to 6-month supply" : "Up to 12-month supply"}</span>
+                      <span>Up to 12-month supply</span>
                     </li>
                     <li className="flex items-start gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-secondary mt-0.5" />
@@ -564,13 +553,6 @@ export default function DashboardPage() {
                       Manage Subscription
                     </Button>
                   </Link>
-                  {user?.subscriptionTier === "gold" && (
-                    <Link href="/settings?tab=subscription" className="flex-1">
-                      <Button className="w-full" data-testid="button-upgrade-to-platinum">
-                        Upgrade to Platinum
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               </>
           </CardContent>

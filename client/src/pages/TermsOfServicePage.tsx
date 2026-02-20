@@ -123,20 +123,16 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-lg mb-3">Membership Plans</h3>
               <p className="mb-3">
-                Pillar Drug Club offers two membership tiers:
+                Pillar Drug Club offers one simple membership:
               </p>
               <div className="space-y-3">
                 <div className="bg-muted p-4 rounded-lg">
-                  <p className="font-semibold">Gold - $9/month ($108/year billed annually)</p>
-                  <p className="text-muted-foreground">Best for most people on stable medications. Up to 6-month supply with $10 fulfillment per shipment.</p>
-                </div>
-                <div className="bg-muted p-4 rounded-lg">
-                  <p className="font-semibold">Platinum - $15/month ($180/year billed annually)</p>
-                  <p className="text-muted-foreground">Best for maximum convenience and zero refills. Up to 12-month supply with $10 fulfillment per shipment.</p>
+                  <p className="font-semibold">Pillar Drug Club Membership - $99/year</p>
+                  <p className="text-muted-foreground">Up to 12-month supply with $10 dispensing fee per medication per fill. Home delivery at carrier rates.</p>
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted-foreground">
-                Both plans are billed annually. See Section 5 for detailed payment terms.
+                Membership is billed annually. See Section 5 for detailed payment terms.
               </p>
             </div>
           </CardContent>
@@ -199,8 +195,7 @@ export default function TermsOfServicePage() {
                 All memberships are billed annually:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
-                <li>Gold: $9/month ($108/year billed annually) with $10 fulfillment per shipment</li>
-                <li>Platinum: $15/month ($180/year billed annually) with $10 fulfillment per shipment</li>
+                <li>Pillar Drug Club Membership: $99/year billed annually with $10 dispensing fee per medication per fill</li>
               </ul>
             </div>
 
@@ -358,8 +353,7 @@ export default function TermsOfServicePage() {
                 Annual memberships are non-refundable once activated:
               </p>
               <ul className="list-disc list-inside space-y-1 ml-4 text-muted-foreground">
-                <li>Gold ($108/year): No refunds after activation</li>
-                <li>Platinum ($180/year): No refunds after activation</li>
+                <li>Membership ($99/year): No refunds after activation</li>
               </ul>
             </div>
 

@@ -491,18 +491,13 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  // Stripe subscription route with two-tier pricing
+  // Stripe subscription route - single $99/year membership
   app.post("/api/create-subscription", async (req, res) => {
     try {
       const { userId, plan = 'plus' } = req.body;
       
       if (!userId) {
         return res.status(400).json({ error: "User ID is required" });
-      }
-
-      // Validate plan
-      if (plan !== 'basic' && plan !== 'plus') {
-        return res.status(400).json({ error: "Invalid plan. Must be 'basic' or 'plus'" });
       }
       
       const user = await storage.getUser(userId);
@@ -533,26 +528,17 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         await storage.updateUserStripeInfo(userId, customerId, null);
       }
       
-      // Determine price based on plan (annual billing)
-      const planConfig: Record<'basic' | 'plus', { amount: number; name: string; description: string }> = {
-        basic: {
-          amount: 10800, // $108.00 in cents (annual - $9/month)
-          name: 'Pillar Drug Club Gold Plan',
-          description: 'Annual membership ($9/mo billed annually) - 6-month supply access'
-        },
-        plus: {
-          amount: 18000, // $180.00 in cents (annual - $15/month)
-          name: 'Pillar Drug Club Platinum Plan',
-          description: 'Annual membership ($15/mo billed annually) - up to 1-year supply access'
-        }
+      // Single membership plan - $99/year
+      const selectedPlan = {
+        amount: 9900, // $99.00 in cents (annual)
+        name: 'Pillar Drug Club Membership',
+        description: 'Annual membership ($99/year) - up to 12-month supply access'
       };
-
-      const selectedPlan = planConfig[plan as 'basic' | 'plus'];
       
       // Create or retrieve the product and price
       // In production, you'd create these once via Stripe Dashboard or a setup script
       // For now, we'll use environment variables or create them dynamically
-      let priceId = plan === 'basic' ? process.env.STRIPE_BASIC_PRICE_ID : process.env.STRIPE_PLUS_PRICE_ID;
+      let priceId = process.env.STRIPE_MEMBERSHIP_PRICE_ID;
       
       if (!priceId) {
         // Create product and price if not configured
@@ -3187,9 +3173,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       const canceledSubscriptions = users.filter((u) => u.subscriptionStatus === 'canceled').length;
       const pastDueSubscriptions = users.filter((u) => u.subscriptionStatus === 'past_due').length;
       
-      // Assuming Basic plan = $15, Plus plan = $25 (simplified - in production would check actual plan)
+      // $99/year membership = ~$8.25/month per subscriber
       // For now, estimate MRR based on active subscriptions
-      const estimatedMRR = activeSubscriptions * 20; // Average of $15 and $25
+      const estimatedMRR = activeSubscriptions * 8.25;
       
       // Calculate revenue metrics
       const totalRevenue = allOrders.reduce((sum: number, order: any) => {

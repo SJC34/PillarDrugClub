@@ -18,18 +18,18 @@ import {
   Home, 
   Mail,
   Loader2,
-  Sparkles,
+  ArrowRight,
   User,
   Phone,
   X
 } from "lucide-react";
 
-interface ComingSoonModalProps {
+interface SignupModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function ComingSoonModal({ open, onOpenChange }: ComingSoonModalProps) {
+export function SignupModal({ open, onOpenChange }: SignupModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -41,8 +41,8 @@ export function ComingSoonModal({ open, onOpenChange }: ComingSoonModalProps) {
     },
     onSuccess: () => {
       toast({
-        title: "You're on the list!",
-        description: "We'll notify you as soon as Pillar launches.",
+        title: "You're in!",
+        description: "We'll be in touch with your membership details shortly.",
       });
       setName("");
       setEmail("");
@@ -97,6 +97,7 @@ export function ComingSoonModal({ open, onOpenChange }: ComingSoonModalProps) {
           size="icon"
           className="absolute right-4 top-4 rounded-full"
           onClick={() => onOpenChange(false)}
+          aria-label="Close signup modal"
           data-testid="button-close-modal"
         >
           <X className="h-4 w-4" />
@@ -104,8 +105,8 @@ export function ComingSoonModal({ open, onOpenChange }: ComingSoonModalProps) {
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-primary">Coming Soon</span>
+              <DollarSign className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-primary">Only $99/year</span>
             </div>
           </div>
           <DialogTitle className="text-center text-3xl md:text-4xl font-black">
@@ -114,18 +115,17 @@ export function ComingSoonModal({ open, onOpenChange }: ComingSoonModalProps) {
             <span className="text-primary">As Low As 1¢ Per Tablet</span>
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            Join the waitlist for Pillar Drug Club — your direct access to affordable, 
+            Join Pillar Drug Club for just $99/year and get direct access to affordable, 
             year-supply prescriptions without the insurance headaches.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
-          {/* Signup Form */}
           <Card className="border-2 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Mail className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-bold text-foreground">Get Early Access</h3>
+                <h3 className="text-lg font-bold text-foreground">Get Started Today</h3>
               </div>
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div className="relative">
@@ -177,17 +177,19 @@ export function ComingSoonModal({ open, onOpenChange }: ComingSoonModalProps) {
                   {signupMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Joining...
+                      Signing Up...
                     </>
                   ) : (
-                    "Join the Waitlist"
+                    <>
+                      Sign Up Now
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
                   )}
                 </Button>
               </form>
             </CardContent>
           </Card>
 
-          {/* Benefits Grid */}
           <div className="grid md:grid-cols-3 gap-4">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;

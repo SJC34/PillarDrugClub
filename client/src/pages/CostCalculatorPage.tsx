@@ -62,16 +62,10 @@ function calculatePlanCosts(inputs: CalculatorInputs): PlanCost[] {
   const { desiredSupplyDays, numMedications, shippingPerOrder } = inputs;
   
   const plans = [
-    { name: "Gold", tierKey: "gold", annualFee: 108, dispensingFeePerMed: 10, maxSupplyDays: 180 },
-    { name: "Platinum", tierKey: "platinum", annualFee: 180, dispensingFeePerMed: 10, maxSupplyDays: 365 },
+    { name: "Pillar Drug Club", tierKey: "member", annualFee: 99, dispensingFeePerMed: 10, maxSupplyDays: 365 },
   ];
 
-  // Filter out Gold if user wants 1 year supply (Gold doesn't support it)
-  const eligiblePlans = desiredSupplyDays > 180 
-    ? plans.filter(p => p.tierKey !== 'gold')
-    : plans;
-
-  const results: PlanCost[] = eligiblePlans.map(plan => {
+  const results: PlanCost[] = plans.map(plan => {
     const effectiveSupply = Math.min(desiredSupplyDays, plan.maxSupplyDays);
     // Convert days to months and calculate orders per year
     // 30 days = 1 month, 60 = 2, 90 = 3, 180 = 6, 365 = 12
@@ -236,8 +230,8 @@ export default function CostCalculatorPage() {
               Find Your Best Plan
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Enter your prescription details to find the most cost-effective plan. The dispensing fee is $10 per medication per fill, 
-              plus shipping costs. Note: Gold plan only supports up to 6-month supply.
+              Enter your prescription details to see your total annual cost. The dispensing fee is $10 per medication per fill, 
+              plus shipping costs. Membership is $99/year.
             </p>
           </CardHeader>
           <CardContent>
@@ -272,9 +266,7 @@ export default function CostCalculatorPage() {
                     <SelectItem value="365">365 days (1 year)</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {Number(planDesiredSupply) > 180 && <span className="text-amber-600 dark:text-amber-400">Gold limited to 6 months</span>}
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">Up to 12-month supply available</p>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Shipping Cost per Order</label>
@@ -306,7 +298,7 @@ export default function CostCalculatorPage() {
                   data-testid="button-calculate-plan"
                 >
                   <Calculator className="h-4 w-4 mr-2" />
-                  Calculate Best Plan
+                  Calculate Cost
                 </Button>
               </div>
             </div>
@@ -314,14 +306,7 @@ export default function CostCalculatorPage() {
             {planResults && (
               <div className="space-y-4">
                 <Separator />
-                {planResults.length === 1 && Number(planDesiredSupply) > 180 && (
-                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 max-w-2xl mx-auto">
-                    <p className="text-sm text-amber-800 dark:text-amber-300">
-                      <strong>Note:</strong> Gold plan is not available for 1-year supply. Only Platinum supports 12-month prescriptions.
-                    </p>
-                  </div>
-                )}
-                <div className={`grid gap-4 max-w-2xl mx-auto ${planResults.length === 1 ? 'grid-cols-1 max-w-sm' : 'grid-cols-1 md:grid-cols-2'}`}>
+                <div className="grid gap-4 max-w-sm mx-auto grid-cols-1">
                   {planResults.map((plan) => (
                     <Card 
                       key={plan.tierKey} 
@@ -389,29 +374,7 @@ export default function CostCalculatorPage() {
                   ))}
                 </div>
                 
-                {/* Savings comparison */}
-                {planResults.length > 1 && (
-                  <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4">
-                    <div className="flex items-start gap-3">
-                      <TrendingDown className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-green-800 dark:text-green-300">
-                          {planResults.find(p => p.isRecommended)?.name} saves you the most!
-                        </p>
-                        <p className="text-sm text-green-700 dark:text-green-400">
-                          {(() => {
-                            const recommended = planResults.find(p => p.isRecommended);
-                            const others = planResults.filter(p => !p.isRecommended);
-                            if (!recommended || others.length === 0) return null;
-                            const maxOther = Math.max(...others.map(o => o.totalAnnualCost));
-                            const savings = maxOther - recommended.totalAnnualCost;
-                            return savings > 0 ? `Save up to $${savings}/year compared to other plans` : 'Most cost-effective for your needs';
-                          })()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                
               </div>
             )}
           </CardContent>

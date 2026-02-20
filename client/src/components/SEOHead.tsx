@@ -200,7 +200,7 @@ export const faqSchema = {
       "name": "How do I save money on my medications?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Get extended supply prescriptions (6 or 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our Gold – 6 Month ($59/year) and Platinum ($99/year) plans unlock extended supply savings with just $10 fulfillment per shipment."
+        "text": "Get extended supply prescriptions (up to 12 months) instead of 30-day refills. This reduces dispensing fees and gives you better bulk pricing. Our $99/year membership unlocks extended supply savings with just $10 dispensing per medication per fill."
       }
     },
     {
@@ -208,7 +208,7 @@ export const faqSchema = {
       "name": "What if I can't afford my prescriptions?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Start with our Gold – 6 Month tier at just $59/year with $10 fulfillment per shipment. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 6-month supply. We also offer payment plans and assistance programs for those who qualify."
+        "text": "Start with our $99/year membership. Common medications like metformin, lisinopril, and atorvastatin cost just dollars for a 12-month supply. We also offer payment plans and assistance programs for those who qualify."
       }
     },
     {
@@ -373,7 +373,7 @@ export const howToSaveMoneySchema = {
       "@type": "HowToStep",
       "position": 3,
       "name": "Choose Your Membership Tier",
-      "text": "Select Gold – 6 Month ($59/year with $10 fulfillment per shipment) or Platinum ($99/year with $10 fulfillment per shipment). Both tiers give you access to wholesale pricing.",
+      "text": "Sign up for $99/year membership with $10 dispensing per medication per fill. Your membership gives you access to wholesale pricing and up to 12-month supply.",
       "url": "https://pillardrugclub.com/register"
     },
     {

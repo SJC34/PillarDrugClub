@@ -22,7 +22,6 @@ import { MedicationSearch } from "@/components/MedicationSearch";
 import { handleDateInputChange } from "@/lib/dateFormatter";
 import { SEOHead, pharmacySchema, createBreadcrumbSchema, getBaseUrl } from "@/components/SEOHead";
 import goldPillarBadge from "@assets/image_1761454767191.png";
-import platinumPillarBadge from "@assets/image_1761453800697.png";
 
 // Schemas for different steps
 const step1SocialSchema = z.object({
@@ -132,7 +131,7 @@ export default function RegisterPage() {
   const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
   const [referralReferrerName, setReferralReferrerName] = useState<string>("");
   const [isValidatingReferral, setIsValidatingReferral] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<"gold" | "platinum">("gold");
+  const [selectedTier] = useState<string>("plus");
   const { toast } = useToast();
 
   // Parse step from URL (for OAuth redirects) - run on first render only
@@ -155,14 +154,6 @@ export default function RegisterPage() {
     }
   }, []);
 
-  // Parse tier from URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tier = params.get('tier');
-    if (tier === 'gold' || tier === 'platinum') {
-      setSelectedTier(tier);
-    }
-  }, []);
 
   // Forms for each step
   const step2Form = useForm<Step2DetailsForm>({
@@ -439,7 +430,7 @@ export default function RegisterPage() {
       // Move to payment step for Gold/Platinum tiers
       const subscriptionResponse = await apiRequest("POST", "/api/create-subscription", { 
         userId: registeredUser.id,
-        plan: selectedTier  // 'gold' or 'platinum'
+        plan: 'plus'
       });
       const subscriptionData = await subscriptionResponse.json();
 
@@ -480,8 +471,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $9/Month"
-          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | $99/Year Membership"
+          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -489,7 +480,7 @@ export default function RegisterPage() {
           <div className="w-full max-w-md">
             <div className="text-center mb-6 md:mb-8">
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Join Pillar Drug Club</h1>
-              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing starting at $9/month</p>
+              <p className="text-sm md:text-base text-muted-foreground">Get wholesale prescription pricing for just $99/year</p>
             </div>
 
           <Card className="border-secondary/20">
@@ -573,8 +564,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $9/Month"
-          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | $99/Year Membership"
+          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -585,56 +576,16 @@ export default function RegisterPage() {
               <p className="text-sm md:text-base text-muted-foreground">Complete your profile to continue</p>
             </div>
 
-          {/* Tier Selection */}
-          <Card className="border-secondary/20 mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg md:text-xl font-display">Choose Your Plan</CardTitle>
-              <CardDescription className="text-sm md:text-base">
-                Select the membership tier that fits your needs
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setSelectedTier("gold")}
-                  className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-visible ${
-                    selectedTier === "gold"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover-elevate"
-                  }`}
-                  data-testid="button-select-gold"
-                >
-                  <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-bold z-10">
-                    MOST POPULAR
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <img src={goldPillarBadge} alt="Gold – 6 Month" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Gold – 6 Month</div>
-                  </div>
-                  <div className="text-2xl font-bold text-primary">$9<span className="text-sm text-muted-foreground">/mo</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$108/year billed annually + $10 fulfillment per shipment</div>
-                  <div className="text-xs">Up to 6-month supply</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedTier("platinum")}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
-                    selectedTier === "platinum"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover-elevate"
-                  }`}
-                  data-testid="button-select-platinum"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <img src={platinumPillarBadge} alt="Platinum" className="w-8 h-8 object-contain" />
-                    <div className="font-bold text-lg">Platinum</div>
-                  </div>
-                  <div className="text-2xl font-bold text-primary">$15<span className="text-sm text-muted-foreground">/mo</span></div>
-                  <div className="text-xs text-muted-foreground mb-2">$180/year billed annually + $10 fulfillment per shipment</div>
-                  <div className="text-xs">Up to 12-month supply</div>
-                </button>
+          <Card className="border-primary/20 mb-6 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <img src={goldPillarBadge} alt="Pillar Drug Club" className="w-10 h-10 object-contain" />
+                <div>
+                  <div className="font-bold text-lg">Pillar Drug Club Membership</div>
+                  <div className="text-2xl font-bold text-primary">$99<span className="text-sm text-muted-foreground">/year</span></div>
+                </div>
               </div>
+              <div className="text-xs text-muted-foreground">Up to 12-month supply + $10 dispensing per medication per fill</div>
             </CardContent>
           </Card>
 
@@ -918,8 +869,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $9/Month"
-          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | $99/Year Membership"
+          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1115,8 +1066,8 @@ export default function RegisterPage() {
     return (
       <>
         <SEOHead
-          title="Join Pillar Drug Club | Prescriptions from $9/Month"
-          description="Join thousands saving on prescriptions. Choose Gold ($9/mo) or Platinum ($15/mo), billed annually. Simple, transparent pricing. No insurance needed."
+          title="Join Pillar Drug Club | $99/Year Membership"
+          description="Join Pillar Drug Club for just $99/year. Save up to 95% on prescriptions. No insurance needed. Up to 12-month supply with home delivery."
           canonical={`${baseUrl}/register`}
           schema={combinedSchema}
         />
@@ -1172,14 +1123,14 @@ export default function RegisterPage() {
                 <div className="mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl md:text-3xl font-bold text-teal-700 dark:text-teal-400">
-                      ${selectedTier === "gold" ? "59" : "99"}
+                      $99
                     </div>
                     <div className="text-sm md:text-base text-muted-foreground">per year</div>
                     <div className="text-xs md:text-sm text-muted-foreground mt-1">
-                      {selectedTier === "gold" ? "Gold – 6 Month • $10 fulfillment" : "Platinum • $10 fulfillment"}
+                      Pillar Drug Club Membership
                     </div>
                     <div className="mt-2 p-2 bg-primary/10 rounded text-xs md:text-sm font-semibold text-primary">
-                      {selectedTier === "gold" ? "Up to 6-month supply" : "Up to 12-month supply"}
+                      Up to 12-month supply + $10 dispensing per fill
                     </div>
                   </div>
                 </div>
