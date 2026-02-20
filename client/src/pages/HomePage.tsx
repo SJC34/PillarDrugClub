@@ -175,7 +175,7 @@ export default function HomePage() {
                 "Pass-through generic pricing — no markup",
                 "6–12 month supplies — fewer orders",
                 "Price locked at cost, no retail markup",
-                "Mail-order delivery included",
+                "Mail-order delivery",
                 "No insurance required, ever",
               ].map((benefit, idx) => (
                 <div key={idx} className="flex items-start gap-3 py-4 border-t border-border" data-testid={`membership-benefit-${idx}`}>
