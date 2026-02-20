@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -13,14 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { 
-  DollarSign, 
-  Shield, 
-  Home, 
-  Mail,
   Loader2,
   ArrowRight,
   User,
   Phone,
+  Mail,
+  Check,
 } from "lucide-react";
 import pillarImage from "@assets/image_1771565518024.png";
 
@@ -73,134 +70,114 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
   };
 
   const benefits = [
-    {
-      icon: DollarSign,
-      title: "Wholesale Pricing",
-      description: "Save up to 95% on prescription medications"
-    },
-    {
-      icon: Shield,
-      title: "No Insurance Needed",
-      description: "Simple, transparent pricing for everyone"
-    },
-    {
-      icon: Home,
-      title: "Home Delivery",
-      description: "Your medications delivered to your door"
-    }
+    "Save up to 95% on prescriptions",
+    "No insurance required",
+    "Delivered to your door",
+    "Up to 12-month supply",
   ];
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-2xl max-h-[90vh] overflow-y-auto [&>button]:hidden"
+        className="sm:max-w-md max-h-[90vh] overflow-y-auto [&>button]:hidden p-0"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <div className="flex items-center justify-center gap-4 mb-3">
-            <img src={pillarImage} alt="" className="h-16 md:h-20 object-contain" />
-            <p className="text-center text-2xl md:text-3xl font-black whitespace-nowrap" style={{ color: '#0d4f4f' }}>Pillar Drug Club</p>
-            <img src={pillarImage} alt="" className="h-16 md:h-20 object-contain" />
+        <div className="rounded-t-lg px-6 pt-8 pb-6" style={{ backgroundColor: '#0d4f4f' }}>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
+            <h2 className="text-2xl md:text-3xl font-black text-white whitespace-nowrap">Pillar Drug Club</h2>
+            <img src={pillarImage} alt="" className="h-12 md:h-14 object-contain" />
           </div>
-          <DialogTitle className="text-center text-xl md:text-2xl font-semibold text-muted-foreground">
-            Your Trusted Pharmacy Autopilot
-            <br />
-            <span className="text-primary font-bold">For Low as a Penny per Pill</span>
-          </DialogTitle>
-          <DialogDescription className="text-center text-base">
-            Join our waitlist to unlock access.
-          </DialogDescription>
-        </DialogHeader>
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-center text-lg md:text-xl font-semibold text-white/90">
+              Your Trusted Pharmacy Autopilot
+              <br />
+              <span className="text-teal-300 font-bold">For Low as a Penny per Pill</span>
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm text-white/60">
+              Join our waitlist to unlock access.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6 mt-4">
-          <Card className="border-2 border-primary/20">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Mail className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-bold text-foreground">Sign Up to Continue</h3>
+        <div className="px-6 pb-6 pt-4 space-y-5">
+          <div className="grid grid-cols-2 gap-2">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <div className="rounded-full p-0.5 mt-0.5" style={{ backgroundColor: '#0d4f4f' }}>
+                  <Check className="h-3 w-3 text-white" />
+                </div>
+                <span className="text-sm text-muted-foreground leading-tight">{benefit}</span>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    placeholder="Full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    disabled={signupMutation.isPending}
-                    className="h-12 text-base pl-10"
-                    data-testid="input-name-signup"
-                    required
-                  />
-                </div>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={signupMutation.isPending}
-                    className="h-12 text-base pl-10"
-                    data-testid="input-email-signup"
-                    required
-                  />
-                </div>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="tel"
-                    placeholder="Phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    disabled={signupMutation.isPending}
-                    className="h-12 text-base pl-10"
-                    data-testid="input-phone-signup"
-                    required
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  className="w-full h-12 text-base font-semibold"
-                  disabled={signupMutation.isPending}
-                  data-testid="button-submit-signup"
-                >
-                  {signupMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Signing Up...
-                    </>
-                  ) : (
-                    <>
-                      Sign Up Now
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            {benefits.map((benefit, index) => {
-              const Icon = benefit.icon;
-              return (
-                <div 
-                  key={index} 
-                  className="flex flex-col items-center text-center p-4 rounded-lg bg-muted/30"
-                >
-                  <div className="mb-3 p-3 rounded-full bg-primary/10">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-bold text-foreground mb-1">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground">{benefit.description}</p>
-                </div>
-              );
-            })}
+            ))}
           </div>
+
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={signupMutation.isPending}
+                className="h-11 text-base pl-10"
+                data-testid="input-name-signup"
+                required
+              />
+            </div>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={signupMutation.isPending}
+                className="h-11 text-base pl-10"
+                data-testid="input-email-signup"
+                required
+              />
+            </div>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="tel"
+                placeholder="Phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={signupMutation.isPending}
+                className="h-11 text-base pl-10"
+                data-testid="input-phone-signup"
+                required
+              />
+            </div>
+            <Button 
+              type="submit" 
+              size="lg" 
+              className="w-full h-12 text-base font-bold"
+              disabled={signupMutation.isPending}
+              data-testid="button-submit-signup"
+              style={{ backgroundColor: '#0d4f4f' }}
+            >
+              {signupMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Joining...
+                </>
+              ) : (
+                <>
+                  Join the Waitlist
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              No spam. Unsubscribe anytime.
+            </p>
+          </form>
         </div>
       </DialogContent>
     </Dialog>
