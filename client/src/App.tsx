@@ -27,7 +27,6 @@ import AdminReportsPage from "@/pages/AdminReportsPage";
 import AdminMedicationPricingPage from "@/pages/AdminMedicationPricingPage";
 import AdminReferralsPage from "@/pages/AdminReferralsPage";
 import AdminBlogPage from "@/pages/AdminBlogPage";
-import AdminContentAutomationPage from "@/pages/AdminContentAutomationPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import CartPage from "@/pages/CartPage";
@@ -94,12 +93,6 @@ function Router() {
       </Route>
       <Route path="/admin/blog">
         <ProtectedRoute requiredRole="admin"><AdminBlogPage /></ProtectedRoute>
-      </Route>
-      <Route path="/admin/automation">
-        <ProtectedRoute requiredRole="admin"><AdminContentAutomationPage /></ProtectedRoute>
-      </Route>
-      <Route path="/admin/content-automation">
-        <ProtectedRoute requiredRole="admin"><AdminContentAutomationPage /></ProtectedRoute>
       </Route>
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />

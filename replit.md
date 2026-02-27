@@ -46,14 +46,7 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
   - **Variable Shipping Cost**: User-configurable shipping cost per order
   - **Calculation Formula**: Total = $99 Membership Fee + (Dispensing × Meds × Orders/Year) + (Shipping × Orders/Year)
 - **Admin Dashboard System**: Comprehensive tools for platform oversight including Executive Dashboard, User Management (deactivate, soft delete, suspend, delete, recover), Financial Dashboard, Communication Center, Reports & Analytics, and Medication Pricing Management. Admin users can toggle between Admin Dashboard and User Dashboard via the header menu for seamless role switching.
-- **Hybrid Blog System ("The Pillar Post 🗞️")**: A dual content generation platform combining general healthcare content (TypeScript/GPT-4) with FDA-compliant medical content (Python FastAPI RAG). Features include an admin interface for content generation, AI-powered SEO keyword generator that analyzes blog titles to suggest 8-12 optimized keywords, compliance review workflow, and a GoodRx-style visual redesign with featured image uploads (client-side resizing, compression, base64 storage).
-- **Sora AI Video Generation System** (November 2025): Dual-track video generation infrastructure for YouTube content marketing with immediate production capability and Q1 2026 API readiness. Features include:
-  - **Intelligent Video Prompt Generation**: GPT-4-powered prompt engineering optimized for Sora's cinematic capabilities (camera movements, visual metaphors, emotional storytelling)
-  - **Multi-Source Support**: Schema supports manual uploads, Runway Gen-3, Pika Labs, and future Sora API integration with proper source attribution
-  - **Status Tracking**: Video lifecycle management (awaiting_upload, processing, ready, failed) with operator notes for manual workflow coordination
-  - **Unified Content Preview**: AdminContentPreviewPage component displaying all content formats (blog markdown, X thread, Reddit post, YouTube video) in tabbed interface with react-markdown rendering
-  - **Error Handling**: Graceful failure detection for prompt generation failures with status="failed" and error messaging
-  - **Production-Ready Architecture**: Immediate manual video upload workflow while maintaining API integration points for Sora public launch
+- **Blog System ("The Pillar Post")**: Manual blog management system with admin interface for creating, editing, publishing, and deleting posts. Features include featured image uploads (client-side resizing, compression, base64 storage), SEO metadata fields, category/tag management, and a public-facing blog with GoodRx-style visual design.
 - **HIPAA Security Infrastructure** (November 2025): Comprehensive HIPAA-compliant security controls including:
   - **Audit Logging System**: Tracks ALL PHI access (authorized & unauthorized), authentication events, admin actions. 6-year retention with indexed queries. Device fingerprinting (IP, user agent, browser/OS/device).
   - **Field-Level Encryption**: AES-256-CBC encryption for sensitive PHI (medical info, addresses). PBKDF2-SHA512 password hashing (100k iterations). Mandatory ENCRYPTION_KEY in production (fails fast if missing).
@@ -79,10 +72,3 @@ Emphasizes modularity, scalability, and security for sensitive healthcare data, 
 - **Healthcare Provider Database**: NLM Clinical Tables NPI database API.
 - **Medication Data**: SJC Pharmacy pricing CSV file, openFDA Drug Label API.
 - **Communication Services**: Twilio (SMS), Resend (email).
-- **AI Content Generation**: OpenAI GPT-4, Python FastAPI RAG service.
-- **Automated Content Marketing Engine** (In Development - 10-13 week roadmap): Comprehensive multi-channel content automation system designed to scale to 10K+ members with zero human intervention. Four-phase implementation:
-  - **Phase 1 (Weeks 1-4)**: Multi-format AI content generation (blog + X thread + Reddit post + video script), content queue database, cron-based auto-publishing, 30-day content calendar
-  - **Phase 2 (Weeks 5-7)**: Mailchimp API integration, member email sync, automation triggers (welcome series, savings reports, refill reminders, referral rewards)
-  - **Phase 3 (Weeks 8-10)**: YouTube video pipeline (FFmpeg short-form video generation), X/Twitter auto-posting, Reddit auto-posting, background job queue (BullMQ/Redis), referral → discount automation loop
-  - **Phase 4 (Weeks 11-12)**: Analytics dashboard, performance tracking, scaling optimizations for 10K members
-  - **Documentation**: See `ARCHITECTURE.md` for full system design and `API_CREDENTIALS.md` for required credentials
