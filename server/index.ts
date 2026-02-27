@@ -31,8 +31,8 @@ app.get("/api/ping", (req, res) => {
 // Security Headers - Apply HIPAA-compliant security headers
 app.use(securityHeaders);
 
-// Stripe webhook needs raw body for signature verification
-app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }));
+// Square webhook needs raw body for signature verification
+app.use('/api/webhooks/square', express.raw({ type: 'application/json' }));
 
 // Apply JSON parsing to all other routes
 app.use(express.json());

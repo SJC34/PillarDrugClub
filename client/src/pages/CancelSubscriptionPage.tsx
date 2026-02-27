@@ -1,21 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Pill, ArrowLeft, AlertTriangle, Calendar, DollarSign, CheckCircle2, Loader2 } from "lucide-react";
+import { Pill, ArrowLeft, AlertTriangle, Calendar, CheckCircle2, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
-const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-// Only load Stripe if we have a valid public key (starts with pk_)
-const stripePromise = (STRIPE_PUBLIC_KEY && STRIPE_PUBLIC_KEY.startsWith('pk_')) ? loadStripe(STRIPE_PUBLIC_KEY) : null;
+const SQUARE_APP_ID = import.meta.env.VITE_SQUARE_APP_ID;
+const SQUARE_LOCATION_ID = import.meta.env.VITE_SQUARE_LOCATION_ID;
+const SQUARE_IS_SANDBOX = import.meta.env.VITE_SQUARE_SANDBOX !== 'false';
 
 interface TerminationFeeDetails {
   needsTerminationFee: boolean;
@@ -29,48 +26,73 @@ interface TerminationFeeDetails {
   message?: string;
 }
 
-function PaymentForm({ 
-  clientSecret, 
-  terminationFee, 
-  onSuccess 
-}: { 
-  clientSecret: string; 
+function SquareTerminationPaymentForm({
+  userId,
+  terminationFee,
+  terminationFeeFormatted,
+  onSuccess,
+}: {
+  userId: string;
   terminationFee: number;
-  onSuccess: (paymentIntentId: string) => void;
+  terminationFeeFormatted: string;
+  onSuccess: (paymentId: string) => void;
 }) {
-  const stripe = useStripe();
-  const elements = useElements();
   const { toast } = useToast();
+  const [isSquareReady, setIsSquareReady] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const cardRef = useRef<any>(null);
+
+  useEffect(() => {
+    const scriptSrc = SQUARE_IS_SANDBOX
+      ? 'https://sandbox.web.squarecdn.com/v1/square.js'
+      : 'https://web.squarecdn.com/v1/square.js';
+
+    const existing = document.querySelector(`script[src="${scriptSrc}"]`);
+    if (existing) { initSquare(); return; }
+
+    const script = document.createElement('script');
+    script.src = scriptSrc;
+    script.onload = initSquare;
+    document.head.appendChild(script);
+  }, []);
+
+  const initSquare = async () => {
+    const w = window as any;
+    if (!w.Square) { setTimeout(initSquare, 200); return; }
+    try {
+      const payments = w.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
+      const card = await payments.card();
+      await card.attach('#sq-termination-card-container');
+      cardRef.current = card;
+      setIsSquareReady(true);
+    } catch (err) {
+      console.error('Square card init failed:', err);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!stripe || !elements) return;
-
+    if (!cardRef.current) return;
     setIsProcessing(true);
 
     try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/settings`,
-        },
-        redirect: "if_required",
-      });
-
-      if (error) {
-        toast({
-          title: "Payment Failed",
-          description: error.message || "Failed to process payment",
-          variant: "destructive",
-        });
-      } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        onSuccess(paymentIntent.id);
+      const result = await cardRef.current.tokenize();
+      if (result.status !== 'OK') {
+        throw new Error(result.errors?.[0]?.message || 'Card tokenization failed');
       }
+
+      const response = await apiRequest("POST", "/api/subscription/termination-fee/create-payment-intent", {
+        userId,
+        sourceId: result.token,
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.message || data.error);
+
+      onSuccess(data.paymentId);
     } catch (err: any) {
       toast({
-        title: "Payment Error",
+        title: "Payment Failed",
         description: err.message || "An unexpected error occurred",
         variant: "destructive",
       });
@@ -81,10 +103,20 @@ function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement />
+      <div
+        id="sq-termination-card-container"
+        className="bg-muted/40 p-4 rounded-lg border border-border min-h-[60px]"
+      >
+        {!isSquareReady && (
+          <div className="flex items-center gap-2 text-muted-foreground text-sm py-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading secure payment form...
+          </div>
+        )}
+      </div>
       <Button
         type="submit"
-        disabled={!stripe || isProcessing}
+        disabled={!isSquareReady || isProcessing}
         className="w-full"
         data-testid="button-pay-termination-fee"
       >
@@ -94,9 +126,7 @@ function PaymentForm({
             Processing Payment...
           </>
         ) : (
-          <>
-            Pay ${(terminationFee / 100).toFixed(2)} & Cancel Subscription
-          </>
+          `Pay ${terminationFeeFormatted} & Cancel Subscription`
         )}
       </Button>
     </form>
@@ -108,52 +138,24 @@ export default function CancelSubscriptionPage() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [step, setStep] = useState<"review" | "payment" | "processing" | "success">("review");
-  const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
-  // Fetch termination fee details
   const { data: feeDetails, isLoading: isLoadingFee, error: feeError } = useQuery<TerminationFeeDetails>({
     queryKey: [`/api/subscription/termination-fee/${user?.id}`],
     enabled: !!user?.id && user?.subscriptionStatus === "active",
   });
 
-  // Create payment intent mutation
-  const createPaymentIntentMutation = useMutation({
-    mutationFn: async () => {
-      if (!user?.id) throw new Error("User not authenticated");
-      return apiRequest("POST", "/api/subscription/termination-fee/create-payment-intent", {
-        userId: user.id,
-      });
-    },
-    onSuccess: (data: any) => {
-      setPaymentClientSecret(data.clientSecret);
-      setStep("payment");
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to initiate payment",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Cancel subscription mutation (with termination fee)
   const cancelSubscriptionMutation = useMutation({
-    mutationFn: async () => {
-      if (!user?.id || !paymentIntentId) throw new Error("Missing required data");
+    mutationFn: async (pId: string) => {
+      if (!user?.id) throw new Error("User not authenticated");
       return apiRequest("POST", "/api/subscription/cancel-with-fee", {
         userId: user.id,
-        paymentIntentId: paymentIntentId,
+        paymentId: pId,
       });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setStep("success");
-      toast({
-        title: "Subscription Canceled",
-        description: "Your subscription has been successfully canceled.",
-      });
     },
     onError: (error: any) => {
       toast({
@@ -165,13 +167,10 @@ export default function CancelSubscriptionPage() {
     },
   });
 
-  // Cancel subscription mutation (no fee - commitment fulfilled)
   const cancelNoFeeMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not authenticated");
-      return apiRequest("POST", "/api/subscription/cancel", {
-        userId: user.id,
-      });
+      return apiRequest("POST", "/api/subscription/cancel", { userId: user.id });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -190,23 +189,22 @@ export default function CancelSubscriptionPage() {
     },
   });
 
-  const handlePaymentSuccess = (intentId: string) => {
-    setPaymentIntentId(intentId);
+  const handlePaymentSuccess = (pId: string) => {
+    setPaymentId(pId);
     setStep("processing");
   };
 
-  // Automatically cancel subscription after payment succeeds
   useEffect(() => {
-    if (step === "processing" && paymentIntentId) {
-      cancelSubscriptionMutation.mutate();
+    if (step === "processing" && paymentId) {
+      cancelSubscriptionMutation.mutate(paymentId);
     }
-  }, [step, paymentIntentId]);
+  }, [step, paymentId]);
 
   if (!user || user.subscriptionStatus !== "active") {
     return (
       <div className="min-h-screen px-4 py-6 md:py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="mb-6 md:mb-8">
+          <div className="mb-6">
             <Link href="/settings">
               <Button variant="ghost" className="mb-4" data-testid="button-back">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -216,9 +214,7 @@ export default function CancelSubscriptionPage() {
           </div>
           <Alert>
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              You don't have an active subscription to cancel.
-            </AlertDescription>
+            <AlertDescription>You don't have an active subscription to cancel.</AlertDescription>
           </Alert>
         </div>
       </div>
@@ -227,7 +223,7 @@ export default function CancelSubscriptionPage() {
 
   if (isLoadingFee) {
     return (
-      <div className="min-h-screen px-4 py-6 md:py-8 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -239,16 +235,13 @@ export default function CancelSubscriptionPage() {
         <div className="max-w-3xl mx-auto">
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              Failed to load cancellation details. Please try again later.
-            </AlertDescription>
+            <AlertDescription>Failed to load cancellation details. Please try again later.</AlertDescription>
           </Alert>
         </div>
       </div>
     );
   }
 
-  // Success state
   if (step === "success") {
     return (
       <div className="min-h-screen px-4 py-6 md:py-8">
@@ -270,10 +263,9 @@ export default function CancelSubscriptionPage() {
     );
   }
 
-  // Processing state
   if (step === "processing") {
     return (
-      <div className="min-h-screen px-4 py-6 md:py-8 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
             <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-4" />
@@ -285,12 +277,11 @@ export default function CancelSubscriptionPage() {
     );
   }
 
-  // No termination fee required
   if (!feeDetails.needsTerminationFee) {
     return (
       <div className="min-h-screen px-4 py-6 md:py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="mb-6 md:mb-8">
+          <div className="mb-6">
             <Link href="/settings">
               <Button variant="ghost" className="mb-4" data-testid="button-back">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -299,9 +290,9 @@ export default function CancelSubscriptionPage() {
             </Link>
             <div className="flex items-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-primary" />
-              <span className="text-xl md:text-2xl font-bold text-foreground">pillar drug club</span>
+              <span className="text-xl font-bold text-foreground">Pharmacy Autopilot</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Cancel Subscription</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Cancel Subscription</h1>
           </div>
 
           <Alert className="mb-6">
@@ -319,7 +310,7 @@ export default function CancelSubscriptionPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Status:</span>
-                <span className="font-semibold text-green-600">Eligible for cancellation</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">Eligible for cancellation</span>
               </div>
               <Separator />
               <Alert>
@@ -346,9 +337,7 @@ export default function CancelSubscriptionPage() {
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Canceling...
                     </>
-                  ) : (
-                    "Cancel Subscription"
-                  )}
+                  ) : "Cancel Subscription"}
                 </Button>
               </div>
             </CardContent>
@@ -358,12 +347,11 @@ export default function CancelSubscriptionPage() {
     );
   }
 
-  // Review step - show termination fee details
   if (step === "review") {
     return (
       <div className="min-h-screen px-4 py-6 md:py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="mb-6 md:mb-8">
+          <div className="mb-6">
             <Link href="/settings">
               <Button variant="ghost" className="mb-4" data-testid="button-back">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -372,18 +360,16 @@ export default function CancelSubscriptionPage() {
             </Link>
             <div className="flex items-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-primary" />
-              <span className="text-xl md:text-2xl font-bold text-foreground">pillar drug club</span>
+              <span className="text-xl font-bold text-foreground">Pharmacy Autopilot</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Cancel Subscription</h1>
-            <p className="text-sm md:text-base text-muted-foreground">
-              Cancel your annual membership
-            </p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Cancel Subscription</h1>
+            <p className="text-muted-foreground">Cancel your annual membership</p>
           </div>
 
           <Alert variant="destructive" className="mb-6">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Annual Membership:</strong> Your annual membership is still active. 
+              <strong>Annual Membership:</strong> Your annual membership is still active.
               Annual memberships are non-refundable once activated.
             </AlertDescription>
           </Alert>
@@ -428,18 +414,10 @@ export default function CancelSubscriptionPage() {
                 <Button
                   variant="destructive"
                   className="flex-1"
-                  onClick={() => cancelNoFeeMutation.mutate()}
-                  disabled={cancelNoFeeMutation.isPending}
+                  onClick={() => setStep("payment")}
                   data-testid="button-proceed-payment"
                 >
-                  {cancelNoFeeMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Canceling...
-                    </>
-                  ) : (
-                    "Cancel Membership"
-                  )}
+                  Proceed to Cancel
                 </Button>
               </div>
             </CardContent>
@@ -449,29 +427,21 @@ export default function CancelSubscriptionPage() {
     );
   }
 
-  // Payment step
-  if (step === "payment" && paymentClientSecret && stripePromise) {
+  if (step === "payment") {
     return (
       <div className="min-h-screen px-4 py-6 md:py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="mb-6 md:mb-8">
-            <Button 
-              variant="ghost" 
-              className="mb-4" 
-              onClick={() => setStep("review")}
-              data-testid="button-back-to-review"
-            >
+          <div className="mb-6">
+            <Button variant="ghost" className="mb-4" onClick={() => setStep("review")} data-testid="button-back-to-review">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
             <div className="flex items-center gap-2 mb-4">
               <Pill className="h-8 w-8 text-primary" />
-              <span className="text-xl md:text-2xl font-bold text-foreground">pillar drug club</span>
+              <span className="text-xl font-bold text-foreground">Pharmacy Autopilot</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Process Cancellation</h1>
-            <p className="text-sm md:text-base text-muted-foreground">
-              Complete any outstanding balance to cancel your membership
-            </p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Process Cancellation</h1>
+            <p className="text-muted-foreground">Complete any outstanding balance to cancel your membership</p>
           </div>
 
           <Card>
@@ -482,13 +452,14 @@ export default function CancelSubscriptionPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Elements stripe={stripePromise} options={{ clientSecret: paymentClientSecret }}>
-                <PaymentForm
-                  clientSecret={paymentClientSecret}
-                  terminationFee={feeDetails.terminationFee || 0}
+              {user && feeDetails.terminationFee && (
+                <SquareTerminationPaymentForm
+                  userId={user.id}
+                  terminationFee={feeDetails.terminationFee}
+                  terminationFeeFormatted={feeDetails.terminationFeeFormatted || ''}
                   onSuccess={handlePaymentSuccess}
                 />
-              </Elements>
+              )}
             </CardContent>
           </Card>
         </div>

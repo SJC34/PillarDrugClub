@@ -228,7 +228,7 @@ export default function TermsOfServicePage() {
             <div>
               <h3 className="font-semibold text-lg mb-3">Payment Methods</h3>
               <p className="text-muted-foreground">
-                We accept major credit cards and debit cards processed through Stripe. You must maintain a valid payment method on file at all times during your membership.
+                We accept major credit cards and debit cards processed securely through Square. You must maintain a valid payment method on file at all times during your membership.
               </p>
             </div>
 
@@ -477,7 +477,7 @@ export default function TermsOfServicePage() {
                 <div>
                   <p className="font-semibold">THIRD-PARTY SERVICES</p>
                   <p className="text-muted-foreground">
-                    We partner with third-party providers (HealthWarehouse, Stripe, etc.). We are not responsible for their actions, omissions, or service failures.
+                    We partner with third-party providers (HealthWarehouse, Square, etc.). We are not responsible for their actions, omissions, or service failures.
                   </p>
                 </div>
               </div>

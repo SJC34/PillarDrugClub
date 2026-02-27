@@ -119,7 +119,7 @@ export default function PrivacyPolicyPage() {
                     We may use and disclose your PHI to obtain payment for services, including:
                   </p>
                   <ul className="list-disc list-inside space-y-1 ml-4 text-muted-foreground">
-                    <li>Processing membership subscription payments through Stripe</li>
+                    <li>Processing membership subscription payments through Square</li>
                     <li>Billing for prescription medications dispensed</li>
                     <li>Verifying insurance coverage and benefits</li>
                     <li>Submitting claims to insurance companies or benefit plans</li>

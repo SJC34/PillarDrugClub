@@ -26,6 +26,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>; // For Replit OAuth
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
   updateUserStripeInfo(id: string, stripeCustomerId: string, stripeSubscriptionId: string | null): Promise<User | undefined>;
+  updateUserSquareInfo(id: string, squareCustomerId: string, squareSubscriptionId: string | null, squareCardId?: string | null): Promise<User | undefined>;
   updateSubscriptionStatus(id: string, status: "active" | "canceled" | "past_due" | "incomplete"): Promise<User | undefined>;
   updateUserPrimaryDoctor(id: string, doctor: { doctorId?: string; doctorName: string; doctorNpi?: string; doctorPhone?: string; doctorAddress?: any }): Promise<User | undefined>;
   updateUserAllergies(id: string, allergies: string[]): Promise<User | undefined>;
@@ -516,8 +517,23 @@ export class MemStorage implements IStorage {
       ...user,
       stripeCustomerId,
       stripeSubscriptionId,
-      // Only set status to active if we have a subscription ID
       subscriptionStatus: stripeSubscriptionId ? "incomplete" as const : user.subscriptionStatus,
+      updatedAt: new Date()
+    };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updateUserSquareInfo(id: string, squareCustomerId: string, squareSubscriptionId: string | null, squareCardId?: string | null): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = {
+      ...user,
+      squareCustomerId,
+      squareSubscriptionId,
+      squareCardId: squareCardId ?? user.squareCardId,
+      subscriptionStatus: squareSubscriptionId ? "incomplete" as const : user.subscriptionStatus,
       updatedAt: new Date()
     };
     this.users.set(id, updatedUser);
@@ -2003,6 +2019,22 @@ export class DbStorage extends MemStorage {
         stripeSubscriptionId,
         updatedAt: new Date(),
       })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserSquareInfo(id: string, squareCustomerId: string, squareSubscriptionId: string | null, squareCardId?: string | null): Promise<User | undefined> {
+    const updateData: any = {
+      squareCustomerId,
+      squareSubscriptionId,
+      updatedAt: new Date(),
+    };
+    if (squareCardId !== undefined) {
+      updateData.squareCardId = squareCardId;
+    }
+    const result = await db.update(users)
+      .set(updateData)
       .where(eq(users.id, id))
       .returning();
     return result[0];

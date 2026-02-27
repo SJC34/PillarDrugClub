@@ -1,0 +1,696 @@
+You are working on Pillar Drug Club, a membership-based cash-pay prescription
+pharmacy platform. The application must be migrated from Replit to GitHub → AWS,
+made fully HIPAA-compliant, prepared for LegitScript pharmacy certification, and
+ready for production launch.
+
+Read all source files before making changes. Do not guess at file contents.
+Work through every phase in order. Commit after each phase completes.
+
+---
+
+CONSTRAINTS (read these first — they override everything else)
+
+- Payment processor: Square only. Remove all Stripe code.
+- Database: AWS RDS PostgreSQL (standard pg driver). Remove all Neon code.
+- Hosting: AWS ECS Fargate via GitHub Actions CI/CD.
+- Do NOT use App Runner, Elastic Beanstalk, or Lambda.
+- Do NOT use Stripe, Neon, or any Replit-specific package.
+- All secrets go in AWS Secrets Manager — never in .env files in production.
+- Session timeout: 30 minutes (HIPAA requirement — do not change).
+- HIPAA: every PHI field must be encrypted before writing to the database.
+
+---
+
+PHASE 1 — AUDIT (read before touching anything)
+
+Read and report the full contents of:
+1. package.json
+2. vite.config.ts
+3. server/db.ts
+4. server/routes.ts (lines 1–60 and lines 1150–1260)
+5. server/socialAuth.ts
+6. server/twilio.ts
+7. server/resend.ts
+8. server/replitAuth.ts
+9. server/encryption.ts
+10. server/auditLogger.ts
+11. client/src/pages/RegisterPage.tsx (lines 1–100)
+12. client/src/pages/CancelSubscriptionPage.tsx (lines 1–30)
+13. shared/schema.ts (lines 1–80)
+
+After reading, produce a gap list under these categories:
+- Replit-specific code that will break on AWS
+- Stripe references to replace with Square
+- Neon references to replace with pg
+- Unprotected admin endpoints (no auth check)
+- PHI fields that are stored but not encrypted
+- Missing or incomplete documentation
+
+Do not write any code yet. Wait for confirmation before proceeding.
+
+---
+
+PHASE 2 — REMOVE REPLIT DEPENDENCIES
+
+2a. vite.config.ts
+Remove all @replit/* imports and plugin registrations. Keep only:
+- @vitejs/plugin-react
+- Path aliases (@, @shared, @assets)
+- Root/outDir/server config
+Final file should have no Replit references.
+
+2b. package.json
+Remove from dependencies:
+- @neondatabase/serverless
+- ws (only used by Neon WebSocket transport)
+
+Remove from devDependencies:
+- @replit/vite-plugin-cartographer
+- @replit/vite-plugin-dev-banner
+- @replit/vite-plugin-runtime-error-modal
+- @types/ws (if present)
+
+Remove from dependencies (Stripe → Square swap):
+- stripe
+- @stripe/stripe-js
+- @stripe/react-stripe-js
+
+Add to dependencies:
+- pg: ^8.13.3
+- square: ^42.0.0 (use latest stable)
+
+Add to devDependencies:
+- @types/pg: ^8.11.11
+
+2c. server/db.ts
+Replace the entire file with:
+
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import * as schema from "@shared/schema";
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL must be set.");
+}
+
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+});
+
+export const db = drizzle(pool, { schema });
+
+2d. server/twilio.ts
+Rewrite to remove Replit Connectors API entirely.
+Read credentials directly from TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN,
+TWILIO_PHONE_NUMBER environment variables only.
+Throw a clear error if any are missing.
+
+2e. server/resend.ts
+Rewrite to remove Replit Connectors API entirely.
+Read RESEND_API_KEY and RESEND_FROM_EMAIL from environment variables only.
+Throw a clear error if either is missing.
+
+2f. server/socialAuth.ts
+Find the callback URL construction block that checks process.env.REPLIT_DOMAINS.
+Replace with:
+  const callbackURL = process.env.CUSTOM_DOMAIN
+    ? `https://${process.env.CUSTOM_DOMAIN}`
+    : "http://localhost:5000";
+
+2g. server/routes.ts — auth config endpoint
+Find the /api/auth/config diagnostic endpoint that reads REPLIT_DOMAINS.
+Replace the domain construction with:
+  const domain = process.env.CUSTOM_DOMAIN || "localhost:5000";
+
+2h. server/replitAuth.ts
+Add a top-of-file comment: // DEPRECATED: Replit OIDC auth — not used on AWS. Safe to delete.
+Do not import it anywhere. Do not delete it yet (let the owner confirm).
+
+---
+
+PHASE 3 — REPLACE STRIPE WITH SQUARE
+
+Square uses a two-step flow:
+1. Frontend: Square Web Payments SDK tokenizes the card (never touches your server)
+2. Backend: You charge the token via Square Payments API
+
+3a. server/services/payment-service.ts
+Create or overwrite with a Square payment service:
+
+/**
+ * Payment Service — Square
+ * Docs: https://developer.squareup.com/docs/payments-api/take-payments
+ *
+ * Required env vars:
+ *   SQUARE_ACCESS_TOKEN   — from Square Developer Dashboard
+ *   SQUARE_LOCATION_ID    — from Square Developer Dashboard
+ *   SQUARE_ENVIRONMENT    — "sandbox" | "production"
+ */
+import { Client, Environment } from 'square';
+
+function getClient() {
+  const token = process.env.SQUARE_ACCESS_TOKEN;
+  const env   = process.env.SQUARE_ENVIRONMENT === 'production'
+    ? Environment.Production
+    : Environment.Sandbox;
+  if (!token) throw new Error('SQUARE_ACCESS_TOKEN not configured.');
+  return new Client({ accessToken: token, environment: env });
+}
+
+export function getLocationId(): string {
+  const id = process.env.SQUARE_LOCATION_ID;
+  if (!id) throw new Error('SQUARE_LOCATION_ID not configured.');
+  return id;
+}
+
+export interface ChargeInput {
+  sourceId:      string;   // Tokenized card nonce from Square Web Payments SDK
+  amountCents:   number;
+  currency:      string;   // 'USD'
+  customerId:    string;   // Your internal user ID
+  customerEmail: string;
+  note:          string;
+}
+
+export interface ChargeResult {
+  success:       boolean;
+  paymentId?:    string;
+  receiptUrl?:   string;
+  error?:        string;
+}
+
+export async function chargePayment(input: ChargeInput): Promise<ChargeResult> {
+  try {
+    const { paymentsApi } = getClient();
+    const { result } = await paymentsApi.createPayment({
+      sourceId:         input.sourceId,
+      idempotencyKey:   `${input.customerId}-${Date.now()}`,
+      amountMoney:      { amount: BigInt(input.amountCents), currency: input.currency },
+      locationId:       getLocationId(),
+      note:             input.note,
+      buyerEmailAddress: input.customerEmail,
+    });
+    return {
+      success:    true,
+      paymentId:  result.payment?.id,
+      receiptUrl: result.payment?.receiptUrl ?? undefined,
+    };
+  } catch (err: any) {
+    return { success: false, error: err?.errors?.[0]?.detail || String(err) };
+  }
+}
+
+export async function refundPayment(paymentId: string, amountCents: number, reason: string): Promise<ChargeResult> {
+  try {
+    const { refundsApi } = getClient();
+    const { result } = await refundsApi.refundPayment({
+      paymentId,
+      idempotencyKey: `refund-${paymentId}-${Date.now()}`,
+      amountMoney:    { amount: BigInt(amountCents), currency: 'USD' },
+      reason,
+    });
+    return { success: true, paymentId: result.refund?.id };
+  } catch (err: any) {
+    return { success: false, error: err?.errors?.[0]?.detail || String(err) };
+  }
+}
+
+export function isPaymentConfigured(): boolean {
+  return !!(process.env.SQUARE_ACCESS_TOKEN && process.env.SQUARE_LOCATION_ID);
+}
+
+3b. server/routes.ts — remove Stripe, wire Square
+1. Remove: import Stripe from 'stripe' and the let stripe initialization block.
+2. Add: import { chargePayment, refundPayment, isPaymentConfigured, getLocationId } from './services/payment-service';
+3. Find every route that calls stripe.* and replace with Square equivalents:
+   - stripe.customers.create → customersApi.createCustomer
+   - stripe.subscriptions.create → subscriptionsApi.createSubscription
+   - stripe.subscriptions.cancel → subscriptionsApi.cancelSubscription
+   - stripe.paymentIntents.create → chargePayment()
+4. Remove the /api/stripe/webhook endpoint.
+5. Add Square webhook endpoint at /api/square/webhook:
+
+app.post('/api/square/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const signature = req.headers['x-square-hmacsha256-signature'] as string;
+  const signatureKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY;
+  const notificationUrl = `https://${process.env.CUSTOM_DOMAIN}/api/square/webhook`;
+  const isValid = WebhooksHelper.isValidWebhookEventSignature(
+    req.body.toString(), signature, signatureKey!, notificationUrl
+  );
+  if (!isValid) return res.status(401).json({ error: 'Invalid signature' });
+  const event = JSON.parse(req.body.toString());
+  console.log('Square webhook event:', event.type);
+  res.json({ received: true });
+});
+
+3c. client/src/pages/RegisterPage.tsx
+Remove all @stripe/react-stripe-js and @stripe/stripe-js imports.
+Load Square Web Payments SDK dynamically and replace the card form with:
+
+function SquarePaymentForm({ onTokenize }: { onTokenize: (token: string) => void }) {
+  const cardContainerRef = useRef<HTMLDivElement>(null);
+  const [card, setCard] = useState<any>(null);
+
+  useEffect(() => {
+    const appId      = import.meta.env.VITE_SQUARE_APP_ID;
+    const locationId = import.meta.env.VITE_SQUARE_LOCATION_ID;
+    if (!appId || !locationId || !cardContainerRef.current) return;
+    (async () => {
+      const payments     = (window as any).Square.payments(appId, locationId);
+      const cardInstance = await payments.card();
+      await cardInstance.attach(cardContainerRef.current!);
+      setCard(cardInstance);
+    })();
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!card) return;
+    const result = await card.tokenize();
+    if (result.status === 'OK') onTokenize(result.token);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div ref={cardContainerRef} id="card-container" />
+      <button type="submit">Pay Now</button>
+    </form>
+  );
+}
+
+Add this script to client/index.html (use sandbox URL in dev, production URL for prod):
+<script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+
+3d. client/src/pages/CancelSubscriptionPage.tsx
+Same treatment as 3c — remove Stripe imports, replace payment form with SquarePaymentForm.
+
+3e. shared/schema.ts
+Add // TODO: rename to squareCustomerId / squareSubscriptionId comments on all
+stripeCustomerId and stripeSubscriptionId fields. Do not run db:push yet.
+
+---
+
+PHASE 4 — SECURITY FIXES
+
+4a. Protect unprotected admin endpoints
+In server/routes.ts, find these four endpoints and add to the top of each handler:
+
+if (!req.isAuthenticated()) return res.status(401).json({ error: 'Unauthorized' });
+const _adminUser = req.user as any;
+if (!_adminUser || _adminUser.role !== 'admin') return res.status(403).json({ error: 'Admin access required' });
+
+Endpoints to fix:
+- POST /api/admin/import-medications
+- POST /api/admin/import-prescribers
+- POST /api/admin/import-pharmacies
+- POST /api/admin/seed-users
+
+4b. Expand PHI_ROUTES in server/auditLogger.ts
+Replace the PHI_ROUTES array with:
+
+export const PHI_ROUTES = [
+  '/api/user/profile',
+  '/api/user/medications',
+  '/api/user/prescriptions',
+  '/api/user/refills',
+  '/api/user/address',
+  '/api/admin/users',
+  '/api/prescriptions',
+  '/api/refills',
+  '/api/prescription-requests',
+  '/api/refill-requests',
+  '/api/orders',
+  '/api/shipments',
+  '/api/users',
+  '/api/customers',
+];
+
+4c. Add /health endpoint
+In server/routes.ts near the top, add:
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+---
+
+PHASE 5 — CONTAINERIZATION
+
+5a. Dockerfile (project root) — multi-stage build:
+Stage 1 (builder): node:20-alpine, npm ci, copy source, npm run build
+Stage 2 (runner): node:20-alpine, npm ci --omit=dev, copy dist/ and shared/
+Non-root user (pillar, UID 1001), expose 5000
+HEALTHCHECK: wget -qO- http://localhost:5000/health || exit 1
+CMD: node dist/index.js
+
+5b. medical-rag/Dockerfile — multi-stage build:
+Stage 1 (builder): python:3.11-slim, install build-essential libgomp1, pip install --prefix=/install
+Stage 2 (runner): python:3.11-slim, install libgomp1, copy deps
+Non-root user (raguser, UID 1001), expose 8001
+ENV DATABASE_PATH=/data/medical_blog.db, VECTOR_STORE_PATH=/data/vectors
+CMD: uvicorn app.main:app --host 0.0.0.0 --port 8001 --workers 2
+
+5c. .dockerignore
+Exclude: node_modules, dist, .env, .env.*, !.env.example, .git, .replit,
+replit.nix, .cache, .upm, attached_assets, medical-rag/data, .fda-cache
+
+5d. docker-compose.yml
+Two services for local dev only:
+- backend on port 5000, depends on medical-rag, all env vars from .env
+- medical-rag on port 8001, rag-data named volume mounted to /data
+
+---
+
+PHASE 6 — ENVIRONMENT VARIABLES
+
+6a. Rewrite .env.example with all required variables:
+
+# Server
+NODE_ENV=production
+PORT=5000
+CUSTOM_DOMAIN=pillardrugclub.com
+
+# Database — AWS RDS PostgreSQL
+DATABASE_URL=postgresql://pillar_admin:password@<rds-endpoint>:5432/pillar_db?sslmode=require
+
+# Security
+SESSION_SECRET=<64-char hex: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))">
+ENCRYPTION_KEY=<32-byte hex: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))">
+
+# Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Twilio (SMS) — BAA required
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_PHONE_NUMBER=
+
+# Resend (Email) — Verify BAA before use with PHI
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=noreply@pillardrugclub.com
+
+# OpenAI — NEVER send PHI to OpenAI (no BAA available)
+OPENAI_API_KEY=
+
+# HealthWarehouse (Pharmacy partner) — BAA required
+HEALTHWAREHOUSE_API_KEY=
+HEALTHWAREHOUSE_API_URL=https://api.healthwarehouse.com
+
+# Square (Payment processing)
+SQUARE_ACCESS_TOKEN=
+SQUARE_LOCATION_ID=
+SQUARE_ENVIRONMENT=sandbox
+SQUARE_WEBHOOK_SIGNATURE_KEY=
+VITE_SQUARE_APP_ID=
+VITE_SQUARE_LOCATION_ID=
+
+---
+
+PHASE 7 — HIPAA DOCUMENTATION
+
+Create these files in docs/hipaa/:
+
+7a. docs/hipaa/01-network-architecture.md
+- ASCII diagram: CloudFront → WAF → ALB → ECS private subnet → RDS
+- All security groups with inbound/outbound rules
+- Data flow for a patient prescription submission
+- VPC Flow Logs configuration
+- Public vs private subnet contents
+
+7b. docs/hipaa/02-encryption.md
+- PHI encryption: AES-256-CBC, fields encrypted, key management
+- Password hashing: PBKDF2-HMAC-SHA512, iterations, salt
+- KMS keys: what each protects, rotation schedule
+- RDS: SSE-KMS, rds.force_ssl=1, credential auto-rotation
+- S3: SSE-KMS, public access blocked, HTTPS-only
+- EFS: encrypted at rest (KMS), in transit (TLS NFSv4)
+- Transmission: CloudFront TLS 1.2+, ALB TLS 1.3, internal VPC
+- Sessions: 30-min timeout, rolling cookies, HttpOnly+Secure+SameSite
+
+7c. docs/hipaa/03-audit-logging.md
+- audit_logs and security_events table schemas
+- PHI_ROUTES list and autoAuditMiddleware behavior
+- CloudWatch log groups: names, retention, KMS keys
+- CloudTrail: multi-region, log file validation, S3 retention
+- Log review process (daily/weekly/monthly/annual)
+- CloudWatch Insights example queries
+
+7d. docs/hipaa/04-security-controls.md
+- RBAC: all four roles and what each can access
+- Admin route protection pattern
+- WAF rules: OWASP CRS, SQLi, IP reputation, rate limits
+- Account lockout, input validation (Zod + parameterized queries)
+- ECR image scanning, npm audit process
+- Breach notification timeline
+
+7e. docs/hipaa/05-baa-checklist.md
+- AWS BAA: sign via AWS Artifact, services covered
+- Twilio: HIPAA mode steps
+- Resend: BAA status / SES alternative
+- HealthWarehouse: BAA required
+- OpenAI: NO BAA — no PHI in prompts policy enforced
+- Square: PCI DSS scope, no HIPAA BAA needed
+- Summary table with status per vendor
+
+7f. docs/hipaa/06-incident-response-plan.md
+Full incident response plan:
+- Roles: Incident Commander, Technical Lead, Communications Lead
+- Tiers: Tier 1 (critical), Tier 2 (high), Tier 3 (medium)
+- Detection: GuardDuty, CloudWatch, user reports, audit anomalies
+- Timeline:
+  T+0: Alert received
+  T+1hr: Incident declared, team assembled
+  T+4hr: Scope and technical assessment complete
+  T+24hr: Containment complete
+  T+60 days: HIPAA breach notification to individuals (if required)
+  T+60 days: HHS OCR notification (if required)
+- Evidence preservation steps
+- Patient notification letter template
+- Post-incident review process
+
+7g. docs/hipaa/07-risk-assessment.md
+HIPAA Security Rule risk assessment:
+- Scope: all ePHI systems
+- Asset inventory: RDS, ECS, S3 PHI bucket, CloudWatch, EFS, Neon (decommissioned)
+- Threat/vulnerability pairs with likelihood (H/M/L) and impact (H/M/L)
+- Risk level matrix
+- Existing controls per threat
+- Residual risk and remediation or acceptance
+- Annual reassessment schedule
+
+---
+
+PHASE 8 — WORKFLOW DOCUMENTATION
+
+Create these files in docs/workflows/:
+
+8a. docs/workflows/01-patient-onboarding.md
+Full flow: plan selection → account creation → Square payment → identity verification
+→ prescription submission → pharmacist review → order confirmation → shipment tracking
+
+8b. docs/workflows/02-prescription-verification.md
+- Valid prescription definition (all 9 elements per 21 CFR 1306.05)
+- Receipt methods (upload, fax, electronic)
+- Pharmacist verification steps
+- Rejection process (invalid, expired, controlled substance refusal)
+- Record retention (2 years minimum, state-specific)
+
+8c. docs/workflows/03-refill-management.md
+- Eligibility check (days supply, refill authorization)
+- Auto-refill opt-in/out
+- Patient request → pharmacist approval → HealthWarehouse trigger → notification
+
+8d. docs/workflows/04-payment-processing.md
+- Square Web Payments SDK tokenization (card never touches your servers)
+- Subscription billing cycle
+- Failed payment handling and retry
+- Refund process
+- PCI DSS compliance statement
+
+8e. docs/workflows/05-complaint-and-adverse-event.md
+- Intake channels
+- Severity classification
+- SLAs: Tier 1 = 4hr, Tier 2 = 24hr, Tier 3 = 72hr
+- FDA MedWatch adverse event reporting process
+- Investigation, resolution, recordkeeping
+
+---
+
+PHASE 9 — LEGITSCRIPT PHARMACY CERTIFICATION
+
+9a. docs/legitscript/requirements-checklist.md
+Create a checklist covering:
+
+Licensing:
+- [ ] Valid pharmacy license in every dispensing state
+- [ ] Pharmacist-in-charge license posted on site
+- [ ] NABP verification
+
+Operational:
+- [ ] Physical US address prominently displayed
+- [ ] Licensed pharmacist reachable by phone during business hours
+- [ ] Patient consultation offered with every Rx
+- [ ] FDA-approved drugs only
+- [ ] No dispensing without valid Rx from licensed US prescriber
+- [ ] No online prescription consultations
+- [ ] No Schedule II-V dispensing without DEA-compliant Rx
+- [ ] Drug sourcing from FDA-registered manufacturers/distributors only
+
+Website:
+- [ ] Privacy Policy linked in footer
+- [ ] Terms of Service linked in footer
+- [ ] Refund Policy page live
+- [ ] Contact page with phone, address, pharmacist name
+- [ ] HIPAA Notice of Privacy Practices linked
+- [ ] "Prescription required" on all Rx drug pages
+- [ ] LegitScript seal (after certification)
+- [ ] No deceptive pricing
+
+Technical:
+- [ ] HTTPS everywhere
+- [ ] No PHI in insecure locations
+- [ ] PCI DSS compliant payments
+- [ ] Age verification (if applicable)
+
+9b. client/src/pages/PrivacyPolicyPage.tsx — verify and update
+Read the file. Confirm it covers:
+- PHI collected (name, DOB, address, medications, prescriptions)
+- Why collected (pharmacy services)
+- Who it's shared with (HealthWarehouse with BAA, Twilio with BAA)
+- Patient rights under HIPAA (access, amendment, accounting, restriction)
+- How to file a complaint (HHS OCR link)
+- Effective date and contact info
+Add anything missing.
+
+9c. client/src/pages/TermsOfServicePage.tsx — verify and update
+Read the file. Confirm it covers:
+- Cash-pay membership pharmacy description
+- "You must have a valid prescription from a licensed US prescriber"
+- US residents only
+- Square subscription, auto-renewal, cancellation terms
+- No resale or prescription sharing
+- Limitation of liability
+- Governing law
+Add anything missing.
+
+9d. Create client/src/pages/NoticeOfPrivacyPracticesPage.tsx
+HIPAA requires this as a separate document from the Privacy Policy. Include:
+- Header: "Notice of Privacy Practices — Pillar Drug Club Pharmacy"
+- Effective date
+- Your Rights: access, amendment, restriction, accounting, portability, complaint
+- Our Duties: what HIPAA requires of us
+- Permitted Uses: treatment, payment, healthcare operations, required by law
+- Authorization Required: marketing, selling PHI
+- Complaint contact: HHS OCR 1-800-368-1019 or www.hhs.gov/ocr/privacy/hipaa/complaints
+- Privacy Officer: name, address, phone
+Add route to App.tsx at /notice-of-privacy-practices.
+Link from footer.
+
+9e. Create client/src/pages/PharmacyLicensePage.tsx
+Page at /pharmacy-license with:
+- Pharmacy name and DBA
+- License number and state
+- Pharmacist-in-charge name and license number
+- Physical address
+- Phone and hours
+- NABP number
+Add route to App.tsx. Link from footer.
+
+9f. Create client/src/pages/ComplaintPage.tsx
+Page at /complaints with:
+- Intro statement about complaint commitment
+- Contact form: name, email, phone, description, type (service/medication/privacy/billing)
+- POST /api/complaints endpoint (create this)
+- "We will respond within 2 business days"
+- Escalation: HIPAA complaints → HHS OCR
+Add route to App.tsx. Link from footer.
+
+---
+
+PHASE 10 — LAUNCH READINESS
+
+10a. Final .env.example pass
+Confirm all variables are present: all Square vars, CUSTOM_DOMAIN,
+ENCRYPTION_KEY, SESSION_SECRET, Twilio, Resend, OpenAI, HealthWarehouse.
+
+10b. docs/launch-runbook.md
+Pre-launch checklist:
+- [ ] AWS BAA signed via AWS Artifact
+- [ ] Twilio HIPAA mode enabled
+- [ ] HealthWarehouse BAA signed
+- [ ] RDS provisioned, DATABASE_URL in Secrets Manager
+- [ ] ENCRYPTION_KEY in Secrets Manager (set once, never changes)
+- [ ] SESSION_SECRET in Secrets Manager
+- [ ] Square production credentials and webhook configured
+- [ ] Google OAuth redirect URIs updated to production domain
+- [ ] ACM SSL certificate issued and validated
+- [ ] CloudFront deployed with custom domain
+- [ ] ECS tasks running, health checks green (both services)
+- [ ] CloudTrail enabled with log file validation
+- [ ] GuardDuty enabled
+- [ ] WAF on CloudFront and ALB
+- [ ] SNS alert email subscription confirmed
+- [ ] LegitScript application submitted or approved
+- [ ] Privacy Policy, Terms, NPP, Pharmacy License, Complaint pages live
+- [ ] All five pages linked in footer
+- [ ] robots.txt does not block compliance pages
+- [ ] Production medication data seeded
+- [ ] Admin account created with strong password and MFA
+- [ ] End-to-end test transaction completed in production
+
+DNS cutover steps:
+1. Confirm CloudFront all origins return 200
+2. Update CNAME/ALIAS to CloudFront domain
+3. Verify SSL is valid
+4. Test login, prescription submit, payment
+5. Monitor CloudWatch error rates for 30 minutes
+
+Post-launch monitoring:
+- CloudWatch dashboard daily for first 2 weeks
+- GuardDuty findings weekly
+- Confirm SNS alerts are working
+
+10c. README.md — rewrite
+- Project description
+- Tech stack: React 18, Node.js/Express, Python FastAPI, PostgreSQL/RDS, Square
+- Local dev: docker-compose up
+- Env vars: link to .env.example
+- Deployment: GitHub Actions → ECS
+- HIPAA compliance status
+- LegitScript certification status
+
+---
+
+COMMIT STRATEGY
+
+After each phase completes:
+  git add -A
+  git commit -m "phase X: <description>"
+
+Push to main on GitHub only after all phases are complete and verified.
+
+---
+
+VERIFICATION CHECKLIST
+
+- [ ] npm run check passes (no TypeScript errors)
+- [ ] docker build -t pillar-test . succeeds from project root
+- [ ] docker build -t pillar-rag-test . succeeds from medical-rag/
+- [ ] No @replit/ imports anywhere in the codebase
+- [ ] No stripe imports in backend
+- [ ] No @stripe/ imports in frontend
+- [ ] No neon imports anywhere
+- [ ] REPLIT_DOMAINS does not appear in any source file
+- [ ] All 4 admin import endpoints have auth checks
+- [ ] /health returns 200
+- [ ] Privacy Policy, Terms, NPP, Pharmacy License, Complaint pages exist and are routed
+- [ ] All HIPAA docs in docs/hipaa/
+- [ ] All workflow docs in docs/workflows/
+- [ ] LegitScript checklist in docs/legitscript/
+- [ ] Launch runbook in docs/
+- [ ] .env.example documents every required variable

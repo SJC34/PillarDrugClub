@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import { apiRequest } from "@/lib/queryClient";
 import { DoctorSearch } from "@/components/DoctorSearch";
 import { MedicationSearch } from "@/components/MedicationSearch";
@@ -57,63 +55,109 @@ const step3RxPreferenceSchema = z.object({
 type Step2DetailsForm = z.infer<typeof step2DetailsSchema>;
 type Step3RxPreferenceForm = z.infer<typeof step3RxPreferenceSchema>;
 
-// Load Stripe
-const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
-// Only load Stripe if we have a valid public key (starts with pk_)
-const stripePromise = (STRIPE_PUBLIC_KEY && STRIPE_PUBLIC_KEY.startsWith('pk_')) ? loadStripe(STRIPE_PUBLIC_KEY) : null;
+const SQUARE_APP_ID = import.meta.env.VITE_SQUARE_APP_ID;
+const SQUARE_LOCATION_ID = import.meta.env.VITE_SQUARE_LOCATION_ID;
+const SQUARE_IS_SANDBOX = import.meta.env.VITE_SQUARE_SANDBOX !== 'false';
 
-// Payment form component
-const PaymentForm = ({ clientSecret, onSuccess }: { clientSecret: string; onSuccess: () => void }) => {
-  const stripe = useStripe();
-  const elements = useElements();
+// Square Web Payments SDK card form component
+const SquarePaymentForm = ({ userId, onSuccess }: { userId: string; onSuccess: () => void }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSquareReady, setIsSquareReady] = useState(false);
+  const cardRef = useRef<any>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    const scriptSrc = SQUARE_IS_SANDBOX
+      ? 'https://sandbox.web.squarecdn.com/v1/square.js'
+      : 'https://web.squarecdn.com/v1/square.js';
 
-    if (!stripe || !elements) {
+    const existingScript = document.querySelector(`script[src="${scriptSrc}"]`);
+    if (existingScript) {
+      initSquare();
       return;
     }
 
+    const script = document.createElement('script');
+    script.src = scriptSrc;
+    script.onload = initSquare;
+    script.onerror = () => console.error('Failed to load Square Web Payments SDK');
+    document.head.appendChild(script);
+  }, []);
+
+  const initSquare = async () => {
+    const w = window as any;
+    if (!w.Square) {
+      setTimeout(initSquare, 200);
+      return;
+    }
+    try {
+      const payments = w.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
+      const card = await payments.card();
+      await card.attach('#square-card-container');
+      cardRef.current = card;
+      setIsSquareReady(true);
+    } catch (err) {
+      console.error('Square card initialization failed:', err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cardRef.current) return;
     setIsLoading(true);
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: window.location.origin + "/dashboard",
-      },
-      redirect: "if_required",
-    });
+    try {
+      const result = await cardRef.current.tokenize();
+      if (result.status !== 'OK') {
+        throw new Error(result.errors?.[0]?.message || 'Card tokenization failed');
+      }
 
-    if (error) {
-      toast({
-        title: "Payment Failed",
-        description: error.message,
-        variant: "destructive",
+      const response = await apiRequest("POST", "/api/create-subscription", {
+        userId,
+        sourceId: result.token,
       });
-      setIsLoading(false);
-    } else {
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.message || data.error);
+
       toast({
         title: "Registration Complete!",
         description: "Welcome to Pharmacy Autopilot! You now have access to wholesale pricing.",
       });
       onSuccess();
+    } catch (err: any) {
+      toast({
+        title: "Payment Failed",
+        description: err.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <PaymentElement />
+      <div className="bg-muted/40 p-4 rounded-lg border border-border min-h-[60px]" id="square-card-container">
+        {!isSquareReady && (
+          <div className="flex items-center gap-2 text-muted-foreground text-sm py-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading secure payment form...
+          </div>
+        )}
       </div>
-      <Button 
-        type="submit" 
-        className="w-full" 
-        disabled={!stripe || isLoading}
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={!isSquareReady || isLoading}
         data-testid="button-complete-subscription"
       >
-        {isLoading ? "Processing Payment..." : "Complete Registration"}
+        {isLoading ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Processing Payment...
+          </>
+        ) : "Complete Registration — $99/year"}
       </Button>
     </form>
   );
@@ -125,7 +169,7 @@ export default function RegisterPage() {
   const [authMethod, setAuthMethod] = useState<"social" | "email">("social");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [clientSecret, setClientSecret] = useState('');
+  const [isPaymentStep, setIsPaymentStep] = useState(false);
   const [registeredUser, setRegisteredUser] = useState<any>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(null);
@@ -417,29 +461,19 @@ export default function RegisterPage() {
         }
       }
 
-      // Check if Stripe is configured for paid tiers
-      if (!STRIPE_PUBLIC_KEY) {
+      // Check if Square is configured for paid tiers
+      if (!SQUARE_APP_ID) {
         toast({
           title: "Payment Not Available",
-          description: "Stripe is not configured. Please contact support.",
+          description: "Square payment is not configured. Please contact support.",
           variant: "destructive",
         });
         return;
       }
 
-      // Move to payment step for Gold/Platinum tiers
-      const subscriptionResponse = await apiRequest("POST", "/api/create-subscription", { 
-        userId: registeredUser.id,
-        plan: 'plus'
-      });
-      const subscriptionData = await subscriptionResponse.json();
-
-      if (subscriptionData.clientSecret) {
-        setClientSecret(subscriptionData.clientSecret);
-        setCurrentStep(4);
-      } else {
-        throw new Error("Payment setup failed. Please try again or contact support.");
-      }
+      // Move to payment step
+      setIsPaymentStep(true);
+      setCurrentStep(4);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -1062,7 +1096,7 @@ export default function RegisterPage() {
   }
 
   // Step 4: Payment
-  if (currentStep === 4 && clientSecret) {
+  if (currentStep === 4 && isPaymentStep) {
     return (
       <>
         <SEOHead
@@ -1116,7 +1150,7 @@ export default function RegisterPage() {
                   Payment Information
                 </CardTitle>
                 <CardDescription className="text-sm md:text-base">
-                  Secure payment powered by Stripe
+                  Secure payment powered by Square
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1135,12 +1169,10 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <Elements stripe={stripePromise} options={{ clientSecret }}>
-                  <PaymentForm clientSecret={clientSecret} onSuccess={onPaymentSuccess} />
-                </Elements>
+                <SquarePaymentForm userId={registeredUser?.id} onSuccess={onPaymentSuccess} />
 
                 <div className="mt-4 text-center text-xs md:text-sm text-muted-foreground">
-                  Your payment information is secure and encrypted.
+                  Your payment information is encrypted and secured by Square.
                 </div>
               </CardContent>
             </Card>

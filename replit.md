@@ -1,7 +1,7 @@
 # Pharmacy Autopilot - Wholesale Prescription Pharmacy Platform
 
 ## Overview
-Pharmacy Autopilot (formerly Pillar Drug Club) is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers — tablets as low as $0.01 per tablet. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers a single membership at $99/year, supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Stripe-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
+Pharmacy Autopilot (formerly Pillar Drug Club) is a membership-based prescription pharmacy platform delivering affordable medications at wholesale prices directly to consumers — tablets as low as $0.01 per tablet. This full-stack web application (React/TypeScript frontend, Node.js/Express backend) bypasses insurance complexities to provide transparent, cost-effective medication access. It offers a single membership at $99/year, supporting various user types including clients, brokers, companies, and administrators. Key features include medication search, cost calculation, prescription management, and Square-integrated payment processing. The platform aims to make essential medications affordable and easily accessible, addressing a significant market opportunity in direct-to-consumer healthcare.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -23,8 +23,8 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
   - **Meta Tag Optimization**: High-intent keywords on HomePage, MedicationsPage, BlogPage, and all 4 RegisterPage steps. SSR-safe `getBaseUrl()` helper for environment-aware canonical URLs
   - **Target Keywords**: "cheap prescriptions without insurance", "prescription drug club membership", "wholesale medication prices", "diabetes meds without insurance"
   - **Technical Implementation**: SEOHead component with unique counter-based script IDs (prevents schema collisions), SSR-compatible URL helpers, metadata persistence across multi-step flows
-- **Multi-Step Registration**: A 4-step onboarding process covering social authentication, user details, prescription preferences, and Stripe membership payment ($99/year single plan).
-- **Payment Processing**: Integrated Stripe for subscription-based membership ($99/year annual billing).
+- **Multi-Step Registration**: A 4-step onboarding process covering social authentication, user details, prescription preferences, and Square payment for membership ($99/year single plan).
+- **Payment Processing**: Integrated Square for subscription-based membership ($99/year annual billing). Square Web Payments SDK handles card tokenization on the frontend; backend uses Square SDK v44 (`SquareClient`) for customer creation, subscription management, and payment processing. Square replaces Stripe entirely across all payment flows (subscription, termination fee, cancellation).
 - **PDF Prescription System**: Generates branded PDF prescription request forms with SureScripts pharmacy lookup information, distributed via email and SMS using PDFKit, Resend, and Twilio.
 - **Account Settings & Member Dashboard**: Users can manage personal information and view a comprehensive dashboard with medication displays, PCP management, drug allergies, and subscription details.
 - **Medication Ordering Workflow**: Streamlined process for requesting prescriptions with tier-based supply length enforcement.
@@ -68,8 +68,8 @@ The frontend uses React 18 with TypeScript and Vite, built with Shadcn/ui and Ta
 Emphasizes modularity, scalability, and security for sensitive healthcare data, utilizing serverless PostgreSQL and asynchronous communication. All HIPAA security controls implemented following § 164.312 Technical Safeguards and § 164.308 Administrative Safeguards requirements.
 
 ## External Dependencies
-- **Database Service**: Neon Database (serverless PostgreSQL).
-- **Payment Gateway**: Stripe.
+- **Database Service**: Neon Database (serverless PostgreSQL) — currently. Migration to AWS RDS PostgreSQL in progress (codebase already uses standard `pg` driver for compatibility).
+- **Payment Gateway**: Square (SDK v44). Replaced Stripe entirely. Uses Square Web Payments SDK for frontend card tokenization, SquareClient for backend API calls (subscriptions, customers, payments).
 - **UI Components**: shadcn/ui (built on Radix UI).
 - **Styling Framework**: Tailwind CSS.
 - **Form Management**: React Hook Form, Zod.

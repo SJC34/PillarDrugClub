@@ -28,6 +28,9 @@ export const users = pgTable("users", {
   smsConsent: text("sms_consent").default("false"),
   role: text("role", { enum: ["admin", "client", "broker", "company"] }).default("client"),
   subscriptionTier: text("subscription_tier", { enum: ["free", "gold", "platinum"] }).default("free"),
+  squareCustomerId: text("square_customer_id"),
+  squareSubscriptionId: text("square_subscription_id"),
+  squareCardId: text("square_card_id"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionStatus: text("subscription_status", { enum: ["active", "canceled", "past_due", "incomplete"] }).default("incomplete"),
@@ -59,7 +62,7 @@ export const users = pgTable("users", {
   privacyPolicyAcceptedAt: timestamp("privacy_policy_accepted_at"),
   hipaaConsentAt: timestamp("hipaa_consent_at"),
   preferredContentTemplate: text("preferred_content_template"), // User's default content template preset
-  subscriptionTierSource: text("subscription_tier_source", { enum: ["stripe", "admin_override"] }).default("stripe"),
+  subscriptionTierSource: text("subscription_tier_source", { enum: ["stripe", "square", "admin_override"] }).default("square"),
   roleLastChangedBy: text("role_last_changed_by"), // Admin user ID who last changed the role
   roleLastChangedAt: timestamp("role_last_changed_at"),
   tierLastChangedBy: text("tier_last_changed_by"), // Admin user ID who last changed the tier
@@ -378,6 +381,7 @@ export const referralCredits = pgTable("referral_credits", {
   creditType: text("credit_type", { enum: ["referrer_bonus", "referee_bonus"] }).notNull(),
   monthsFree: integer("months_free").notNull().default(1),
   status: text("status", { enum: ["pending", "applied", "redeemed", "expired"] }).default("pending"),
+  squareDiscountId: text("square_discount_id"),
   stripeCouponId: text("stripe_coupon_id"),
   appliedAt: timestamp("applied_at"),
   redeemedAt: timestamp("redeemed_at"),

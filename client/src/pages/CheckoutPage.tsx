@@ -309,8 +309,8 @@ export default function CheckoutPage() {
             <CardContent>
               <div className="p-4 bg-muted rounded-md">
                 <p className="text-sm text-muted-foreground">
-                  Payment processing will be handled through Stripe integration.
-                  This is a placeholder for the payment integration point.
+                  Payment processing is handled securely through Square.
+                  Complete your membership registration to proceed.
                 </p>
               </div>
             </CardContent>
