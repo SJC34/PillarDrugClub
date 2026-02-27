@@ -115,16 +115,7 @@
 
 ---
 
-## 11. Domain & DNS
-- [ ] Point `pharmacyautopilot.com` to the ALB via Route 53 or your DNS provider
-- [ ] Confirm HTTPS works end-to-end with a valid certificate
-- [ ] Set up DNSSEC if possible
-- [ ] Update Google OAuth callback URLs to use `pharmacyautopilot.com`
-- [ ] Update any hardcoded `REPLIT_DOMAINS` references in the app to your domain
-
----
-
-## 12. Application-Level HIPAA Checks (Pre-Launch)
+## 11. Application-Level HIPAA Checks (Pre-Launch)
 - [ ] Set `NODE_ENV=production` in the deployment environment
 - [ ] Set `ENCRYPTION_KEY` — app will refuse to start without it
 - [ ] Confirm session timeout is 30 minutes (already coded)
@@ -135,7 +126,7 @@
 
 ---
 
-## 13. Team & Workforce (Administrative Safeguards)
+## 12. Team & Workforce (Administrative Safeguards)
 - [ ] Document who has access to production systems and what level
 - [ ] Complete HIPAA training for all team members with PHI access
 - [ ] Create a written Incident Response Plan (what to do if there's a breach)
@@ -144,7 +135,7 @@
 
 ---
 
-## 14. LegitScript (Pharmacy Certification)
+## 13. LegitScript (Pharmacy Certification)
 - [ ] Submit LegitScript pharmacy certification application
 - [ ] Provide pharmacy license documentation
 - [ ] Provide pharmacist credentials (Seth Collins, Pharm.D.)
@@ -161,6 +152,5 @@
 4. Store all secrets in Secrets Manager
 5. Deploy app behind HTTPS ALB
 6. Enable CloudTrail + CloudWatch logging with 6-year retention
-7. Point domain to production, update OAuth callbacks
-8. Run end-to-end smoke test
-9. Start LegitScript application process
+7. Run end-to-end smoke test
+8. Start LegitScript application process
