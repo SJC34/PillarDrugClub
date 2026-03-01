@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-const SQUARE_APP_ID = import.meta.env.VITE_SQUARE_APP_ID;
-const SQUARE_LOCATION_ID = import.meta.env.VITE_SQUARE_LOCATION_ID;
-const SQUARE_IS_SANDBOX = import.meta.env.VITE_SQUARE_SANDBOX !== 'false';
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '');
 
 interface TerminationFeeDetails {
   needsTerminationFee: boolean;
@@ -26,70 +26,34 @@ interface TerminationFeeDetails {
   message?: string;
 }
 
-function SquareTerminationPaymentForm({
-  userId,
-  terminationFee,
+function StripeTerminationInner({
   terminationFeeFormatted,
   onSuccess,
 }: {
-  userId: string;
-  terminationFee: number;
   terminationFeeFormatted: string;
-  onSuccess: (paymentId: string) => void;
+  onSuccess: (paymentIntentId: string) => void;
 }) {
+  const stripe = useStripe();
+  const elements = useElements();
   const { toast } = useToast();
-  const [isSquareReady, setIsSquareReady] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const cardRef = useRef<any>(null);
-
-  useEffect(() => {
-    const scriptSrc = SQUARE_IS_SANDBOX
-      ? 'https://sandbox.web.squarecdn.com/v1/square.js'
-      : 'https://web.squarecdn.com/v1/square.js';
-
-    const existing = document.querySelector(`script[src="${scriptSrc}"]`);
-    if (existing) { initSquare(); return; }
-
-    const script = document.createElement('script');
-    script.src = scriptSrc;
-    script.onload = initSquare;
-    document.head.appendChild(script);
-  }, []);
-
-  const initSquare = async () => {
-    const w = window as any;
-    if (!w.Square) { setTimeout(initSquare, 200); return; }
-    try {
-      const payments = w.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
-      const card = await payments.card();
-      await card.attach('#sq-termination-card-container');
-      cardRef.current = card;
-      setIsSquareReady(true);
-    } catch (err) {
-      console.error('Square card init failed:', err);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!cardRef.current) return;
+    if (!stripe || !elements) return;
     setIsProcessing(true);
 
     try {
-      const result = await cardRef.current.tokenize();
-      if (result.status !== 'OK') {
-        throw new Error(result.errors?.[0]?.message || 'Card tokenization failed');
-      }
-
-      const response = await apiRequest("POST", "/api/subscription/termination-fee/create-payment-intent", {
-        userId,
-        sourceId: result.token,
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: `${window.location.origin}/settings` },
+        redirect: 'if_required',
       });
-      const data = await response.json();
 
-      if (data.error) throw new Error(data.message || data.error);
+      if (error) throw new Error(error.message);
+      if (!paymentIntent) throw new Error("Payment confirmation failed");
 
-      onSuccess(data.paymentId);
+      onSuccess(paymentIntent.id);
     } catch (err: any) {
       toast({
         title: "Payment Failed",
@@ -103,20 +67,10 @@ function SquareTerminationPaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div
-        id="sq-termination-card-container"
-        className="bg-muted/40 p-4 rounded-lg border border-border min-h-[60px]"
-      >
-        {!isSquareReady && (
-          <div className="flex items-center gap-2 text-muted-foreground text-sm py-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading secure payment form...
-          </div>
-        )}
-      </div>
+      <PaymentElement />
       <Button
         type="submit"
-        disabled={!isSquareReady || isProcessing}
+        disabled={!stripe || !elements || isProcessing}
         className="w-full"
         data-testid="button-pay-termination-fee"
       >
@@ -130,6 +84,68 @@ function SquareTerminationPaymentForm({
         )}
       </Button>
     </form>
+  );
+}
+
+function StripeTerminationPaymentForm({
+  userId,
+  terminationFee,
+  terminationFeeFormatted,
+  onSuccess,
+}: {
+  userId: string;
+  terminationFee: number;
+  terminationFeeFormatted: string;
+  onSuccess: (paymentIntentId: string) => void;
+}) {
+  const { toast } = useToast();
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [initError, setInitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const createPaymentIntent = async () => {
+      try {
+        const response = await apiRequest(
+          "POST",
+          "/api/subscription/termination-fee/create-payment-intent",
+          { userId }
+        );
+        const data = await response.json();
+        if (data.error) throw new Error(data.message || data.error);
+        setClientSecret(data.clientSecret);
+      } catch (err: any) {
+        const msg = err.message || "Failed to initialize payment";
+        setInitError(msg);
+        toast({ title: "Payment Setup Failed", description: msg, variant: "destructive" });
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    createPaymentIntent();
+  }, [userId]);
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center gap-2 text-muted-foreground text-sm py-4">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Setting up secure payment...
+      </div>
+    );
+  }
+
+  if (initError || !clientSecret) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{initError || "Failed to initialize payment. Please try again."}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <Elements stripe={stripePromise} options={{ clientSecret }}>
+      <StripeTerminationInner terminationFeeFormatted={terminationFeeFormatted} onSuccess={onSuccess} />
+    </Elements>
   );
 }
 
@@ -150,7 +166,7 @@ export default function CancelSubscriptionPage() {
       if (!user?.id) throw new Error("User not authenticated");
       return apiRequest("POST", "/api/subscription/cancel-with-fee", {
         userId: user.id,
-        paymentId: pId,
+        paymentIntentId: pId,
       });
     },
     onSuccess: async () => {

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,64 +7,38 @@ import { Pill, Check, CreditCard, AlertCircle, Loader2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-const SQUARE_APP_ID = import.meta.env.VITE_SQUARE_APP_ID;
-const SQUARE_LOCATION_ID = import.meta.env.VITE_SQUARE_LOCATION_ID;
-const SQUARE_IS_SANDBOX = import.meta.env.VITE_SQUARE_SANDBOX !== 'false';
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '');
 
-const SquareSubscribeForm = ({ userId }: { userId: string }) => {
-  const [, setLocation] = useLocation();
+const StripeSubscribeInner = ({ subscriptionId, userId }: { subscriptionId: string; userId: string }) => {
+  const stripe = useStripe();
+  const elements = useElements();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
-  const [isSquareReady, setIsSquareReady] = useState(false);
-  const cardRef = useRef<any>(null);
-
-  useEffect(() => {
-    const scriptSrc = SQUARE_IS_SANDBOX
-      ? 'https://sandbox.web.squarecdn.com/v1/square.js'
-      : 'https://web.squarecdn.com/v1/square.js';
-
-    const existing = document.querySelector(`script[src="${scriptSrc}"]`);
-    if (existing) { initSquare(); return; }
-
-    const script = document.createElement('script');
-    script.src = scriptSrc;
-    script.onload = initSquare;
-    document.head.appendChild(script);
-  }, []);
-
-  const initSquare = async () => {
-    const w = window as any;
-    if (!w.Square) { setTimeout(initSquare, 200); return; }
-    try {
-      const payments = w.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
-      const card = await payments.card();
-      await card.attach('#sq-card-container');
-      cardRef.current = card;
-      setIsSquareReady(true);
-    } catch (err) {
-      console.error('Square card init failed:', err);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!cardRef.current) return;
+    if (!stripe || !elements) return;
     setIsLoading(true);
 
     try {
-      const result = await cardRef.current.tokenize();
-      if (result.status !== 'OK') {
-        throw new Error(result.errors?.[0]?.message || 'Card tokenization failed');
-      }
-
-      const response = await apiRequest("POST", "/api/create-subscription", {
-        userId,
-        sourceId: result.token,
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: `${window.location.origin}/dashboard` },
+        redirect: 'if_required',
       });
-      const data = await response.json();
 
-      if (data.error) throw new Error(data.message || data.error);
+      if (error) throw new Error(error.message);
+
+      const activateResp = await apiRequest("POST", "/api/subscription/activate", {
+        userId,
+        subscriptionId,
+      });
+      const activateData = await activateResp.json();
+      if (activateData.error) throw new Error(activateData.message || activateData.error);
 
       toast({
         title: "Subscription Successful",
@@ -84,17 +58,7 @@ const SquareSubscribeForm = ({ userId }: { userId: string }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div
-        id="sq-card-container"
-        className="bg-muted/40 p-4 rounded-lg border border-border min-h-[60px]"
-      >
-        {!isSquareReady && (
-          <div className="flex items-center gap-2 text-muted-foreground text-sm py-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading secure payment form...
-          </div>
-        )}
-      </div>
+      <PaymentElement />
 
       <Alert>
         <AlertCircle className="h-4 w-4" />
@@ -110,7 +74,7 @@ const SquareSubscribeForm = ({ userId }: { userId: string }) => {
         type="submit"
         className="w-full"
         size="lg"
-        disabled={!isSquareReady || isLoading}
+        disabled={!stripe || !elements || isLoading}
         data-testid="button-subscribe"
       >
         {isLoading ? (
@@ -121,6 +85,56 @@ const SquareSubscribeForm = ({ userId }: { userId: string }) => {
         ) : "Subscribe — $99/year"}
       </Button>
     </form>
+  );
+};
+
+const StripeSubscribeForm = ({ userId }: { userId: string }) => {
+  const { toast } = useToast();
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [initError, setInitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const createSubscription = async () => {
+      try {
+        const response = await apiRequest("POST", "/api/create-subscription", { userId });
+        const data = await response.json();
+        if (data.error) throw new Error(data.message || data.error);
+        setClientSecret(data.clientSecret);
+        setSubscriptionId(data.subscriptionId);
+      } catch (err: any) {
+        const msg = err.message || "Failed to initialize payment";
+        setInitError(msg);
+        toast({ title: "Payment Setup Failed", description: msg, variant: "destructive" });
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    createSubscription();
+  }, [userId]);
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center gap-2 text-muted-foreground text-sm py-4">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Setting up secure payment...
+      </div>
+    );
+  }
+
+  if (initError || !clientSecret) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{initError || "Failed to initialize payment. Please try again."}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <Elements stripe={stripePromise} options={{ clientSecret }}>
+      <StripeSubscribeInner subscriptionId={subscriptionId!} userId={userId} />
+    </Elements>
   );
 };
 
@@ -162,7 +176,7 @@ export default function SubscriptionPage() {
     );
   }
 
-  if (!SQUARE_APP_ID) {
+  if (!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <Card className="w-full max-w-md">
@@ -252,7 +266,7 @@ export default function SubscriptionPage() {
           <Card>
             <CardHeader>
               <CardTitle>Payment Information</CardTitle>
-              <CardDescription>Secure payment powered by Square</CardDescription>
+              <CardDescription>Secure payment powered by Stripe</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
@@ -263,10 +277,10 @@ export default function SubscriptionPage() {
                 </div>
               </div>
 
-              {user && <SquareSubscribeForm userId={user.id} />}
+              {user && <StripeSubscribeForm userId={user.id} />}
 
               <div className="mt-4 text-center text-xs text-muted-foreground">
-                Your payment information is encrypted and secured by Square.
+                Your payment information is encrypted and secured by Stripe.
               </div>
             </CardContent>
           </Card>

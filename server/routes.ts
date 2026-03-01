@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { squareClient } from "./square";
+import { stripeClient } from "./stripe";
 import { z } from "zod";
 import { storage } from "./storage";
 import { insertUserSchema, insertEmailSignupSchema } from "@shared/schema";
@@ -473,13 +473,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  // Stripe subscription route - single $99/year membership
+  // Create Stripe subscription - single $99/year membership
+  // Returns clientSecret for frontend to confirm payment
   app.post("/api/create-subscription", async (req, res) => {
     try {
-      const { userId, sourceId } = req.body;
+      const { userId } = req.body;
 
-      if (!userId || !sourceId) {
-        return res.status(400).json({ error: "userId and sourceId are required" });
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
       }
 
       const user = await storage.getUser(userId);
@@ -487,72 +488,56 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (!squareClient) {
+      if (!stripeClient) {
         return res.status(503).json({
           error: "Payment processing unavailable",
-          message: "Square is not configured"
+          message: "Stripe is not configured"
         });
       }
 
-      const planVariationId = process.env.SQUARE_PLAN_VARIATION_ID;
-      const locationId = process.env.SQUARE_LOCATION_ID;
-
-      if (!planVariationId || !locationId) {
+      const priceId = process.env.STRIPE_PRICE_ID;
+      if (!priceId) {
         return res.status(503).json({
           error: "Payment configuration incomplete",
-          message: "SQUARE_PLAN_VARIATION_ID and SQUARE_LOCATION_ID must be set"
+          message: "STRIPE_PRICE_ID must be set"
         });
       }
 
-      // Create or retrieve Square customer
-      let squareCustomerId = user.squareCustomerId;
-      if (!squareCustomerId) {
-        const customer = await squareClient.customers.create({
-          emailAddress: user.email ?? undefined,
-          givenName: user.firstName ?? undefined,
-          familyName: user.lastName ?? undefined,
-          referenceId: userId,
-          note: "Pharmacy Autopilot member"
+      // Create or retrieve Stripe customer
+      let stripeCustomerId = user.stripeCustomerId;
+      if (!stripeCustomerId) {
+        const customer = await stripeClient.customers.create({
+          email: user.email ?? undefined,
+          name: [user.firstName, user.lastName].filter(Boolean).join(' ') || undefined,
+          metadata: { userId },
         });
-        squareCustomerId = (customer as any).id ?? (customer as any).customer?.id;
-        await storage.updateUserSquareInfo(userId, squareCustomerId!, null);
-        console.log(`Created Square customer ${squareCustomerId} for user ${userId}`);
+        stripeCustomerId = customer.id;
+        console.log(`Created Stripe customer ${stripeCustomerId} for user ${userId}`);
       }
 
-      // Save card on file using the sourceId from Square Web Payments SDK
-      const cardResult = await squareClient.cards.create({
-        idempotencyKey: `card-${userId}-${Date.now()}`,
-        sourceId,
-        card: {
-          customerId: squareCustomerId,
-        }
-      });
-      const squareCardId = (cardResult as any).id ?? (cardResult as any).card?.id;
-      console.log(`Saved card on file ${squareCardId} for customer ${squareCustomerId}`);
-
-      // Create the subscription
-      const now = new Date();
-      const startDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
-
-      const subResult = await squareClient.subscriptions.create({
-        idempotencyKey: `sub-${userId}-${Date.now()}`,
-        locationId,
-        planVariationId,
-        customerId: squareCustomerId,
-        cardId: squareCardId,
-        startDate,
+      // Create subscription with payment_behavior: 'default_incomplete'
+      // This creates an invoice + PaymentIntent we can use to collect payment
+      const subscription = await stripeClient.subscriptions.create({
+        customer: stripeCustomerId,
+        items: [{ price: priceId }],
+        payment_behavior: 'default_incomplete',
+        payment_settings: { save_default_payment_method: 'on_subscription' },
+        expand: ['latest_invoice.payment_intent'],
       });
 
-      const subscription = (subResult as any).subscription ?? subResult;
-      if (!subscription?.id) {
-        throw new Error('Failed to create Square subscription');
+      const invoice = subscription.latest_invoice as any;
+      const clientSecret = invoice?.payment_intent?.client_secret;
+
+      if (!clientSecret) {
+        throw new Error('Failed to get payment client secret from Stripe');
       }
 
-      // Persist Square IDs
-      await storage.updateUserSquareInfo(userId, squareCustomerId, subscription.id, squareCardId);
+      // Persist Stripe IDs (subscription still incomplete until frontend confirms)
+      await storage.updateUserStripeInfo(userId, stripeCustomerId, subscription.id);
 
-      // Annual commitment tracking
+      // Set commitment tracking dates
       if (!user.commitmentStartDate) {
+        const now = new Date();
         const commitmentEnd = new Date(now);
         commitmentEnd.setFullYear(commitmentEnd.getFullYear() + 1);
         await storage.updateUser(userId, {
@@ -565,14 +550,49 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
       res.json({
         subscriptionId: subscription.id,
-        status: subscription.status
+        clientSecret,
       });
     } catch (error: any) {
-      console.error("Square subscription error:", error);
+      console.error("Stripe subscription error:", error);
       res.status(500).json({
         error: "Error creating subscription",
         message: error.message
       });
+    }
+  });
+
+  // Activate subscription after Stripe payment confirmation on frontend
+  app.post("/api/subscription/activate", async (req, res) => {
+    try {
+      const { userId, subscriptionId } = req.body;
+
+      if (!userId || !subscriptionId) {
+        return res.status(400).json({ error: "userId and subscriptionId are required" });
+      }
+
+      if (!stripeClient) {
+        return res.status(503).json({ error: "Stripe is not configured" });
+      }
+
+      const subscription = await stripeClient.subscriptions.retrieve(subscriptionId);
+
+      if (subscription.status === 'active' || subscription.status === 'trialing') {
+        await storage.updateSubscriptionStatus(userId, 'active');
+        await storage.updateUser(userId, {
+          subscriptionTier: 'gold',
+          subscriptionTierSource: 'stripe',
+        });
+        console.log(`Activated subscription ${subscriptionId} for user ${userId}`);
+        res.json({ success: true, status: subscription.status });
+      } else {
+        res.status(400).json({
+          error: "Subscription not active",
+          message: `Subscription status: ${subscription.status}`,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error activating subscription:", error);
+      res.status(500).json({ error: "Error activating subscription", message: error.message });
     }
   });
 
@@ -591,7 +611,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       }
       
       // Check if user has an active subscription
-      if (!user.squareSubscriptionId || user.subscriptionStatus === 'canceled') {
+      if (!user.stripeSubscriptionId || user.subscriptionStatus === 'canceled') {
         return res.status(400).json({ error: "No active subscription found" });
       }
       
@@ -639,19 +659,20 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  // Create termination fee payment via Square
+  // Create Stripe PaymentIntent for termination fee
+  // Frontend confirms payment, then calls cancel-with-fee
   app.post("/api/subscription/termination-fee/create-payment-intent", async (req, res) => {
     try {
-      const { userId, sourceId } = req.body;
+      const { userId } = req.body;
 
       if (!userId) {
         return res.status(400).json({ error: "User ID is required" });
       }
 
-      if (!squareClient) {
+      if (!stripeClient) {
         return res.status(503).json({
           error: "Payment processing unavailable",
-          message: "Square is not configured"
+          message: "Stripe is not configured"
         });
       }
 
@@ -660,7 +681,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (!user.squareSubscriptionId || user.subscriptionStatus === 'canceled') {
+      if (!user.stripeSubscriptionId || user.subscriptionStatus === 'canceled') {
         return res.status(400).json({ error: "No active subscription found" });
       }
 
@@ -676,57 +697,46 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         });
       }
 
-      const locationId = process.env.SQUARE_LOCATION_ID;
-      if (!locationId) {
-        return res.status(503).json({ error: "SQUARE_LOCATION_ID not configured" });
-      }
-
-      // Charge the termination fee via Square Payments API
-      const paymentResult = await squareClient.payments.create({
-        idempotencyKey: `termfee-${userId}-${Date.now()}`,
-        sourceId: sourceId || (user.squareCardId ?? 'CARD_ON_FILE'),
-        amountMoney: {
-          amount: BigInt(terminationFeeCents),
-          currency: 'USD'
-        },
-        customerId: user.squareCustomerId ?? undefined,
-        locationId,
-        note: `Early termination fee — ${remainingMonths} months remaining`,
-        referenceId: `termfee-${userId}`,
+      // Create a Stripe PaymentIntent for the termination fee
+      const paymentIntent = await stripeClient.paymentIntents.create({
+        amount: terminationFeeCents,
+        currency: 'usd',
+        customer: user.stripeCustomerId ?? undefined,
+        metadata: { userId, type: 'termination_fee' },
+        description: `Early termination fee — ${remainingMonths} months remaining`,
       });
 
-      const payment = (paymentResult as any).payment ?? paymentResult;
-      console.log(`Termination fee payment ${payment?.id} created for user ${userId}: $${(terminationFeeCents / 100).toFixed(2)}`);
+      console.log(`Termination fee PaymentIntent ${paymentIntent.id} created for user ${userId}: $${(terminationFeeCents / 100).toFixed(2)}`);
 
       res.json({
-        paymentId: payment?.id,
-        status: payment?.status,
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
         amount: terminationFeeCents,
         amountFormatted: `$${(terminationFeeCents / 100).toFixed(2)}`,
-        remainingMonths
+        remainingMonths,
       });
     } catch (error: any) {
-      console.error("Error creating termination fee payment:", error);
+      console.error("Error creating termination fee payment intent:", error);
       res.status(500).json({
-        error: "Error creating termination fee payment",
+        error: "Error creating termination fee payment intent",
         message: error.message
       });
     }
   });
 
-  // Cancel subscription after termination fee payment (Square)
+  // Cancel subscription after termination fee confirmed via Stripe
   app.post("/api/subscription/cancel-with-fee", async (req, res) => {
     try {
-      const { userId, paymentId } = req.body;
+      const { userId, paymentIntentId } = req.body;
 
-      if (!userId || !paymentId) {
-        return res.status(400).json({ error: "userId and paymentId are required" });
+      if (!userId || !paymentIntentId) {
+        return res.status(400).json({ error: "userId and paymentIntentId are required" });
       }
 
-      if (!squareClient) {
+      if (!stripeClient) {
         return res.status(503).json({
           error: "Payment processing unavailable",
-          message: "Square is not configured"
+          message: "Stripe is not configured"
         });
       }
 
@@ -735,42 +745,31 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (!user.squareSubscriptionId || user.subscriptionStatus !== 'active') {
+      if (!user.stripeSubscriptionId || user.subscriptionStatus !== 'active') {
         return res.status(400).json({
           error: "No active subscription",
           message: "Subscription is not active or already canceled"
         });
       }
 
-      const monthsPaid = user.monthsPaid ?? 0;
-      const remainingMonths = Math.max(0, 12 - monthsPaid);
+      // Verify the Stripe PaymentIntent succeeded
+      const paymentIntent = await stripeClient.paymentIntents.retrieve(paymentIntentId);
 
-      if (remainingMonths === 0) {
-        return res.status(400).json({
-          error: "No termination fee required",
-          message: "12-month commitment already fulfilled - cancel without fee"
-        });
-      }
-
-      // Verify the Square payment succeeded
-      const paymentResp = await squareClient.payments.get(paymentId);
-      const payment = (paymentResp as any).payment ?? paymentResp;
-
-      if (payment?.status !== 'COMPLETED') {
+      if (paymentIntent.status !== 'succeeded') {
         return res.status(400).json({
           error: "Payment not completed",
           message: "Termination fee must be paid before cancellation"
         });
       }
 
-      if (payment.referenceId !== `termfee-${userId}`) {
+      if (paymentIntent.metadata.userId !== userId) {
         return res.status(403).json({ error: "Unauthorized — payment does not match user" });
       }
 
-      // Cancel the Square subscription
-      await squareClient.subscriptions.cancel(user.squareSubscriptionId);
+      // Cancel the Stripe subscription immediately
+      await stripeClient.subscriptions.cancel(user.stripeSubscriptionId);
       await storage.updateSubscriptionStatus(userId, 'canceled');
-      console.log(`Canceled Square subscription ${user.squareSubscriptionId} for user ${userId} after termination fee`);
+      console.log(`Canceled Stripe subscription ${user.stripeSubscriptionId} for user ${userId} after termination fee`);
 
       res.json({ success: true, message: "Subscription canceled after termination fee payment" });
     } catch (error: any) {
@@ -779,7 +778,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  // Cancel subscription without termination fee (commitment fulfilled)
+  // Cancel subscription at period end (commitment fulfilled, no fee)
   app.post("/api/subscription/cancel", async (req, res) => {
     try {
       const { userId } = req.body;
@@ -788,10 +787,10 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(400).json({ error: "User ID is required" });
       }
 
-      if (!squareClient) {
+      if (!stripeClient) {
         return res.status(503).json({
           error: "Payment processing unavailable",
-          message: "Square is not configured"
+          message: "Stripe is not configured"
         });
       }
 
@@ -800,7 +799,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (!user.squareSubscriptionId || user.subscriptionStatus !== 'active') {
+      if (!user.stripeSubscriptionId || user.subscriptionStatus !== 'active') {
         return res.status(400).json({
           error: "No active subscription",
           message: "Subscription is not active or already canceled"
@@ -817,11 +816,14 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         });
       }
 
-      await squareClient.subscriptions.cancel(user.squareSubscriptionId);
+      // Cancel at period end so member keeps access until renewal date
+      await stripeClient.subscriptions.update(user.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      });
       await storage.updateSubscriptionStatus(userId, 'canceled');
-      console.log(`Canceled Square subscription ${user.squareSubscriptionId} for user ${userId} (commitment fulfilled)`);
+      console.log(`Scheduled cancellation of Stripe subscription ${user.stripeSubscriptionId} for user ${userId}`);
 
-      res.json({ success: true, message: "Subscription canceled successfully" });
+      res.json({ success: true, message: "Subscription will cancel at the end of the current billing period" });
     } catch (error: any) {
       console.error("Error canceling subscription:", error);
       res.status(500).json({ error: "Error canceling subscription", message: error.message });
