@@ -28,7 +28,6 @@ import {
 } from "./securityMiddleware";
 import { createAuditLog, createSecurityEvent } from "./auditLogger";
 
-// Square client is initialized in server/square.ts
 
 // Helper function to generate unique referral codes
 function generateReferralCode(firstName?: string, lastName?: string): string {
@@ -830,94 +829,56 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
-  // Square webhook endpoint for subscription and payment events
-  app.post("/api/webhooks/square", async (req, res) => {
+  // Stripe webhook endpoint — receives subscription and payment events from Stripe
+  app.post("/api/webhooks/stripe", async (req, res) => {
     try {
-      const signatureKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY;
-      const squareSignature = req.headers['x-square-hmacsha256-signature'] as string;
-
-      // Verify webhook signature in production
-      if (signatureKey && squareSignature) {
-        const crypto = await import('crypto');
-        const webhookUrl = process.env.SQUARE_WEBHOOK_URL || '';
-        const body = req.body.toString();
-        const hmac = crypto.createHmac('sha256', signatureKey);
-        hmac.update(webhookUrl + body);
-        const expectedSig = hmac.digest('base64');
-        if (expectedSig !== squareSignature) {
-          console.error('Square webhook signature mismatch');
-          return res.status(400).json({ error: 'Invalid webhook signature' });
-        }
-      } else if (process.env.NODE_ENV === 'production' && signatureKey) {
-        return res.status(400).json({ error: 'Missing webhook signature' });
-      }
-
       const event = JSON.parse(req.body.toString());
-      const eventType = event.type as string;
-      const data = event.data?.object;
+      console.log(`Stripe webhook received: ${event.type}`);
 
-      console.log(`Square webhook received: ${eventType}`);
-
-      switch (eventType) {
-        case 'subscription.updated': {
-          const sub = data?.subscription;
-          if (!sub) break;
-          const squareSubId = sub.id as string;
-
-          // Find user by squareSubscriptionId
+      switch (event.type) {
+        case 'invoice.payment_succeeded': {
+          const invoice = event.data.object;
+          const stripeSubId = invoice.subscription as string;
+          if (!stripeSubId) break;
           const allUsersResult = await storage.getAllUsers({ limit: 10000 });
-          const user = allUsersResult.users.find(u => u.squareSubscriptionId === squareSubId);
+          const user = allUsersResult.users.find(u => u.stripeSubscriptionId === stripeSubId);
           if (!user) break;
-
-          let status: "active" | "canceled" | "past_due" | "incomplete";
-          switch (sub.status) {
-            case 'ACTIVE': status = 'active'; break;
-            case 'CANCELED': case 'DEACTIVATED': status = 'canceled'; break;
-            case 'PAUSED': status = 'past_due'; break;
-            default: status = 'incomplete';
-          }
-
-          await storage.updateSubscriptionStatus(user.id, status);
-          console.log(`Updated subscription status to ${status} for user ${user.id}`);
+          await storage.updateSubscriptionStatus(user.id, 'active');
+          const newMonthsPaid = (user.monthsPaid ?? 0) + 1;
+          await storage.updateUser(user.id, { monthsPaid: newMonthsPaid });
+          console.log(`Stripe invoice paid for user ${user.id}, monthsPaid: ${newMonthsPaid}`);
           break;
         }
 
-        case 'payment.completed': {
-          const payment = data?.payment;
-          if (!payment) break;
-          const refId = payment.reference_id as string;
+        case 'invoice.payment_failed': {
+          const invoice = event.data.object;
+          const stripeSubId = invoice.subscription as string;
+          if (!stripeSubId) break;
+          const allUsersResult = await storage.getAllUsers({ limit: 10000 });
+          const user = allUsersResult.users.find(u => u.stripeSubscriptionId === stripeSubId);
+          if (!user) break;
+          await storage.updateSubscriptionStatus(user.id, 'past_due');
+          console.log(`Stripe payment failed for user ${user.id}`);
+          break;
+        }
 
-          // If this payment is tied to a subscription renewal, increment monthsPaid
-          if (refId && refId.startsWith('sub-')) {
-            const userId = refId.replace('sub-', '').split('-')[0];
-            const user = await storage.getUser(userId);
-            if (user) {
-              await storage.updateSubscriptionStatus(userId, 'active');
-              const newMonthsPaid = (user.monthsPaid ?? 0) + 1;
-              await storage.updateUser(userId, { monthsPaid: newMonthsPaid });
-              console.log(`Payment completed for user ${userId}, monthsPaid: ${newMonthsPaid}`);
-
-              if (newMonthsPaid === 1) {
-                const appliedCredits = await storage.getAvailableReferralCredits(userId);
-                for (const credit of appliedCredits.filter(c => c.status === 'applied')) {
-                  await storage.updateReferralCredit(credit.id, {
-                    status: 'redeemed',
-                    redeemedAt: new Date()
-                  });
-                }
-              }
-            }
-          }
+        case 'customer.subscription.deleted': {
+          const sub = event.data.object;
+          const allUsersResult = await storage.getAllUsers({ limit: 10000 });
+          const user = allUsersResult.users.find(u => u.stripeSubscriptionId === sub.id);
+          if (!user) break;
+          await storage.updateSubscriptionStatus(user.id, 'canceled');
+          console.log(`Stripe subscription canceled for user ${user.id}`);
           break;
         }
 
         default:
-          console.log(`Unhandled Square webhook event: ${eventType}`);
+          console.log(`Unhandled Stripe webhook event: ${event.type}`);
       }
 
       res.json({ received: true });
     } catch (error: any) {
-      console.error('Square webhook error:', error);
+      console.error('Stripe webhook error:', error);
       res.status(500).json({ error: 'Webhook processing failed' });
     }
   });

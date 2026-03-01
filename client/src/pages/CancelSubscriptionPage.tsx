@@ -469,7 +469,7 @@ export default function CancelSubscriptionPage() {
             </CardHeader>
             <CardContent>
               {user && feeDetails.terminationFee && (
-                <SquareTerminationPaymentForm
+                <StripeTerminationPaymentForm
                   userId={user.id}
                   terminationFee={feeDetails.terminationFee}
                   terminationFeeFormatted={feeDetails.terminationFeeFormatted || ''}
