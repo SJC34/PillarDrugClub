@@ -1,0 +1,271 @@
+REPLIT PROMPT — TECHNICAL SEO + AIO INFRASTRUCTURE FOR PILLARDRUGCLUB.COM
+
+OVERVIEW
+Convert the existing React site at pillardrugclub.com to Next.js 14 and implement full technical SEO and AIO infrastructure. Includes SSR/SSG rendering, structured data, sitemap, robots.txt, meta tags, page speed optimizations, and Organization schema. Do not rebuild the UI — migrate existing components and pages into Next.js with zero visual changes.
+
+PART 1 — MIGRATE TO NEXT.JS
+Install dependencies:
+
+npm install next@latest react@latest react-dom@latest
+npm install next-sitemap
+
+
+Migrate all existing pages into /app directory:
+	∙	/app/page.tsx — homepage
+	∙	/app/how-it-works/page.tsx
+	∙	/app/pricing/page.tsx
+	∙	/app/about/page.tsx
+	∙	/app/contact/page.tsx
+	∙	/app/faq/page.tsx
+	∙	/app/pharmacy-membership-vs-goodrx/page.tsx
+	∙	/app/scriptco-alternative/page.tsx
+Move all shared components into /components. Move all styles into /styles. Preserve every existing component, layout, color, font, and design element exactly. Zero visual changes.
+Create /app/layout.tsx:
+
+export const metadata = {
+  metadataBase: new URL('https://pillardrugclub.com'),
+  title: {
+    default: 'Pillar Drug Club | Generic Medications at Wholesale Prices',
+    template: '%s | Pillar Drug Club'
+  },
+  description: 'Membership pharmacy offering FDA-approved generic medications at true wholesale prices. $99/year. No insurance required. Available in all 50 states.',
+  openGraph: {
+    siteName: 'Pillar Drug Club',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  }
+}
+
+
+PART 2 — META TAGS ON EVERY PAGE
+Use Next.js 14 native Metadata API. Do not use React Helmet.
+Homepage:
+
+export const metadata = {
+  title: 'Pillar Drug Club | Generic Medications at Wholesale Prices',
+  description: 'Pay $99/year and access generic medications at true wholesale prices. Most tablets as low as $0.01. A 365-day supply for as little as $3.65. No insurance required.',
+  alternates: { canonical: 'https://pillardrugclub.com' }
+}
+
+
+FAQ:
+
+export const metadata = {
+  title: 'FAQ | Pillar Drug Club',
+  description: 'Questions about Pillar Drug Club? Learn how the $99 membership works, what medications cost at wholesale, how auto-refills work, fees, HIPAA compliance, and how to get started.',
+  alternates: { canonical: 'https://pillardrugclub.com/faq' }
+}
+
+
+GoodRx comparison:
+
+export const metadata = {
+  title: 'Pharmacy Membership vs GoodRx: Real Cost Comparison | Pillar Drug Club',
+  description: 'GoodRx offers coupons. Pillar Drug Club offers wholesale prices. See the real cost difference on generic medications for cash-pay patients.',
+  alternates: { canonical: 'https://pillardrugclub.com/pharmacy-membership-vs-goodrx' }
+}
+
+
+ScriptCo alternative:
+
+export const metadata = {
+  title: 'Best ScriptCo Alternative 2025 | Pillar Drug Club',
+  description: 'ScriptCo has been around since 2019 but growth has been slow. See how Pillar Drug Club compares on price, service, and medication access.',
+  alternates: { canonical: 'https://pillardrugclub.com/scriptco-alternative' }
+}
+
+
+Apply unique metadata to all remaining pages.
+
+PART 3 — JSON-LD STRUCTURED DATA
+Create /components/JsonLd.tsx:
+
+export default function JsonLd({ data }: { data: object }) {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  )
+}
+
+
+This must render server-side in static HTML — not via useEffect or client-side JavaScript.
+Add to homepage — Organization schema:
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Pillar Drug Club",
+  "url": "https://pillardrugclub.com",
+  "logo": "https://pillardrugclub.com/logo.png",
+  "description": "Membership pharmacy offering FDA-approved generic medications at true wholesale prices. $99/year. No insurance required.",
+  "foundingDate": "2024",
+  "areaServed": "US",
+  "serviceType": "Pharmacy Membership",
+  "sameAs": [
+    "https://www.linkedin.com/company/pillar-drug-club",
+    "https://www.crunchbase.com/organization/pillar-drug-club"
+  ]
+}
+
+
+Add to homepage — WebSite schema:
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Pillar Drug Club",
+  "url": "https://pillardrugclub.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://pillardrugclub.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+
+
+Add FAQPage schema to /faq, /pharmacy-membership-vs-goodrx, and /scriptco-alternative pages:
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": questions.map(q => ({
+    "@type": "Question",
+    "name": q.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": q.answer
+    }
+  }))
+}
+
+
+Pass the relevant questions array into this schema on each respective page.
+
+PART 4 — ROBOTS.TXT
+Create /public/robots.txt with this exact content:
+
+User-agent: *
+Allow: /
+Sitemap: https://pillardrugclub.com/sitemap.xml
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+
+PART 5 — SITEMAP
+Create next-sitemap.config.js in root:
+
+/** @type {import('next-sitemap').IConfig} */
+module.exports = {
+  siteUrl: 'https://pillardrugclub.com',
+  generateRobotsTxt: false,
+  changefreq: 'weekly',
+  priority: 0.7,
+  sitemapSize: 5000,
+  exclude: ['/api/*', '/dashboard/*', '/account/*'],
+  additionalPaths: async (config) => [
+    await config.transform(config, '/'),
+    await config.transform(config, '/faq'),
+    await config.transform(config, '/pharmacy-membership-vs-goodrx'),
+    await config.transform(config, '/scriptco-alternative'),
+    await config.transform(config, '/how-it-works'),
+    await config.transform(config, '/pricing'),
+    await config.transform(config, '/about'),
+    await config.transform(config, '/contact'),
+  ],
+}
+
+
+Add to package.json scripts:
+
+"postbuild": "next-sitemap"
+
+
+PART 6 — PAGE SPEED OPTIMIZATIONS
+Images: Replace all <img> tags with Next.js <Image> component. Set explicit width and height on all images. Add priority prop to all above-fold images.
+Fonts: Replace any Google Fonts <link> tags with Next.js font optimization:
+
+import { Inter } from 'next/font/google'
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
+
+
+Lazy loading: Add loading="lazy" to all below-fold images. Use dynamic() for any heavy components not needed on initial load:
+
+import dynamic from 'next/dynamic'
+const HeavyComponent = dynamic(() => import('./HeavyComponent'))
+
+
+PART 7 — NEXT.CONFIG.JS
+Create or update next.config.js:
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  poweredByHeader: false,
+  compress: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    domains: ['pillardrugclub.com'],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:all*(svg|jpg|png|webp|gif|ico|css|js)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+        ],
+      },
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
+    ]
+  },
+}
+
+module.exports = nextConfig
+
+
+PART 8 — VERIFICATION FILES
+Create these empty placeholder files in /public:
+
+/public/google-site-verification.html
+/public/BingSiteAuth.xml
+
+
+PART 9 — FINAL CHECKS
+After migration run the following and confirm zero errors:
+	1.	npm run build — builds without errors
+	2.	npm run start — site renders correctly at localhost
+	3.	View page source on homepage — confirm <title>, <meta name="description">, and application/ld+json are present in raw HTML before JavaScript executes
+	4.	Visit /sitemap.xml — returns valid XML listing all pages
+	5.	Visit /robots.txt — returns correct content with all AI crawlers listed
+	6.	All existing pages render identically to before migration
+	7.	No console errors in browser developer tools​​​​​​​​​​​​​​​​
