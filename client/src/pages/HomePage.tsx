@@ -249,7 +249,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto">
           <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-4" data-testid="text-problem-label">THE PROBLEM</p>
           <h2 className="text-3xl md:text-5xl font-black text-foreground mb-16 leading-tight" data-testid="text-problem-headline">
-            The pharmacy system is<br />built to confuse you.
+            <span className="whitespace-nowrap">The pharmacy system is</span><br /><span className="whitespace-nowrap">built to confuse you.</span>
           </h2>
 
           <div className="space-y-12">
