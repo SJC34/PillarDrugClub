@@ -42,6 +42,9 @@ import CancelSubscriptionPage from "@/pages/CancelSubscriptionPage";
 import RefundPolicyPage from "@/pages/RefundPolicyPage";
 import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
 import TermsOfServicePage from "@/pages/TermsOfServicePage";
+import FAQPage from "@/pages/FAQPage";
+import PharmacyMembershipVsGoodRxPage from "@/pages/PharmacyMembershipVsGoodRxPage";
+import ScriptCoAlternativePage from "@/pages/ScriptCoAlternativePage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
@@ -112,6 +115,9 @@ function Router() {
       <Route path="/terms-of-service" component={TermsOfServicePage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
+      <Route path="/faq" component={FAQPage} />
+      <Route path="/pharmacy-membership-vs-goodrx" component={PharmacyMembershipVsGoodRxPage} />
+      <Route path="/scriptco-alternative" component={ScriptCoAlternativePage} />
       <Route path="/cart" component={CartPage} />
       <Route path="/checkout" component={CheckoutPage} />
       <Route path="/orders" component={OrdersPage} />

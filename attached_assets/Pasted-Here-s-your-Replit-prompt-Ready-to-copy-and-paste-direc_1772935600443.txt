@@ -1,0 +1,91 @@
+Here’s your Replit prompt. Ready to copy and paste directly.
+
+REPLIT PROMPT:
+
+I need you to add 3 new features to my existing React site at pillardrugclub.com. Do not rebuild the site — edit the existing codebase only. Match all existing branding, colors, fonts, components, and layout exactly.
+
+CONTEXT ABOUT THE BUSINESS
+Pillar Drug Club (PDC) is a membership pharmacy service. Members pay $99/year and get access to generic medications at wholesale prices. There are pass-through fees: $10 dispensing fee per medication and $5 flat shipping per order. Fulfillment is handled by HealthWarehouse. This is not insurance. It is a cash-pay membership club for people without insurance or with high-deductible health plans.
+
+TASK 1: NEW AIO LANDING PAGE — “Pharmacy Membership vs GoodRx”
+Create a new page at /pharmacy-membership-vs-goodrx
+This page must be structured for AI search optimization (AIO). That means:
+	∙	H1: “Pharmacy Membership vs GoodRx: Which Actually Saves You More?”
+	∙	Opening paragraph directly answers the question in 2–3 sentences
+	∙	Use H2s structured as questions, e.g. “How does GoodRx work?”, “How does a pharmacy membership work?”, “Which saves more on generic medications?”, “Who should use a pharmacy membership instead of GoodRx?”
+	∙	Include a comparison table with columns: Feature | GoodRx | Pillar Drug Club. Rows: Cost model, Annual cost, Generic drug pricing, 90-day supply availability, Membership required, Best for
+	∙	Include specific example: “A 90-day supply of metformin 500mg at GoodRx costs approximately $X. At Pillar Drug Club, the same supply costs wholesale price + $10 dispensing + $5 shipping.”
+	∙	End with a clear CTA: “Join Pillar Drug Club for $99/year”
+	∙	Add FAQ schema markup (JSON-LD) in the page head with at least 5 Q&A pairs about GoodRx vs pharmacy memberships
+	∙	Page must have a meta title: “Pharmacy Membership vs GoodRx: Real Cost Comparison (2025)”
+	∙	Meta description: “GoodRx offers coupons. Pillar Drug Club offers wholesale prices. See the real cost difference on generic medications for cash-pay patients.”
+
+TASK 2: NEW AIO LANDING PAGE — “ScriptCo Alternative”
+Create a new page at /scriptco-alternative
+Structure:
+	∙	H1: “Looking for a ScriptCo Alternative? Here’s How Pillar Drug Club Compares”
+	∙	Opening paragraph: directly answers “what is the best alternative to ScriptCo” in 2–3 sentences
+	∙	H2 sections structured as questions: “What is ScriptCo?”, “What are ScriptCo’s limitations?”, “How is Pillar Drug Club different from ScriptCo?”, “Is Pillar Drug Club cheaper than ScriptCo?”, “How do I switch from ScriptCo to Pillar Drug Club?”
+	∙	Include a comparison table: Feature | ScriptCo | Pillar Drug Club. Rows: Annual membership cost, Medication pricing model, 90-day supply, Fulfillment, Founded
+	∙	Add FAQ schema markup (JSON-LD) with 5 Q&A pairs
+	∙	Meta title: “Best ScriptCo Alternative 2025 | Pillar Drug Club”
+	∙	Meta description: “ScriptCo has been around since 2019 but growth has been slow. See how Pillar Drug Club compares on price, service, and medication access.”
+	∙	End with CTA: “Join Pillar Drug Club for $99/year”
+
+TASK 3: FAQ — ACCORDION COMPONENT + DEDICATED PAGE
+Part A — Reusable FAQ accordion component
+Build a reusable <FAQAccordion /> React component with the following:
+	∙	Accordion style: click question to expand answer
+	∙	Smooth open/close animation
+	∙	Only one answer open at a time
+	∙	Matches existing site styling exactly
+	∙	Includes FAQ schema markup (JSON-LD) that updates dynamically based on which questions are passed in as props
+	∙	Accept questions as a props array: [{ question: string, answer: string }]
+FAQ content to use:
+Q: What is Pillar Drug Club?
+A: Pillar Drug Club is a membership-based pharmacy service that gives members access to generic medications at wholesale prices. For $99 per year, members pay true wholesale drug costs plus a $10 dispensing fee per medication and $5 flat shipping — no insurance required.
+Q: How is Pillar Drug Club different from GoodRx?
+A: GoodRx provides coupons that discount retail pharmacy prices. Pillar Drug Club starts at wholesale — the price before retail markup. For members on multiple generic medications, the annual savings typically far exceed the $99 membership cost.
+Q: What medications are covered?
+A: Pillar Drug Club covers hundreds of generic medications across all major therapeutic categories including blood pressure, diabetes, cholesterol, thyroid, mental health, and more. Brand-name medications are not included. Members can request a specific medication lookup before joining.
+Q: How does the $99 membership work?
+A: Pay $99 once per year. That gives you access to wholesale generic pricing for 12 months. You pay separately for each order: wholesale drug cost + $10 dispensing fee per medication + $5 flat shipping. No monthly fees, no hidden costs.
+Q: What are the dispensing and shipping fees?
+A: Each medication has a $10 dispensing fee. Shipping is a flat $5 per order regardless of how many medications are included. Example: 3 medications in one order = $30 dispensing + $5 shipping = $35 in fees, plus the wholesale cost of the medications.
+Q: How do I transfer my prescription?
+A: After joining, you provide your prescription information during onboarding. PDC coordinates the transfer to our fulfillment partner. You can transfer from any pharmacy. Most transfers are completed within 1–2 business days.
+Q: Is my data private and HIPAA compliant?
+A: Yes. Pillar Drug Club operates under full HIPAA compliance. Your prescription and health information is never sold or shared with advertisers. All data is encrypted and handled according to federal healthcare privacy standards.
+Part B — Dedicated FAQ page
+Create a new page at /faq that:
+	∙	Uses the <FAQAccordion /> component with all 7 questions above
+	∙	Has H1: “Frequently Asked Questions About Pillar Drug Club”
+	∙	Brief intro paragraph: “Everything you need to know about how Pillar Drug Club works, what it costs, and how to get started.”
+	∙	Meta title: “Pillar Drug Club FAQ | How the $99 Pharmacy Membership Works”
+	∙	Meta description: “Questions about Pillar Drug Club? Learn how the membership works, what medications are covered, fees, HIPAA compliance, and how to transfer your prescription.”
+Part C — Add FAQ to existing pages
+Add the <FAQAccordion /> component to:
+	∙	The homepage — use questions 1, 2, 4, 5 only, with H2: “Common Questions”
+	∙	The pricing page (if it exists) — use questions 4 and 5 only
+
+ROUTING
+Inspect the existing codebase to determine how routing is currently handled. If React Router is already installed, add the new routes there. If not, install React Router v6 and configure it. New routes needed: /pharmacy-membership-vs-goodrx, /scriptco-alternative, /faq
+Add links to these three new pages in the existing site navigation if a nav component exists.
+
+SEO / AIO TECHNICAL REQUIREMENTS (apply to all new pages)
+	∙	Each page must have a unique <title> and <meta name="description"> tag using React Helmet or whatever head management is already in the codebase
+	∙	Each page must include FAQ schema (JSON-LD) as described above
+	∙	All H tags must follow proper hierarchy: one H1, multiple H2s, H3s where needed
+	∙	Pages must be server-renderable or at minimum have static meta tags — do not put meta content only inside client-rendered JS
+	∙	All new pages must be added to the sitemap if one exists
+
+DO NOT:
+	∙	Rebuild or redesign any existing pages
+	∙	Change existing component styles
+	∙	Remove any existing content
+	∙	Install unnecessary packages
+
+That’s the full prompt. A few notes before you paste it:
+One thing to add yourself: The actual GoodRx price for metformin so the comparison is factual — check GoodRx.com for your zip code before running this. Otherwise Replit will either hallucinate a number or leave a placeholder.
+Expect Replit to ask for clarification on routing once it inspects your codebase. Let it figure that out rather than prescribing it — you told it to in the prompt.
+After it runs, the three highest-priority things to verify manually: FAQ schema is valid (test at schema.org/SchemaMarkup validator), meta tags are rendering in page source not just in JS, and the comparison tables look clean on mobile.​​​​​​​​​​​​​​​​

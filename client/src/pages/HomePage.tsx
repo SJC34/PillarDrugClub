@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, ArrowRight, Plus } from "lucide-react";
 import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
+import { FAQAccordion } from "@/components/FAQAccordion";
 import pdcLogo from "@assets/image_1771566531369.jpeg";
 
 export default function HomePage() {
@@ -308,6 +309,39 @@ export default function HomePage() {
           <p className="text-xs text-muted-foreground" data-testid="text-no-spam">
             No spam. No commitment. We'll reach out before launch.
           </p>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 md:py-24 px-6 md:px-12 bg-muted/30">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-4xl font-black text-foreground mb-8 leading-tight" data-testid="text-faq-headline">
+            Common Questions
+          </h2>
+          <FAQAccordion
+            items={[
+              {
+                question: "What is Pillar Drug Club?",
+                answer:
+                  "Pillar Drug Club is a membership-based pharmacy service that gives members access to generic medications at wholesale prices. For $99 per year, members pay true wholesale drug costs plus a $10 dispensing fee per medication and $5 flat shipping — no insurance required.",
+              },
+              {
+                question: "How is Pillar Drug Club different from GoodRx?",
+                answer:
+                  "GoodRx provides coupons that discount retail pharmacy prices. Pillar Drug Club starts at wholesale — the price before retail markup. For members on multiple generic medications, the annual savings typically far exceed the $99 membership cost.",
+              },
+              {
+                question: "How does the $99 membership work?",
+                answer:
+                  "Pay $99 once per year. That gives you access to wholesale generic pricing for 12 months. You pay separately for each order: wholesale drug cost + $10 dispensing fee per medication + $5 flat shipping. No monthly fees, no hidden costs.",
+              },
+              {
+                question: "What are the dispensing and shipping fees?",
+                answer:
+                  "Each medication has a $10 dispensing fee. Shipping is a flat $5 per order regardless of how many medications are included. Example: 3 medications in one order = $30 dispensing + $5 shipping = $35 in fees, plus the wholesale cost of the medications.",
+              },
+            ]}
+          />
         </div>
       </section>
 

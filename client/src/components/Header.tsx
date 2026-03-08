@@ -35,6 +35,7 @@ export default function Header() {
     { name: "COST CALCULATOR", href: "/cost-calculator" },
     { name: "DASHBOARD", href: "/dashboard" },
     { name: "BLOG", href: "/blog" },
+    { name: "FAQ", href: "/faq" },
   ];
 
   return (
