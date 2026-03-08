@@ -1,17 +1,15 @@
-# Robots.txt for Pharmacy Autopilot
-# Allow all search engines to crawl the site
-
 User-agent: *
 Allow: /
-
-# High-priority pages for crawling
 Allow: /medications
 Allow: /cost-calculator
 Allow: /register
-Allow: /pricing
+Allow: /faq
+Allow: /pharmacy-membership-vs-goodrx
+Allow: /scriptco-alternative
+Allow: /blog
 Allow: /refund-policy
-
-# Disallow admin and account-specific pages
+Allow: /privacy-policy
+Allow: /terms-of-service
 Disallow: /admin
 Disallow: /admin/*
 Disallow: /dashboard
@@ -21,9 +19,27 @@ Disallow: /checkout
 Disallow: /orders
 Disallow: /prescriptions
 Disallow: /refills
-
-# Disallow API endpoints
 Disallow: /api/*
 
-# Sitemap location
-Sitemap: https://pharmacyautopilot.com/sitemap.xml
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+Sitemap: https://pillardrugclub.com/sitemap.xml

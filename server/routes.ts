@@ -99,7 +99,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   app.get('/sitemap.xml', async (req, res) => {
     try {
       const domain = process.env.CUSTOM_DOMAIN || 
-        (process.env.REPLIT_DOMAINS ? process.env.REPLIT_DOMAINS.split(",")[0] : "pharmacyautopilot.com");
+        (process.env.REPLIT_DOMAINS ? process.env.REPLIT_DOMAINS.split(",")[0] : "pillardrugclub.com");
       const baseUrl = `https://${domain}`;
       const today = new Date().toISOString().split('T')[0];
       
@@ -118,13 +118,13 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       ];
       
       // Get all published blog posts
-      const blogPosts = await storage.getBlogPosts({ 
+      const { posts: blogPosts } = await storage.getAllBlogPosts({ 
         status: 'published',
         limit: 1000 
       });
       
       // Get all medications
-      const medications = await storage.searchMedications({ limit: 2000 });
+      const { medications } = await storage.searchMedications({ limit: 2000 });
       
       // Build XML sitemap
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';

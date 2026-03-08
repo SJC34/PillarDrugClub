@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- Replace this file content with the BingSiteAuth.xml provided by Bing Webmaster Tools -->
+<!-- Go to: https://www.bing.com/webmasters → Add site → XML file method -->
+<users>
+  <user>REPLACE_WITH_BING_AUTH_CODE</user>
+</users>
