@@ -1,0 +1,135 @@
+Here’s your complete Replit prompt:
+
+REPLIT PROMPT — ADD COMPLETE FAQ SYSTEM TO PILLARDRUGCLUB.COM
+
+CONTEXT
+Pillar Drug Club (PDC) is a membership pharmacy service. Members pay $99/year for access to generic medications at true wholesale prices. Pass-through fees: $10 dispensing fee per medication per order, $5 flat shipping per order. Fulfillment partner: HealthWarehouse (licensed US mail-order pharmacy). PDC is LegitScript certified. No insurance required. Available all 50 states. Cash-pay only. No brand-name drugs, no controlled substances, no compounded medications, no OTCs.
+Do not rebuild or redesign any existing pages. Match all existing branding, colors, fonts, and components exactly.
+
+TASK 1 — BUILD REUSABLE FAQ ACCORDION COMPONENT
+Create a reusable React component: <FAQAccordion />
+Requirements:
+	∙	Click question to expand answer
+	∙	Smooth open/close animation
+	∙	Only one answer open at a time
+	∙	Matches existing site styling exactly
+	∙	Accepts questions as props: [{ question: string, answer: string }]
+	∙	Dynamically generates FAQ schema markup (JSON-LD) based on questions passed in
+	∙	JSON-LD must render in page head using whatever head management library is already in the codebase (React Helmet or equivalent)
+
+TASK 2 — CREATE DEDICATED FAQ PAGE
+Create new page at /faq
+	∙	H1: “Frequently Asked Questions”
+	∙	Intro paragraph: “Everything you need to know about how Pillar Drug Club works, what it costs, and how to get started.”
+	∙	Meta title: “Pillar Drug Club FAQ | Wholesale Generic Medications for $99/Year”
+	∙	Meta description: “Questions about Pillar Drug Club? Learn how the $99 membership works, what medications cost at wholesale, how auto-refills work, fees, HIPAA compliance, and how to get started.”
+	∙	Use <FAQAccordion /> component with all 21 questions below
+
+TASK 3 — ADD FAQ TO EXISTING PAGES
+Add <FAQAccordion /> to:
+	∙	Homepage — use questions 1, 3, 5, 9, 13, 15 with H2: “Common Questions”
+	∙	Pricing page (if exists) — use questions 9, 10, 11 with H2: “Pricing Questions”
+
+TASK 4 — ROUTING
+Inspect existing codebase to determine how routing is handled. If React Router is installed add the new /faq route. If not, install React Router v6 and configure it. Add FAQ link to existing site navigation if a nav component exists.
+
+FAQ CONTENT — ALL 21 QUESTIONS
+Use this content exactly as written. Do not paraphrase or rewrite.
+
+Question 1
+Q: What is Pillar Drug Club?
+A: A membership pharmacy that gives you access to generic medications at true wholesale prices — what pharmacies actually pay, before any markup. Pay $99/year, get wholesale pricing on hundreds of generics. Most tablets cost as little as $0.01, making a full year’s supply as low as $3.65. No insurance needed. Available in all 50 states.
+
+Question 2
+Q: Why are retail pharmacy prices so high?
+A: Because pharmacies don’t quote you the real cost of the drug — they quote the insurance billing price. That number is inflated by middlemen called PBMs (Pharmacy Benefit Managers) who profit from the gap between what insurers pay and what drugs actually cost. The result: cash-paying patients get charged the highest price in the supply chain, even though the drug itself may cost pennies to make. PDC removes every middleman and passes you the actual wholesale cost — nothing more.
+
+Question 3
+Q: What is a PBM and why does it matter?
+A: PBMs — CVS Caremark, Express Scripts, OptumRx — control roughly 80% of US prescription transactions. They sit between manufacturers, insurers, and pharmacies, collecting rebates and profiting from spread pricing. The more expensive the drug, the more they make. Cash-pay PDC members bypass PBMs entirely. No middleman. No spread pricing. Just wholesale cost plus a flat fee.
+
+Question 4
+Q: How is PDC different from GoodRx?
+A: GoodRx discounts retail prices — you’re still paying a marked-up price, just less of it. PDC starts at wholesale — before retail markup exists. For members on multiple generics, the difference is hundreds of dollars per year. GoodRx is free but costs more per prescription. PDC costs $99/year but charges less per prescription.
+
+Question 5
+Q: How is PDC different from Mark Cuban’s Cost Plus Drugs?
+A: Cost Plus charges a 15% markup over wholesale plus fees — better than retail, but still a markup. The more expensive your medication, the more they earn per transaction. PDC charges zero markup on medications. Every dollar of profit comes from the $99 membership — not from your prescriptions. Think Costco: they profit on memberships, not products, which forces them to deliver genuine value on everything they sell. Same model here.
+
+Question 6
+Q: Why can PDC charge so little?
+A: Three reasons. First, medications are priced at actual acquisition cost — zero markup. Second, the membership fee funds operations, eliminating margin pressure on every prescription. Third, HealthWarehouse fulfills orders at high volume on thin margins. Remove the PBM, remove the retail markup, remove the insurance billing infrastructure — what’s left is the real price of the drug. For most common generics that’s a fraction of a cent per tablet.
+
+Question 7
+Q: What does wholesale actually cost?
+A: Generic drugs are manufactured competitively once brand patents expire, driving costs to near zero for many medications. Metformin, lisinopril, atorvastatin, omeprazole — some of the most prescribed drugs in America — cost less than $0.01 per tablet at wholesale. A 365-day supply: $3.65 in drug cost. Retail pharmacies mark this up 1,000%+. Cost Plus marks it up 15%. PDC marks it up zero.
+
+Question 8
+Q: What are AWP, WAC, and AAC?
+A: The three pricing benchmarks that drive US drug costs:
+AWP (Average Wholesale Price) — fictional. Set by manufacturers for insurance billing purposes. Industry insiders call it “Ain’t What’s Paid.” This is what retail pharmacies use to set cash prices.
+WAC (Wholesale Acquisition Cost) — the manufacturer’s list price to distributors. Closer to real but still not actual cost.
+AAC (Actual Acquisition Cost) — what a pharmacy truly pays after all discounts. This is what PDC charges members. For most generics, AAC is 90–99% below AWP.
+
+Question 9
+Q: How does the $99 membership work?
+A: Pay $99 once, get 12 months of wholesale pricing. Each order is billed separately: wholesale drug cost + $10 dispensing fee per medication + $5 flat shipping per order. To maximize savings, order a 365-day supply in one order. Example: 3 medications, annual order = ~$10.95 drug cost + $30 dispensing + $5 shipping = $45.95 for a full year. Same 3 medications ordered monthly = $430+. Membership auto-renews annually — cancel anytime from your account.
+
+Question 10
+Q: How do supply length and fees work?
+A: Since dispensing ($10/medication) and shipping ($5/order) are charged per order — not per month — ordering annually costs the same in fees as ordering once for 30 days. One medication, 365-day supply: $3.65 drug cost + $10 dispensing + $5 shipping = $18.65 for the entire year. Stack multiple medications in one order and the $5 shipping is shared across all of them.
+
+Question 11
+Q: Can I order multiple medications in one order?
+A: Yes. Order as many medications as needed in a single order. Shipping is a flat $5 regardless of quantity. A member on 5 medications, one annual order, pays $1 per medication in shipping for the entire year.
+
+Question 12
+Q: What medications are covered?
+A: Hundreds of FDA-approved generic medications — blood pressure, diabetes, cholesterol, thyroid, mental health, acid reflux, and more. No brand-name drugs, no compounded medications, no controlled substances, no OTCs. Search the full drug list on our site before joining — no account required. Pricing shown in real time.
+
+Question 13
+Q: Can I see my savings before I join?
+A: Yes. The savings calculator shows your wholesale cost side-by-side with average retail prices for every medication. Enter your drugs, see your annual savings. Most members on 2+ generics save significantly more than the $99 membership fee in the first order alone.
+
+Question 14
+Q: How does PDC help manage my medications?
+A: PDC is more than a pricing model — it’s a complete medication management system. Once your prescriptions are set up you can automate the entire process. Auto-refills process automatically before you run out. Refill renewal alerts notify you when a prescription is expiring so you can request a renewal before it lapses. The active medication dashboard shows all your medications in one place with dosing details, refill status, and order history. No more calling the pharmacy. No more running out of medications. No more managing refills across multiple apps or locations. Everything automated in one dashboard.
+
+Question 15
+Q: How does signup work?
+A: Entirely online, takes minutes. Pay $99, wholesale access activates immediately. Submit your prescription through your member dashboard — transfer from your current pharmacy (1–2 business days) or have your doctor send a new prescription directly to HealthWarehouse. Set up auto-refills, refill renewal alerts, and manage all active medications from one dashboard. Orders ship to any US address including addresses different from your billing address.
+
+Question 16
+Q: Is prior authorization ever required?
+A: Never. Prior auth is an insurance construct. PDC is cash-pay — no insurance, no prior auth, no step therapy, no formulary restrictions, no claim denials. Your doctor writes it, it’s a covered generic, you can order it.
+
+Question 17
+Q: Is this legal?
+A: Yes. Cash-pay pharmacy is legal in all 50 states. What’s new is making wholesale pricing accessible to individuals — the same way Costco made bulk pricing accessible to everyday consumers. Every order goes through HealthWarehouse, a fully licensed US pharmacy, under a valid prescription.
+
+Question 18
+Q: Is PDC a licensed pharmacy?
+A: PDC is LegitScript certified as a healthcare merchant — the same standard required by Google and Meta for pharmacy advertising. Prescription fulfillment is handled by HealthWarehouse, our licensed pharmacy partner. Your medications are dispensed by a fully regulated US pharmacy.
+
+Question 19
+Q: Is my information private?
+A: Yes. Full HIPAA compliance. Your data is encrypted, never sold, never shared with advertisers. HealthWarehouse operates under a Business Associate Agreement (BAA) with PDC. Your prescription history stays private.
+
+Question 20
+Q: Can I pause my membership?
+A: Yes. Pause anytime from your account settings. While paused your membership year stops counting down — but you cannot place prescription orders during a pause. Resume anytime to restore full access. Useful if you gain temporary insurance coverage or won’t need refills for an extended period.
+
+Question 21
+Q: What is the refund and cancellation policy?
+A: Full refund within 30 days if no prescriptions have been ordered. Once a prescription is filled the membership fee is non-refundable. Membership can be paused — ordering suspended until resumed. If cancelled, access continues through end of paid year. Membership auto-renews annually — turn off auto-renew anytime in account settings.
+
+TECHNICAL REQUIREMENTS — APPLY TO ALL NEW PAGES AND COMPONENTS
+	∙	Unique <title> and <meta name="description"> on every new page
+	∙	FAQ JSON-LD schema on every page using the FAQAccordion component
+	∙	Proper H tag hierarchy — one H1, multiple H2s
+	∙	Meta tags must render server-side or as static tags — not client-rendered JS only
+	∙	Add /faq to sitemap if one exists
+	∙	Do not install unnecessary packages
+	∙	Do not modify any existing pages beyond adding the FAQAccordion component where specified
+
+That’s the complete prompt. Copy and paste directly into Replit. One note: the pause membership feature (Question 20) references account settings functionality — make sure that’s actually built in your member dashboard before this goes live, otherwise it creates a support ticket the moment the first member tries to find it.​​​​​​​​​​​​​​​​

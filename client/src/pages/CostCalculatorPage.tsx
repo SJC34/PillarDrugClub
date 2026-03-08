@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Calculator, Search, DollarSign, TrendingDown, Calendar, Pill, Plus, X, Star, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 import { SEOHead, createBreadcrumbSchema } from "@/components/SEOHead";
+import { FAQAccordion } from "@/components/FAQAccordion";
 
 interface Medication {
   id: string;
@@ -684,6 +685,30 @@ export default function CostCalculatorPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Pricing FAQ */}
+        <div className="mt-16 pt-10 border-t border-border">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Pricing Questions</h2>
+          <FAQAccordion
+            items={[
+              {
+                question: "How does the $99 membership work?",
+                answer:
+                  "Pay $99 once, get 12 months of wholesale pricing. Each order is billed separately: wholesale drug cost + $10 dispensing fee per medication + $5 flat shipping per order. To maximize savings, order a 365-day supply in one order. Example: 3 medications, annual order = ~$10.95 drug cost + $30 dispensing + $5 shipping = $45.95 for a full year. Same 3 medications ordered monthly = $430+. Membership auto-renews annually — cancel anytime from your account.",
+              },
+              {
+                question: "How do supply length and fees work?",
+                answer:
+                  "Since dispensing ($10/medication) and shipping ($5/order) are charged per order — not per month — ordering annually costs the same in fees as ordering once for 30 days. One medication, 365-day supply: $3.65 drug cost + $10 dispensing + $5 shipping = $18.65 for the entire year. Stack multiple medications in one order and the $5 shipping is shared across all of them.",
+              },
+              {
+                question: "Can I order multiple medications in one order?",
+                answer:
+                  "Yes. Order as many medications as needed in a single order. Shipping is a flat $5 regardless of quantity. A member on 5 medications, one annual order, pays $1 per medication in shipping for the entire year.",
+              },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );

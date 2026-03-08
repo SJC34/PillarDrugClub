@@ -323,22 +323,32 @@ export default function HomePage() {
               {
                 question: "What is Pillar Drug Club?",
                 answer:
-                  "Pillar Drug Club is a membership-based pharmacy service that gives members access to generic medications at wholesale prices. For $99 per year, members pay true wholesale drug costs plus a $10 dispensing fee per medication and $5 flat shipping — no insurance required.",
+                  "A membership pharmacy that gives you access to generic medications at true wholesale prices — what pharmacies actually pay, before any markup. Pay $99/year, get wholesale pricing on hundreds of generics. Most tablets cost as little as $0.01, making a full year's supply as low as $3.65. No insurance needed. Available in all 50 states.",
               },
               {
-                question: "How is Pillar Drug Club different from GoodRx?",
+                question: "What is a PBM and why does it matter?",
                 answer:
-                  "GoodRx provides coupons that discount retail pharmacy prices. Pillar Drug Club starts at wholesale — the price before retail markup. For members on multiple generic medications, the annual savings typically far exceed the $99 membership cost.",
+                  "PBMs — CVS Caremark, Express Scripts, OptumRx — control roughly 80% of US prescription transactions. They sit between manufacturers, insurers, and pharmacies, collecting rebates and profiting from spread pricing. The more expensive the drug, the more they make. Cash-pay PDC members bypass PBMs entirely. No middleman. No spread pricing. Just wholesale cost plus a flat fee.",
+              },
+              {
+                question: "How is PDC different from Mark Cuban's Cost Plus Drugs?",
+                answer:
+                  "Cost Plus charges a 15% markup over wholesale plus fees — better than retail, but still a markup. The more expensive your medication, the more they earn per transaction. PDC charges zero markup on medications. Every dollar of profit comes from the $99 membership — not from your prescriptions. Think Costco: they profit on memberships, not products, which forces them to deliver genuine value on everything they sell. Same model here.",
               },
               {
                 question: "How does the $99 membership work?",
                 answer:
-                  "Pay $99 once per year. That gives you access to wholesale generic pricing for 12 months. You pay separately for each order: wholesale drug cost + $10 dispensing fee per medication + $5 flat shipping. No monthly fees, no hidden costs.",
+                  "Pay $99 once, get 12 months of wholesale pricing. Each order is billed separately: wholesale drug cost + $10 dispensing fee per medication + $5 flat shipping per order. To maximize savings, order a 365-day supply in one order. Example: 3 medications, annual order = ~$10.95 drug cost + $30 dispensing + $5 shipping = $45.95 for a full year. Same 3 medications ordered monthly = $430+. Membership auto-renews annually — cancel anytime from your account.",
               },
               {
-                question: "What are the dispensing and shipping fees?",
+                question: "Can I see my savings before I join?",
                 answer:
-                  "Each medication has a $10 dispensing fee. Shipping is a flat $5 per order regardless of how many medications are included. Example: 3 medications in one order = $30 dispensing + $5 shipping = $35 in fees, plus the wholesale cost of the medications.",
+                  "Yes. The savings calculator shows your wholesale cost side-by-side with average retail prices for every medication. Enter your drugs, see your annual savings. Most members on 2+ generics save significantly more than the $99 membership fee in the first order alone.",
+              },
+              {
+                question: "How does signup work?",
+                answer:
+                  "Entirely online, takes minutes. Pay $99, wholesale access activates immediately. Submit your prescription through your member dashboard — transfer from your current pharmacy (1–2 business days) or have your doctor send a new prescription directly to HealthWarehouse. Set up auto-refills, refill renewal alerts, and manage all active medications from one dashboard. Orders ship to any US address including addresses different from your billing address.",
               },
             ]}
           />
