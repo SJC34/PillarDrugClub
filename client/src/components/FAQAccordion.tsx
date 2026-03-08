@@ -16,12 +16,15 @@ export interface FAQItem {
 interface FAQAccordionProps {
   items: FAQItem[];
   className?: string;
+  noSchema?: boolean;
 }
 
-export function FAQAccordion({ items, className }: FAQAccordionProps) {
+export function FAQAccordion({ items, className, noSchema }: FAQAccordionProps) {
   const scriptIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (noSchema) return;
+
     if (!scriptIdRef.current) {
       scriptIdRef.current = `faq-schema-${++faqSchemaCounter}`;
     }
@@ -54,7 +57,7 @@ export function FAQAccordion({ items, className }: FAQAccordionProps) {
       const existing = document.getElementById(scriptId);
       if (existing) existing.remove();
     };
-  }, [items]);
+  }, [items, noSchema]);
 
   return (
     <Accordion type="single" collapsible className={className}>

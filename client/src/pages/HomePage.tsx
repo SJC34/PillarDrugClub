@@ -318,6 +318,7 @@ export default function HomePage() {
             Common Questions
           </h2>
           <FAQAccordion
+            noSchema
             items={[
               {
                 question: "What is Pillar Drug Club?",

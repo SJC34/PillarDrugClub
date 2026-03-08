@@ -52,12 +52,12 @@ export const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.stripe.com", "https://*.stripe.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://api.fda.gov", "https://clinicaltables.nlm.nih.gov", "https://connect.squareup.com", "https://connect.squareupsandbox.com"],
-      frameSrc: ["'self'", "https://js.squareup.com"],
+      connectSrc: ["'self'", "https://api.fda.gov", "https://clinicaltables.nlm.nih.gov", "https://connect.squareup.com", "https://connect.squareupsandbox.com", "https://api.stripe.com", "https://*.stripe.com"],
+      frameSrc: ["'self'", "https://js.squareup.com", "https://js.stripe.com", "https://*.stripe.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },

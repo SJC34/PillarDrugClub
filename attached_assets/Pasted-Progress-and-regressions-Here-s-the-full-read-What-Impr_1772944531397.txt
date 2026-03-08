@@ -1,0 +1,105 @@
+Progress and regressions. Here’s the full read:
+
+What Improved
+Auth 499 fix worked. Auth now exits cleanly — Setting isLoading=false immediately after localStorage user: not found. No more 499 timeout. Good.
+All page resources loaded. Previously 1 resource failed. Now all loaded. Good.
+
+What’s Still Broken
+1. FAQ Schema — Still 2 Invalid Items
+The fix didn’t work. Same error as before. Two questions still have invalid structure. The issue wasn’t resolved by the last Replit prompt.
+Next step: You need to find the exact two broken questions. Go into Replit and look at the raw JSON-LD being generated. The most likely culprit is one of the questions with multi-line answers or bullet-point style text — specifically the AWP/WAC/AAC question and the fee breakdown question. Both contain structured text that may be rendering as objects or arrays instead of plain strings.
+
+2. Stripe.js Blocked by CSP — New Issue
+
+Loading the script 'https://js.stripe.com/basil/stripe.js' violates 
+Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+
+
+Your Content Security Policy is blocking Stripe from loading. This means payment processing is broken for crawlers and potentially some users. This is a production issue, not just a crawl issue.
+Fix: Add https://js.stripe.com to the script-src directive in your CSP header. Current CSP:
+
+script-src 'self' 'unsafe-inline' 'unsafe-eval'
+
+
+Needs to be:
+
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.stripe.com
+
+
+Also add to frame-src (Stripe uses iframes):
+
+frame-src 'self' https://js.squareup.com https://*.stripe.com
+
+
+Score Comparison
+
+
+
+|Item            |Last Test  |This Test            |
+|----------------|-----------|---------------------|
+|FAQ schema      |2 invalid  |2 invalid — unchanged|
+|Auth 499        |Present    |Fixed ✅              |
+|Resource loading|1 failed   |All loaded ✅         |
+|Stripe CSP      |Not present|New error ⚠️          |
+|Organization    |5 valid    |5 valid              |
+|Local Business  |4 valid    |3 valid — lost one   |
+
+Priority Fix Order
+
+
+
+|Priority|Fix                       |Urgency                             |
+|--------|--------------------------|------------------------------------|
+|1       |Stripe CSP header         |Production — payments may be failing|
+|2       |FAQ schema 2 invalid items|Rich results blocked                |
+
+Replit Prompt for Both Fixes
+REPLIT PROMPT:
+Fix two issues. Do not change anything else.
+FIX 1 — CSP HEADER FOR STRIPE
+Locate where the Content-Security-Policy header is set. It is in either a middleware file, server.js, index.js, or an Express/Node config. Find the script-src directive and add Stripe domains.
+Change:
+
+script-src 'self' 'unsafe-inline' 'unsafe-eval'
+
+
+To:
+
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.stripe.com
+
+
+Change:
+
+frame-src 'self' https://js.squareup.com
+
+
+To:
+
+frame-src 'self' https://js.squareup.com https://js.stripe.com https://*.stripe.com
+
+
+Also add to connect-src:
+
+https://api.stripe.com https://*.stripe.com
+
+
+FIX 2 — FAQ SCHEMA
+Find every application/ld+json script tag in the codebase. For each FAQ schema, log the complete JSON to console during build or add a temporary console.log(JSON.stringify(faqSchema, null, 2)) to identify which question objects are malformed.
+The two invalid items are most likely questions where the answer text is being set as an object, array, or contains unescaped special characters instead of a plain string.
+Check specifically:
+	∙	Any question where the answer contains colons followed by text on new lines — these may be parsed as objects
+	∙	Any question where the answer contains bullet points built as arrays
+	∙	Any answer text field that is null, undefined, or an empty string
+Fix rule: every "text" field inside every "acceptedAnswer" must be a single plain string. Convert any structured content to plain text with \n for line breaks. Example of the AWP/WAC/AAC answer which is the most likely culprit:
+
+{
+  "@type": "Question",
+  "name": "What are AWP, WAC, and AAC?",
+  "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "AWP (Average Wholesale Price) — fictional. Set by manufacturers for insurance billing. Industry insiders call it Ain't What's Paid. This is what retail pharmacies use to set cash prices.\n\nWAC (Wholesale Acquisition Cost) — the manufacturer's list price to distributors. Closer to real but still not actual cost.\n\nAAC (Actual Acquisition Cost) — what a pharmacy truly pays after all discounts. This is what PDC charges members. For most generics, AAC is 90-99% below AWP."
+  }
+}
+
+
+After fixing, run JSON.parse(schemaString) in a test to confirm valid JSON before deploying.​​​​​​​​​​​​​​​​
