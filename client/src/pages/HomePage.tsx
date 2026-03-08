@@ -155,7 +155,7 @@ export default function HomePage() {
               )}
             </Button>
           </form>
-          <p className="text-xs text-foreground">Lock in $99/yr for first 100 members</p>
+          <p className="text-xs font-bold text-foreground">Lock in $99/yr for first 100 members</p>
           <p className="text-sm font-bold text-primary">Only 16 spots left!</p>
         </div>
       </section>
@@ -226,7 +226,7 @@ export default function HomePage() {
                 )}
               </Button>
             </form>
-            <p className="text-xs text-foreground mt-2 text-center">Lock in $99/yr for first 100 members</p>
+            <p className="text-xs font-bold text-foreground mt-2 text-center">Lock in $99/yr for first 100 members</p>
             <p className="text-sm font-bold text-primary text-center">Only 16 spots left!</p>
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function HomePage() {
               )}
             </Button>
           </form>
-          <p className="text-xs text-muted-foreground" data-testid="text-no-spam">
+          <p className="text-xs font-bold text-muted-foreground" data-testid="text-no-spam">
             No spam. No commitment. We'll reach out before launch.
           </p>
         </div>
