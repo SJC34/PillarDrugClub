@@ -120,7 +120,7 @@ export default function HomePage() {
       <section className="pt-16 md:pt-24 pb-8 px-6 md:px-12 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-black text-foreground leading-tight mb-6" data-testid="text-hero-headline">
-            Your prescriptions.
+            <span className="whitespace-nowrap">Your prescriptions.</span>
             <br />
             <span className="text-primary">On Autopilot. 🛩</span>
           </h1>
