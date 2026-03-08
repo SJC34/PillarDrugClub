@@ -120,9 +120,9 @@ export default function HomePage() {
       <section className="pt-16 md:pt-24 pb-8 px-6 md:px-12 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-black text-foreground leading-tight mb-6" data-testid="text-hero-headline">
-            <span className="whitespace-nowrap">Your prescriptions.</span>
+            <span className="whitespace-nowrap">Your prescriptions</span>
             <br />
-            <span className="text-primary">On Autopilot. 🛩</span>
+            <span className="text-primary">on autopilot. 🛩</span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto" data-testid="text-hero-subline">
             Stop guessing what you'll pay at the pharmacy. Pillar Drug Club locks in pass-through pricing on generics with 6–12 month supplies — no insurance games, no surprises.
