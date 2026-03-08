@@ -11,7 +11,7 @@ export function getBaseUrl(): string {
   if (typeof window !== 'undefined') {
     return window.location.origin;
   }
-  return 'https://pharmacyautopilot.com';
+  return 'https://pillardrugclub.com';
 }
 
 let schemaIdCounter = 0;

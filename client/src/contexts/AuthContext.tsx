@@ -37,16 +37,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // First check localStorage for immediate UI update
         const storedUser = localStorage.getItem("pillar_user");
         console.log("[AuthContext] localStorage user:", storedUser ? "found" : "not found");
-        if (storedUser) {
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            console.log("[AuthContext] Setting user from localStorage:", parsedUser.email);
-            setUser(parsedUser);
-          } catch {
-            // Invalid JSON in localStorage, clear it
-            console.warn("[AuthContext] Invalid JSON in localStorage, clearing");
-            localStorage.removeItem("pillar_user");
-          }
+
+        // Skip API call entirely if no cached user — prevents 499 timeout on unauthenticated requests
+        if (!storedUser) {
+          setIsLoading(false);
+          return;
+        }
+
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          console.log("[AuthContext] Setting user from localStorage:", parsedUser.email);
+          setUser(parsedUser);
+        } catch {
+          // Invalid JSON in localStorage, clear it and bail out
+          console.warn("[AuthContext] Invalid JSON in localStorage, clearing");
+          localStorage.removeItem("pillar_user");
+          setIsLoading(false);
+          return;
         }
 
         // Then verify with server (this is the source of truth)

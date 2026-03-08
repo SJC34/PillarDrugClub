@@ -1,0 +1,114 @@
+REPLIT PROMPT — FIX FAQ SCHEMA + ROBOTS.TXT + AUTH 499
+
+CONTEXT
+Site is at pillardrugclub.com. Three specific issues need to be fixed based on Google Rich Results Test results. Do not change anything else.
+
+FIX 1 — FAQ SCHEMA INVALID ITEMS
+Locate all FAQ structured data (JSON-LD) in the codebase. Search for application/ld+json and FAQPage.
+The FAQ schema has 2 invalid items. Fix every question object to match this exact structure with no exceptions:
+
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Question text goes here",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Answer text goes here"
+      }
+    }
+  ]
+}
+
+
+Apply these rules to every single question object in every FAQ schema on the site:
+	1.	Every question object must have "@type": "Question"
+	2.	Every question object must have "name" — the question text as a plain string
+	3.	Every question object must have "acceptedAnswer" — an object, not a string
+	4.	Every acceptedAnswer object must have "@type": "Answer"
+	5.	Every acceptedAnswer object must have "text" — plain text only
+	6.	Strip all HTML tags from every answer text field — no <br>, <strong>, <p>, <ul>, <li>, or any other HTML. Plain text only. Use newlines \n instead of <br> if line breaks are needed
+	7.	No answer text field can be null, undefined, or empty string
+	8.	The outer object must have "@context": "https://schema.org" and "@type": "FAQPage"
+After fixing, verify the complete schema is valid JSON — no trailing commas, no missing brackets.
+
+FIX 2 — ROBOTS.TXT
+Locate /public/robots.txt or wherever robots.txt is served from.
+Replace the entire contents with exactly this:
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /account/
+Sitemap: https://pillardrugclub.com/sitemap.xml
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+
+FIX 3 — AUTH 499 ERROR
+Locate the AuthContext file — based on console logs it is inside index-BM4v-0o3.js source, find the original source file. Look for loadUser function and localStorage user check.
+The current flow makes an API call to /api/auth/user even when no user is cached, causing a 499 timeout when Google crawls the page.
+Fix the loadUser function to skip the API call entirely if no cached user exists:
+
+const loadUser = async () => {
+  try {
+    console.log('[AuthContext] Starting loadUser...')
+    
+    const cachedUser = localStorage.getItem('user')
+    console.log('[AuthContext] localStorage user:', cachedUser ? 'found' : 'not found')
+    
+    // Skip API call if no cached user — prevents timeout on unauthenticated requests
+    if (!cachedUser) {
+      setIsLoading(false)
+      return
+    }
+    
+    const response = await fetch('/api/auth/user')
+    console.log('[AuthContext] Server response status:', response.status)
+    
+    if (!response.ok) {
+      console.warn('[AuthContext] Server error while checking auth, keeping cached user:', response.status)
+      setIsLoading(false)
+      return
+    }
+    
+    const data = await response.json()
+    setUser(data)
+  } catch (err) {
+    console.warn('[AuthContext] Auth check failed:', err)
+  } finally {
+    setIsLoading(false)
+  }
+}
+
+
+If the existing function structure differs significantly, preserve the existing logic but add the early return after the localStorage check as shown above. Do not break existing authentication for logged-in users.
+
+VERIFICATION
+After making all three fixes:
+	1.	Search the entire codebase for application/ld+json — open every instance and confirm every acceptedAnswer has "@type": "Answer" and plain text only in the "text" field
+	2.	Visit /robots.txt in browser — confirm it shows Disallow: /api/ and all AI crawlers listed
+	3.	Open browser developer tools console on homepage while logged out — confirm no 499 error appears
+	4.	Do not change any UI, styling, or other functionality​​​​​​​​​​​​​​​​

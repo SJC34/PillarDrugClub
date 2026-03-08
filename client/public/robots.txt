@@ -1,25 +1,9 @@
 User-agent: *
 Allow: /
-Allow: /medications
-Allow: /cost-calculator
-Allow: /register
-Allow: /faq
-Allow: /pharmacy-membership-vs-goodrx
-Allow: /scriptco-alternative
-Allow: /blog
-Allow: /refund-policy
-Allow: /privacy-policy
-Allow: /terms-of-service
-Disallow: /admin
-Disallow: /admin/*
-Disallow: /dashboard
-Disallow: /settings
-Disallow: /cart
-Disallow: /checkout
-Disallow: /orders
-Disallow: /prescriptions
-Disallow: /refills
-Disallow: /api/*
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /account/
+Sitemap: https://pillardrugclub.com/sitemap.xml
 
 User-agent: GPTBot
 Allow: /
@@ -41,5 +25,3 @@ Allow: /
 
 User-agent: cohere-ai
 Allow: /
-
-Sitemap: https://pillardrugclub.com/sitemap.xml

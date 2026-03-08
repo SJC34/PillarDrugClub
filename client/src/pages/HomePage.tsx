@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, ArrowRight, Plus } from "lucide-react";
-import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, faqSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
+import { SEOHead, pharmacySchema, medicalWebPageSchema, organizationSchema, howToSaveMoneySchema, getBaseUrl } from "@/components/SEOHead";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import pdcLogo from "@assets/image_1771566531369.jpeg";
 
@@ -77,7 +77,6 @@ export default function HomePage() {
       pharmacySchema,
       medicalWebPageSchema,
       organizationSchema,
-      faqSchema,
       howToSaveMoneySchema
     ]
   };
