@@ -66,7 +66,7 @@ export function FAQAccordion({ items, className }: FAQAccordionProps) {
           >
             {item.question}
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground leading-relaxed" data-testid={`faq-answer-${index}`}>
+          <AccordionContent className="text-muted-foreground leading-relaxed font-bold" data-testid={`faq-answer-${index}`}>
             {item.answer}
           </AccordionContent>
         </AccordionItem>
