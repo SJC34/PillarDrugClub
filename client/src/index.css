@@ -222,10 +222,6 @@
     letter-spacing: 0.01em;
   }
 
-  h1 + p, h2 + p, h3 + p, h4 + p {
-    font-weight: 700;
-  }
-
   .font-display {
     font-family: var(--font-display);
   }
