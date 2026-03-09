@@ -269,7 +269,7 @@ export default function HomePage() {
       {/* ── THE REAL PROBLEM ─────────────────────────────────────── */}
       <section className="py-16 md:py-24 px-6 md:px-12">
         <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4" data-testid="text-problem-label">
+          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4 text-center" data-testid="text-problem-label">
             THE REAL PROBLEM
           </p>
           <h2 className="text-3xl md:text-5xl font-black text-foreground mb-6 leading-tight" data-testid="text-problem-headline">
@@ -284,7 +284,7 @@ export default function HomePage() {
       {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
       <section className="py-16 md:py-24 px-6 md:px-12 bg-muted/30">
         <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4" data-testid="text-how-label">
+          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4 text-center" data-testid="text-how-label">
             HOW IT WORKS
           </p>
           <h2 className="text-3xl md:text-4xl font-black text-foreground mb-12 leading-tight" data-testid="text-how-headline">
@@ -309,7 +309,7 @@ export default function HomePage() {
       {/* ── THE NUMBERS ──────────────────────────────────────────── */}
       <section className="py-16 md:py-24 px-6 md:px-12">
         <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4" data-testid="text-numbers-label">
+          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4 text-center" data-testid="text-numbers-label">
             THE NUMBERS
           </p>
           <h2 className="text-3xl md:text-4xl font-black text-foreground mb-3 leading-tight" data-testid="text-numbers-headline">
@@ -354,7 +354,7 @@ export default function HomePage() {
       {/* ── FAQ ──────────────────────────────────────────────────── */}
       <section className="py-16 md:py-24 px-6 md:px-12 bg-muted/30">
         <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4" data-testid="text-faq-label">
+          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4 text-center" data-testid="text-faq-label">
             QUESTIONS
           </p>
           <h2 className="text-3xl md:text-4xl font-black text-foreground mb-10 leading-tight" data-testid="text-faq-headline">
