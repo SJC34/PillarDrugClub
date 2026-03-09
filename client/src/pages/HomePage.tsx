@@ -371,20 +371,20 @@ export default function HomePage() {
                 answer: "PBMs — CVS Caremark, Express Scripts, OptumRx — control roughly 80% of US prescription transactions. They sit between manufacturers, insurers, and pharmacies, collecting rebates and profiting from spread pricing. The more expensive the drug, the more they make. Cash-pay PDC members bypass PBMs entirely. No middleman. No spread pricing. Just wholesale cost plus a flat fee.",
               },
               {
-                question: "How is PDC different from GoodRx?",
-                answer: "GoodRx discounts retail prices — you're still paying a marked-up price, just less of it. PDC starts at wholesale — before retail markup exists. For members on multiple generics, the difference is hundreds of dollars per year. GoodRx is free but costs more per prescription. PDC costs $99/year but charges less per prescription.",
+                question: "How is PDC different from Mark Cuban's Cost Plus Drugs?",
+                answer: "Cost Plus charges a 15% markup over wholesale plus fees — better than retail, but still a markup. The more expensive your medication, the more they earn per transaction. PDC charges zero markup on medications. Every dollar of profit comes from the $99 membership — not from your prescriptions. Think Costco: they profit on memberships, not products, which forces them to deliver genuine value on everything they sell. Same model here.",
               },
               {
                 question: "How does the $99 membership work?",
                 answer: "Pay $99 once, get 12 months of wholesale pricing. Each order is billed separately: wholesale drug cost + $10 dispensing fee per medication + $5 flat shipping per order. To maximize savings, order a 365-day supply in one order. Example: 3 medications, annual order = ~$10.95 drug cost + $30 dispensing + $5 shipping = $45.95 for a full year. Same 3 medications ordered monthly = $430+. Membership auto-renews annually — cancel anytime from your account.",
               },
               {
-                question: "Is prior authorization ever required?",
-                answer: "Never. Prior auth is an insurance construct. PDC is cash-pay — no insurance, no prior auth, no step therapy, no formulary restrictions, no claim denials. Your doctor writes it, it's a covered generic, you can order it.",
+                question: "Can I see my savings before I join?",
+                answer: "Yes. The savings calculator shows your wholesale cost side-by-side with average retail prices for every medication. Enter your drugs, see your annual savings. Most members on 2+ generics save significantly more than the $99 membership fee in the first order alone.",
               },
               {
-                question: "Is my information private?",
-                answer: "Yes. Full HIPAA compliance. Your data is encrypted, never sold, never shared with advertisers. HealthWarehouse operates under a Business Associate Agreement with PDC. Your prescription history stays private.",
+                question: "How does signup work?",
+                answer: "Entirely online, takes minutes. Pay $99, wholesale access activates immediately. Submit your prescription through your member dashboard — transfer from your current pharmacy (1–2 business days) or have your doctor send a new prescription directly to HealthWarehouse. Set up auto-refills, refill renewal alerts, and manage all active medications from one dashboard. Orders ship to any US address including addresses different from your billing address.",
               },
             ]}
           />
