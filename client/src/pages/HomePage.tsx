@@ -167,23 +167,22 @@ export default function HomePage() {
       <WaitlistModal open={modalOpen} onOpenChange={setModalOpen} />
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="pt-20 md:pt-28 pb-16 md:pb-24 px-6 md:px-12 text-center">
-        <div className="max-w-3xl mx-auto">
+      <section className="pt-20 md:pt-28 pb-16 md:pb-24 px-6 md:px-12">
+        <div className="max-w-3xl">
           <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-6" data-testid="text-hero-badge">
             FOUNDED BY A LICENSED PHARMACIST
           </p>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-foreground leading-[1.05] mb-6" data-testid="text-hero-headline">
             Your prescriptions.<br />
-            At <em>actual</em><br />
-            wholesale cost.
+            At <em>actual</em> wholesale cost.
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto" data-testid="text-hero-subline">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl" data-testid="text-hero-subline">
             One $99/year membership. Every generic at the price your pharmacy paid — not what they charge you.
           </p>
 
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-start gap-3">
             <Button
               size="lg"
               className="h-14 px-10 text-base font-bold"
