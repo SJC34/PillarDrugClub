@@ -236,7 +236,8 @@ export default function HomePage() {
           {/* Proof bar */}
           <div className="mt-6 pt-6 border-t border-border/60 text-center space-y-2">
             <p className="text-sm font-bold text-foreground" data-testid="text-annual-savings">
-              Annual savings on those 4 drugs alone: <span className="text-primary">$621 vs. retail</span> / 4 fills each
+              Annual savings on those 4 drugs alone:<br />
+              <span className="text-primary">$621 vs. retail</span> / 4 fills each
             </p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-3">
               {[
