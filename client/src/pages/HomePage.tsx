@@ -182,7 +182,7 @@ export default function HomePage() {
             One $99/year membership. Every generic at the price your pharmacy paid — not what they charge you.
           </p>
 
-          <div className="flex flex-col items-start gap-3">
+          <div className="flex flex-col items-center gap-3">
             <Button
               size="lg"
               className="h-14 px-10 text-base font-bold"
