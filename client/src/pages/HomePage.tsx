@@ -173,7 +173,7 @@ export default function HomePage() {
             FOUNDED BY A LICENSED PHARMACIST
           </p>
 
-          <h1 className="text-5xl md:text-7xl font-black text-foreground leading-[1.05] mb-6" data-testid="text-hero-headline">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-foreground leading-[1.05] mb-6" data-testid="text-hero-headline">
             Your prescriptions.<br />
             At <em>actual</em><br />
             wholesale cost.
