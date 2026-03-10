@@ -167,7 +167,7 @@ export default function HomePage() {
       <WaitlistModal open={modalOpen} onOpenChange={setModalOpen} />
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="pt-20 md:pt-28 pb-16 md:pb-24 px-6 md:px-12">
+      <section className="pt-8 md:pt-12 pb-16 md:pb-24 px-6 md:px-12">
         <div className="max-w-3xl">
           <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4 md:mb-12 text-center" data-testid="text-hero-badge">
             FOUNDED BY A LICENSED PHARMACIST
