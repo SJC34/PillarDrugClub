@@ -169,9 +169,11 @@ export default function HomePage() {
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <section className="pt-8 md:pt-12 pb-16 md:pb-24 px-6 md:px-12">
         <div className="max-w-3xl">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary mb-4 md:mb-12 text-center" data-testid="text-hero-badge">
-            FOUNDED BY A LICENSED PHARMACIST
-          </p>
+          <div className="flex justify-center mb-4 md:mb-12">
+            <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary px-5 py-2.5 rounded-lg border border-border shadow-md bg-card" data-testid="text-hero-badge">
+              FOUNDED BY A LICENSED PHARMACIST
+            </p>
+          </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-foreground leading-[1.05] mb-6" data-testid="text-hero-headline">
             Your prescriptions.<br />
