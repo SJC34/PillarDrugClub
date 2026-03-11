@@ -1,5 +1,4 @@
-import XLSX from 'xlsx';
-import { readFileSync } from 'fs';
+import ExcelJS from 'exceljs';
 import { storage } from '../server/storage';
 
 interface ExcelMedication {
@@ -10,14 +9,31 @@ export async function importMedicationsFromExcel() {
   try {
     // Read the Excel file
     const filePath = 'attached_assets/Top Generics 5.22.25_1758991198647.xlsx';
-    const workbook = XLSX.readFile(filePath);
-    
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
+
     // Get the first worksheet
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    
-    // Convert to JSON
-    const rawData: ExcelMedication[] = XLSX.utils.sheet_to_json(worksheet);
+    const worksheet = workbook.worksheets[0];
+
+    // Convert to JSON by reading headers from row 1 and data from subsequent rows
+    const rawData: ExcelMedication[] = [];
+    const headers: string[] = [];
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.eachCell((cell) => {
+          headers.push(cell.text);
+        });
+      } else {
+        const obj: ExcelMedication = {};
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          const header = headers[colNumber - 1];
+          if (header) {
+            obj[header] = cell.value;
+          }
+        });
+        rawData.push(obj);
+      }
+    });
     
     console.log(`Found ${rawData.length} medications in Excel file`);
     console.log('Sample data:', rawData[0]);
