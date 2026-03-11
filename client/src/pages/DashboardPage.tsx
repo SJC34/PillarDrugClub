@@ -950,7 +950,7 @@ export default function DashboardPage() {
         )}
 
         {/* Prescription Requests */}
-        <Card className="mt-12">
+        <Card className="mt-8">
           <CardHeader>
             <CardTitle>Prescription Requests</CardTitle>
             <CardDescription>
