@@ -177,7 +177,7 @@ export default function HomePage() {
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-foreground leading-[1.05] mb-6" data-testid="text-hero-headline">
             Your prescriptions<br />
-            at <em className="text-secondary">actual</em> cost,<br />
+            at <em className="text-secondary font-normal">actual</em> cost,<br />
             not markups.
           </h1>
 
