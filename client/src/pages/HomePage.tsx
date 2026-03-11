@@ -198,9 +198,7 @@ export default function HomePage() {
             </Button>
             <div className="flex flex-col items-center gap-1.5 mt-1">
               {[
-                { icon: "shield", text: "PharmD — 10+ years clinical experience" },
                 { icon: "shield", text: "HIPAA-compliant fulfillment" },
-                { icon: "check", text: "Free delivery to your door" },
                 { icon: "check", text: "No insurance required" },
               ].map((item, i) => (
                 <p key={i} className="text-sm text-muted-foreground">
