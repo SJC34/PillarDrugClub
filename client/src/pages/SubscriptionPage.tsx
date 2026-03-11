@@ -44,6 +44,8 @@ const StripeSubscribeInner = ({ subscriptionId, userId }: { subscriptionId: stri
         title: "Subscription Successful",
         description: "Welcome to Pharmacy Autopilot! You now have access to wholesale pricing.",
       });
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({ event: 'purchase_complete', value: 99, currency: 'USD' });
       setLocation("/dashboard");
     } catch (err: any) {
       toast({
