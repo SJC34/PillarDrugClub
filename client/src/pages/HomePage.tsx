@@ -201,8 +201,8 @@ export default function HomePage() {
                 { icon: "shield", text: "HIPAA-compliant fulfillment" },
                 { icon: "check", text: "No insurance required" },
                 { icon: "check", text: "Nationwide Delivery" },
-                { icon: "check", text: "Optimize with 6-12 month supplies" },
                 { icon: "check", text: "30 Day Money-Back Guarantee" },
+                { icon: "check", text: "Optimize with 6-12 month supplies" },
               ].map((item, i) => (
                 <p key={i} className="text-sm text-muted-foreground">
                   {item.icon === "shield"
