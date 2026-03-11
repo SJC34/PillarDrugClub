@@ -199,6 +199,22 @@ export default function HomePage() {
               <Check className="inline h-3.5 w-3.5 mr-1 text-primary" />
               Cancel anytime. No contracts.
             </p>
+            <div className="flex flex-col items-center gap-1.5 mt-1">
+              {[
+                { icon: "shield", text: "PharmD — 10+ years clinical experience" },
+                { icon: "shield", text: "HIPAA-compliant fulfillment" },
+                { icon: "check", text: "Free delivery to your door" },
+                { icon: "check", text: "No insurance required" },
+                { icon: "check", text: "Cancel anytime — zero risk" },
+              ].map((item, i) => (
+                <p key={i} className="text-sm text-muted-foreground">
+                  {item.icon === "shield"
+                    ? <ShieldCheck className="inline h-3.5 w-3.5 mr-1 text-primary" />
+                    : <Check className="inline h-3.5 w-3.5 mr-1 text-primary" />}
+                  {item.text}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -237,34 +253,11 @@ export default function HomePage() {
           </div>
 
           {/* Proof bar */}
-          <div className="mt-6 pt-6 border-t border-border/60 text-center space-y-2">
+          <div className="mt-6 pt-6 border-t border-border/60 text-center">
             <p className="text-sm font-bold text-foreground" data-testid="text-annual-savings">
               Annual savings on those 4 drugs alone:<br />
               <span className="text-primary">$621 vs. retail</span> / 4 fills each
             </p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-3">
-              {[
-                "PharmD — 10+ years clinical experience",
-                "HIPAA-compliant fulfillment",
-              ].map((item, i) => (
-                <p key={i} className="text-xs text-muted-foreground">
-                  <ShieldCheck className="inline h-3 w-3 mr-1 text-primary" />
-                  {item}
-                </p>
-              ))}
-            </div>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
-              {[
-                "Free delivery to your door",
-                "No insurance required",
-                "Cancel anytime — zero risk",
-              ].map((item, i) => (
-                <p key={i} className="text-xs text-muted-foreground">
-                  <Check className="inline h-3 w-3 mr-1 text-primary" />
-                  {item}
-                </p>
-              ))}
-            </div>
           </div>
         </div>
       </section>
