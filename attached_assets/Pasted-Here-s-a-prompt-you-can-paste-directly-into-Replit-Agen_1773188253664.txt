@@ -1,0 +1,49 @@
+Here’s a prompt you can paste directly into Replit Agent:
+
+I need to install Google Tag Manager and set up Google Ads conversion tracking on my web app. Here’s exactly what to do:
+1. Install GTM snippets
+Add the following to my base HTML layout file (the template that wraps every page):
+Immediately after the opening <head> tag, add:
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+<!-- End Google Tag Manager -->
+
+
+Immediately after the opening <body> tag, add:
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
+I will replace GTM-XXXXXXX with my real GTM container ID after you make the changes.
+2. Add a dataLayer push on the confirmation page
+Find the page or route that a user lands on after successfully completing payment — this is my post-purchase confirmation page. Its URL contains “/confirmation” (tell me if you find a different URL pattern and I’ll confirm).
+On that page, add this script block before the closing </body> tag:
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    'event': 'purchase_complete',
+    'value': 99,
+    'currency': 'USD'
+  });
+</script>
+
+
+3. Tell me what you changed
+When done, tell me:
+	∙	Which file you added the GTM head snippet to
+	∙	Which file you added the GTM body snippet to
+	∙	Which file and line you added the dataLayer push to
+	∙	The exact URL path of the confirmation page
+Do not change anything else. Do not install any packages. This is pure HTML snippet insertion only.
+
+After Replit makes those changes, two more manual steps:
+In GTM (tagmanager.google.com), create a trigger: Custom Event → Event Name = purchase_complete. Then create a Google Ads Conversion tag that fires on that trigger. That’s it — no more code changes needed.​​​​​​​​​​​​​​​​
