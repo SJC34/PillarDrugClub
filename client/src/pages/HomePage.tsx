@@ -202,6 +202,7 @@ export default function HomePage() {
                 { icon: "check", text: "No insurance required" },
                 { icon: "check", text: "Nationwide Delivery" },
                 { icon: "check", text: "Optimize with 6-12 month supplies" },
+                { icon: "check", text: "30 Day Money-Back Guarantee" },
               ].map((item, i) => (
                 <p key={i} className="text-sm text-muted-foreground">
                   {item.icon === "shield"
