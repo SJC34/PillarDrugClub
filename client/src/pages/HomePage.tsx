@@ -170,7 +170,7 @@ export default function HomePage() {
       <section className="pt-8 md:pt-12 pb-16 md:pb-24 px-6 md:px-12">
         <div className="max-w-3xl">
           <div className="flex justify-center mb-4 md:mb-12">
-            <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary px-5 py-2.5 rounded-lg border border-border shadow-md bg-card text-center" data-testid="text-hero-badge">
+            <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary px-5 py-2.5 rounded-lg border border-border bg-card text-center" style={{boxShadow: "0px 2px 0px 0px hsl(153 73% 28% / 0.12), 0px 5px 10px -1px hsl(153 73% 28% / 0.30)"}} data-testid="text-hero-badge">
               FOUNDED BY A LICENSED PHARMACIST
             </p>
           </div>
