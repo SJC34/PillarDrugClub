@@ -150,7 +150,6 @@ export default function DashboardPage() {
   // Update drug allergies mutation
   const updateAllergiesMutation = useMutation({
     mutationFn: async (allergies: string[]) => {
-      console.log('[DashboardPage] Updating allergies for user:', user?.id, 'allergies:', allergies);
       return apiRequest('PUT', `/api/users/${user?.id}/allergies`, { drugAllergies: allergies });
     },
     onSuccess: async () => {
