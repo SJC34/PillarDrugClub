@@ -176,8 +176,8 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-foreground leading-[1.05] mb-6" data-testid="text-hero-headline">
-            Your prescriptions.<br />
-            At <em className="text-secondary">actual</em> wholesale cost.
+            Your prescriptions,<br />
+            at <em className="text-secondary">actual</em> cost, not markups.
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl" data-testid="text-hero-subline">
