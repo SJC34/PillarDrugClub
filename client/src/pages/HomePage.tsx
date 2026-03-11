@@ -189,6 +189,7 @@ export default function HomePage() {
             <Button
               size="lg"
               className="h-14 px-10 text-base font-bold"
+              style={{boxShadow: "0 0 0 1px hsl(177 65% 48% / 0.15), 0 0 16px 4px hsl(177 65% 48% / 0.30)"}}
               onClick={() => setModalOpen(true)}
               data-testid="button-hero-cta"
             >
