@@ -168,7 +168,7 @@ export default function HomePage() {
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <section className="pt-8 md:pt-12 pb-16 md:pb-24 px-6 md:px-12">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl md:text-center">
           <div className="flex justify-center mb-8 md:mb-16">
             <p className="text-xs font-bold tracking-[0.3em] uppercase text-secondary px-5 py-2.5 rounded-lg border border-border bg-card text-center" style={{boxShadow: "0 0 0 1px hsl(153 73% 28% / 0.13), 0 0 14px 4px hsl(153 73% 28% / 0.33)"}} data-testid="text-hero-badge">
               No Profit from Pills Policy.
