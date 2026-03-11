@@ -249,7 +249,7 @@ export default function HomePage() {
 
           {/* Proof bar */}
           <div className="mt-6 pt-6 border-t border-border/60 text-center">
-            <p className="text-sm font-bold text-foreground" data-testid="text-annual-savings">
+            <p className="text-lg font-bold text-foreground" data-testid="text-annual-savings">
               Annual savings on those 4 drugs alone:<br />
               <span className="text-primary">$621 vs. retail</span> / 4 fills each
             </p>
