@@ -195,17 +195,12 @@ export default function HomePage() {
               Start Saving Today — $99/year
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <p className="text-sm text-muted-foreground">
-              <Check className="inline h-3.5 w-3.5 mr-1 text-primary" />
-              Cancel anytime. No contracts.
-            </p>
             <div className="flex flex-col items-center gap-1.5 mt-1">
               {[
                 { icon: "shield", text: "PharmD — 10+ years clinical experience" },
                 { icon: "shield", text: "HIPAA-compliant fulfillment" },
                 { icon: "check", text: "Free delivery to your door" },
                 { icon: "check", text: "No insurance required" },
-                { icon: "check", text: "Cancel anytime — zero risk" },
               ].map((item, i) => (
                 <p key={i} className="text-sm text-muted-foreground">
                   {item.icon === "shield"
