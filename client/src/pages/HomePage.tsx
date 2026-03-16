@@ -200,7 +200,7 @@ export default function HomePage() {
               {[
                 { icon: "shield", text: "HIPAA-compliant fulfillment" },
                 { icon: "check", text: "No insurance required" },
-                { icon: "check", text: "Nationwide Delivery" },
+                { icon: "check", text: "$5 flat-rate shipping nationwide" },
                 { icon: "check", text: "30 Day Money-Back Guarantee" },
                 { icon: "check", text: "Optimize with 6-12 month supplies" },
               ].map((item, i) => (
