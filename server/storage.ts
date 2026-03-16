@@ -2064,10 +2064,10 @@ export class DbStorage extends MemStorage {
       }
 
       // Create LegitScript reviewer account if doesn't exist
-      const existingReviewer = await this.getUserByEmail("review@pillardrugclub.com");
-      if (!existingReviewer) {
+      let reviewerUser = await this.getUserByEmail("review@pillardrugclub.com");
+      if (!reviewerUser) {
         const hashedReviewerPassword = await bcrypt.hash("LSreview2026!", 10);
-        await db.insert(users).values({
+        const result = await db.insert(users).values({
           username: "review@pillardrugclub.com",
           email: "review@pillardrugclub.com",
           password: hashedReviewerPassword,
@@ -2087,8 +2087,59 @@ export class DbStorage extends MemStorage {
           primaryDoctorPhone: "5559876543",
           primaryDoctorAddress: { street: "100 Medical Center Dr", city: "Nashville", state: "TN", zip: "37203" },
           userAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zip: "37215" },
-        });
+        }).returning();
+        reviewerUser = result[0];
         console.log('✅ LegitScript reviewer account created: review@pillardrugclub.com');
+      }
+
+      // Seed reviewer sample prescription requests and orders in memory
+      // (prescription requests use MemStorage in-memory Maps, not DB tables)
+      if (reviewerUser && this.prescriptionRequests.size === 0) {
+        const rid = reviewerUser.id;
+        const now = new Date().toISOString();
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
+
+        this.prescriptionRequests.set("prx-review-1", {
+          id: "prx-review-1",
+          userId: rid,
+          patientName: "LegitScript Reviewer",
+          dateOfBirth: "01/15/1985",
+          medicationName: "Lisinopril 10mg",
+          dosage: "10mg",
+          quantity: "90",
+          doctorName: "Dr. Jane Smith, MD",
+          doctorPhone: "5559876543",
+          doctorFax: "5559876544",
+          doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
+          urgency: "routine",
+          specialInstructions: "Annual refill request",
+          status: "confirmed",
+          requestDate: thirtyDaysAgo,
+          createdAt: thirtyDaysAgo,
+          updatedAt: thirtyDaysAgo
+        } as any);
+
+        this.prescriptionRequests.set("prx-review-2", {
+          id: "prx-review-2",
+          userId: rid,
+          patientName: "LegitScript Reviewer",
+          dateOfBirth: "01/15/1985",
+          medicationName: "Metformin 500mg",
+          dosage: "500mg",
+          quantity: "180",
+          doctorName: "Dr. Jane Smith, MD",
+          doctorPhone: "5559876543",
+          doctorFax: "5559876544",
+          doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
+          urgency: "routine",
+          status: "pending",
+          requestDate: fiveDaysAgo,
+          createdAt: fiveDaysAgo,
+          updatedAt: fiveDaysAgo
+        } as any);
+
+        console.log('✅ LegitScript reviewer sample data seeded (prescription requests)');
       }
     } catch (error) {
       console.error('Error seeding test users:', error);

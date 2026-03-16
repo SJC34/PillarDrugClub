@@ -129,7 +129,72 @@ A pre-configured reviewer account is available at `/reviewer-access` with:
 
 ---
 
-## 9. Technology Stack
+## 9. End-to-End Patient Workflow
+
+The following describes the complete user journey from registration through order receipt.
+
+### Step 1: Registration (`/register`)
+The user creates an account by providing email, password, first name, last name, date of birth, phone number, and optional drug allergy information. Passwords must meet complexity requirements (uppercase, lowercase, digit, special character, minimum 8 characters). An SMS consent checkbox is presented.
+
+### Step 2: Membership Payment (`/subscribe`)
+After registration, the user is directed to the subscription page to activate their $99/year membership. Payment is processed via Stripe (credit/debit card). The membership fee covers platform access and wholesale pricing — it does not cover the cost of individual medications or shipping.
+
+### Step 3: Member Dashboard (`/dashboard`)
+Upon successful payment, the user lands on the member dashboard. The dashboard shows:
+- Subscription status (Active/Pending)
+- Quick actions: Cost Calculator, My Medications, Prescription Request, Referrals, Browse Medications, Account Settings
+- Primary care physician on file
+- Drug allergy list
+- Recent activity feed
+
+### Step 4: Browse Medications (`/medications`)
+The member browses the generic medication catalog (4,700+ FDA-approved generics). Each medication displays: name, strength, dosage form, manufacturer, wholesale price, and retail comparison price. Controlled substances are excluded from the catalog entirely.
+
+### Step 5: Cost Calculator (`/cost-calculator`)
+The member uses the interactive cost calculator to estimate their annual costs. The calculator factors in: $99 membership fee + ($10 dispensing fee per medication per fill) + ($5 shipping per order). Supply duration options: 30, 60, 90, 180, or 365 days.
+
+### Step 6: Prescription Request (`/prescription-request`)
+The member submits a prescription request by providing:
+- Patient name, date of birth
+- Medication name, dosage, quantity
+- Prescribing doctor name, phone, fax, address
+- Urgency level (routine/urgent/emergency)
+- Special instructions
+
+PDC generates a branded PDF and faxes it to the prescriber's office for authorization. The member can also download the PDF and text it to their phone.
+
+### Step 7: Prescription Verification
+HealthWarehouse receives the authorized prescription from the prescriber and performs:
+- Prescription validity verification
+- Drug utilization review (DUR) by a licensed pharmacist
+- Drug-drug interaction screening
+- Allergy cross-reference
+
+### Step 8: Order Placement (`/checkout`)
+Once the prescription is verified, the member places an order. The checkout page displays:
+- Medication items with wholesale pricing
+- $5 flat-rate shipping fee
+- Shipping address (on file or new entry)
+- Order summary with total
+
+### Step 9: Fulfillment & Shipping
+HealthWarehouse dispenses the medication and ships via USPS or UPS. The member receives:
+- Order confirmation email
+- Shipping confirmation with tracking number
+- SMS notification (if opted in)
+
+### Step 10: Order Tracking (`/orders`)
+The member tracks their order status through the Orders page:
+- Pending, Processing, Shipped, Delivered
+- Tracking number with carrier link
+- Estimated delivery date
+
+### Step 11: Refill Management (`/refills`)
+When a prescription allows refills, the member can request refills through the platform. Refill requests are routed to HealthWarehouse within the bounds of the original prescription authorization.
+
+---
+
+## 10. Technology Stack
 
 | Component | Technology |
 |---|---|
@@ -145,7 +210,7 @@ A pre-configured reviewer account is available at `/reviewer-access` with:
 
 ---
 
-## 10. Regulatory Posture
+## 11. Regulatory Posture
 
 | Requirement | Status |
 |---|---|

@@ -993,8 +993,11 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   });
 
   // Manual test user seeding endpoint (for production setup)
-  app.post("/api/admin/seed-users", async (req, res) => {
+  app.post("/api/admin/seed-users", async (req: any, res) => {
     try {
+      if (!req.isAuthenticated() || req.user?.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
       console.log("🔄 Manual user seeding triggered...");
       const dbStorage = storage as any;
       if (dbStorage.seedTestUsers) {
