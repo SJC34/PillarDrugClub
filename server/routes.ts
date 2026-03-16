@@ -94,6 +94,18 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     });
   });
 
+  // LegitScript reviewer credentials endpoint — only available in development
+  app.get('/api/reviewer-credentials', (req, res) => {
+    const isDev = process.env.NODE_ENV !== 'production';
+    if (!isDev) {
+      return res.status(403).json({ error: "Reviewer access is not available in production" });
+    }
+    res.json({
+      email: "review@pillardrugclub.com",
+      password: "LSreview2026!"
+    });
+  });
+
   // ===== SEO: Dynamic Sitemap Generation =====
   // Generate XML sitemap for search engines
   app.get('/sitemap.xml', async (req, res) => {

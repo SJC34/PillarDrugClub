@@ -45,6 +45,7 @@ import TermsOfServicePage from "@/pages/TermsOfServicePage";
 import FAQPage from "@/pages/FAQPage";
 import PharmacyMembershipVsGoodRxPage from "@/pages/PharmacyMembershipVsGoodRxPage";
 import ScriptCoAlternativePage from "@/pages/ScriptCoAlternativePage";
+import ReviewerAccessPage from "@/pages/ReviewerAccessPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
@@ -118,6 +119,7 @@ function Router() {
       <Route path="/faq" component={FAQPage} />
       <Route path="/pharmacy-membership-vs-goodrx" component={PharmacyMembershipVsGoodRxPage} />
       <Route path="/scriptco-alternative" component={ScriptCoAlternativePage} />
+      <Route path="/reviewer-access" component={ReviewerAccessPage} />
       <Route path="/cart" component={CartPage} />
       <Route path="/checkout" component={CheckoutPage} />
       <Route path="/orders" component={OrdersPage} />

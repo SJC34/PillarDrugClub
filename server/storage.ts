@@ -385,6 +385,123 @@ export class MemStorage implements IStorage {
     };
     this.users.set(sjcId, sjcUser);
     console.log('✅ SJC Pharmacy test user created: sjcpharmacy@gmail.com');
+
+    // Create LegitScript reviewer account with active membership and sample data
+    const reviewerId = randomUUID();
+    const hashedReviewerPassword = await bcrypt.hash("LSreview2026!", 10);
+    const reviewerUser: User = {
+      id: reviewerId,
+      username: "review@pillardrugclub.com",
+      email: "review@pillardrugclub.com",
+      password: hashedReviewerPassword,
+      firstName: "LegitScript",
+      lastName: "Reviewer",
+      dateOfBirth: "01/15/1985",
+      phoneNumber: "5551234567",
+      smsConsent: "false",
+      role: "client",
+      stripeCustomerId: "cus_reviewer_demo",
+      stripeSubscriptionId: "sub_reviewer_demo",
+      subscriptionStatus: "active",
+      isActive: "true",
+      profileImageUrl: null,
+      drugAllergies: ["Penicillin", "Sulfa"],
+      primaryDoctorId: "doc-reviewer-1",
+      primaryDoctorName: "Dr. Jane Smith, MD",
+      primaryDoctorNpi: "1234567890",
+      primaryDoctorPhone: "5559876543",
+      primaryDoctorAddress: { street: "100 Medical Center Dr", city: "Nashville", state: "TN", zip: "37203" },
+      userAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zip: "37215" },
+      createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+      updatedAt: now
+    };
+    this.users.set(reviewerId, reviewerUser);
+
+    // Seed sample prescription requests for reviewer
+    const reviewerPrescriptionRequests: PrescriptionRequest[] = [
+      {
+        id: "prx-review-1",
+        userId: reviewerId,
+        patientName: "LegitScript Reviewer",
+        dateOfBirth: "01/15/1985",
+        medicationName: "Lisinopril 10mg",
+        dosage: "10mg",
+        quantity: "90",
+        doctorName: "Dr. Jane Smith, MD",
+        doctorPhone: "5559876543",
+        doctorFax: "5559876544",
+        doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
+        urgency: "routine",
+        specialInstructions: "Annual refill request",
+        status: "confirmed",
+        requestDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: "prx-review-2",
+        userId: reviewerId,
+        patientName: "LegitScript Reviewer",
+        dateOfBirth: "01/15/1985",
+        medicationName: "Metformin 500mg",
+        dosage: "500mg",
+        quantity: "180",
+        doctorName: "Dr. Jane Smith, MD",
+        doctorPhone: "5559876543",
+        doctorFax: "5559876544",
+        doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
+        urgency: "routine",
+        status: "pending",
+        requestDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    ];
+    reviewerPrescriptionRequests.forEach(pr => this.prescriptionRequests.set(pr.id, pr));
+
+    // Seed sample orders for reviewer (using any to match loosely-typed MemStorage)
+    const reviewerOrders = [
+      {
+        id: "ord-review-1",
+        userId: reviewerId,
+        customerId: reviewerId,
+        orderNumber: "PD001001",
+        status: "delivered",
+        items: [
+          { type: "prescription", medicationId: "med-1", quantity: 90, price: 8.99, totalPrice: 8.99 }
+        ],
+        subtotal: 8.99,
+        shippingCost: 5.00,
+        tax: 0,
+        total: 13.99,
+        shippingAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zipCode: "37215", country: "US" },
+        paymentMethod: { type: "credit_card", last4: "4242", brand: "Visa" },
+        createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: "ord-review-2",
+        userId: reviewerId,
+        customerId: reviewerId,
+        orderNumber: "PD001042",
+        status: "processing",
+        items: [
+          { type: "prescription", medicationId: "med-2", quantity: 180, price: 4.99, totalPrice: 4.99 },
+          { type: "prescription", medicationId: "med-3", quantity: 90, price: 11.99, totalPrice: 11.99 }
+        ],
+        subtotal: 16.98,
+        shippingCost: 5.00,
+        tax: 0,
+        total: 21.98,
+        shippingAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zipCode: "37215", country: "US" },
+        paymentMethod: { type: "credit_card", last4: "4242", brand: "Visa" },
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    ];
+    reviewerOrders.forEach(o => this.orders.set(o.id, o as any));
+
+    console.log('✅ LegitScript reviewer account created: review@pillardrugclub.com');
   }
 
   async loadImportedMedications() {
@@ -1944,6 +2061,34 @@ export class DbStorage extends MemStorage {
           smsConsent: "false",
         });
         console.log('✅ SJC Pharmacy test user created: sjcpharmacy@gmail.com');
+      }
+
+      // Create LegitScript reviewer account if doesn't exist
+      const existingReviewer = await this.getUserByEmail("review@pillardrugclub.com");
+      if (!existingReviewer) {
+        const hashedReviewerPassword = await bcrypt.hash("LSreview2026!", 10);
+        await db.insert(users).values({
+          username: "review@pillardrugclub.com",
+          email: "review@pillardrugclub.com",
+          password: hashedReviewerPassword,
+          firstName: "LegitScript",
+          lastName: "Reviewer",
+          dateOfBirth: "01/15/1985",
+          phoneNumber: "5551234567",
+          role: "client",
+          stripeCustomerId: "cus_reviewer_demo",
+          stripeSubscriptionId: "sub_reviewer_demo",
+          subscriptionStatus: "active",
+          isActive: "true",
+          smsConsent: "false",
+          drugAllergies: ["Penicillin", "Sulfa"],
+          primaryDoctorName: "Dr. Jane Smith, MD",
+          primaryDoctorNpi: "1234567890",
+          primaryDoctorPhone: "5559876543",
+          primaryDoctorAddress: { street: "100 Medical Center Dr", city: "Nashville", state: "TN", zip: "37203" },
+          userAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zip: "37215" },
+        });
+        console.log('✅ LegitScript reviewer account created: review@pillardrugclub.com');
       }
     } catch (error) {
       console.error('Error seeding test users:', error);
