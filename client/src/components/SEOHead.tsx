@@ -87,7 +87,7 @@ export const pharmacySchema = {
   "@context": "https://schema.org",
   "@type": "Pharmacy",
   "name": "Pharmacy Autopilot",
-  "description": "Get affordable prescription medications as low as $0.01 per tablet without insurance. Save 90% on diabetes meds, blood pressure medications, cholesterol drugs & more. Wholesale pricing beats Amazon Pharmacy, GoodRx, and Cost Plus Drugs. Free home delivery nationwide.",
+  "description": "Get affordable prescription medications as low as $0.01 per tablet without insurance. Save up to 89% on diabetes meds, blood pressure medications, cholesterol drugs & more. Wholesale pricing. $5 flat-rate shipping nationwide. Savings vary by medication.",
   "url": "https://pharmacyautopilot.com",
   "priceRange": "$",
   "address": {
@@ -104,7 +104,7 @@ export const pharmacySchema = {
     {
       "@type": "MedicalProcedure",
       "name": "Cheap Prescriptions Without Insurance",
-      "description": "Save 90% on medications by buying directly at wholesale cost - no insurance needed. Get diabetes medications, blood pressure pills, cholesterol drugs for pennies per pill"
+      "description": "Save up to 89% on medications by buying directly at wholesale cost - no insurance needed. Get diabetes medications, blood pressure pills, cholesterol drugs for pennies per pill"
     },
     {
       "@type": "Service",
@@ -113,8 +113,8 @@ export const pharmacySchema = {
     },
     {
       "@type": "DeliveryService",
-      "name": "Free Home Delivery",
-      "description": "Your medications shipped directly to your door at no extra cost. All 50 states, no insurance required"
+      "name": "$5 Flat-Rate Shipping",
+      "description": "Your medications shipped directly to your door for a flat $5 per order. All 50 states, no insurance required"
     },
     {
       "@type": "Service",
@@ -133,14 +133,14 @@ export const pharmacySchema = {
     "ratingCount": "1247",
     "reviewCount": "1247"
   },
-  "slogan": "Beat Amazon - Save 90% Today"
+  "slogan": "Wholesale Prescription Pricing - Save Up to 89%"
 };
 
 export const medicalWebPageSchema = {
   "@context": "https://schema.org",
   "@type": "MedicalWebPage",
   "name": "Pharmacy Autopilot - Save Money on Prescriptions",
-  "description": "Stop overpaying for prescriptions. Get medications as low as $0.01 per tablet without insurance. Free delivery.",
+  "description": "Stop overpaying for prescriptions. Get medications as low as $0.01 per tablet without insurance. $5 flat-rate shipping.",
   "url": "https://pharmacyautopilot.com",
   "specialty": "Pharmacy",
   "about": {
@@ -216,7 +216,7 @@ export const faqSchema = {
       "name": "Do you deliver to my home?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, free delivery nationwide to all 50 states. Your medications are shipped directly to your door with tracking. No pharmacy trips, no waiting in line."
+        "text": "Yes, nationwide delivery to all 50 states for a flat $5 per order. Your medications are shipped directly to your door with tracking. No pharmacy trips, no waiting in line."
       }
     },
     {
@@ -347,7 +347,7 @@ export const howToSaveMoneySchema = {
   "@context": "https://schema.org",
   "@type": "HowTo",
   "name": "How to Save Money on Prescriptions Without Insurance",
-  "description": "Step-by-step guide to getting affordable medications without insurance. Save 90% on diabetes meds, blood pressure medications, and other prescriptions.",
+  "description": "Step-by-step guide to getting affordable medications without insurance. Save up to 89% on diabetes meds, blood pressure medications, and other prescriptions. Savings vary by medication.",
   "totalTime": "PT10M",
   "estimatedCost": {
     "@type": "MonetaryAmount",
@@ -386,8 +386,8 @@ export const howToSaveMoneySchema = {
     {
       "@type": "HowToStep",
       "position": 5,
-      "name": "Get Free Home Delivery",
-      "text": "Your medications ship directly to your door at no extra cost. Tracking included. Available in all 50 states.",
+      "name": "Get $5 Flat-Rate Shipping",
+      "text": "Your medications ship directly to your door for a flat $5 per order. Tracking included. Available in all 50 states.",
       "url": "https://pharmacyautopilot.com"
     }
   ]

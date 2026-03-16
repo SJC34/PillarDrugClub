@@ -93,7 +93,7 @@ export const ALL_FAQS: FAQItem[] = [
   {
     question: "Is PDC a licensed pharmacy?",
     answer:
-      "PDC is LegitScript certified as a healthcare merchant — the same standard required by Google and Meta for pharmacy advertising. Prescription fulfillment is handled by HealthWarehouse, our licensed pharmacy partner. Your medications are dispensed by a fully regulated US pharmacy.",
+      "PDC operates as a healthcare merchant. Prescription fulfillment is handled by HealthWarehouse, our licensed pharmacy partner. Your medications are dispensed by a fully regulated US pharmacy.",
   },
   {
     question: "Is my information private?",

@@ -130,7 +130,7 @@ export default function HomePage() {
         "name": "Is PDC a licensed pharmacy?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "PDC is LegitScript certified as a healthcare merchant — the same standard required by Google and Meta for pharmacy advertising. Prescription fulfillment is handled by HealthWarehouse, our licensed pharmacy partner. Your medications are dispensed by a fully regulated US pharmacy."
+          "text": "PDC operates as a healthcare merchant. Prescription fulfillment is handled by HealthWarehouse, our licensed pharmacy partner. Your medications are dispensed by a fully regulated US pharmacy."
         }
       },
       {
@@ -158,7 +158,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Save 90% on Prescriptions | Get Meds Without Insurance | Pillar Drug Club"
+        title="Save Up to 89% on Prescriptions | Get Meds Without Insurance | Pillar Drug Club"
         description="Pay $99/year and access generic medications at true wholesale prices. Most tablets as low as $0.01. No insurance required. Founded by a licensed pharmacist."
         canonical={getBaseUrl()}
         schema={combinedSchema}
@@ -252,8 +252,11 @@ export default function HomePage() {
           {/* Proof bar */}
           <div className="mt-6 pt-6 border-t border-border/60 text-center">
             <p className="text-base font-bold text-foreground" data-testid="text-annual-savings">
-              Annual savings on those 4 drugs alone:<br />
-              <span className="text-primary">$621 vs. retail</span> / 4 fills each
+              Estimated annual savings on those 4 drugs:<br />
+              <span className="text-primary">Up to $621 vs. retail</span> / 4 fills each
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Based on representative retail prices from major US pharmacy chains. Actual savings vary.
             </p>
           </div>
         </div>
@@ -339,7 +342,7 @@ export default function HomePage() {
           </div>
 
           <p className="mt-4 text-xs text-muted-foreground leading-relaxed" data-testid="text-numbers-footnote">
-            GoodRx is free but requires a coupon at a retail counter and prices vary by location. PDC eliminates per-prescription variables entirely. One $99 annual fee, then wholesale on everything.
+            Retail prices are representative averages from major US pharmacy chains as of early 2026. GoodRx prices as listed on goodrx.com; actual prices vary by pharmacy and location. PDC prices reflect wholesale acquisition cost before dispensing and shipping fees. Savings vary by medication, quantity, and order frequency.
           </p>
         </div>
       </section>
@@ -402,8 +405,8 @@ export default function HomePage() {
             </div>
             <div className="hidden sm:block w-px h-16 bg-border" />
             <div className="text-center">
-              <p className="text-xl font-bold text-primary" data-testid="text-bottom-savings">$480 avg. retail savings/year</p>
-              <p className="text-sm text-muted-foreground mt-1">Most members save 4–8× the fee</p>
+              <p className="text-xl font-bold text-primary" data-testid="text-bottom-savings">Up to $480+ in retail savings/year</p>
+              <p className="text-sm text-muted-foreground mt-1">Based on representative retail pricing*</p>
             </div>
           </div>
 
@@ -418,7 +421,7 @@ export default function HomePage() {
           </Button>
 
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
-            {["Cancel anytime", "Free delivery", "Satisfaction guarantee"].map((item) => (
+            {["Cancel anytime", "$5 flat-rate shipping", "30-day money-back guarantee"].map((item) => (
               <p key={item} className="text-sm text-muted-foreground">
                 <Check className="inline h-3.5 w-3.5 mr-1 text-primary" />
                 {item}
@@ -433,7 +436,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto text-center">
           <img src={pdcLogo} alt="Pillar Drug Club" className="h-8 md:h-10 object-contain mx-auto mb-6" data-testid="img-logo-footer" />
           <p className="text-xs text-muted-foreground leading-relaxed mb-4 max-w-xl mx-auto" data-testid="text-footer-legal">
-            Pillar Drug Club is not an insurance product. PDC provides access to wholesale medication pricing through licensed pharmacy partners. Not all medications are available. Controlled substances are excluded.
+            Pillar Drug Club is not an insurance product. PDC provides access to wholesale medication pricing through licensed pharmacy partners. Not all medications are available. Controlled substances are excluded. *Savings estimates are based on publicly available retail pricing data and may vary by medication, dosage, quantity, and individual circumstances. Prices shown are representative and subject to change.
           </p>
           <div className="flex justify-center gap-4 mb-4">
             <Link href="/privacy-policy" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link>

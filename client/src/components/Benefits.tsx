@@ -20,7 +20,7 @@ export default function Benefits() {
     },
     {
       icon: Truck,
-      title: "Free delivery",
+      title: "$5 flat-rate shipping",
       description: "Medications shipped directly to your door in secure, discreet packaging within 2-3 business days."
     },
     {
