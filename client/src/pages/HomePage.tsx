@@ -405,7 +405,7 @@ export default function HomePage() {
             </div>
             <div className="hidden sm:block w-px h-16 bg-border" />
             <div className="text-center">
-              <p className="text-xl font-bold text-primary" data-testid="text-bottom-savings">Up to $480+ in retail savings/year</p>
+              <p className="text-xl font-bold text-primary" data-testid="text-bottom-savings">Up to $480 in retail savings/year</p>
               <p className="text-sm text-muted-foreground mt-1">Based on representative retail pricing*</p>
             </div>
           </div>
