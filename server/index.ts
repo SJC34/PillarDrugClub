@@ -9,6 +9,16 @@ import {
 } from "./securityMiddleware";
 import { autoAuditMiddleware } from "./auditLogger";
 
+// Fail fast in production if required secrets are missing
+if (process.env.NODE_ENV === 'production') {
+  const required = ['KLAVIYO_API_KEY'];
+  const missing = required.filter(k => !process.env[k]);
+  if (missing.length > 0) {
+    console.error(`FATAL: Missing required environment variable(s): ${missing.join(', ')}`);
+    process.exit(1);
+  }
+}
+
 const app = express();
 
 // CRITICAL: Add health check endpoints FIRST, before any middleware

@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
-    "@hubspot/api-client": "^12.0.1",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@mailchimp/mailchimp_marketing": "^3.0.80",
     "@neondatabase/serverless": "^0.10.4",
