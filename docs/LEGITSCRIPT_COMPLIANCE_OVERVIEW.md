@@ -119,7 +119,7 @@ A pre-configured reviewer account is available at `/reviewer-access` with:
 - Shipping address on file
 - Marked as `isTestAccount: true` — excluded from member metrics and analytics
 
-**Access control:** The `/reviewer-access` page and credentials endpoint are available in development mode by default. In production, set the environment variable `REVIEWER_ACCESS_ENABLED=true` to enable reviewer access during the certification review period.
+**Access control:** The `/reviewer-access` page and credentials endpoint are available in development mode by default. In production, set the environment variable `REVIEWER_ACCESS_TOKEN` to a secret value, then share the URL `/reviewer-access?token=<secret>` with the LegitScript reviewer. The token is required to access credentials in production.
 
 ### Suggested Review Flow
 1. Visit `/reviewer-access` and click "Quick Login as Reviewer"

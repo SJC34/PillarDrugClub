@@ -94,13 +94,22 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     });
   });
 
-  // LegitScript reviewer credentials endpoint — available in dev or when REVIEWER_ACCESS_ENABLED=true
   app.get('/api/reviewer-credentials', (req, res) => {
     const isDev = process.env.NODE_ENV !== 'production';
-    const reviewerAccessEnabled = process.env.REVIEWER_ACCESS_ENABLED === 'true';
-    if (!isDev && !reviewerAccessEnabled) {
+    const accessToken = process.env.REVIEWER_ACCESS_TOKEN;
+    const providedToken = req.query.token as string | undefined;
+
+    if (isDev) {
+      return res.json({
+        email: "review@pillardrugclub.com",
+        password: "LSreview2026!"
+      });
+    }
+
+    if (!accessToken || !providedToken || providedToken !== accessToken) {
       return res.status(403).json({ error: "Reviewer access is not available" });
     }
+
     res.json({
       email: "review@pillardrugclub.com",
       password: "LSreview2026!"
@@ -928,9 +937,10 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         return res.status(404).json({ error: "User not found" });
       }
       
+      const hasAccess = user.subscriptionStatus === 'active' || user.isTestAccount === true;
       res.json({ 
         subscriptionStatus: user.subscriptionStatus,
-        hasAccess: true // Allow all users to bypass subscription requirement
+        hasAccess
       });
     } catch (error: any) {
       console.error("Subscription status error:", error);

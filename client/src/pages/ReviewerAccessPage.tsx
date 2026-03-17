@@ -36,7 +36,12 @@ export default function ReviewerAccessPage() {
   const { user, login } = useAuth();
 
   useEffect(() => {
-    fetch("/api/reviewer-credentials")
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const url = token
+      ? `/api/reviewer-credentials?token=${encodeURIComponent(token)}`
+      : "/api/reviewer-credentials";
+    fetch(url)
       .then(res => {
         if (!res.ok) {
           setAccessDenied(true);

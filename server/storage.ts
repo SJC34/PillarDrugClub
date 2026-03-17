@@ -341,6 +341,7 @@ export class MemStorage implements IStorage {
       subscriptionStatus: "active",
       isActive: "true",
       profileImageUrl: null,
+      isTestAccount: false,
       drugAllergies: null,
       primaryDoctorId: null,
       primaryDoctorName: null,
@@ -373,6 +374,7 @@ export class MemStorage implements IStorage {
       subscriptionStatus: "active",
       isActive: "true",
       profileImageUrl: null,
+      isTestAccount: false,
       drugAllergies: null,
       primaryDoctorId: null,
       primaryDoctorName: null,
@@ -405,6 +407,7 @@ export class MemStorage implements IStorage {
       subscriptionStatus: "active",
       isActive: "true",
       profileImageUrl: null,
+      isTestAccount: true,
       drugAllergies: ["Penicillin", "Sulfa"],
       primaryDoctorId: "doc-reviewer-1",
       primaryDoctorName: "Dr. Jane Smith, MD",
@@ -459,44 +462,24 @@ export class MemStorage implements IStorage {
     ];
     reviewerPrescriptionRequests.forEach(pr => this.prescriptionRequests.set(pr.id, pr));
 
-    const reviewerOrders: Order[] = [
-      {
-        id: "ord-review-1",
-        customerId: reviewerId,
-        orderNumber: "PD001001",
-        status: "delivered",
-        items: [
-          { type: "prescription", medicationId: "med-1", quantity: 90, price: 8.99, totalPrice: 8.99 }
-        ],
-        subtotal: 8.99,
-        shippingCost: 5.00,
-        tax: 0,
-        total: 13.99,
-        shippingAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zipCode: "37215", country: "US" },
-        paymentMethod: { type: "credit_card", last4: "4242", brand: "Visa" },
-        createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: "ord-review-2",
-        customerId: reviewerId,
-        orderNumber: "PD001042",
-        status: "processing",
-        items: [
-          { type: "prescription", medicationId: "med-2", quantity: 180, price: 4.99, totalPrice: 4.99 },
-          { type: "prescription", medicationId: "med-3", quantity: 90, price: 11.99, totalPrice: 11.99 }
-        ],
-        subtotal: 16.98,
-        shippingCost: 5.00,
-        tax: 0,
-        total: 21.98,
-        shippingAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zipCode: "37215", country: "US" },
-        paymentMethod: { type: "credit_card", last4: "4242", brand: "Visa" },
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-      }
-    ];
-    reviewerOrders.forEach(o => this.orders.set(o.id, o));
+    const reviewerOrder: Order = {
+      id: "ord-review-1",
+      customerId: reviewerId,
+      orderNumber: "PD001001",
+      status: "delivered",
+      items: [
+        { type: "prescription", medicationId: "med-1", quantity: 90, price: 8.99, totalPrice: 8.99 }
+      ],
+      subtotal: 8.99,
+      shippingCost: 5.00,
+      tax: 0,
+      total: 13.99,
+      shippingAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zipCode: "37215", country: "US" },
+      paymentMethod: { type: "credit_card", last4: "4242", brand: "Visa" },
+      createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
+    };
+    this.orders.set(reviewerOrder.id, reviewerOrder);
 
     const reviewerPrescription: Prescription = {
       id: "rx-review-1",
