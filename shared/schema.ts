@@ -49,6 +49,7 @@ export const users = pgTable("users", {
   hwCustomerId: integer("hw_customer_id"), // HealthWarehouse customer ID
   hwPatientId: integer("hw_patient_id"), // HealthWarehouse patient ID
   credentials: text("credentials"), // Professional credentials (e.g., "Pharm.D.", "M.D.", "R.Ph.")
+  isTestAccount: boolean("is_test_account").default(false),
   deletedAt: timestamp("deleted_at"), // Soft delete timestamp
   deletionReason: text("deletion_reason"), // Reason for deletion/deactivation
   failedLoginAttempts: integer("failed_login_attempts").default(0),

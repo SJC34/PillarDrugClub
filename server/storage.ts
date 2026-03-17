@@ -2081,6 +2081,7 @@ export class DbStorage extends MemStorage {
           subscriptionStatus: "active",
           isActive: "true",
           smsConsent: "false",
+          isTestAccount: true,
           drugAllergies: ["Penicillin", "Sulfa"],
           primaryDoctorName: "Dr. Jane Smith, MD",
           primaryDoctorNpi: "1234567890",
@@ -2090,59 +2091,91 @@ export class DbStorage extends MemStorage {
         }).returning();
         reviewerUser = result[0];
         console.log('✅ LegitScript reviewer account created: review@pillardrugclub.com');
+      } else if (reviewerUser && !reviewerUser.isTestAccount) {
+        await db.update(users).set({ isTestAccount: true }).where(eq(users.id, reviewerUser.id));
       }
 
-      // Seed reviewer sample prescription requests and orders in memory
-      // (prescription requests use MemStorage in-memory Maps, not DB tables)
-      if (reviewerUser && this.prescriptionRequests.size === 0) {
-        const rid = reviewerUser.id;
-        const now = new Date().toISOString();
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-        const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
-
-        this.prescriptionRequests.set("prx-review-1", {
-          id: "prx-review-1",
-          userId: rid,
-          patientName: "LegitScript Reviewer",
-          dateOfBirth: "01/15/1985",
-          medicationName: "Lisinopril 10mg",
-          dosage: "10mg",
-          quantity: "90",
-          doctorName: "Dr. Jane Smith, MD",
-          doctorPhone: "5559876543",
-          doctorFax: "5559876544",
-          doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
-          urgency: "routine",
-          specialInstructions: "Annual refill request",
-          status: "confirmed",
-          requestDate: thirtyDaysAgo,
-          createdAt: thirtyDaysAgo,
-          updatedAt: thirtyDaysAgo
-        } as any);
-
-        this.prescriptionRequests.set("prx-review-2", {
-          id: "prx-review-2",
-          userId: rid,
-          patientName: "LegitScript Reviewer",
-          dateOfBirth: "01/15/1985",
-          medicationName: "Metformin 500mg",
-          dosage: "500mg",
-          quantity: "180",
-          doctorName: "Dr. Jane Smith, MD",
-          doctorPhone: "5559876543",
-          doctorFax: "5559876544",
-          doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
-          urgency: "routine",
-          status: "pending",
-          requestDate: fiveDaysAgo,
-          createdAt: fiveDaysAgo,
-          updatedAt: fiveDaysAgo
-        } as any);
-
-        console.log('✅ LegitScript reviewer sample data seeded (prescription requests)');
+      if (reviewerUser) {
+        await this.seedReviewerSampleData(reviewerUser.id);
       }
     } catch (error) {
       console.error('Error seeding test users:', error);
+    }
+  }
+
+  private async seedReviewerSampleData(userId: string): Promise<void> {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
+
+    if (this.prescriptionRequests.size === 0) {
+      const confirmedRequest: PrescriptionRequest = {
+        id: "prx-review-1",
+        userId,
+        patientName: "LegitScript Reviewer",
+        dateOfBirth: "01/15/1985",
+        medicationName: "Lisinopril 10mg",
+        dosage: "10mg",
+        quantity: "90",
+        doctorName: "Dr. Jane Smith, MD",
+        doctorPhone: "5559876543",
+        doctorFax: "5559876544",
+        doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
+        urgency: "routine",
+        specialInstructions: "Annual refill request",
+        status: "confirmed",
+        requestDate: thirtyDaysAgo,
+        createdAt: thirtyDaysAgo,
+        updatedAt: thirtyDaysAgo
+      };
+
+      const pendingRequest: PrescriptionRequest = {
+        id: "prx-review-2",
+        userId,
+        patientName: "LegitScript Reviewer",
+        dateOfBirth: "01/15/1985",
+        medicationName: "Metformin 500mg",
+        dosage: "500mg",
+        quantity: "180",
+        doctorName: "Dr. Jane Smith, MD",
+        doctorPhone: "5559876543",
+        doctorFax: "5559876544",
+        doctorAddress: "100 Medical Center Dr, Nashville, TN 37203",
+        urgency: "routine",
+        status: "pending",
+        requestDate: fiveDaysAgo,
+        createdAt: fiveDaysAgo,
+        updatedAt: fiveDaysAgo
+      };
+
+      this.prescriptionRequests.set("prx-review-1", confirmedRequest);
+      this.prescriptionRequests.set("prx-review-2", pendingRequest);
+      console.log('✅ LegitScript reviewer prescription requests seeded');
+    }
+
+    const existingOrders = await db.select().from(ordersTable).where(eq(ordersTable.userId, userId));
+    if (existingOrders.length === 0) {
+      const orderNumber = `PDC-REVIEW-${Date.now()}`;
+      await db.insert(ordersTable).values({
+        userId,
+        orderNumber,
+        status: "delivered",
+        items: [
+          {
+            medicationName: "Lisinopril 10mg",
+            quantity: 90,
+            price: "4.20",
+            dispensingFee: "10.00"
+          }
+        ],
+        subtotal: "14.20",
+        shippingCost: "5.00",
+        tax: "0.00",
+        total: "19.20",
+        shippingAddress: { street: "456 Oak Avenue", city: "Nashville", state: "TN", zip: "37215" },
+        paymentMethod: { type: "card", last4: "4242" },
+        notes: "Demo order for LegitScript review"
+      });
+      console.log('✅ LegitScript reviewer sample order seeded in database');
     }
   }
 
@@ -2646,8 +2679,8 @@ export class DbStorage extends MemStorage {
     const oneMonthAgo = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // User Metrics - fetch from database instead of in-memory Map
-    const allUsers = await db.select().from(users);
+    // User Metrics - fetch from database, excluding test accounts
+    const allUsers = (await db.select().from(users)).filter(u => !u.isTestAccount);
     const totalUsers = allUsers.length;
     const newUsersThisWeek = allUsers.filter(u => u.createdAt && new Date(u.createdAt) >= oneWeekAgo).length;
     

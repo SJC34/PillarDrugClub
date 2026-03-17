@@ -94,11 +94,12 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     });
   });
 
-  // LegitScript reviewer credentials endpoint — only available in development
+  // LegitScript reviewer credentials endpoint — available in dev or when REVIEWER_ACCESS_ENABLED=true
   app.get('/api/reviewer-credentials', (req, res) => {
     const isDev = process.env.NODE_ENV !== 'production';
-    if (!isDev) {
-      return res.status(403).json({ error: "Reviewer access is not available in production" });
+    const reviewerAccessEnabled = process.env.REVIEWER_ACCESS_ENABLED === 'true';
+    if (!isDev && !reviewerAccessEnabled) {
+      return res.status(403).json({ error: "Reviewer access is not available" });
     }
     res.json({
       email: "review@pillardrugclub.com",

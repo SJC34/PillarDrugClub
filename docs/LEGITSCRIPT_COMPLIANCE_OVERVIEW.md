@@ -114,9 +114,12 @@ A pre-configured reviewer account is available at `/reviewer-access` with:
 - **Password:** `LSreview2026!`
 - Active membership (bypasses Stripe for review purposes)
 - Sample prescription requests (1 confirmed, 1 pending)
-- Sample orders (1 delivered, 1 processing)
+- Sample order (1 delivered) in the database
 - Drug allergies (Penicillin, Sulfa) and primary doctor on file
 - Shipping address on file
+- Marked as `isTestAccount: true` — excluded from member metrics and analytics
+
+**Access control:** The `/reviewer-access` page and credentials endpoint are available in development mode by default. In production, set the environment variable `REVIEWER_ACCESS_ENABLED=true` to enable reviewer access during the certification review period.
 
 ### Suggested Review Flow
 1. Visit `/reviewer-access` and click "Quick Login as Reviewer"
