@@ -109,10 +109,11 @@ export default function ReviewerAccessPage() {
         description: "Welcome to the LegitScript review account",
       });
       setShouldRedirect(true);
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not log in with reviewer credentials";
       toast({
         title: "Login Failed",
-        description: error.message || "Could not log in with reviewer credentials",
+        description: message,
         variant: "destructive",
       });
     } finally {

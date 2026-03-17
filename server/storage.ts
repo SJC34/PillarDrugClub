@@ -459,11 +459,9 @@ export class MemStorage implements IStorage {
     ];
     reviewerPrescriptionRequests.forEach(pr => this.prescriptionRequests.set(pr.id, pr));
 
-    // Seed sample orders for reviewer (using any to match loosely-typed MemStorage)
-    const reviewerOrders = [
+    const reviewerOrders: Order[] = [
       {
         id: "ord-review-1",
-        userId: reviewerId,
         customerId: reviewerId,
         orderNumber: "PD001001",
         status: "delivered",
@@ -481,7 +479,6 @@ export class MemStorage implements IStorage {
       },
       {
         id: "ord-review-2",
-        userId: reviewerId,
         customerId: reviewerId,
         orderNumber: "PD001042",
         status: "processing",
@@ -499,7 +496,28 @@ export class MemStorage implements IStorage {
         updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
       }
     ];
-    reviewerOrders.forEach(o => this.orders.set(o.id, o as any));
+    reviewerOrders.forEach(o => this.orders.set(o.id, o));
+
+    const reviewerPrescription: Prescription = {
+      id: "rx-review-1",
+      customerId: reviewerId,
+      medicationId: "med-1",
+      prescriberId: "dr-1",
+      prescriberName: "Dr. Jane Smith, MD",
+      prescriberNpi: "1234567890",
+      quantity: 90,
+      daysSupply: 90,
+      refillsRemaining: 3,
+      originalRefills: 5,
+      directions: "Take 1 tablet by mouth daily",
+      writtenDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+      expirationDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000).toISOString(),
+      status: "active",
+      isTransfer: false,
+      createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString()
+    };
+    this.prescriptions.set(reviewerPrescription.id, reviewerPrescription);
 
     console.log('✅ LegitScript reviewer account created: review@pillardrugclub.com');
   }
@@ -2149,7 +2167,29 @@ export class DbStorage extends MemStorage {
 
       this.prescriptionRequests.set("prx-review-1", confirmedRequest);
       this.prescriptionRequests.set("prx-review-2", pendingRequest);
-      console.log('✅ LegitScript reviewer prescription requests seeded');
+
+      const activePrescription: Prescription = {
+        id: "rx-review-1",
+        customerId: userId,
+        medicationId: "med-1",
+        prescriberId: "dr-1",
+        prescriberName: "Dr. Jane Smith, MD",
+        prescriberNpi: "1234567890",
+        quantity: 90,
+        daysSupply: 90,
+        refillsRemaining: 3,
+        originalRefills: 5,
+        directions: "Take 1 tablet by mouth daily",
+        writtenDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+        expirationDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "active",
+        isTransfer: false,
+        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      this.prescriptions.set(activePrescription.id, activePrescription);
+
+      console.log('✅ LegitScript reviewer sample data seeded (prescriptions, prescription requests)');
     }
 
     const existingOrders = await db.select().from(ordersTable).where(eq(ordersTable.userId, userId));
