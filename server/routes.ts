@@ -27,7 +27,7 @@ import {
   requireSecurePassword
 } from "./securityMiddleware";
 import { createAuditLog, createSecurityEvent } from "./auditLogger";
-import { syncUserToHubSpot } from "./hubspot";
+import { syncUserToKlaviyo } from "./klaviyo";
 
 
 // Helper function to generate unique referral codes
@@ -282,9 +282,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         details: { email: user.email, method: 'email_password' },
       });
 
-      // Sync new lead to HubSpot (fire-and-forget)
-      syncUserToHubSpot(user, { lifecyclestage: 'lead', subscription_status: 'free' })
-        .catch(err => console.error('HubSpot registration sync error:', err));
+      // Sync new lead to Klaviyo (fire-and-forget)
+      syncUserToKlaviyo(user, { lifecycle_stage: 'lead', subscription_status: 'free' }, 'Registered')
+        .catch(err => console.error('Klaviyo registration sync error:', err));
       
       // Create session for the newly registered user
       req.login({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role }, (err: any) => {
@@ -613,11 +613,11 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         });
         console.log(`Activated subscription ${subscriptionId} for user ${userId}`);
 
-        // Sync subscriber to HubSpot as customer (fire-and-forget)
+        // Sync subscriber to Klaviyo as customer (fire-and-forget)
         const activatedUser = await storage.getUser(userId);
         if (activatedUser) {
-          syncUserToHubSpot(activatedUser, { lifecyclestage: 'customer', subscription_status: 'active' })
-            .catch(err => console.error('HubSpot activation sync error:', err));
+          syncUserToKlaviyo(activatedUser, { lifecycle_stage: 'customer', subscription_status: 'active' }, 'Subscribed')
+            .catch(err => console.error('Klaviyo activation sync error:', err));
         }
 
         res.json({ success: true, status: subscription.status });
@@ -808,9 +808,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       await storage.updateSubscriptionStatus(userId, 'canceled');
       console.log(`Canceled Stripe subscription ${user.stripeSubscriptionId} for user ${userId} after termination fee`);
 
-      // Sync cancellation to HubSpot (fire-and-forget)
-      syncUserToHubSpot(user, { subscription_status: 'canceled' })
-        .catch(err => console.error('HubSpot cancel-with-fee sync error:', err));
+      // Sync cancellation to Klaviyo (fire-and-forget)
+      syncUserToKlaviyo(user, { subscription_status: 'canceled' }, 'Subscription Cancelled')
+        .catch(err => console.error('Klaviyo cancel-with-fee sync error:', err));
 
       res.json({ success: true, message: "Subscription canceled after termination fee payment" });
     } catch (error: any) {
@@ -864,9 +864,9 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       await storage.updateSubscriptionStatus(userId, 'canceled');
       console.log(`Scheduled cancellation of Stripe subscription ${user.stripeSubscriptionId} for user ${userId}`);
 
-      // Sync cancellation to HubSpot (fire-and-forget)
-      syncUserToHubSpot(user, { subscription_status: 'canceled' })
-        .catch(err => console.error('HubSpot cancel sync error:', err));
+      // Sync cancellation to Klaviyo (fire-and-forget)
+      syncUserToKlaviyo(user, { subscription_status: 'canceled' }, 'Subscription Cancelled')
+        .catch(err => console.error('Klaviyo cancel sync error:', err));
 
       res.json({ success: true, message: "Subscription will cancel at the end of the current billing period" });
     } catch (error: any) {
