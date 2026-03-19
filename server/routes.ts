@@ -1282,6 +1282,12 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
           if (!data.doctorName || data.doctorName.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Doctor name is required", path: ["doctorName"] });
           }
+          if (!data.doctorPhone || data.doctorPhone.trim().length < 10) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Doctor phone is required", path: ["doctorPhone"] });
+          }
+          if (!data.doctorAddress || data.doctorAddress.trim().length < 5) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Doctor address is required", path: ["doctorAddress"] });
+          }
         } else {
           if (!data.transferFromPharmacy || data.transferFromPharmacy.trim().length < 2) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Pharmacy name is required", path: ["transferFromPharmacy"] });
@@ -1544,26 +1550,47 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         }
       }
 
-      const requestData = {
-        patientName: request.patientName,
-        patientEmail,
-        dateOfBirth: request.dateOfBirth,
-        medicationName: request.medicationName,
-        dosage: request.dosage,
-        quantity: request.quantity,
-        doctorName: request.doctorName,
-        doctorPhone: request.doctorPhone,
-        doctorFax: request.doctorFax,
-        doctorAddress: request.doctorAddress,
-        urgency: request.urgency,
-        specialInstructions: request.specialInstructions,
-        requestDate: request.requestDate
-      };
+      let pdfBuffer: Buffer;
+      let filename: string;
 
-      const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
+      if (request.isTransfer && request.transferFromPharmacy) {
+        const transferData = {
+          patientName: request.patientName,
+          patientEmail,
+          dateOfBirth: request.dateOfBirth,
+          medicationName: request.medicationName,
+          dosage: request.dosage,
+          quantity: request.quantity,
+          pharmacyName: request.transferFromPharmacy,
+          pharmacyPhone: request.transferFromPharmacyPhone || '',
+          pharmacyAddress: request.transferFromPharmacyAddress || undefined,
+          specialInstructions: request.specialInstructions || undefined,
+          requestDate: request.requestDate
+        };
+        pdfBuffer = await generatePharmacyTransferPDF(transferData);
+        filename = `pharmacy-transfer-${request.patientName.replace(/\s+/g, '-')}.pdf`;
+      } else {
+        const requestData = {
+          patientName: request.patientName,
+          patientEmail,
+          dateOfBirth: request.dateOfBirth,
+          medicationName: request.medicationName,
+          dosage: request.dosage,
+          quantity: request.quantity,
+          doctorName: request.doctorName,
+          doctorPhone: request.doctorPhone,
+          doctorFax: request.doctorFax,
+          doctorAddress: request.doctorAddress,
+          urgency: request.urgency,
+          specialInstructions: request.specialInstructions,
+          requestDate: request.requestDate
+        };
+        pdfBuffer = await generatePrescriptionRequestPDF(requestData);
+        filename = `prescription-request-${request.patientName.replace(/\s+/g, '-')}.pdf`;
+      }
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="prescription-request-${request.patientName.replace(/\s+/g, '-')}.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.send(pdfBuffer);
     } catch (error: any) {
       console.error("Error regenerating PDF:", error);
