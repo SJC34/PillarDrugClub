@@ -15,7 +15,7 @@ import {
   orderSearchSchema,
   insertPrescriptionRequestSchema
 } from "@shared/pharmacy-schema";
-import { generatePrescriptionRequestPDF, generateMessageTemplate, generateRefundPolicyPDF } from "./pdf-generator";
+import { generatePrescriptionRequestPDF, generateMessageTemplate, generatePharmacyTransferPDF, generateRefundPolicyPDF } from "./pdf-generator";
 import { sendSMS } from "./twilio";
 import { sendEmail, sendEmailWithAttachment } from "./resend";
 import multer from "multer";
@@ -1251,7 +1251,7 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
   // Generate PDF and message for prescription request
   app.post("/api/prescriptions/generate-pdf", async (req, res) => {
     try {
-      // Validate request data
+      // Validate request data — supports both "message doctor" and "transfer from pharmacy" flows
       const pdfRequestSchema = z.object({
         userId: z.string().optional(),
         patientName: z.string().min(2, "Patient name is required"),
@@ -1261,19 +1261,39 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         medicationName: z.string().min(2, "Medication name is required"),
         dosage: z.string().min(1, "Dosage is required"),
         quantity: z.string().min(1, "Quantity is required"),
-        doctorName: z.string().min(2, "Doctor name is required"),
+        // Doctor flow fields (required when isTransfer is false)
+        doctorName: z.string().optional(),
         doctorPhone: z.string().optional(),
         doctorEmail: z.union([z.string().email(), z.literal("")]).optional(),
         doctorFax: z.string().optional(),
         doctorAddress: z.string().optional(),
+        // Transfer flow fields (required when isTransfer is true)
+        isTransfer: z.boolean().optional().default(false),
+        transferFromPharmacy: z.string().optional(),
+        transferFromPharmacyPhone: z.string().optional(),
+        transferFromPharmacyAddress: z.string().optional(),
         urgency: z.enum(["routine", "urgent", "emergency"]).default("routine"),
         specialInstructions: z.string().optional(),
         sendEmail: z.boolean().optional().default(true),
         sendText: z.boolean().optional().default(false),
         downloadForm: z.boolean().optional().default(false)
+      }).superRefine((data, ctx) => {
+        if (!data.isTransfer) {
+          if (!data.doctorName || data.doctorName.trim().length < 2) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Doctor name is required", path: ["doctorName"] });
+          }
+        } else {
+          if (!data.transferFromPharmacy || data.transferFromPharmacy.trim().length < 2) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Pharmacy name is required", path: ["transferFromPharmacy"] });
+          }
+          if (!data.transferFromPharmacyPhone || data.transferFromPharmacyPhone.trim().length < 10) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Pharmacy phone is required", path: ["transferFromPharmacyPhone"] });
+          }
+        }
       });
 
       const validatedData = pdfRequestSchema.parse(req.body);
+      const isTransfer = validatedData.isTransfer ?? false;
       
       // Fetch patient email/phone from request or from user profile if userId is provided
       let patientEmail = validatedData.patientEmail || '';
@@ -1281,31 +1301,16 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       if (validatedData.userId) {
         const user = await storage.getUser(validatedData.userId);
         if (user) {
-          // Use user profile data if not provided in request
           if (!patientEmail) patientEmail = user.email || '';
           if (!patientPhone) patientPhone = user.phoneNumber || '';
         }
       }
-      
-      const requestData = {
-        patientName: validatedData.patientName,
-        patientEmail,
-        dateOfBirth: validatedData.dateOfBirth || "",
-        medicationName: validatedData.medicationName,
-        dosage: validatedData.dosage,
-        quantity: validatedData.quantity,
-        doctorName: validatedData.doctorName,
-        doctorPhone: validatedData.doctorPhone || "",
-        doctorFax: validatedData.doctorFax || "",
-        doctorAddress: validatedData.doctorAddress || "",
-        urgency: validatedData.urgency || "routine",
-        specialInstructions: validatedData.specialInstructions || "",
-        requestDate: new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })
-      };
+
+      const requestDate = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
 
       // Save prescription request to storage
       const prescriptionRequest = await storage.createPrescriptionRequest({
@@ -1315,121 +1320,187 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         medicationName: validatedData.medicationName,
         dosage: validatedData.dosage,
         quantity: validatedData.quantity,
-        doctorName: validatedData.doctorName,
+        doctorName: isTransfer ? "" : (validatedData.doctorName || ""),
         doctorPhone: validatedData.doctorPhone || "",
         doctorFax: validatedData.doctorFax,
         doctorAddress: validatedData.doctorAddress || "",
+        isTransfer,
+        transferFromPharmacy: validatedData.transferFromPharmacy,
+        transferFromPharmacyPhone: validatedData.transferFromPharmacyPhone,
+        transferFromPharmacyAddress: validatedData.transferFromPharmacyAddress,
         urgency: validatedData.urgency || "routine",
         specialInstructions: validatedData.specialInstructions,
         status: "pending",
-        requestDate: requestData.requestDate
+        requestDate
       });
 
-      console.log(`✅ Prescription request saved: ${prescriptionRequest.id}`);
+      console.log(`✅ Prescription request saved: ${prescriptionRequest.id} (isTransfer: ${isTransfer})`);
 
-      // Generate PDF
-      const pdfBuffer = await generatePrescriptionRequestPDF(requestData);
-      
-      // Generate message template
-      const messageTemplate = generateMessageTemplate(requestData);
+      let pdfBuffer: Buffer;
+      let messageTemplate = "";
+      let pdfFilename: string;
 
-      console.log(`🔔 Starting notification process - sendEmail: ${validatedData.sendEmail}, sendText: ${validatedData.sendText}`);
-      
-      // Send notifications to patient, doctor (async, don't block response)
-      const sendNotifications = async () => {
-        console.log(`📬 Inside sendNotifications function`);
-        const notificationPromises: Promise<any>[] = [];
-        
-        // Send PDF to patient via email (only if sendEmail is true)
-        if (validatedData.sendEmail && patientEmail && patientEmail.trim().length > 0) {
-          const patientEmailSubject = `Your Prescription Request Form - Pharmacy Autopilot`;
-          const patientEmailBody = `
-            <h2>Your Prescription Request Form</h2>
-            <p>Dear ${validatedData.patientName},</p>
-            <p>Thank you for your prescription request. We've attached your completed prescription request form.</p>
-            
-            <h3>What to do next:</h3>
-            <ol>
-              <li>Review the attached PDF form</li>
-              <li>Forward this email with the form to your doctor</li>
-              <li>Or upload the form to your doctor's secure portal</li>
-              <li>Your doctor will electronically submit the prescription to Pharmacy Autopilot</li>
-            </ol>
-            
-            <h3>Requested Medication:</h3>
-            <ul>
-              <li><strong>Medication:</strong> ${validatedData.medicationName}</li>
-              <li><strong>Dosage:</strong> ${validatedData.dosage}</li>
-              <li><strong>Quantity:</strong> ${validatedData.quantity}</li>
-            </ul>
-            
-            <p>If you have any questions, please contact us.</p>
-            <p>Best regards,<br/>Pharmacy Autopilot Team</p>
-          `;
-          
-          notificationPromises.push(
-            sendEmailWithAttachment(
-              patientEmail,
-              patientEmailSubject,
-              patientEmailBody,
-              {
-                filename: `prescription-request-${validatedData.patientName.replace(/\s+/g, '-')}.pdf`,
+      if (isTransfer) {
+        // --- TRANSFER FROM PHARMACY FLOW ---
+        pdfBuffer = await generatePharmacyTransferPDF({
+          patientName: validatedData.patientName,
+          patientEmail,
+          dateOfBirth: validatedData.dateOfBirth || "",
+          medicationName: validatedData.medicationName,
+          dosage: validatedData.dosage,
+          quantity: validatedData.quantity,
+          pharmacyName: validatedData.transferFromPharmacy!,
+          pharmacyPhone: validatedData.transferFromPharmacyPhone!,
+          pharmacyAddress: validatedData.transferFromPharmacyAddress,
+          specialInstructions: validatedData.specialInstructions,
+          requestDate
+        });
+        pdfFilename = `pharmacy-transfer-${validatedData.patientName.replace(/\s+/g, '-')}.pdf`;
+        messageTemplate = "";
+
+        // Transfer-specific notifications
+        const sendTransferNotifications = async () => {
+          const notificationPromises: Promise<any>[] = [];
+
+          if (validatedData.sendEmail && patientEmail && patientEmail.trim().length > 0) {
+            const subject = `Your Pharmacy Transfer Request - Pharmacy Autopilot`;
+            const body = `
+              <h2>Your Pharmacy Transfer Request Has Been Submitted</h2>
+              <p>Dear ${validatedData.patientName},</p>
+              <p>Your transfer request has been received. HealthWarehouse will contact <strong>${validatedData.transferFromPharmacy}</strong> within <strong>1–2 business days</strong> to initiate the transfer of your prescription.</p>
+              
+              <h3>Transfer Details:</h3>
+              <ul>
+                <li><strong>Medication:</strong> ${validatedData.medicationName} ${validatedData.dosage}</li>
+                <li><strong>Quantity:</strong> ${validatedData.quantity}</li>
+                <li><strong>Transferring From:</strong> ${validatedData.transferFromPharmacy} (${validatedData.transferFromPharmacyPhone})</li>
+                <li><strong>Transferring To:</strong> HealthWarehouse (fulfilled by Pharmacy Autopilot)</li>
+              </ul>
+              
+              <p><strong>No action is needed from you.</strong> We've attached the official transfer request form for your records.</p>
+              <p>If the transfer is not completed within 3 business days, please contact us at support@pillardrugclub.com.</p>
+              <p>Best regards,<br/>Pharmacy Autopilot Team</p>
+            `;
+            notificationPromises.push(
+              sendEmailWithAttachment(patientEmail, subject, body, {
+                filename: pdfFilename,
                 content: pdfBuffer
-              }
-            )
-              .then(success => {
-                if (success) {
-                  console.log(`✅ PDF sent to patient: ${patientEmail}`);
-                } else {
-                  console.warn(`⚠️ Failed to send PDF to patient: ${patientEmail}`);
-                }
-              })
-              .catch(err => {
-                console.error('Patient email error:', err);
-                return false;
-              })
-          );
-        }
-        
-        // Send SMS to patient with instructions (only if sendText is true)
-        console.log(`📱 SMS check: sendText=${validatedData.sendText}, phone="${patientPhone}", length=${patientPhone.trim().length}`);
-        if (validatedData.sendText && patientPhone && patientPhone.trim().length > 0) {
-          console.log(`📤 Attempting to send SMS to: ${patientPhone}`);
-          const patientSmsMessage = `Pharmacy Autopilot: Your prescription request form has been emailed to you. Please forward it to your doctor ${validatedData.doctorName} or upload to their secure portal.`;
-          notificationPromises.push(
-            sendSMS(patientPhone, patientSmsMessage)
-              .then(success => {
-                if (success) {
-                  console.log(`✅ SMS sent to patient: ${patientPhone}`);
-                } else {
-                  console.warn(`⚠️ Failed to send SMS to patient: ${patientPhone}`);
-                }
-              })
-              .catch(err => {
-                console.error('Patient SMS error:', err);
-                return false;
-              })
-          );
-        } else {
-          console.log(`⚠️ SMS not sent: conditions not met`);
-        }
+              }).catch(err => console.error('Transfer email error:', err))
+            );
+          }
 
-        // Wait for all notifications to complete or fail
-        if (notificationPromises.length > 0) {
-          await Promise.allSettled(notificationPromises);
-        }
-      };
+          if (validatedData.sendText && patientPhone && patientPhone.trim().length > 0) {
+            const smsMsg = `PDC: Your transfer request for ${validatedData.medicationName} has been submitted. HealthWarehouse will contact ${validatedData.transferFromPharmacy} within 1-2 business days.`;
+            notificationPromises.push(
+              sendSMS(patientPhone, smsMsg).catch(err => console.error('Transfer SMS error:', err))
+            );
+          }
 
-      // Start notifications in background without blocking response
-      sendNotifications().catch(err => 
-        console.error('Critical error in notification processing:', err)
-      );
+          if (notificationPromises.length > 0) {
+            await Promise.allSettled(notificationPromises);
+          }
+        };
+
+        sendTransferNotifications().catch(err => 
+          console.error('Critical error in transfer notification processing:', err)
+        );
+
+      } else {
+        // --- MESSAGE DOCTOR FLOW ---
+        const requestData = {
+          patientName: validatedData.patientName,
+          patientEmail,
+          dateOfBirth: validatedData.dateOfBirth || "",
+          medicationName: validatedData.medicationName,
+          dosage: validatedData.dosage,
+          quantity: validatedData.quantity,
+          doctorName: validatedData.doctorName!,
+          doctorPhone: validatedData.doctorPhone || "",
+          doctorFax: validatedData.doctorFax || "",
+          doctorAddress: validatedData.doctorAddress || "",
+          urgency: validatedData.urgency || "routine",
+          specialInstructions: validatedData.specialInstructions || "",
+          requestDate
+        };
+
+        pdfBuffer = await generatePrescriptionRequestPDF(requestData);
+        messageTemplate = generateMessageTemplate(requestData);
+        pdfFilename = `prescription-request-${validatedData.patientName.replace(/\s+/g, '-')}.pdf`;
+
+        console.log(`🔔 Starting notification process - sendEmail: ${validatedData.sendEmail}, sendText: ${validatedData.sendText}`);
+
+        const sendNotifications = async () => {
+          const notificationPromises: Promise<any>[] = [];
+
+          if (validatedData.sendEmail && patientEmail && patientEmail.trim().length > 0) {
+            const patientEmailSubject = `Your Prescription Request Form - Pharmacy Autopilot`;
+            const patientEmailBody = `
+              <h2>Your Prescription Request Form</h2>
+              <p>Dear ${validatedData.patientName},</p>
+              <p>Thank you for your prescription request. We've attached your completed prescription request form.</p>
+              
+              <h3>What to do next:</h3>
+              <ol>
+                <li>Review the attached PDF form</li>
+                <li>Forward this email with the form to your doctor</li>
+                <li>Or upload the form to your doctor's secure portal</li>
+                <li>Your doctor will electronically submit the prescription to Pharmacy Autopilot</li>
+              </ol>
+              
+              <h3>Requested Medication:</h3>
+              <ul>
+                <li><strong>Medication:</strong> ${validatedData.medicationName}</li>
+                <li><strong>Dosage:</strong> ${validatedData.dosage}</li>
+                <li><strong>Quantity:</strong> ${validatedData.quantity}</li>
+              </ul>
+              
+              <p>If you have any questions, please contact us.</p>
+              <p>Best regards,<br/>Pharmacy Autopilot Team</p>
+            `;
+            notificationPromises.push(
+              sendEmailWithAttachment(
+                patientEmail,
+                patientEmailSubject,
+                patientEmailBody,
+                { filename: pdfFilename, content: pdfBuffer }
+              )
+                .then(success => {
+                  if (success) console.log(`✅ PDF sent to patient: ${patientEmail}`);
+                  else console.warn(`⚠️ Failed to send PDF to patient: ${patientEmail}`);
+                })
+                .catch(err => { console.error('Patient email error:', err); return false; })
+            );
+          }
+
+          if (validatedData.sendText && patientPhone && patientPhone.trim().length > 0) {
+            const patientSmsMessage = `Pharmacy Autopilot: Your prescription request form has been emailed to you. Please forward it to your doctor ${validatedData.doctorName} or upload to their secure portal.`;
+            notificationPromises.push(
+              sendSMS(patientPhone, patientSmsMessage)
+                .then(success => {
+                  if (success) console.log(`✅ SMS sent to patient: ${patientPhone}`);
+                  else console.warn(`⚠️ Failed to send SMS to patient: ${patientPhone}`);
+                })
+                .catch(err => { console.error('Patient SMS error:', err); return false; })
+            );
+          }
+
+          if (notificationPromises.length > 0) {
+            await Promise.allSettled(notificationPromises);
+          }
+        };
+
+        sendNotifications().catch(err => 
+          console.error('Critical error in notification processing:', err)
+        );
+      }
 
       // Return PDF as downloadable file
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="prescription-request-${requestData.patientName.replace(/\s+/g, '-')}.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${pdfFilename}"`);
       res.setHeader('X-Message-Template', Buffer.from(messageTemplate).toString('base64'));
       res.setHeader('X-Prescription-Request-Id', prescriptionRequest.id);
+      res.setHeader('X-Is-Transfer', isTransfer ? 'true' : 'false');
+      res.setHeader('X-Transfer-Pharmacy-Name', validatedData.transferFromPharmacy || '');
       res.send(pdfBuffer);
     } catch (error: any) {
       console.error("PDF generation error:", error);

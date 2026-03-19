@@ -380,6 +380,279 @@ Best regards,
 ${data.patientName}`;
 }
 
+interface PharmacyTransferData {
+  patientName: string;
+  patientEmail?: string;
+  dateOfBirth: string;
+  medicationName: string;
+  dosage: string;
+  quantity: string;
+  pharmacyName: string;
+  pharmacyPhone: string;
+  pharmacyAddress?: string;
+  specialInstructions?: string;
+  requestDate: string;
+}
+
+export async function generatePharmacyTransferPDF(data: PharmacyTransferData): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({
+      size: 'LETTER',
+      margins: { top: 50, bottom: 50, left: 60, right: 60 }
+    });
+
+    const chunks: Buffer[] = [];
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+
+    const BRAND_PRIMARY = '#2BABA2';
+    const BRAND_SECONDARY = '#0A736D';
+    const BRAND_FOREGROUND = '#1C2F2E';
+    const BRAND_LIGHT_BG = '#E5F5F4';
+    const BRAND_MUTED = '#5A7A78';
+
+    // Header
+    doc.fontSize(24)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('PHARMACY AUTOPILOT', { align: 'center' });
+
+    doc.moveDown(0.3);
+    doc.fontSize(14)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Pharmacy Transfer Request', { align: 'center' });
+
+    doc.moveDown(0.5);
+    doc.fontSize(9)
+       .fillColor(BRAND_MUTED)
+       .text('Wholesale Prescription Pharmacy', { align: 'center' });
+
+    doc.moveDown(1.5);
+
+    // Introduction
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(
+         'This is an official pharmacy transfer request. Please transfer the prescription(s) listed below to HealthWarehouse on behalf of the above-named patient.',
+         { align: 'left', width: 492 }
+       );
+
+    doc.moveDown(1.5);
+
+    // Patient Information Box
+    const patientBoxY = doc.y;
+    doc.roundedRect(60, patientBoxY, 492, 70, 4)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
+
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('PATIENT INFORMATION', 75, patientBoxY + 15);
+
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Name: ${data.patientName}`, 75, patientBoxY + 35)
+       .text(`Date of Birth: ${data.dateOfBirth}`, 75, patientBoxY + 50);
+
+    if (data.patientEmail) {
+      doc.text(`Email: ${data.patientEmail}`, 320, patientBoxY + 35);
+    }
+
+    doc.moveDown(4);
+
+    // Two-column layout
+    const twoColY = doc.y;
+    const leftX = 60;
+    const rightX = 310;
+    const colW = 240;
+
+    // Left: Medication Info
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('MEDICATION TO TRANSFER', leftX, twoColY, { width: colW });
+
+    doc.moveDown(0.5);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND);
+
+    const medY = doc.y;
+    doc.text('Medication: ', leftX, medY, { width: colW, continued: true })
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text(data.medicationName, { width: colW });
+
+    doc.moveDown(0.3);
+    const dosageY = doc.y;
+    doc.font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Dosage: ', leftX, dosageY, { width: colW, continued: true })
+       .font('Helvetica-Bold')
+       .text(data.dosage, { width: colW });
+
+    doc.moveDown(0.3);
+    const qtyY = doc.y;
+    doc.font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Quantity: ', leftX, qtyY, { width: colW, continued: true })
+       .font('Helvetica-Bold')
+       .text(data.quantity, { width: colW });
+
+    if (data.specialInstructions) {
+      doc.moveDown(0.5);
+      doc.fontSize(9)
+         .font('Helvetica')
+         .fillColor(BRAND_MUTED)
+         .text(`Notes: ${data.specialInstructions}`, leftX, doc.y, { width: colW });
+    }
+
+    // Left: Transfer FROM
+    doc.moveDown(1);
+    const fromY = doc.y;
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('TRANSFER FROM (CURRENT PHARMACY)', leftX, fromY, { width: colW });
+
+    doc.moveDown(0.5);
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Pharmacy: ${data.pharmacyName}`, leftX, doc.y, { width: colW });
+    doc.text(`Phone: ${data.pharmacyPhone}`, leftX, doc.y, { width: colW });
+    if (data.pharmacyAddress) {
+      doc.text(`Address: ${data.pharmacyAddress}`, leftX, doc.y, { width: colW });
+    }
+
+    const leftEndY = doc.y;
+
+    // Right: Transfer TO box
+    const toBoxH = 130;
+    doc.roundedRect(rightX, twoColY, colW, toBoxH, 4)
+       .lineWidth(2)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY);
+
+    doc.fontSize(11)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('TRANSFER TO (RECEIVING PHARMACY)', rightX + 10, twoColY + 10, { width: colW - 20 });
+
+    doc.fontSize(10)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_PRIMARY)
+       .text('HealthWarehouse', rightX + 10, twoColY + 33, { width: colW - 20 });
+
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text('Pharmacy Lookup Information:', rightX + 10, twoColY + 51, { width: colW - 20 });
+
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('NCPDP: ', rightX + 10, twoColY + 65, { continued: true })
+       .font('Helvetica')
+       .text('1832674', { width: colW - 20 });
+
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('NPI: ', rightX + 10, twoColY + 79, { continued: true })
+       .font('Helvetica')
+       .text('1619252160', { width: colW - 20 });
+
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_FOREGROUND)
+       .text('DEA: ', rightX + 10, twoColY + 93, { continued: true })
+       .font('Helvetica')
+       .text('FH1427536', { width: colW - 20 });
+
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_MUTED)
+       .text('Florence, KY 41042', rightX + 10, twoColY + 109, { width: colW - 20 });
+
+    const rightEndY = twoColY + toBoxH;
+    doc.y = Math.max(leftEndY, rightEndY) + 20;
+
+    // Authorization Box
+    const authBoxY = doc.y;
+    doc.roundedRect(60, authBoxY, 492, 120, 4)
+       .lineWidth(2)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_SECONDARY);
+
+    doc.fontSize(12)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('TRANSFER AUTHORIZATION', 75, authBoxY + 15, { width: 462 });
+
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(
+         'Please transfer the above-listed prescription(s) to HealthWarehouse on behalf of the named patient. The patient is a member of Pharmacy Autopilot and has authorized this transfer.',
+         75, authBoxY + 38, { width: 462 }
+       );
+
+    doc.moveDown(1);
+    doc.fontSize(9)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('IMPORTANT: Please include patient email in transfer:', 75, authBoxY + 73, { width: 462 });
+
+    doc.fontSize(9)
+       .font('Helvetica')
+       .fillColor(BRAND_FOREGROUND)
+       .text(`Patient Email: ${data.patientEmail || 'REQUIRED'}`, 75, authBoxY + 88, { width: 462 })
+       .text('Our system matches prescriptions to patient accounts via email address.', 75, authBoxY + 103, { width: 462 });
+
+    doc.moveDown(2.5);
+
+    // Disclaimer
+    const disclaimerBoxY = doc.y;
+    doc.roundedRect(60, disclaimerBoxY, 492, 60, 4)
+       .lineWidth(1)
+       .strokeColor(BRAND_PRIMARY)
+       .fillOpacity(0.05)
+       .fillAndStroke(BRAND_LIGHT_BG, BRAND_PRIMARY)
+       .fillOpacity(1);
+
+    doc.fontSize(8)
+       .font('Helvetica-Bold')
+       .fillColor(BRAND_SECONDARY)
+       .text('CONFIDENTIAL MEDICAL INFORMATION', 75, disclaimerBoxY + 10, { width: 462 });
+
+    doc.fontSize(7.5)
+       .font('Helvetica')
+       .fillColor(BRAND_MUTED)
+       .text(
+         'This document contains protected health information (PHI) that is privileged and confidential. The information is for the sole use of the named patient and healthcare providers. We are required to safeguard PHI by applicable law.',
+         75, disclaimerBoxY + 25, { width: 462 }
+       );
+
+    // Footer
+    doc.fontSize(8)
+       .font('Helvetica')
+       .fillColor(BRAND_MUTED)
+       .text(`Request Date: ${new Date(data.requestDate).toLocaleDateString()}`, 60, 730, { align: 'left' });
+
+    doc.fontSize(8)
+       .fillColor(BRAND_PRIMARY)
+       .text('PHARMACY AUTOPILOT', 60, 745, { align: 'center' })
+       .fontSize(7)
+       .fillColor(BRAND_MUTED)
+       .text('Wholesale Prescription Pharmacy', 60, 756, { align: 'center' });
+
+    doc.end();
+  });
+}
+
 export async function generateRefundPolicyPDF(): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ 
