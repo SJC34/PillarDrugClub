@@ -967,7 +967,10 @@ export default function PrescriptionRequestPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Doctor's contact information</span>
+                  {requestType === 'transfer'
+                    ? <span>Current pharmacy name and phone number</span>
+                    : <span>Doctor's contact information</span>
+                  }
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
