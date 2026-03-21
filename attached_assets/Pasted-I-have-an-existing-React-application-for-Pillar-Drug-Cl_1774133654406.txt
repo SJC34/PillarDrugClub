@@ -1,0 +1,236 @@
+I have an existing React application for Pillar Drug Club (PDC), a 
+subscription pharmacy membership platform ($119/year, annual billing 
+only — no monthly billing, no MRR). I need you to do two things:
+
+1. Wire up and verify all third-party integrations
+2. Build a comprehensive admin dashboard to track all business metrics
+
+---
+
+## PART 1: INTEGRATION SETUP & VERIFICATION
+
+Build an integration health checker and wire up the following 
+services. For each integration, create a status check that confirms 
+the connection is live and returns a green/yellow/red status card 
+in the admin portal.
+
+### Payments
+- **Stripe** — $119/year annual membership billing, auto-renewal, 
+  failed payment webhooks, refund handling
+  - Wire up: Stripe.js, webhook endpoint, subscription creation 
+    at $119/year, customer portal link
+  - Status check: ping Stripe API, confirm webhook signing secret 
+    is valid
+
+### Email
+- **HushMail** — PHI email only (Rx notifications, clinical comms)
+  - Wire up: SMTP credentials via environment variables
+  - Status check: send test email, confirm delivery
+- **Klaviyo** — non-PHI marketing email (welcome, renewal, winback)
+  - Wire up: Klaviyo API key, list IDs, event tracking
+  - Status check: ping Klaviyo API, confirm list connection
+  - Trigger events to wire: member_signup, renewal_due, 
+    winback_30, winback_60
+
+### SMS
+- **Twilio** — order confirmations, shipping updates, membership alerts
+  - Wire up: Account SID, Auth Token, phone number via env vars
+  - Status check: send test SMS to admin number
+  - Message triggers: order_confirmed, rx_shipped, renewal_reminder
+
+### Customer Service
+- **Azure** — CS chatbot
+  - Wire up: Azure Bot Service endpoint, Direct Line API key
+  - Embed chatbot widget in member-facing portal
+  - Status check: ping Azure endpoint, confirm bot responds
+- **Resen AI** — CS phone line
+  - Wire up: API credentials, inbound call routing config
+  - Status check: confirm API key valid, phone number active
+
+### Hosting
+- **Aptible** — already deployed, confirm environment variables 
+  are set for all above services
+  - Status check: list all required env vars, flag any that are 
+    missing or empty
+
+### Analytics & Marketing Tracking
+- **Google Analytics 4** — wire up GA4 measurement ID
+  - Track events: page_view, signup_start, signup_complete, 
+    login, rx_submitted
+- **Google Tag Manager** — wire up GTM container ID
+  - Configure conversion triggers for signup_complete
+- **Meta Pixel** — wire up pixel ID
+  - Track: PageView, Lead, Purchase events
+- **Reddit Pixel** — wire up pixel ID
+  - Track: PageVisit, SignUp, Purchase events
+
+---
+
+## PART 2: ADMIN DASHBOARD — FULL BUILD
+
+Build a /admin route (password protected, admin-only) with the 
+following sections accessible via sidebar navigation.
+
+IMPORTANT BILLING CONTEXT: PDC charges $119/year as a single 
+annual payment. There is no monthly billing and no MRR. All 
+revenue metrics must reflect annual subscription mechanics. 
+Never calculate or display MRR anywhere in the dashboard.
+
+---
+
+### A. EXECUTIVE OVERVIEW (default landing page)
+Top-line KPI cards — pull from Stripe + manual inputs:
+- Total Active Members
+- ARR (active members × $119)
+- New Members This Month
+- New ARR This Month (new members × $119)
+- Churned Members This Month (manual input)
+- Churned ARR This Month (churned members × $119)
+- Cash Collected (actual Stripe deposits — lump sum at 
+  enrollment/renewal)
+- Cash Runway (manual input: cash balance ÷ monthly burn)
+- LTV:CAC Ratio (calculated: $446 LTV ÷ entered CAC)
+
+Threshold flags:
+- CAC over $110 → red
+- LTV:CAC below 4.4x → red
+- Churn over 3% monthly → yellow
+
+---
+
+### B. MEMBER MANAGEMENT
+- Table: Member ID | Name | Email | Join Date | Status | 
+  Renewal Date | Rx Count
+- Search + filter by status (Active / Cancelled / Past Due)
+- Click row → member detail view
+- Manual status override button
+- Export to CSV
+
+---
+
+### C. FINANCIAL DASHBOARD
+Pull from Stripe where possible, manual entry fallback:
+- ARR over time (line chart, Recharts)
+- New members vs churned members per month (bar chart)
+- Cash collected per month (bar chart — reflects actual 
+  annual payment timing, not smoothed monthly)
+- Failed payments count + retry status
+- Stripe balance + upcoming payouts
+- Monthly burn tracker (manual inputs per vendor):
+  - Aptible: $499
+  - HushMail: $15
+  - Klaviyo: variable
+  - Twilio: variable
+  - LegitScript: $179
+  - HealthWarehouse: variable
+  - Azure: variable
+  - Resen AI: variable
+  - Dev Contractor: variable
+- Auto-calculates: total monthly burn, net cash position, 
+  runway in months
+
+---
+
+### D. MARKETING DASHBOARD
+Manual data entry + GA4 pull where possible:
+
+Channel Performance Table:
+- Columns: Channel | Spend | Clicks | Conversions | CAC | 
+  ROAS | WoW Change
+- Rows: Google Search | Meta | Reddit | Organic/SEO | 
+  Direct | Email | Referral
+- Color-code CAC: green <$94.50 | yellow $94.50–$110 | red >$110
+
+SEO Tracker:
+- Content pieces table: Title | Keyword | Status | 
+  Google Position | Impressions | Clicks
+- Flag rows where position >20
+
+Email Sequence Tracker:
+- Sequences: Welcome | Onboarding D3 | Onboarding D7 | 
+  Upsell | Winback 30 | Winback 60
+- Columns: Name | Status | Open Rate | Click Rate | 
+  Revenue Attributed
+- Toggle Active/Paused per row
+
+Weekly Report Generator:
+- Button: "Generate Weekly Report"
+- Renders: top-line numbers, flags, channel breakdown
+- Print/PDF export
+
+---
+
+### E. FULFILLMENT DASHBOARD
+Manual inputs (HealthWarehouse data entry):
+- Rx fills this month
+- Pending fills
+- Average fill time (days)
+- HealthWarehouse monthly cost tracker:
+  - Flat fee entered
+  - Dispense fee (fills × per-fill cost)
+  - Total HealthWarehouse spend
+- Fill rate by drug category (manual entry)
+
+---
+
+### F. CUSTOMER SERVICE DASHBOARD
+- Azure chatbot: conversation volume, resolution rate, 
+  escalation rate (pull from Azure API if available, 
+  manual fallback)
+- Resen AI: call volume, average handle time, missed calls
+  (pull from Resen API if available, manual fallback)
+- Open tickets count (manual input)
+- CSAT score (manual input)
+
+---
+
+### G. INTEGRATION STATUS PAGE
+- Grid of all integrations listed in Part 1
+- Each card shows: Vendor name | Status (Live/Error/Unconfigured) | 
+  Last checked timestamp | Re-check button
+- Run all checks button
+- Flag any missing environment variables
+
+---
+
+## TECHNICAL REQUIREMENTS
+
+- React frontend, modular component structure (one file per section)
+- All sensitive credentials via environment variables only — 
+  never hardcoded
+- Data layer abstracted: use local state + localStorage for now, 
+  structured so API calls can replace localStorage cleanly later
+- Recharts for all charts (check if installed, install if not)
+- Mobile responsive
+- Admin auth: simple password gate on /admin route using 
+  env var ADMIN_PASSWORD
+- Error boundaries on every dashboard section so one broken 
+  integration doesn't crash the whole dashboard
+- Loading skeletons while data fetches
+- No MRR calculated or displayed anywhere in the application
+
+---
+
+## ENVIRONMENT VARIABLES NEEDED
+Create a .env.example file listing every required variable:
+
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+STRIPE_PUBLISHABLE_KEY
+KLAVIYO_API_KEY
+KLAVIYO_LIST_ID
+TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN
+TWILIO_PHONE_NUMBER
+HUSHMAIL_SMTP_HOST
+HUSHMAIL_SMTP_USER
+HUSHMAIL_SMTP_PASS
+AZURE_BOT_ENDPOINT
+AZURE_DIRECT_LINE_KEY
+RESEN_AI_API_KEY
+GA4_MEASUREMENT_ID
+GTM_CONTAINER_ID
+META_PIXEL_ID
+REDDIT_PIXEL_ID
+ADMIN_PASSWORD
+APTIBLE_ENV
