@@ -27,6 +27,9 @@ import AdminReportsPage from "@/pages/AdminReportsPage";
 import AdminMedicationPricingPage from "@/pages/AdminMedicationPricingPage";
 import AdminReferralsPage from "@/pages/AdminReferralsPage";
 import AdminBlogPage from "@/pages/AdminBlogPage";
+import AdminMarketingPage from "@/pages/AdminMarketingPage";
+import AdminFulfillmentPage from "@/pages/AdminFulfillmentPage";
+import AdminCSPage from "@/pages/AdminCSPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import CartPage from "@/pages/CartPage";
@@ -97,6 +100,15 @@ function Router() {
       </Route>
       <Route path="/admin/blog">
         <ProtectedRoute requiredRole="admin"><AdminBlogPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/marketing">
+        <ProtectedRoute requiredRole="admin"><AdminMarketingPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/fulfillment">
+        <ProtectedRoute requiredRole="admin"><AdminFulfillmentPage /></ProtectedRoute>
+      </Route>
+      <Route path="/admin/cs">
+        <ProtectedRoute requiredRole="admin"><AdminCSPage /></ProtectedRoute>
       </Route>
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />

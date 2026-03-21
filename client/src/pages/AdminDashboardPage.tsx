@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Users, 
   FileText, 
@@ -17,9 +20,22 @@ import {
   Mail,
   Upload,
   Gift,
-  PenTool
+  PenTool,
+  HeartPulse,
+  Headphones,
+  AlertTriangle,
 } from "lucide-react";
 import { Link } from "wouter";
+
+const MEMBERSHIP_PRICE = 99;
+const LTV = 446;
+const CAC_RED = 110;
+const CAC_YELLOW = 94.5;
+const CAC_LTV_RATIO_THRESHOLD = 4.4;
+const CHURN_YELLOW_PCT = 3;
+
+const CAC_LS_KEY = "admin_dashboard_cac_v1";
+const CHURN_LS_KEY = "admin_dashboard_churn_v1";
 
 interface DashboardMetrics {
   userMetrics: {
@@ -71,10 +87,30 @@ interface DashboardMetrics {
   };
 }
 
+function loadNumber(key: string, def: string): string {
+  try {
+    return localStorage.getItem(key) || def;
+  } catch {
+    return def;
+  }
+}
+
 export default function AdminDashboardPage() {
   const { data, isLoading } = useQuery<DashboardMetrics>({
     queryKey: ["/api/admin/dashboard-metrics"],
   });
+
+  const [cac, setCac] = useState<string>(() => loadNumber(CAC_LS_KEY, ""));
+  const [churnedMembers, setChurnedMembers] = useState<string>(() => loadNumber(CHURN_LS_KEY, ""));
+
+  const saveCac = (val: string) => {
+    setCac(val);
+    localStorage.setItem(CAC_LS_KEY, val);
+  };
+  const saveChurn = (val: string) => {
+    setChurnedMembers(val);
+    localStorage.setItem(CHURN_LS_KEY, val);
+  };
 
   if (isLoading) {
     return (
@@ -88,7 +124,21 @@ export default function AdminDashboardPage() {
   }
 
   const metrics = data;
-  
+  const activeMembers = (metrics?.userMetrics.usersByTier.basic || 0) + (metrics?.userMetrics.usersByTier.plus || 0);
+  const arr = activeMembers * MEMBERSHIP_PRICE;
+  const newMembersThisMonth = metrics?.userMetrics.newUsersThisWeek || 0;
+  const newArrThisMonth = newMembersThisMonth * MEMBERSHIP_PRICE;
+
+  const churnedCount = parseFloat(churnedMembers) || 0;
+  const churnedArr = churnedCount * MEMBERSHIP_PRICE;
+  const churnPct = activeMembers > 0 ? (churnedCount / activeMembers) * 100 : 0;
+
+  const cacNum = parseFloat(cac);
+  const cacIsRed = !isNaN(cacNum) && cacNum > CAC_RED;
+  const cacIsYellow = !isNaN(cacNum) && cacNum >= CAC_YELLOW && cacNum <= CAC_RED;
+  const ltvCacRatio = !isNaN(cacNum) && cacNum > 0 ? LTV / cacNum : null;
+  const ltvCacIsRed = ltvCacRatio !== null && ltvCacRatio < CAC_LTV_RATIO_THRESHOLD;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-teal-100 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -98,89 +148,235 @@ export default function AdminDashboardPage() {
           <p className="text-muted-foreground">Real-time overview of your pharmacy operations</p>
         </div>
 
-        {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Total Users */}
-          <Link href="/admin/users">
-            <Card className="hover-elevate cursor-pointer transition-all">
+        {/* ARR & Business KPIs */}
+        <div>
+          <h2 className="text-lg font-semibold text-foreground mb-3">Business KPIs</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Total Users</p>
-                    <p className="text-2xl font-bold" data-testid="metric-total-users">
-                      {metrics?.userMetrics.totalUsers || 0}
+                    <p className="text-sm font-medium text-muted-foreground">ARR</p>
+                    <p className="text-2xl font-bold" data-testid="metric-arr">
+                      ${arr.toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      +{metrics?.userMetrics.newUsersThisWeek || 0} this week
+                      {activeMembers} members × ${MEMBERSHIP_PRICE}
                     </p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <Users className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-teal-100 rounded-lg">
+                    <DollarSign className="h-6 w-6 text-teal-700" />
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </Link>
 
-          {/* Active Prescriptions */}
-          <Card className="hover-elevate">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Active Prescriptions</p>
-                  <p className="text-2xl font-bold" data-testid="metric-active-prescriptions">
-                    {metrics?.prescriptionMetrics.totalActivePrescriptions || 0}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {metrics?.prescriptionMetrics.prescriptionsNeedingRefill || 0} need refill
-                  </p>
-                </div>
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <FileText className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Monthly Orders */}
-          <Card className="hover-elevate">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Orders This Month</p>
-                  <p className="text-2xl font-bold" data-testid="metric-monthly-orders">
-                    {metrics?.orderMetrics.ordersThisMonth || 0}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {metrics?.orderMetrics.totalOrders || 0} total
-                  </p>
-                </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <Package className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Revenue */}
-          <Link href="/admin/financial">
-            <Card className="hover-elevate cursor-pointer transition-all">
+            <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Revenue (Est.)</p>
-                    <p className="text-2xl font-bold" data-testid="metric-revenue">
-                      ${parseFloat(metrics?.orderMetrics.revenueEstimate || "0").toLocaleString()}
+                    <p className="text-sm font-medium text-muted-foreground">New ARR This Month</p>
+                    <p className="text-2xl font-bold text-green-700" data-testid="metric-new-arr">
+                      ${newArrThisMonth.toLocaleString()}
                     </p>
-                    <p className="text-xs text-muted-foreground">From orders</p>
+                    <p className="text-xs text-muted-foreground">
+                      {newMembersThisMonth} new members
+                    </p>
                   </div>
-                  <div className="p-3 bg-teal-100 rounded-lg">
-                    <DollarSign className="h-6 w-6 text-teal-700 dark:text-teal-400" />
+                  <div className="p-3 bg-green-100 rounded-lg">
+                    <TrendingUp className="h-6 w-6 text-green-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </Link>
+
+            <Card className={churnPct > CHURN_YELLOW_PCT ? "border-yellow-400" : ""}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Churned ARR</p>
+                    <p className="text-2xl font-bold text-red-600" data-testid="metric-churned-arr">
+                      ${churnedArr.toLocaleString()}
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs text-muted-foreground">
+                        {churnedCount} churned ({churnPct.toFixed(1)}%)
+                      </p>
+                      {churnPct > CHURN_YELLOW_PCT && (
+                        <AlertTriangle className="h-3 w-3 text-yellow-500" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-3 bg-red-100 rounded-lg">
+                    <Users className="h-6 w-6 text-red-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className={ltvCacIsRed ? "border-red-400" : ""}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">LTV:CAC</p>
+                    <p className={`text-2xl font-bold ${ltvCacIsRed ? "text-red-600" : "text-foreground"}`} data-testid="metric-ltv-cac">
+                      {ltvCacRatio !== null ? `${ltvCacRatio.toFixed(1)}x` : "—"}
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs text-muted-foreground">
+                        LTV $446 ÷ CAC {!isNaN(cacNum) ? `$${cacNum}` : "?"}
+                      </p>
+                      {ltvCacIsRed && <AlertTriangle className="h-3 w-3 text-red-500" />}
+                    </div>
+                  </div>
+                  <div className={`p-3 rounded-lg ${ltvCacIsRed ? "bg-red-100" : "bg-purple-100"}`}>
+                    <BarChart3 className={`h-6 w-6 ${ltvCacIsRed ? "text-red-600" : "text-purple-600"}`} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* CAC + Churn Inputs */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Manual Inputs</CardTitle>
+            <CardDescription>Enter CAC and churn to power the KPI cards above</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <Label htmlFor="cac-input" className="flex items-center gap-2">
+                  CAC (Customer Acquisition Cost)
+                  {cacIsRed && <Badge className="bg-red-100 text-red-800 text-xs">Above $110 — Red flag</Badge>}
+                  {cacIsYellow && !cacIsRed && <Badge className="bg-yellow-100 text-yellow-800 text-xs">$94.50–$110</Badge>}
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input
+                    id="cac-input"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="0"
+                    value={cac}
+                    onChange={(e) => saveCac(e.target.value)}
+                    data-testid="input-cac"
+                    className={`pl-7 ${cacIsRed ? "border-red-400 focus-visible:ring-red-400" : cacIsYellow ? "border-yellow-400 focus-visible:ring-yellow-400" : ""}`}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Green &lt; $94.50 · Yellow $94.50–$110 · Red &gt; $110</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="churn-input" className="flex items-center gap-2">
+                  Churned Members This Month
+                  {churnPct > CHURN_YELLOW_PCT && (
+                    <Badge className="bg-yellow-100 text-yellow-800 text-xs">
+                      {churnPct.toFixed(1)}% — Above 3%
+                    </Badge>
+                  )}
+                </Label>
+                <Input
+                  id="churn-input"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="0"
+                  value={churnedMembers}
+                  onChange={(e) => saveChurn(e.target.value)}
+                  data-testid="input-churned-members"
+                  className={churnPct > CHURN_YELLOW_PCT ? "border-yellow-400 focus-visible:ring-yellow-400" : ""}
+                />
+                <p className="text-xs text-muted-foreground">Yellow flag if monthly churn &gt; 3%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Operational Key Metrics Grid */}
+        <div>
+          <h2 className="text-lg font-semibold text-foreground mb-3">Operational Metrics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link href="/admin/users">
+              <Card className="hover-elevate cursor-pointer transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Total Members</p>
+                      <p className="text-2xl font-bold" data-testid="metric-total-users">
+                        {metrics?.userMetrics.totalUsers || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        +{metrics?.userMetrics.newUsersThisWeek || 0} this week
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <Users className="h-6 w-6 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Card className="hover-elevate">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Active Prescriptions</p>
+                    <p className="text-2xl font-bold" data-testid="metric-active-prescriptions">
+                      {metrics?.prescriptionMetrics.totalActivePrescriptions || 0}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {metrics?.prescriptionMetrics.prescriptionsNeedingRefill || 0} need refill
+                    </p>
+                  </div>
+                  <div className="p-3 bg-purple-100 rounded-lg">
+                    <FileText className="h-6 w-6 text-purple-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-elevate">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Orders This Month</p>
+                    <p className="text-2xl font-bold" data-testid="metric-monthly-orders">
+                      {metrics?.orderMetrics.ordersThisMonth || 0}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {metrics?.orderMetrics.totalOrders || 0} total
+                    </p>
+                  </div>
+                  <div className="p-3 bg-green-100 rounded-lg">
+                    <Package className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Link href="/admin/financial">
+              <Card className="hover-elevate cursor-pointer transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Revenue (Est.)</p>
+                      <p className="text-2xl font-bold" data-testid="metric-revenue">
+                        ${parseFloat(metrics?.orderMetrics.revenueEstimate || "0").toLocaleString()}
+                      </p>
+                      <p className="text-xs text-muted-foreground">From orders</p>
+                    </div>
+                    <div className="p-3 bg-teal-100 rounded-lg">
+                      <DollarSign className="h-6 w-6 text-teal-700 dark:text-teal-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
         </div>
 
         {/* Alerts & Action Items */}
@@ -238,7 +434,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        {/* Quick Actions - Admin Tools */}
+        {/* Admin Tools */}
         <div>
           <h2 className="text-xl font-semibold text-foreground mb-4">Admin Tools</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -267,7 +463,55 @@ export default function AdminDashboardPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">Financial Dashboard</p>
-                      <p className="text-sm text-muted-foreground">Revenue & transactions</p>
+                      <p className="text-sm text-muted-foreground">ARR, burn & transactions</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/marketing">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-marketing-dashboard">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-orange-100 rounded-lg">
+                      <BarChart3 className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Marketing Dashboard</p>
+                      <p className="text-sm text-muted-foreground">Channels, SEO & email</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/fulfillment">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-fulfillment-dashboard">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-teal-100 rounded-lg">
+                      <HeartPulse className="h-6 w-6 text-teal-700" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">Fulfillment Dashboard</p>
+                      <p className="text-sm text-muted-foreground">HW costs & fill rates</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/cs">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-cs-dashboard">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-indigo-100 rounded-lg">
+                      <Headphones className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">CS Dashboard</p>
+                      <p className="text-sm text-muted-foreground">Retell AI, chatbot & CSAT</p>
                     </div>
                   </div>
                 </CardContent>
@@ -307,7 +551,7 @@ export default function AdminDashboardPage() {
             </Link>
 
             <Link href="/admin/pricing">
-              <Card className="hover-elevate cursor-pointer transition-all border-2 border-primary/20" data-testid="card-pricing-management">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-pricing-management">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-teal-100 rounded-lg">
@@ -339,7 +583,7 @@ export default function AdminDashboardPage() {
             </Link>
 
             <Link href="/admin/blog">
-              <Card className="hover-elevate cursor-pointer transition-all border-2 border-indigo-200" data-testid="card-blog-management">
+              <Card className="hover-elevate cursor-pointer transition-all" data-testid="card-blog-management">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-indigo-100 rounded-lg">
@@ -353,11 +597,10 @@ export default function AdminDashboardPage() {
                 </CardContent>
               </Card>
             </Link>
-
           </div>
         </div>
 
-        {/* Membership Distribution */}
+        {/* Membership Distribution + Refill Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -375,7 +618,7 @@ export default function AdminDashboardPage() {
                     <p className="text-sm text-muted-foreground">Up to 12-month supply</p>
                   </div>
                   <p className="text-2xl font-bold text-primary" data-testid="metric-total-members">
-                    {(metrics?.userMetrics.usersByTier.basic || 0) + (metrics?.userMetrics.usersByTier.plus || 0)}
+                    {activeMembers}
                   </p>
                 </div>
               </div>
@@ -440,7 +683,7 @@ export default function AdminDashboardPage() {
                 ) : (
                   <div className="space-y-2">
                     {metrics?.recentActivity.recentPrescriptionRequests.slice(0, 5).map((request) => (
-                      <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover-elevate" data-testid={`activity-prescription-${request.id}`}>
+                      <div key={request.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover-elevate" data-testid={`activity-prescription-${request.id}`}>
                         <div className="flex-1">
                           <p className="font-medium text-sm text-foreground">{request.patientName}</p>
                           <p className="text-xs text-muted-foreground">{request.medicationName}</p>
@@ -471,7 +714,7 @@ export default function AdminDashboardPage() {
                 ) : (
                   <div className="space-y-2">
                     {metrics?.recentActivity.recentRefillRequests.slice(0, 5).map((refill) => (
-                      <div key={refill.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover-elevate" data-testid={`activity-refill-${refill.id}`}>
+                      <div key={refill.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover-elevate" data-testid={`activity-refill-${refill.id}`}>
                         <div className="flex-1">
                           <p className="font-medium text-sm text-foreground">{refill.patientName}</p>
                           <p className="text-xs text-muted-foreground">{refill.medicationName}</p>
@@ -502,7 +745,7 @@ export default function AdminDashboardPage() {
                 ) : (
                   <div className="space-y-2">
                     {metrics?.recentActivity.recentOrders.slice(0, 5).map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover-elevate" data-testid={`activity-order-${order.id}`}>
+                      <div key={order.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover-elevate" data-testid={`activity-order-${order.id}`}>
                         <div className="flex-1">
                           <p className="font-medium text-sm text-foreground">Order #{order.orderNumber}</p>
                           <p className="text-xs text-muted-foreground">
