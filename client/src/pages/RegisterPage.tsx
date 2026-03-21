@@ -23,6 +23,7 @@ import { SEOHead, pharmacySchema, createBreadcrumbSchema, getBaseUrl } from "@/c
 import goldPillarBadge from "@assets/image_1761454767191.png";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { trackSignupStart, trackSignupComplete } from "@/hooks/useAnalytics";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '');
 
@@ -95,6 +96,7 @@ const StripeCheckoutInner = ({
       const activateData = await activateResp.json();
       if (activateData.error) throw new Error(activateData.message || activateData.error);
 
+      trackSignupComplete();
       toast({
         title: "Registration Complete!",
         description: "Welcome to Pharmacy Autopilot! You now have access to wholesale pricing.",
@@ -551,7 +553,7 @@ export default function RegisterPage() {
                   type="button"
                   variant="outline"
                   className="w-full h-11 md:h-12"
-                  onClick={() => window.location.href = '/api/auth/google'}
+                  onClick={() => { trackSignupStart(); window.location.href = '/api/auth/google'; }}
                   data-testid="button-google-register"
                 >
                   <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -579,6 +581,7 @@ export default function RegisterPage() {
                 className="w-full h-11 md:h-12"
                 onClick={() => {
                   setAuthMethod("email");
+                  trackSignupStart();
                   setCurrentStep(2);
                 }}
                 data-testid="button-email-register"

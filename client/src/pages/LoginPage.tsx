@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackLogin } from "@/hooks/useAnalytics";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -89,6 +90,7 @@ export default function LoginPage() {
       
       // Save user to context and localStorage
       login(result.user);
+      trackLogin();
       
       toast({
         title: "Login Successful",

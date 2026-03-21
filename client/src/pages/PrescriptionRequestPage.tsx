@@ -56,6 +56,7 @@ import { MedicationSearch } from "@/components/MedicationSearch";
 import { useAuth } from "@/hooks/useAuth";
 import { handleDateInputChange } from "@/lib/dateFormatter";
 import { useMutation } from "@tanstack/react-query";
+import { trackRxSubmitted } from "@/hooks/useAnalytics";
 
 const prescriptionRequestSchema = z.object({
   patientName: z.string().min(2, "Patient name is required"),
@@ -323,6 +324,7 @@ export default function PrescriptionRequestPage() {
         document.body.removeChild(a);
       }
       
+      trackRxSubmitted();
       setSubmissionStatus("success");
       setShowSuccessDialog(true);
       

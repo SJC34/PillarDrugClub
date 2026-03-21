@@ -40,6 +40,52 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
+    <!-- GA4 — loaded only when VITE_GA4_MEASUREMENT_ID is set (Vite inlines at build time) -->
+    <script>
+      (function() {
+        var ga4Id = "%VITE_GA4_MEASUREMENT_ID%";
+        if (!ga4Id || ga4Id === "%VITE_GA4_MEASUREMENT_ID%") return;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = "https://www.googletagmanager.com/gtag/js?id=" + ga4Id;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', ga4Id);
+      })();
+    </script>
+
+    <!-- Meta Pixel — loaded only when VITE_META_PIXEL_ID is set -->
+    <script>
+      (function() {
+        var pixelId = "%VITE_META_PIXEL_ID%";
+        if (!pixelId || pixelId === "%VITE_META_PIXEL_ID%") return;
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', pixelId);
+        fbq('track', 'PageView');
+      })();
+    </script>
+
+    <!-- Reddit Pixel — loaded only when VITE_REDDIT_PIXEL_ID is set -->
+    <script>
+      (function() {
+        var rPixelId = "%VITE_REDDIT_PIXEL_ID%";
+        if (!rPixelId || rPixelId === "%VITE_REDDIT_PIXEL_ID%") return;
+        !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/v2.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
+        rdt('init', rPixelId);
+        rdt('track', 'PageVisit');
+      })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

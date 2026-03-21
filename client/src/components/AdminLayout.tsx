@@ -25,6 +25,7 @@ import {
   Gift,
   PenTool,
   Shield,
+  Plug,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -39,6 +40,7 @@ const NAV_ITEMS = [
   { title: "Medication Pricing", url: "/admin/pricing", icon: Upload },
   { title: "Referrals", url: "/admin/referrals", icon: Gift },
   { title: "Blog Manager", url: "/admin/blog", icon: PenTool },
+  { title: "Integrations", url: "/admin/integrations", icon: Plug },
   { title: "Rx Management", url: "/admin-portal", icon: Shield },
 ];
 

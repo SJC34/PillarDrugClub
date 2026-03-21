@@ -1,4 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -32,6 +33,7 @@ import AdminBlogPage from "@/pages/AdminBlogPage";
 import AdminMarketingPage from "@/pages/AdminMarketingPage";
 import AdminFulfillmentPage from "@/pages/AdminFulfillmentPage";
 import AdminCSPage from "@/pages/AdminCSPage";
+import AdminIntegrationsPage from "@/pages/AdminIntegrationsPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import CartPage from "@/pages/CartPage";
@@ -54,6 +56,7 @@ import ReviewerAccessPage from "@/pages/ReviewerAccessPage";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
+import { trackPageView } from "@/hooks/useAnalytics";
 
 function withAdminLayout(page: React.ReactNode, fallbackTitle?: string) {
   return (
@@ -150,6 +153,11 @@ function Router() {
           {withAdminLayout(<AdminCSPage />, "CS Error")}
         </ProtectedRoute>
       </Route>
+      <Route path="/admin/integrations">
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminIntegrationsPage />, "Integrations Error")}
+        </ProtectedRoute>
+      </Route>
 
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
@@ -188,6 +196,11 @@ function AppContent() {
   const [location] = useLocation();
   const isComingSoonPage = location === "/coming-soon";
   const isAdminPage = location === "/admin" || location.startsWith("/admin/") || location === "/admin-portal";
+
+  // Fire page-view analytics on every route change
+  useEffect(() => {
+    trackPageView(location);
+  }, [location]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

@@ -28,6 +28,7 @@ import {
 } from "./securityMiddleware";
 import { createAuditLog, createSecurityEvent } from "./auditLogger";
 import { syncUserToKlaviyo } from "./klaviyo";
+import { testHushmailConnection, isHushmailConfigured } from "./hushmail";
 
 
 // Helper function to generate unique referral codes
@@ -3858,6 +3859,152 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     } catch (error: any) {
       console.error("Error deleting blog post:", error);
       res.status(500).json({ error: "Failed to delete blog post", message: error.message });
+    }
+  });
+
+  // GET /api/admin/integrations/status — lightweight health checks for every vendor
+  app.get("/api/admin/integrations/status", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const now = new Date().toISOString();
+      const results: Array<{
+        vendor: string;
+        status: "live" | "error" | "unconfigured";
+        message: string;
+        checkedAt: string;
+      }> = [];
+
+      // --- Stripe ---
+      const stripeKey = process.env.STRIPE_SECRET_KEY;
+      if (!stripeKey) {
+        results.push({ vendor: "Stripe", status: "unconfigured", message: "STRIPE_SECRET_KEY not set", checkedAt: now });
+      } else {
+        try {
+          await stripeClient.balance.retrieve();
+          results.push({ vendor: "Stripe", status: "live", message: "Balance API reachable", checkedAt: now });
+        } catch (err: any) {
+          results.push({ vendor: "Stripe", status: "error", message: err?.message || "API error", checkedAt: now });
+        }
+      }
+
+      // --- Klaviyo ---
+      const klaviyoKey = process.env.KLAVIYO_API_KEY;
+      if (!klaviyoKey) {
+        results.push({ vendor: "Klaviyo", status: "unconfigured", message: "KLAVIYO_API_KEY not set", checkedAt: now });
+      } else {
+        try {
+          const r = await fetch("https://a.klaviyo.com/api/accounts/", {
+            headers: { Authorization: `Klaviyo-API-Key ${klaviyoKey}`, revision: "2024-02-15" },
+          });
+          results.push({
+            vendor: "Klaviyo",
+            status: r.ok ? "live" : "error",
+            message: r.ok ? "Accounts API reachable" : `HTTP ${r.status}`,
+            checkedAt: now,
+          });
+        } catch (err: any) {
+          results.push({ vendor: "Klaviyo", status: "error", message: err?.message || "API error", checkedAt: now });
+        }
+      }
+
+      // --- Twilio ---
+      const twilioSid = process.env.TWILIO_ACCOUNT_SID;
+      const twilioToken = process.env.TWILIO_AUTH_TOKEN;
+      if (!twilioSid || !twilioToken) {
+        results.push({ vendor: "Twilio", status: "unconfigured", message: "TWILIO_ACCOUNT_SID or TWILIO_AUTH_TOKEN not set", checkedAt: now });
+      } else {
+        try {
+          const creds = Buffer.from(`${twilioSid}:${twilioToken}`).toString("base64");
+          const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}.json`, {
+            headers: { Authorization: `Basic ${creds}` },
+          });
+          results.push({
+            vendor: "Twilio",
+            status: r.ok ? "live" : "error",
+            message: r.ok ? "Account API reachable" : `HTTP ${r.status}`,
+            checkedAt: now,
+          });
+        } catch (err: any) {
+          results.push({ vendor: "Twilio", status: "error", message: err?.message || "API error", checkedAt: now });
+        }
+      }
+
+      // --- Resend ---
+      const resendKey = process.env.RESEND_API_KEY;
+      if (!resendKey) {
+        results.push({ vendor: "Resend", status: "unconfigured", message: "RESEND_API_KEY not set", checkedAt: now });
+      } else {
+        try {
+          const r = await fetch("https://api.resend.com/domains", {
+            headers: { Authorization: `Bearer ${resendKey}` },
+          });
+          results.push({
+            vendor: "Resend",
+            status: r.ok ? "live" : "error",
+            message: r.ok ? "Domains API reachable" : `HTTP ${r.status}`,
+            checkedAt: now,
+          });
+        } catch (err: any) {
+          results.push({ vendor: "Resend", status: "error", message: err?.message || "API error", checkedAt: now });
+        }
+      }
+
+      // --- HushMail SMTP ---
+      if (!isHushmailConfigured()) {
+        results.push({ vendor: "HushMail SMTP", status: "unconfigured", message: "HUSHMAIL_SMTP_* env vars not set", checkedAt: now });
+      } else {
+        const test = await testHushmailConnection();
+        results.push({
+          vendor: "HushMail SMTP",
+          status: test.connected ? "live" : "error",
+          message: test.connected ? "SMTP connection verified" : (test.error || "Connection failed"),
+          checkedAt: now,
+        });
+      }
+
+      // --- GTM (env var presence check) ---
+      const gtmId = process.env.VITE_GTM_ID || process.env.GTM_ID;
+      results.push({
+        vendor: "Google Tag Manager",
+        status: gtmId ? "live" : "unconfigured",
+        message: gtmId ? `Container ID present (${gtmId})` : "GTM container ID not configured in env",
+        checkedAt: now,
+      });
+
+      // --- GA4 (env var presence check) ---
+      const ga4Id = process.env.VITE_GA4_MEASUREMENT_ID;
+      results.push({
+        vendor: "GA4",
+        status: ga4Id ? "live" : "unconfigured",
+        message: ga4Id ? `Measurement ID present` : "VITE_GA4_MEASUREMENT_ID not set",
+        checkedAt: now,
+      });
+
+      // --- Meta Pixel (env var presence check) ---
+      const metaPixelId = process.env.VITE_META_PIXEL_ID;
+      results.push({
+        vendor: "Meta Pixel",
+        status: metaPixelId ? "live" : "unconfigured",
+        message: metaPixelId ? "Pixel ID present" : "VITE_META_PIXEL_ID not set",
+        checkedAt: now,
+      });
+
+      // --- Reddit Pixel (env var presence check) ---
+      const redditPixelId = process.env.VITE_REDDIT_PIXEL_ID;
+      results.push({
+        vendor: "Reddit Pixel",
+        status: redditPixelId ? "live" : "unconfigured",
+        message: redditPixelId ? "Pixel ID present" : "VITE_REDDIT_PIXEL_ID not set",
+        checkedAt: now,
+      });
+
+      res.json({ status: results, checkedAt: now });
+    } catch (error: any) {
+      console.error("Integration status check error:", error);
+      res.status(500).json({ error: "Status check failed", message: error.message });
     }
   });
 
