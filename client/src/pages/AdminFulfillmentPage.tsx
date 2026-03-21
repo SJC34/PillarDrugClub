@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +68,9 @@ function saveState(state: FulfillmentState) {
 
 export default function AdminFulfillmentPage() {
   const [state, setState] = useState<FulfillmentState>(loadState);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => { setIsHydrated(true); }, []);
 
   const update = (patch: Partial<FulfillmentState>) => {
     const next = { ...state, ...patch };
@@ -99,6 +102,21 @@ export default function AdminFulfillmentPage() {
   const dispensePerFill = parseFloat(state.hwDispenseFeePerFill) || 0;
   const dispenseFeeTotal = fills * dispensePerFill;
   const hwTotalSpend = flatFee + dispenseFeeTotal;
+
+  if (!isHydrated) {
+    return (
+      <div className="p-6 space-y-6 max-w-5xl mx-auto">
+        <div className="h-9 w-56 bg-muted animate-pulse rounded-md" />
+        <div className="h-4 w-72 bg-muted animate-pulse rounded-md" />
+        <div className="grid grid-cols-3 gap-4 mt-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-28 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+        <div className="h-48 bg-muted animate-pulse rounded-lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto" data-testid="page-admin-fulfillment">

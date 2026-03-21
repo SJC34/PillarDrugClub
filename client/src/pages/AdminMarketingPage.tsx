@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,6 +130,9 @@ export default function AdminMarketingPage() {
     loadOrDefault("admin_marketing_email", DEFAULT_EMAIL_SEQS)
   );
   const [showReport, setShowReport] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => { setIsHydrated(true); }, []);
 
   const save = (
     key: string,
@@ -181,6 +184,20 @@ export default function AdminMarketingPage() {
   const totalConversions = channels.reduce((acc, r) => acc + (parseFloat(r.conversions) || 0), 0);
   const blendedCac = totalConversions > 0 ? totalSpend / totalConversions : null;
   const blendedRoas = totalSpend > 0 ? (totalConversions * MEMBERSHIP_PRICE) / totalSpend : null;
+
+  if (!isHydrated) {
+    return (
+      <div className="p-6 space-y-6 max-w-7xl mx-auto">
+        <div className="h-9 w-60 bg-muted animate-pulse rounded-md" />
+        <div className="h-4 w-80 bg-muted animate-pulse rounded-md" />
+        <div className="grid grid-cols-1 gap-4 mt-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-40 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto" data-testid="page-admin-marketing">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,6 +91,9 @@ function MetricInput({ id, label, hint, value, type = "number", suffix, onChange
 
 export default function AdminCSPage() {
   const [state, setState] = useState<CSState>(loadState);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => { setIsHydrated(true); }, []);
 
   const update = (patch: Partial<CSState>) => {
     const next = { ...state, ...patch };
@@ -108,6 +111,20 @@ export default function AdminCSPage() {
   const missedCalls = parseFloat(state.retellMissedCalls) || 0;
   const totalCalls = parseFloat(state.retellCallVolume) || 0;
   const missedRate = totalCalls > 0 ? ((missedCalls / totalCalls) * 100).toFixed(1) : null;
+
+  if (!isHydrated) {
+    return (
+      <div className="p-6 space-y-6 max-w-5xl mx-auto">
+        <div className="h-9 w-64 bg-muted animate-pulse rounded-md" />
+        <div className="h-4 w-80 bg-muted animate-pulse rounded-md" />
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-36 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto" data-testid="page-admin-cs">
