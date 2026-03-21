@@ -40,6 +40,7 @@ const VENDOR_META: Record<string, { icon: React.ElementType; category: string; e
   "GA4": { icon: BarChart3, category: "Analytics", envVars: ["VITE_GA4_MEASUREMENT_ID"] },
   "Meta Pixel": { icon: Zap, category: "Ad Tracking", envVars: ["VITE_META_PIXEL_ID"] },
   "Reddit Pixel": { icon: MessageSquare, category: "Ad Tracking", envVars: ["VITE_REDDIT_PIXEL_ID"] },
+  "Retell AI": { icon: Phone, category: "Voice AI", envVars: ["RETELL_AI_API_KEY", "RETELL_AI_PHONE_NUMBER"] },
 };
 
 function StatusBadge({ status }: { status: "live" | "error" | "unconfigured" }) {

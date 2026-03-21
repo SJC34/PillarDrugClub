@@ -30,6 +30,7 @@ import {
 import { createAuditLog, createSecurityEvent } from "./auditLogger";
 import { syncUserToKlaviyo } from "./klaviyo";
 import { testHushmailConnection, isHushmailConfigured } from "./hushmail";
+import { pingRetell, getRetellCallStats, isRetellConfigured } from "./retell";
 
 
 // Helper function to generate unique referral codes
@@ -3864,6 +3865,41 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
     }
   });
 
+  // GET /api/admin/retell/stats — current-month Retell AI call metrics
+  app.get("/api/admin/retell/stats", async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated() || req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      if (!isRetellConfigured()) {
+        return res.json({ configured: false, message: "RETELL_AI_API_KEY not set" });
+      }
+
+      const now = new Date();
+      const fromDate = new Date(now.getFullYear(), now.getMonth(), 1); // first of current month
+      const toDate = new Date(now.getFullYear(), now.getMonth() + 1, 1); // first of next month
+
+      const stats = await getRetellCallStats(fromDate, toDate);
+      if (!stats) {
+        return res.json({ configured: true, available: false, message: "Failed to fetch call data from Retell AI" });
+      }
+
+      res.json({
+        configured: true,
+        available: true,
+        callVolume: stats.callVolume,
+        avgHandleTimeMinutes: stats.avgHandleTimeMinutes,
+        missedCalls: stats.missedCalls,
+        periodStart: fromDate.toISOString(),
+        periodEnd: toDate.toISOString(),
+      });
+    } catch (error: any) {
+      console.error("Retell stats error:", error);
+      res.status(500).json({ error: "Failed to fetch Retell stats", message: error.message });
+    }
+  });
+
   // GET /api/admin/integrations/status — lightweight health checks for every vendor
   app.get("/api/admin/integrations/status", async (req: any, res) => {
     try {
@@ -4001,6 +4037,19 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         message: redditPixelId ? "Pixel ID present" : "VITE_REDDIT_PIXEL_ID not set",
         checkedAt: now,
       });
+
+      // --- Retell AI (live API ping) ---
+      if (!isRetellConfigured()) {
+        results.push({ vendor: "Retell AI", status: "unconfigured", message: "RETELL_AI_API_KEY not set", checkedAt: now });
+      } else {
+        const ping = await pingRetell();
+        results.push({
+          vendor: "Retell AI",
+          status: ping.ok ? "live" : "error",
+          message: ping.ok ? "API reachable" : (ping.error || "Ping failed"),
+          checkedAt: now,
+        });
+      }
 
       res.json({ status: results, checkedAt: now });
     } catch (error: any) {
