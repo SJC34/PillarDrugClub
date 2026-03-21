@@ -157,7 +157,25 @@ export default function AdminDashboardPage() {
         {/* ARR & Business KPIs */}
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-3">Business KPIs</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Row 1 */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Total Active Members</p>
+                    <p className="text-2xl font-bold" data-testid="metric-active-members">
+                      {activeMembers.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Paying members</p>
+                  </div>
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <Users className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -167,54 +185,11 @@ export default function AdminDashboardPage() {
                       ${arr.toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {activeMembers} members × ${MEMBERSHIP_PRICE}
+                      {activeMembers} × ${MEMBERSHIP_PRICE}/yr
                     </p>
                   </div>
                   <div className="p-3 bg-teal-100 rounded-lg">
                     <DollarSign className="h-6 w-6 text-teal-700" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">New ARR This Month</p>
-                    <p className="text-2xl font-bold text-green-700" data-testid="metric-new-arr">
-                      ${newArrThisMonth.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {newMembersThisMonth} new members
-                    </p>
-                  </div>
-                  <div className="p-3 bg-green-100 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className={churnPct > CHURN_YELLOW_PCT ? "border-yellow-400" : ""}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Churned ARR</p>
-                    <p className="text-2xl font-bold text-red-600" data-testid="metric-churned-arr">
-                      ${churnedArr.toLocaleString()}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      <p className="text-xs text-muted-foreground">
-                        {churnedCount} churned ({churnPct.toFixed(1)}%)
-                      </p>
-                      {churnPct > CHURN_YELLOW_PCT && (
-                        <AlertTriangle className="h-3 w-3 text-yellow-500" />
-                      )}
-                    </div>
-                  </div>
-                  <div className="p-3 bg-red-100 rounded-lg">
-                    <Users className="h-6 w-6 text-red-600" />
                   </div>
                 </div>
               </CardContent>
@@ -241,6 +216,78 @@ export default function AdminDashboardPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Row 2 */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">New Members This Month</p>
+                    <p className="text-2xl font-bold text-green-700" data-testid="metric-new-members-month">
+                      {newMembersThisMonth.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Manual input below</p>
+                  </div>
+                  <div className="p-3 bg-green-100 rounded-lg">
+                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">New ARR This Month</p>
+                    <p className="text-2xl font-bold text-green-700" data-testid="metric-new-arr">
+                      ${newArrThisMonth.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {newMembersThisMonth} new × ${MEMBERSHIP_PRICE}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-green-100 rounded-lg">
+                    <DollarSign className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className={churnPct > CHURN_YELLOW_PCT ? "border-yellow-400" : ""}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Churned Members This Month</p>
+                    <p className="text-2xl font-bold text-red-600" data-testid="metric-churned-members">
+                      {churnedCount.toLocaleString()}
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs text-muted-foreground">
+                        {churnPct.toFixed(1)}% of active
+                      </p>
+                      {churnPct > CHURN_YELLOW_PCT && (
+                        <AlertTriangle className="h-3 w-3 text-yellow-500" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-3 bg-red-100 rounded-lg">
+                    <Users className="h-6 w-6 text-red-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Churned ARR supplementary */}
+          <div className="mt-4 p-4 border rounded-lg flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">Churned ARR This Month</p>
+              <p className="text-xl font-bold text-red-600" data-testid="metric-churned-arr">
+                ${churnedArr.toLocaleString()}
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">{churnedCount} members × ${MEMBERSHIP_PRICE}</p>
           </div>
         </div>
 
