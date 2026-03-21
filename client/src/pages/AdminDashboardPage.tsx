@@ -120,11 +120,23 @@ export default function AdminDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-teal-100 p-4 md:p-6 flex items-center justify-center">
-        <div className="text-center">
-          <Activity className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading dashboard...</p>
+      <div className="p-6 space-y-6 max-w-7xl mx-auto">
+        <div className="h-9 w-64 bg-muted animate-pulse rounded-md" />
+        <div className="h-4 w-72 bg-muted animate-pulse rounded-md" />
+        <div>
+          <div className="h-5 w-32 bg-muted animate-pulse rounded-md mb-3" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-28 bg-muted animate-pulse rounded-lg" />
+            ))}
+          </div>
         </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-28 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+        <div className="h-48 bg-muted animate-pulse rounded-lg" />
       </div>
     );
   }
