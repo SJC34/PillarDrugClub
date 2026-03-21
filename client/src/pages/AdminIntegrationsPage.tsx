@@ -60,7 +60,7 @@ function StatusBadge({ status }: { status: "live" | "error" | "unconfigured" }) 
     );
   }
   return (
-    <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-0" data-testid="badge-status-unconfigured">
+    <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-0" data-testid="badge-status-unconfigured">
       <AlertCircle className="h-3 w-3 mr-1" />
       Unconfigured
     </Badge>

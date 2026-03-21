@@ -18,6 +18,7 @@ import {
 import { generatePrescriptionRequestPDF, generateMessageTemplate, generatePharmacyTransferPDF, generateRefundPolicyPDF } from "./pdf-generator";
 import { sendSMS } from "./twilio";
 import { sendEmail, sendEmailWithAttachment } from "./resend";
+import { sendPhiEmail } from "./hushmail";
 import multer from "multer";
 import { 
   authRateLimiter,
@@ -1389,10 +1390,11 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
               <p>Best regards,<br/>Pharmacy Autopilot Team</p>
             `;
             notificationPromises.push(
-              sendEmailWithAttachment(patientEmail, subject, body, {
+              sendPhiEmail(patientEmail, subject, body, [{
                 filename: pdfFilename,
                 content: pdfBuffer
-              }).catch(err => console.error('Transfer email error:', err))
+              }]).then(ok => { if (!ok) console.warn('⚠️ HushMail transfer email not sent'); })
+                 .catch(err => console.error('Transfer PHI email error:', err))
             );
           }
 
@@ -1465,17 +1467,17 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
               <p>Best regards,<br/>Pharmacy Autopilot Team</p>
             `;
             notificationPromises.push(
-              sendEmailWithAttachment(
+              sendPhiEmail(
                 patientEmail,
                 patientEmailSubject,
                 patientEmailBody,
-                { filename: pdfFilename, content: pdfBuffer }
+                [{ filename: pdfFilename, content: pdfBuffer }]
               )
                 .then(success => {
-                  if (success) console.log(`✅ PDF sent to patient: ${patientEmail}`);
-                  else console.warn(`⚠️ Failed to send PDF to patient: ${patientEmail}`);
+                  if (success) console.log(`✅ PHI PDF sent to patient via HushMail: ${patientEmail}`);
+                  else console.warn(`⚠️ HushMail not configured — PHI email not sent to: ${patientEmail}`);
                 })
-                .catch(err => { console.error('Patient email error:', err); return false; })
+                .catch(err => { console.error('Patient PHI email error:', err); return false; })
             );
           }
 
