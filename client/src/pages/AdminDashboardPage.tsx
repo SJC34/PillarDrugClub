@@ -36,6 +36,7 @@ const CHURN_YELLOW_PCT = 3;
 
 const CAC_LS_KEY = "admin_dashboard_cac_v1";
 const CHURN_LS_KEY = "admin_dashboard_churn_v1";
+const NEW_MEMBERS_LS_KEY = "admin_dashboard_new_members_month_v1";
 
 interface DashboardMetrics {
   userMetrics: {
@@ -102,6 +103,7 @@ export default function AdminDashboardPage() {
 
   const [cac, setCac] = useState<string>(() => loadNumber(CAC_LS_KEY, ""));
   const [churnedMembers, setChurnedMembers] = useState<string>(() => loadNumber(CHURN_LS_KEY, ""));
+  const [newMembersMonth, setNewMembersMonth] = useState<string>(() => loadNumber(NEW_MEMBERS_LS_KEY, ""));
 
   const saveCac = (val: string) => {
     setCac(val);
@@ -110,6 +112,10 @@ export default function AdminDashboardPage() {
   const saveChurn = (val: string) => {
     setChurnedMembers(val);
     localStorage.setItem(CHURN_LS_KEY, val);
+  };
+  const saveNewMembers = (val: string) => {
+    setNewMembersMonth(val);
+    localStorage.setItem(NEW_MEMBERS_LS_KEY, val);
   };
 
   if (isLoading) {
@@ -126,7 +132,7 @@ export default function AdminDashboardPage() {
   const metrics = data;
   const activeMembers = (metrics?.userMetrics.usersByTier.basic || 0) + (metrics?.userMetrics.usersByTier.plus || 0);
   const arr = activeMembers * MEMBERSHIP_PRICE;
-  const newMembersThisMonth = metrics?.userMetrics.newUsersThisWeek || 0;
+  const newMembersThisMonth = parseFloat(newMembersMonth) || 0;
   const newArrThisMonth = newMembersThisMonth * MEMBERSHIP_PRICE;
 
   const churnedCount = parseFloat(churnedMembers) || 0;
@@ -245,7 +251,22 @@ export default function AdminDashboardPage() {
             <CardDescription>Enter CAC and churn to power the KPI cards above</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <div className="space-y-2">
+                <Label htmlFor="new-members-month-input">New Members This Month</Label>
+                <Input
+                  id="new-members-month-input"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="0"
+                  value={newMembersMonth}
+                  onChange={(e) => saveNewMembers(e.target.value)}
+                  data-testid="input-new-members-month"
+                />
+                <p className="text-xs text-muted-foreground">Drives New ARR This Month calculation</p>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="cac-input" className="flex items-center gap-2">
                   CAC (Customer Acquisition Cost)

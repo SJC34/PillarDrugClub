@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ArrowLeft,
   Plus,
   Trash2,
   Printer,
@@ -187,16 +185,9 @@ export default function AdminMarketingPage() {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto" data-testid="page-admin-marketing">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Link href="/admin">
-            <Button variant="ghost" size="icon" data-testid="button-back">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Marketing Dashboard</h1>
-            <p className="text-muted-foreground">Channel performance, SEO, and email sequences</p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Marketing Dashboard</h1>
+          <p className="text-muted-foreground">Channel performance, SEO, and email sequences</p>
         </div>
         <Button onClick={() => setShowReport(true)} data-testid="button-generate-report">
           <Printer className="h-4 w-4 mr-2" />

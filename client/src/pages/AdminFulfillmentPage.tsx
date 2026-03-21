@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ArrowLeft,
   Package,
   Clock,
   DollarSign,
@@ -104,16 +102,9 @@ export default function AdminFulfillmentPage() {
 
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto" data-testid="page-admin-fulfillment">
-      <div className="flex items-center gap-3">
-        <Link href="/admin">
-          <Button variant="ghost" size="icon" data-testid="button-back">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Fulfillment Dashboard</h1>
-          <p className="text-muted-foreground">HealthWarehouse metrics and cost tracking</p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Fulfillment Dashboard</h1>
+        <p className="text-muted-foreground">HealthWarehouse metrics and cost tracking</p>
       </div>
 
       {/* Top Metrics */}

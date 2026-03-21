@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,6 @@ import {
   DollarSign, 
   TrendingUp, 
   Users,
-  ArrowLeft,
   Download,
   Flame,
 } from "lucide-react";
@@ -27,6 +25,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 const MEMBERSHIP_PRICE = 99;
 const BURN_LS_KEY = "admin_burn_tracker_v1";
+const CASH_RESERVE_LS_KEY = "admin_cash_reserve_v1";
 
 interface VendorBurn {
   name: string;
@@ -90,6 +89,9 @@ export default function AdminFinancialPage() {
   });
 
   const [vendors, setVendors] = useState<VendorBurn[]>(loadVendors);
+  const [cashReserve, setCashReserve] = useState<string>(() => {
+    try { return localStorage.getItem(CASH_RESERVE_LS_KEY) || ""; } catch { return ""; }
+  });
 
   const updateVendorAmount = (idx: number, val: string) => {
     const updated = vendors.map((v, i) => (i === idx ? { ...v, amount: val } : v));
@@ -102,7 +104,12 @@ export default function AdminFinancialPage() {
   const monthlyRevenue = parseFloat(metrics?.revenueMetrics.monthlyRevenue || "0");
 
   const totalBurn = vendors.reduce((acc, v) => acc + (parseFloat(v.amount) || 0), 0);
-  const runwayMonths = totalBurn > 0 ? (monthlyRevenue / totalBurn) : null;
+  const cashReserveNum = parseFloat(cashReserve) || 0;
+  const netMonthlyBurn = totalBurn - monthlyRevenue;
+  const runwayMonths = netMonthlyBurn > 0 && cashReserveNum > 0
+    ? cashReserveNum / netMonthlyBurn
+    : null;
+  const isCashFlowPositive = netMonthlyBurn <= 0 && totalBurn > 0;
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -118,15 +125,13 @@ export default function AdminFinancialPage() {
   if (isLoading) {
     return (
       <div className="p-8">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold">Financial Overview</h1>
-            <p className="text-muted-foreground">Loading financial data...</p>
+        <div className="space-y-4">
+          <div className="h-8 w-48 bg-muted animate-pulse rounded-md" />
+          <div className="h-4 w-72 bg-muted animate-pulse rounded-md" />
+          <div className="grid grid-cols-4 gap-4 mt-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-28 bg-muted animate-pulse rounded-lg" />
+            ))}
           </div>
         </div>
       </div>
@@ -137,16 +142,9 @@ export default function AdminFinancialPage() {
     <div className="p-8 space-y-6 max-w-7xl mx-auto" data-testid="page-admin-financial">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/dashboard">
-            <Button variant="ghost" size="icon" data-testid="button-back">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Financial Overview</h1>
-            <p className="text-muted-foreground">Revenue, ARR, subscriptions, and monthly burn</p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Financial Overview</h1>
+          <p className="text-muted-foreground">Revenue, ARR, subscriptions, and monthly burn</p>
         </div>
         <Button variant="outline" data-testid="button-export-report">
           <Download className="h-4 w-4 mr-2" />
@@ -352,26 +350,59 @@ export default function AdminFinancialPage() {
 
           <Separator />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+            <div className="space-y-2">
+              <Label htmlFor="cashReserve">Cash Reserve ($)</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  id="cashReserve"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={cashReserve}
+                  onChange={(e) => {
+                    setCashReserve(e.target.value);
+                    try { localStorage.setItem(CASH_RESERVE_LS_KEY, e.target.value); } catch {}
+                  }}
+                  data-testid="input-cash-reserve"
+                  className="pl-7"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Enter current bank / cash balance to calculate runway</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
             <div className="p-4 bg-muted/40 rounded-lg text-center">
-              <Label className="text-xs text-muted-foreground">Total Monthly Burn</Label>
-              <p className="text-2xl font-bold mt-1" data-testid="metric-total-burn">
+              <p className="text-xs text-muted-foreground mb-1">Total Monthly Burn</p>
+              <p className="text-2xl font-bold" data-testid="metric-total-burn">
                 ${totalBurn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div className="p-4 bg-muted/40 rounded-lg text-center">
-              <Label className="text-xs text-muted-foreground">Cash Collected This Month</Label>
-              <p className="text-2xl font-bold mt-1">
+              <p className="text-xs text-muted-foreground mb-1">Cash Collected (Month)</p>
+              <p className="text-2xl font-bold">
                 ${monthlyRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
-            <div className={`p-4 rounded-lg text-center ${runwayMonths !== null && runwayMonths < 3 ? "bg-red-100 dark:bg-red-900/20" : "bg-green-100 dark:bg-green-900/20"}`}>
-              <Label className="text-xs text-muted-foreground">Revenue / Burn Ratio</Label>
-              <p className="text-2xl font-bold mt-1" data-testid="metric-burn-ratio">
-                {runwayMonths !== null ? `${runwayMonths.toFixed(1)}x` : "—"}
+            <div className="p-4 bg-muted/40 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground mb-1">Net Monthly Burn</p>
+              <p className={`text-2xl font-bold ${netMonthlyBurn > 0 ? "text-red-600" : "text-green-600"}`} data-testid="metric-net-burn">
+                {netMonthlyBurn > 0 ? `$${netMonthlyBurn.toFixed(2)}` : "Cash-flow +"}
+              </p>
+            </div>
+            <div className={`p-4 rounded-lg text-center ${isCashFlowPositive ? "bg-green-100 dark:bg-green-900/20" : runwayMonths !== null && runwayMonths < 3 ? "bg-red-100 dark:bg-red-900/20" : "bg-muted/40"}`}>
+              <p className="text-xs text-muted-foreground mb-1">Net Runway</p>
+              <p className="text-2xl font-bold" data-testid="metric-runway-months">
+                {isCashFlowPositive
+                  ? "Sustainable"
+                  : runwayMonths !== null
+                  ? `${runwayMonths.toFixed(1)} mo`
+                  : "—"}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                {runwayMonths !== null && runwayMonths < 1 ? "Cash-flow negative" : ""}
+                {!isCashFlowPositive && cashReserveNum === 0 ? "Enter cash reserve above" : ""}
               </p>
             </div>
           </div>

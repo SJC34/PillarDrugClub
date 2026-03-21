@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import AdminLayout from "@/components/AdminLayout";
+import AdminErrorBoundary from "@/components/AdminErrorBoundary";
 import ComingSoonPage from "@/pages/ComingSoonPage";
 import HomePage from "@/pages/HomePage";
 import MedicationsPage from "@/pages/MedicationsPage";
@@ -53,6 +55,16 @@ import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import PriceBanner from "@/components/PriceBanner";
 
+function withAdminLayout(page: React.ReactNode, fallbackTitle?: string) {
+  return (
+    <AdminLayout>
+      <AdminErrorBoundary fallbackTitle={fallbackTitle}>
+        {page}
+      </AdminErrorBoundary>
+    </AdminLayout>
+  );
+}
+
 function Router() {
   return (
     <Switch>
@@ -71,45 +83,74 @@ function Router() {
       <Route path="/my-medications">
         <ProtectedRoute><MyMedicationsPage /></ProtectedRoute>
       </Route>
+
+      {/* Admin routes — all wrapped in AdminLayout + ErrorBoundary */}
       <Route path="/admin">
-        <ProtectedRoute requiredRole="admin"><AdminDashboardPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminDashboardPage />, "Dashboard Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin-portal">
-        <ProtectedRoute requiredRole="admin"><AdminPortalPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminPortalPage />, "Portal Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/dashboard">
-        <ProtectedRoute requiredRole="admin"><AdminDashboardPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminDashboardPage />, "Dashboard Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/users">
-        <ProtectedRoute requiredRole="admin"><AdminUsersPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminUsersPage />, "Users Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/financial">
-        <ProtectedRoute requiredRole="admin"><AdminFinancialPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminFinancialPage />, "Financial Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/communications">
-        <ProtectedRoute requiredRole="admin"><AdminCommunicationsPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminCommunicationsPage />, "Communications Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/reports">
-        <ProtectedRoute requiredRole="admin"><AdminReportsPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminReportsPage />, "Reports Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/pricing">
-        <ProtectedRoute requiredRole="admin"><AdminMedicationPricingPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminMedicationPricingPage />, "Pricing Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/referrals">
-        <ProtectedRoute requiredRole="admin"><AdminReferralsPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminReferralsPage />, "Referrals Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/blog">
-        <ProtectedRoute requiredRole="admin"><AdminBlogPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminBlogPage />, "Blog Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/marketing">
-        <ProtectedRoute requiredRole="admin"><AdminMarketingPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminMarketingPage />, "Marketing Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/fulfillment">
-        <ProtectedRoute requiredRole="admin"><AdminFulfillmentPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminFulfillmentPage />, "Fulfillment Error")}
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/cs">
-        <ProtectedRoute requiredRole="admin"><AdminCSPage /></ProtectedRoute>
+        <ProtectedRoute requiredRole="admin">
+          {withAdminLayout(<AdminCSPage />, "CS Error")}
+        </ProtectedRoute>
       </Route>
+
       <Route path="/medications" component={MedicationsPage} />
       <Route path="/medications/:id" component={MedicationDetailsPage} />
       <Route path="/cost-calculator" component={CostCalculatorPage} />
@@ -146,12 +187,13 @@ function Router() {
 function AppContent() {
   const [location] = useLocation();
   const isComingSoonPage = location === "/coming-soon";
+  const isAdminPage = location === "/admin" || location.startsWith("/admin/") || location === "/admin-portal";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {!isComingSoonPage && <PriceBanner />}
-      {!isComingSoonPage && <Header />}
-      <main className="flex-1">
+      {!isComingSoonPage && !isAdminPage && <PriceBanner />}
+      {!isComingSoonPage && !isAdminPage && <Header />}
+      <main className={isAdminPage ? "h-screen overflow-hidden" : "flex-1"}>
         <Router />
       </main>
     </div>
