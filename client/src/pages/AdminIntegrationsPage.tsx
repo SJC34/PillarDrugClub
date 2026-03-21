@@ -160,12 +160,12 @@ export default function AdminIntegrationsPage() {
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-yellow-600" />
+            <div className="p-2 bg-red-100 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-red-600" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Unconfigured</p>
-              <p className="text-xl font-bold text-yellow-600" data-testid="metric-unconfigured-count">{unconfiguredCount}</p>
+              <p className="text-xl font-bold text-red-600" data-testid="metric-unconfigured-count">{unconfiguredCount}</p>
             </div>
           </CardContent>
         </Card>
@@ -187,14 +187,14 @@ export default function AdminIntegrationsPage() {
           return (
             <Card
               key={item.vendor}
-              className={item.status === "error" ? "border-red-300 dark:border-red-700" : item.status === "unconfigured" ? "border-yellow-300 dark:border-yellow-700" : ""}
+              className={item.status === "live" ? "" : "border-red-300 dark:border-red-700"}
               data-testid={`card-integration-${item.vendor.toLowerCase().replace(/\s+/g, "-")}`}
             >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <div className={`p-2 rounded-lg ${item.status === "live" ? "bg-green-100" : item.status === "error" ? "bg-red-100" : "bg-yellow-100"}`}>
-                      <Icon className={`h-4 w-4 ${item.status === "live" ? "text-green-700" : item.status === "error" ? "text-red-600" : "text-yellow-600"}`} />
+                    <div className={`p-2 rounded-lg ${item.status === "live" ? "bg-green-100" : "bg-red-100"}`}>
+                      <Icon className={`h-4 w-4 ${item.status === "live" ? "text-green-700" : "text-red-600"}`} />
                     </div>
                     <div>
                       <CardTitle className="text-sm font-semibold">{item.vendor}</CardTitle>

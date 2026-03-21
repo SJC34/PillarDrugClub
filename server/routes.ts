@@ -3967,12 +3967,11 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         });
       }
 
-      // --- GTM (env var presence check) ---
-      const gtmId = process.env.VITE_GTM_ID || process.env.GTM_ID;
+      // --- GTM (hardcoded GTM-K9PCBCLM in index.html — always live) ---
       results.push({
         vendor: "Google Tag Manager",
-        status: gtmId ? "live" : "unconfigured",
-        message: gtmId ? `Container ID present (${gtmId})` : "GTM container ID not configured in env",
+        status: "live",
+        message: "Container GTM-K9PCBCLM hardcoded in index.html",
         checkedAt: now,
       });
 
