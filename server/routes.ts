@@ -30,7 +30,7 @@ import {
 import { createAuditLog, createSecurityEvent } from "./auditLogger";
 import { syncUserToKlaviyo } from "./klaviyo";
 import { testHushmailConnection, isHushmailConfigured } from "./hushmail";
-import { pingRetell, getRetellCallStats, isRetellConfigured } from "./retell";
+import { pingRetell, getRetellCallStats, isRetellConfigured, getRetellMissingVars } from "./retell";
 
 
 // Helper function to generate unique referral codes
@@ -3873,7 +3873,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
       }
 
       if (!isRetellConfigured()) {
-        return res.json({ configured: false, message: "RETELL_AI_API_KEY not set" });
+        const missing = getRetellMissingVars();
+        return res.json({ configured: false, message: `Missing env vars: ${missing.join(", ")}` });
       }
 
       const now = new Date();
@@ -4038,9 +4039,10 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
         checkedAt: now,
       });
 
-      // --- Retell AI (live API ping) ---
+      // --- Retell AI (live API ping with phone number verification) ---
       if (!isRetellConfigured()) {
-        results.push({ vendor: "Retell AI", status: "unconfigured", message: "RETELL_AI_API_KEY not set", checkedAt: now });
+        const retellMissing = getRetellMissingVars();
+        results.push({ vendor: "Retell AI", status: "unconfigured", message: `Missing: ${retellMissing.join(", ")}`, checkedAt: now });
       } else {
         const ping = await pingRetell();
         results.push({
