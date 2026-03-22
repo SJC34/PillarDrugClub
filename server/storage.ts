@@ -324,11 +324,11 @@ export class MemStorage implements IStorage {
     // Create admin user with hashed password
     const adminId = randomUUID();
     const now = new Date();
-    const hashedAdminPassword = await bcrypt.hash("Spaceworm#25", 10);
+    const hashedAdminPassword = await bcrypt.hash("Pillar", 10);
     const adminUser: User = {
       id: adminId,
-      username: "seth@pharmacyautopilot.com",
-      email: "seth@pharmacyautopilot.com",
+      username: "seth@pillardrugclub.com",
+      email: "seth@pillardrugclub.com",
       password: hashedAdminPassword,
       firstName: "Seth",
       lastName: "Admin",
@@ -353,7 +353,7 @@ export class MemStorage implements IStorage {
       updatedAt: now
     };
     this.users.set(adminId, adminUser);
-    console.log('✅ Admin user created: seth@pharmacyautopilot.com');
+    console.log('✅ Admin user created: seth@pillardrugclub.com');
 
     // Create SJC Pharmacy test user with hashed password
     const sjcId = randomUUID();
@@ -2026,13 +2026,20 @@ export class DbStorage extends MemStorage {
   
   private async seedTestUsers(): Promise<void> {
     try {
-      // Create admin user if doesn't exist
-      const existingAdmin = await this.getUserByEmail("seth@pharmacyautopilot.com");
-      if (!existingAdmin) {
-        const hashedAdminPassword = await bcrypt.hash("Spaceworm#25", 10);
+      // Ensure Seth admin credentials are always up to date
+      const hashedAdminPassword = await bcrypt.hash("Pillar", 10);
+      // Look up by current or previous email
+      let sethAdmin = (await db.select().from(users).where(eq(users.email, "seth@pillardrugclub.com")).limit(1))[0]
+                   ?? (await db.select().from(users).where(eq(users.email, "seth@pharmacyautopilot.com")).limit(1))[0];
+      if (sethAdmin) {
+        await db.update(users)
+          .set({ username: "seth@pillardrugclub.com", email: "seth@pillardrugclub.com", password: hashedAdminPassword })
+          .where(eq(users.id, sethAdmin.id));
+        console.log('✅ Admin user updated: seth@pillardrugclub.com');
+      } else {
         await db.insert(users).values({
-          username: "seth@pharmacyautopilot.com",
-          email: "seth@pharmacyautopilot.com",
+          username: "seth@pillardrugclub.com",
+          email: "seth@pillardrugclub.com",
           password: hashedAdminPassword,
           firstName: "Seth",
           lastName: "Admin",
@@ -2041,7 +2048,7 @@ export class DbStorage extends MemStorage {
           isActive: "true",
           smsConsent: "false",
         });
-        console.log('✅ Admin user created: seth@pharmacyautopilot.com');
+        console.log('✅ Admin user created: seth@pillardrugclub.com');
       }
 
       // Create SJC Pharmacy test user if doesn't exist

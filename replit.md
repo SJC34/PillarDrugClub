@@ -5,7 +5,7 @@ Pillar Drug Club is a membership-based prescription pharmacy platform delivering
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-Primary admin user: Seth Collins, Pharm.D. (seth@pharmacyautopilot.com)
+Primary admin user: Seth Collins, Pharm.D. (seth@pillardrugclub.com)
 
 ## System Architecture
 

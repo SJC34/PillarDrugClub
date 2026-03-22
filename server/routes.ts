@@ -308,7 +308,8 @@ export async function registerRoutes(app: Express, server: Server): Promise<void
 
   app.post("/api/auth/login", authRateLimiter, async (req: any, res) => {
     try {
-      const { email, password } = req.body;
+      const { email: rawEmail, password } = req.body;
+      const email = rawEmail?.toLowerCase?.() ?? rawEmail;
       
       if (!email || !password) {
         return res.status(400).json({ error: "Email and password are required" });
