@@ -129,7 +129,6 @@ function ManualBadge() {
 export default function AdminCSPage() {
   const [state, setState] = useState<CSState>(loadState);
   const [isHydrated, setIsHydrated] = useState(false);
-  const [showOverride, setShowOverride] = useState(false);
 
   useEffect(() => { setIsHydrated(true); }, []);
 
@@ -299,45 +298,37 @@ export default function AdminCSPage() {
             </div>
           )}
 
-          {/* Override toggle when live data is available */}
+          {/* Manual override fields — always visible but secondary when live data is present */}
           {hasLiveRetell && (
-            <div>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="text-xs h-7 px-2 text-muted-foreground"
-                onClick={() => setShowOverride((v) => !v)}
-                data-testid="button-retell-override-toggle"
-              >
-                <PenLine className="h-3 w-3 mr-1" />
-                {showOverride ? "Hide manual override" : "Enter manual override"}
-              </Button>
-              {showOverride && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-4 pt-4 border-t">
-                  <MetricInput
-                    id="retellCallVolumeOverride"
-                    label="Call Volume override"
-                    value={state.retellOverrideCallVolume}
-                    onChange={(v) => update({ retellOverrideCallVolume: v })}
-                    testId="input-retell-call-volume-override"
-                  />
-                  <MetricInput
-                    id="retellAvgHandleTimeOverride"
-                    label="Avg Handle Time override"
-                    suffix="min"
-                    value={state.retellOverrideAvgHandleTime}
-                    onChange={(v) => update({ retellOverrideAvgHandleTime: v })}
-                    testId="input-retell-avg-handle-time-override"
-                  />
-                  <MetricInput
-                    id="retellMissedCallsOverride"
-                    label="Missed Calls override"
-                    value={state.retellOverrideMissedCalls}
-                    onChange={(v) => update({ retellOverrideMissedCalls: v })}
-                    testId="input-retell-missed-calls-override"
-                  />
-                </div>
-              )}
+            <div className="pt-3 border-t">
+              <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                <PenLine className="h-3 w-3" />
+                Manual override (leave blank to use live data above)
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <MetricInput
+                  id="retellCallVolumeOverride"
+                  label="Call Volume override"
+                  value={state.retellOverrideCallVolume}
+                  onChange={(v) => update({ retellOverrideCallVolume: v })}
+                  testId="input-retell-call-volume-override"
+                />
+                <MetricInput
+                  id="retellAvgHandleTimeOverride"
+                  label="Avg Handle Time override"
+                  suffix="min"
+                  value={state.retellOverrideAvgHandleTime}
+                  onChange={(v) => update({ retellOverrideAvgHandleTime: v })}
+                  testId="input-retell-avg-handle-time-override"
+                />
+                <MetricInput
+                  id="retellMissedCallsOverride"
+                  label="Missed Calls override"
+                  value={state.retellOverrideMissedCalls}
+                  onChange={(v) => update({ retellOverrideMissedCalls: v })}
+                  testId="input-retell-missed-calls-override"
+                />
+              </div>
             </div>
           )}
 
