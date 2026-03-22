@@ -206,7 +206,7 @@ function AppContent() {
     <div className="min-h-screen bg-background text-foreground">
       {!isComingSoonPage && !isAdminPage && <PriceBanner />}
       {!isComingSoonPage && !isAdminPage && <Header />}
-      <main className={isAdminPage ? "h-screen overflow-hidden" : "flex-1"}>
+      <main className={isAdminPage ? "h-screen overflow-y-auto" : "flex-1"}>
         <Router />
       </main>
     </div>
